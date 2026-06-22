@@ -1,0 +1,319 @@
+package com.asistentewhatsapp.aiagents.application;
+
+import com.asistentewhatsapp.aiagents.domain.AgentIntent;
+import com.asistentewhatsapp.aiagents.domain.AgentType;
+import com.asistentewhatsapp.aiagents.infrastructure.AiAgentJdbcRepository;
+import com.asistentewhatsapp.shared.observability.LogSanitizer;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class AgentCoordinatorService {
+
+    private static final Pattern NUMERIC_OPTION_PATTERN = Pattern.compile("^(?:opcion|opci[oó]n)?\\s*([1-3])\\s*$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern BOOKING_OPTION_LINE_PATTERN = Pattern.compile("\\b([1-3])\\.\\s*([a-záéíóúñ]+)\\s+a\\s+las\\s+([01]?\\d|2[0-3])(?::([0-5]\\d))?\\b", Pattern.CASE_INSENSITIVE);
+
+    private final AiAgentProperties properties;
+    private final IntentDetectorService intentDetectorService;
+    private final EntityExtractionService entityExtractionService;
+    private final AgentRegistry agentRegistry;
+    private final AiAgentJdbcRepository aiAgentJdbcRepository;
+
+    public AgentCoordinatorService(
+            AiAgentProperties properties,
+            IntentDetectorService intentDetectorService,
+            EntityExtractionService entityExtractionService,
+            AgentRegistry agentRegistry,
+            AiAgentJdbcRepository aiAgentJdbcRepository) {
+        this.properties = properties;
+        this.intentDetectorService = intentDetectorService;
+        this.entityExtractionService = entityExtractionService;
+        this.agentRegistry = agentRegistry;
+        this.aiAgentJdbcRepository = aiAgentJdbcRepository;
+    }
+
+    @Transactional
+    public Optional<AgentRoutingResult> route(AgentConversationRequest request) {
+        String traceId = AiTraceLogger.traceId(request);
+        AiTraceLogger.info("AI_ROUTE_STARTED", traceId, request.conversationId(), null, "AgentCoordinatorService",
+                "channelAccountId=" + request.channelAccountId()
+                        + " customerId=" + request.customerId()
+                        + " phoneMasked=" + AiTraceLogger.maskPhone(request.customerPhone())
+                        + " " + LogSanitizer.messageSummary("message", request.messageBody()));
+        if (!properties.enabled() || isNonActionableMessage(request.messageBody())) {
+            AiTraceLogger.warn("AI_ROUTE_SKIPPED", traceId, request.conversationId(), null, "AgentCoordinatorService",
+                    "enabled=" + properties.enabled() + " nonActionable=true");
+            return Optional.empty();
+        }
+
+        Optional<AiAgentJdbcRepository.ConversationContextSnapshot> previousContext =
+                aiAgentJdbcRepository.findConversationContext(request.businessId(), request.conversationId());
+        AiTraceLogger.info("CONVERSATION_CONTEXT_LOADED", traceId, request.conversationId(), null, "AgentCoordinatorService",
+                "hasPreviousContext=" + previousContext.isPresent()
+                        + " previousAgent=" + previousContext.map(AiAgentJdbcRepository.ConversationContextSnapshot::activeAgent).orElse(null)
+                        + " previousIntent=" + previousContext.map(AiAgentJdbcRepository.ConversationContextSnapshot::primaryIntent).orElse(null));
+
+        IntentDetectionResult intent = intentDetectorService.detect(request);
+        AiTraceLogger.info("INTENT_DETECTED", traceId, request.conversationId(), null, "AgentCoordinatorService",
+                "intent=" + intent.primaryIntent()
+                        + " secondary=" + intent.secondaryIntent()
+                        + " confidence=" + intent.confidence()
+                        + " urgency=" + intent.urgency()
+                        + " reason=" + intent.handoffReason());
+        Map<String, String> entities = mergeEntities(previousContext, entityExtractionService.extract(request));
+        enrichTurnContext(entities, request);
+        entities.put("trace_id", traceId);
+        resolveNumericBookingOption(previousContext, request.messageBody(), entities, traceId, request.conversationId());
+        AiTraceLogger.info("ENTITIES_MERGED", traceId, request.conversationId(), null, "AgentCoordinatorService",
+                "entities=" + AiTraceLogger.summarizeMap(entities));
+        IntentDetectionResult resolvedIntent = resolveContextAwareIntent(intent, previousContext, entities);
+        if (resolvedIntent != intent) {
+            AiTraceLogger.info("INTENT_CONTEXT_RESOLVED", traceId, request.conversationId(), null, "AgentCoordinatorService",
+                    "original=" + intent.primaryIntent() + " resolved=" + resolvedIntent.primaryIntent()
+                            + " confidence=" + resolvedIntent.confidence());
+        }
+
+        AgentHandler handler = agentRegistry.resolve(resolvedIntent);
+        AiTraceLogger.info("AGENT_SELECTED", traceId, request.conversationId(), null, "AgentCoordinatorService",
+                "agent=" + handler.type() + " intent=" + resolvedIntent.primaryIntent());
+        AgentRoutingResult result = handler.handle(request, resolvedIntent, entities, List.of());
+        enrichResultContext(result);
+        AiTraceLogger.info("AI_FINAL_RESPONSE", traceId, request.conversationId(), null, "AgentCoordinatorService",
+                "agent=" + result.agentType()
+                        + " intent=" + result.primaryIntent()
+                        + " confidence=" + result.confidence()
+                        + " missing=" + result.missingData()
+                        + " containsLink=" + (result.responseToCustomer() != null && result.responseToCustomer().contains("/reservas/confirmar/"))
+                        + " " + LogSanitizer.responseSummary(result.responseToCustomer()));
+
+        if (properties.auditEnabled()) {
+            aiAgentJdbcRepository.upsertConversationContext(result);
+            aiAgentJdbcRepository.insertDecisionLog(result);
+            aiAgentJdbcRepository.incrementMetric(result);
+            if (result.requiresHuman()) {
+                aiAgentJdbcRepository.insertHumanHandoff(result);
+            }
+        }
+
+        return Optional.of(result);
+    }
+
+
+    public Optional<AgentRoutingResult> preview(AgentConversationRequest request) {
+        String traceId = AiTraceLogger.traceId(request);
+        AiTraceLogger.info("AI_PREVIEW_STARTED", traceId, request.conversationId(), null, "AgentCoordinatorService",
+                "customerId=" + request.customerId() + " " + LogSanitizer.messageSummary("message", request.messageBody()));
+        if (!properties.enabled() || isNonActionableMessage(request.messageBody())) {
+            AiTraceLogger.warn("AI_PREVIEW_SKIPPED", traceId, request.conversationId(), null, "AgentCoordinatorService",
+                    "enabled=" + properties.enabled() + " nonActionable=true");
+            return Optional.empty();
+        }
+
+        Optional<AiAgentJdbcRepository.ConversationContextSnapshot> previousContext =
+                aiAgentJdbcRepository.findConversationContext(request.businessId(), request.conversationId());
+        AiTraceLogger.info("CONVERSATION_CONTEXT_LOADED", traceId, request.conversationId(), null, "AgentCoordinatorService",
+                "hasPreviousContext=" + previousContext.isPresent()
+                        + " previousAgent=" + previousContext.map(AiAgentJdbcRepository.ConversationContextSnapshot::activeAgent).orElse(null)
+                        + " previousIntent=" + previousContext.map(AiAgentJdbcRepository.ConversationContextSnapshot::primaryIntent).orElse(null));
+
+        IntentDetectionResult intent = intentDetectorService.detect(request);
+        AiTraceLogger.info("INTENT_DETECTED", traceId, request.conversationId(), null, "AgentCoordinatorService",
+                "intent=" + intent.primaryIntent()
+                        + " secondary=" + intent.secondaryIntent()
+                        + " confidence=" + intent.confidence()
+                        + " urgency=" + intent.urgency()
+                        + " reason=" + intent.handoffReason());
+        Map<String, String> entities = mergeEntities(previousContext, entityExtractionService.extract(request));
+        enrichTurnContext(entities, request);
+        entities.put("trace_id", traceId);
+        resolveNumericBookingOption(previousContext, request.messageBody(), entities, traceId, request.conversationId());
+        AiTraceLogger.info("ENTITIES_MERGED", traceId, request.conversationId(), null, "AgentCoordinatorService",
+                "entities=" + AiTraceLogger.summarizeMap(entities));
+        IntentDetectionResult resolvedIntent = resolveContextAwareIntent(intent, previousContext, entities);
+        AgentHandler handler = agentRegistry.resolve(resolvedIntent);
+        AiTraceLogger.info("AGENT_SELECTED", traceId, request.conversationId(), null, "AgentCoordinatorService",
+                "agent=" + handler.type() + " intent=" + resolvedIntent.primaryIntent());
+        AgentRoutingResult result = handler.handle(request, resolvedIntent, entities, List.of());
+        enrichResultContext(result);
+        AiTraceLogger.info("AI_FINAL_RESPONSE", traceId, request.conversationId(), null, "AgentCoordinatorService",
+                "agent=" + result.agentType()
+                        + " intent=" + result.primaryIntent()
+                        + " confidence=" + result.confidence()
+                        + " missing=" + result.missingData()
+                        + " containsLink=" + (result.responseToCustomer() != null && result.responseToCustomer().contains("/reservas/confirmar/"))
+                        + " " + LogSanitizer.responseSummary(result.responseToCustomer()));
+        if (properties.auditEnabled()) {
+            aiAgentJdbcRepository.upsertConversationContext(result);
+        }
+        return Optional.of(result);
+    }
+
+
+
+    private void resolveNumericBookingOption(
+            Optional<AiAgentJdbcRepository.ConversationContextSnapshot> previousContext,
+            String messageBody,
+            Map<String, String> entities,
+            String traceId,
+            java.util.UUID conversationId) {
+        if (previousContext.isEmpty() || messageBody == null) {
+            return;
+        }
+        Matcher selected = NUMERIC_OPTION_PATTERN.matcher(TextNormalizer.normalize(messageBody));
+        if (!selected.matches()) {
+            return;
+        }
+        int option = Integer.parseInt(selected.group(1));
+        String lastResponse = previousContext.get().extractedData().get("ultima_respuesta_ia");
+        if (lastResponse == null || lastResponse.isBlank() || !lastResponse.contains("Opciones disponibles")) {
+            return;
+        }
+        Matcher optionLine = BOOKING_OPTION_LINE_PATTERN.matcher(lastResponse);
+        while (optionLine.find()) {
+            int candidate = Integer.parseInt(optionLine.group(1));
+            if (candidate == option) {
+                String weekday = optionLine.group(2);
+                String hour = optionLine.group(3);
+                String minute = optionLine.group(4) == null ? "00" : optionLine.group(4);
+                String normalizedTime = String.format(java.util.Locale.ROOT, "%02d:%02d", Integer.parseInt(hour), Integer.parseInt(minute));
+                entities.put("fecha_relativa", weekday.toLowerCase(java.util.Locale.ROOT));
+                entities.put("hora", normalizedTime);
+                entities.put("opcion_agenda_seleccionada", String.valueOf(option));
+                AiTraceLogger.info("BOOKING_OPTION_SELECTED", traceId, conversationId, null, "AgentCoordinatorService",
+                        "option=" + option + " resolvedDate=" + entities.get("fecha_relativa") + " resolvedTime=" + normalizedTime);
+                return;
+            }
+        }
+        AiTraceLogger.warn("BOOKING_OPTION_NOT_RESOLVED", traceId, conversationId, null, "AgentCoordinatorService",
+                "option=" + option + " reason=NO_MATCHING_PREVIOUS_OPTION");
+    }
+
+    private void enrichTurnContext(Map<String, String> entities, AgentConversationRequest request) {
+        if (request.messageBody() != null && !request.messageBody().isBlank()) {
+            entities.put("ultimo_mensaje_cliente", request.messageBody().trim());
+        }
+        if (request.occurredAt() != null) {
+            entities.put("timestamp_ultimo_turno", request.occurredAt().toString());
+        }
+    }
+
+    private void enrichResultContext(AgentRoutingResult result) {
+        if (result == null || result.extractedData() == null) {
+            return;
+        }
+        if (result.responseToCustomer() != null && !result.responseToCustomer().isBlank()) {
+            result.extractedData().put("ultima_respuesta_ia", result.responseToCustomer());
+        }
+        if (result.missingData() != null && !result.missingData().isEmpty()) {
+            result.extractedData().put("ultimo_dato_solicitado", String.join(",", result.missingData()));
+        } else {
+            result.extractedData().remove("ultimo_dato_solicitado");
+        }
+    }
+
+    private Map<String, String> mergeEntities(
+            Optional<AiAgentJdbcRepository.ConversationContextSnapshot> previousContext,
+            Map<String, String> currentEntities) {
+        Map<String, String> merged = new LinkedHashMap<>();
+        previousContext.ifPresent(context -> merged.putAll(context.extractedData()));
+        merged.putAll(currentEntities);
+        return merged;
+    }
+
+    private IntentDetectionResult resolveContextAwareIntent(
+            IntentDetectionResult current,
+            Optional<AiAgentJdbcRepository.ConversationContextSnapshot> previousContext,
+            Map<String, String> entities) {
+        if (current.primaryIntent() == AgentIntent.BOOKING_CANCEL
+                || current.primaryIntent() == AgentIntent.BOOKING_CHANGE) {
+            return current;
+        }
+        if (previousContext.isPresent()) {
+            AiAgentJdbcRepository.ConversationContextSnapshot context = previousContext.get();
+            String pendingAction = context.extractedData().getOrDefault("accion_pendiente", "");
+            if (!pendingAction.isBlank()
+                    && context.activeAgent() == AgentType.BOOKING
+                    && (context.primaryIntent() == AgentIntent.BOOKING_CANCEL
+                            || context.primaryIntent() == AgentIntent.BOOKING_CHANGE)) {
+                return new IntentDetectionResult(context.primaryIntent(), context.secondaryIntent(), 0.86, "medio", false, null);
+            }
+            boolean previousWasBooking = context.activeAgent() == AgentType.BOOKING
+                    || context.primaryIntent() == AgentIntent.BOOKING_REQUEST
+                    || context.primaryIntent() == AgentIntent.BOOKING_CHANGE
+                    || context.primaryIntent() == AgentIntent.BOOKING_CANCEL
+                    || context.primaryIntent() == AgentIntent.COMMERCIAL_AND_BOOKING;
+            boolean bookingWasWaitingForService = context.missingData().contains("motivo_o_servicio");
+            boolean bookingWasWaitingForDate = context.missingData().contains("fecha_deseada");
+            boolean bookingWasWaitingForTime = context.missingData().contains("horario_preferido");
+            boolean currentHasService = entities.containsKey("servicio_o_producto");
+            boolean currentHasDate = entities.containsKey("fecha") || entities.containsKey("fecha_relativa");
+            boolean currentHasTime = entities.containsKey("hora");
+
+            if (previousWasBooking && (
+                    (bookingWasWaitingForService && currentHasService)
+                            || (bookingWasWaitingForDate && currentHasDate)
+                            || (bookingWasWaitingForTime && currentHasTime)
+                            || (currentHasService && (currentHasDate || currentHasTime)))) {
+                return new IntentDetectionResult(AgentIntent.BOOKING_REQUEST, null, 0.83, "bajo", false, null);
+            }
+
+            if (current.primaryIntent() == AgentIntent.GREETING && previousWasBooking && hasOpenBookingData(context)) {
+                return new IntentDetectionResult(AgentIntent.BOOKING_REQUEST, null, 0.7, "bajo", false, null);
+            }
+        }
+
+        if (current.primaryIntent() != AgentIntent.AMBIGUOUS && current.primaryIntent() != AgentIntent.GREETING) {
+            return current;
+        }
+        if (entities.containsKey("servicio_o_producto")) {
+            AgentIntent previous = previousContext
+                    .map(AiAgentJdbcRepository.ConversationContextSnapshot::primaryIntent)
+                    .orElse(AgentIntent.COMMERCIAL_INQUIRY);
+            AgentIntent resolved = switch (previous) {
+                case BOOKING_CHANGE -> AgentIntent.BOOKING_CHANGE;
+                case BOOKING_CANCEL -> AgentIntent.BOOKING_CANCEL;
+                case BOOKING_REQUEST, BOOKING_STATUS, COMMERCIAL_AND_BOOKING -> AgentIntent.BOOKING_REQUEST;
+                default -> AgentIntent.COMMERCIAL_INQUIRY;
+            };
+            return new IntentDetectionResult(resolved, null, 0.78, "bajo", false, null);
+        }
+        if (entities.containsKey("nombre") && previousContext.isPresent()) {
+            AiAgentJdbcRepository.ConversationContextSnapshot context = previousContext.get();
+            if (context.activeAgent() == AgentType.SALES && context.primaryIntent() != null) {
+                return new IntentDetectionResult(context.primaryIntent(), context.secondaryIntent(), 0.72, "bajo", false, null);
+            }
+            if (context.activeAgent() == AgentType.BOOKING && context.primaryIntent() != null) {
+                return new IntentDetectionResult(context.primaryIntent(), context.secondaryIntent(), 0.72, "bajo", false, null);
+            }
+        }
+        return current;
+    }
+
+    private boolean hasOpenBookingData(AiAgentJdbcRepository.ConversationContextSnapshot context) {
+        return context.extractedData().containsKey("servicio_o_producto")
+                || context.extractedData().containsKey("fecha")
+                || context.extractedData().containsKey("fecha_relativa")
+                || context.extractedData().containsKey("hora")
+                || context.missingData().contains("motivo_o_servicio")
+                || context.missingData().contains("fecha_deseada")
+                || context.missingData().contains("horario_preferido");
+    }
+
+    private boolean isNonActionableMessage(String value) {
+        if (value == null || value.isBlank()) {
+            return true;
+        }
+        String normalized = value.trim().toLowerCase(java.util.Locale.ROOT);
+        return normalized.equals("mensaje recibido sin texto") || normalized.equals("mensaje recibido sin texto.");
+    }
+
+    public boolean autoReplyEnabled() {
+        return properties.enabled() && properties.autoReplyEnabled();
+    }
+}

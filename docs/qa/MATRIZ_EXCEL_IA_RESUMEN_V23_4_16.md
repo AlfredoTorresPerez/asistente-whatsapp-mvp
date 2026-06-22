@@ -1,0 +1,37 @@
+# Matriz Excel IA - Resumen incorporado v23.4.16
+
+- Casos de Matriz_QA: 119
+- Servicios cargados para pruebas: 56
+- Alias de entidades cargados para pruebas: 19
+
+## Intenciones esperadas
+
+- PRICE_REQUEST: 57
+- BOOKING_REQUEST: 30
+- COMMERCIAL_INQUIRY: 5
+- BOOKING_STATUS: 4
+- SUPPORT_GENERAL: 4
+- PAYMENT_INQUIRY: 4
+- GREETING: 3
+- COMPLAINT: 2
+- AMBIGUOUS: 1
+- QUOTE_REQUEST: 1
+- BOOKING_CHANGE: 1
+- BOOKING_CANCEL: 1
+- TECHNICAL_MESSAGE: 1
+- PAYMENT_PROBLEM: 1
+- KNOWLEDGE_QUERY: 1
+- FOLLOW_UP: 1
+- HUMAN_REQUEST: 1
+- COMMERCIAL_AND_BOOKING: 1
+
+## Agentes esperados
+
+- SALES: 63
+- BOOKING: 37
+- SUPPORT: 5
+- RECEPTION: 4
+- PAYMENTS: 4
+- HUMAN_HANDOFF: 4
+- KNOWLEDGE: 1
+- FOLLOW_UP: 1

@@ -1,0 +1,202 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: asistente-whatsapp-postgres
+    environment:
+      TZ: ${TZ:-America/Santiago}
+      PGTZ: ${TZ:-America/Santiago}
+      POSTGRES_DB: asistente_whatsapp
+      POSTGRES_USER: assistant
+      POSTGRES_PASSWORD: assistant
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U assistant -d asistente_whatsapp"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  backend-java:
+    build:
+      context: ./backend-java
+      dockerfile: Dockerfile
+      network: host
+    container_name: asistente-whatsapp-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      whatsapp-web-service:
+        condition: service_healthy
+    environment:
+      TZ: ${TZ:-America/Santiago}
+      JAVA_TOOL_OPTIONS: "-Duser.timezone=America/Santiago -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+      SPRING_JACKSON_TIME_ZONE: ${SPRING_JACKSON_TIME_ZONE:-America/Santiago}
+      APP_TIME_ZONE: ${APP_TIME_ZONE:-America/Santiago}
+      SERVER_PORT: 8080
+      APP_DB_URL: jdbc:postgresql://postgres:5432/asistente_whatsapp
+      APP_DB_USERNAME: assistant
+      APP_DB_PASSWORD: assistant
+      APP_JWT_SECRET: change-this-secret-in-local-development-please-2026
+      APP_ACCESS_TOKEN_EXPIRES_IN_SECONDS: 28800
+      APP_RESET_TOKEN_EXPIRES_IN_MINUTES: 30
+      APP_CORS_ALLOWED_ORIGINS: http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173,http://127.0.0.1:4173
+      APP_WHATSAPP_CHANNEL_PROVIDER: WEB
+      APP_WHATSAPP_WEB_ENABLED: "true"
+      APP_WHATSAPP_CLOUD_API_ENABLED: "false"
+      APP_WHATSAPP_WEB_BASE_URL: http://whatsapp-web-service:3001
+      APP_WHATSAPP_WEB_API_KEY: dev-whatsapp-web-key
+      APP_WHATSAPP_WEB_DEFAULT_PHONE_NUMBER: ${WHATSAPP_WEB_COMPANY_PHONE_NUMBER:-56900000000}
+      APP_WHATSAPP_WEB_WEBHOOK_SECRET: dev-whatsapp-web-webhook-secret
+      APP_WHATSAPP_WEB_WEBHOOK_TOLERANCE_SECONDS: 300
+      APP_WHATSAPP_WEB_DEMO_FALLBACK_ENABLED: "false"
+      APP_WHATSAPP_CLOUD_API_DRY_RUN_ENABLED: "false"
+      APP_AI_AGENTS_ENABLED: "true"
+      APP_AI_AGENTS_AUTO_REPLY_ENABLED: "true"
+      APP_AI_AGENTS_AUDIT_ENABLED: "true"
+      APP_AI_AGENTS_OUTBOX_WORKER_INTERVAL_MS: "5000"
+      APP_AI_AGENTS_OUTBOX_BATCH_SIZE: "10"
+      APP_AI_AGENTS_OUTBOX_PROCESSING_TIMEOUT_MS: "120000"
+      APP_AI_AGENTS_OUTBOX_RETRY_BASE_DELAY_MS: "30000"
+      APP_AI_AGENTS_OUTBOX_RETRY_MAX_DELAY_MS: "900000"
+      APP_OPENAI_ENABLED: "false"
+      APP_OPENAI_BASE_URL: https://api.openai.com/v1/responses
+      APP_OPENAI_API_KEY: ""
+      APP_OPENAI_MODEL: "gpt-5.4-mini"
+      APP_OPENAI_TIMEOUT_SECONDS: 30
+      APP_BOOKING_CONFIRMATION_EXPIRATION_MINUTES: ${APP_BOOKING_CONFIRMATION_EXPIRATION_MINUTES:-60}
+      APP_BOOKING_CONFIRMATION_EXPIRATION_SCAN_MS: ${APP_BOOKING_CONFIRMATION_EXPIRATION_SCAN_MS:-60000}
+      APP_BOOKING_CONFIRMATION_PUBLIC_BASE_URL: ${APP_BOOKING_CONFIRMATION_PUBLIC_BASE_URL:-http://localhost:5173/reservas/confirmar}
+      APP_BOOKING_CONFIRMATION_DISPATCH_WHATSAPP: ${APP_BOOKING_CONFIRMATION_DISPATCH_WHATSAPP:-false}
+      APP_EMAIL_ENABLED: ${APP_EMAIL_ENABLED:-true}
+      APP_EMAIL_SIMULATION_ENABLED: ${APP_EMAIL_SIMULATION_ENABLED:-false}
+      APP_EMAIL_HEALTH_ENABLED: ${APP_EMAIL_HEALTH_ENABLED:-false}
+      APP_EMAIL_FROM: ${APP_EMAIL_FROM:-altp2006@gmail.com}
+      APP_EMAIL_FROM_NAME: ${APP_EMAIL_FROM_NAME:-Centro Estetico Bella}
+      APP_FRONTEND_PUBLIC_BASE_URL: ${APP_FRONTEND_PUBLIC_BASE_URL:-http://localhost:5173}
+      SPRING_MAIL_HOST: ${SPRING_MAIL_HOST:-smtp.gmail.com}
+      SPRING_MAIL_PORT: ${SPRING_MAIL_PORT:-587}
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME:-altp2006@gmail.com}
+      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD:-ohmfallwunvjgzmt}
+      SPRING_MAIL_SMTP_AUTH: ${SPRING_MAIL_SMTP_AUTH:-true}
+      SPRING_MAIL_SMTP_STARTTLS_ENABLE: ${SPRING_MAIL_SMTP_STARTTLS_ENABLE:-true}
+      SPRING_MAIL_SMTP_STARTTLS_REQUIRED: ${SPRING_MAIL_SMTP_STARTTLS_REQUIRED:-true}
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    ports:
+      - "8080:8080"
+      - "5005:5005"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "bash -ec 'exec 3<>/dev/tcp/127.0.0.1/8080; printf \"GET /actuator/health HTTP/1.0\\r\\n\\r\\n\" >&3; grep -q UP <&3'",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  frontend-react:
+    build:
+      context: ./frontend-react
+      dockerfile: Dockerfile
+      network: host
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api/v1}
+    container_name: asistente-whatsapp-frontend
+    depends_on:
+      backend-java:
+        condition: service_healthy
+    environment:
+      TZ: ${TZ:-America/Santiago}
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api/v1}
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    ports:
+      - "5173:8080"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -qO- http://127.0.0.1:8080 >/dev/null 2>&1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  whatsapp-web-service:
+    restart: unless-stopped
+    build:
+      context: ./whatsapp-web-service
+      dockerfile: Dockerfile
+      network: host
+    container_name: asistente-whatsapp-whatsapp-web
+    environment:
+      TZ: ${TZ:-America/Santiago}
+      WHATSAPP_WEB_PORT: 3001
+      WHATSAPP_WEB_API_KEY: dev-whatsapp-web-key
+      WHATSAPP_WEB_SESSION_ID: demo-sales
+      WHATSAPP_WEB_REAL_ENABLED: "true"
+      WHATSAPP_WEB_AUTO_CONNECT: "false"
+      WHATSAPP_WEB_DEFAULT_PHONE_NUMBER: ${WHATSAPP_WEB_COMPANY_PHONE_NUMBER:-56900000000}
+      WHATSAPP_WEB_COMPANY_PHONE_NUMBER: ${WHATSAPP_WEB_COMPANY_PHONE_NUMBER:-56900000000}
+      WHATSAPP_WEB_TEST_CUSTOMER_PHONE_NUMBER: ${WHATSAPP_WEB_TEST_CUSTOMER_PHONE_NUMBER:-56950954580}
+      WHATSAPP_WEB_BACKEND_WEBHOOK_URL: http://backend-java:8080/api/v1/integrations/whatsapp-web/webhook
+      WHATSAPP_WEB_WEBHOOK_SECRET: dev-whatsapp-web-webhook-secret
+      WHATSAPP_WEB_SESSION_DATA_PATH: /app/.wwebjs_auth
+      WHATSAPP_WEB_CACHE_PATH: /app/.wwebjs_cache
+      WHATSAPP_WEB_HEADLESS: "false"
+      WHATSAPP_WEB_VISUAL_MODE: "true"
+      WHATSAPP_WEB_BROWSER_VIEWER_URL: http://localhost:6080/vnc.html?autoconnect=true&resize=scale
+      WHATSAPP_WEB_CHROME_EXECUTABLE: /usr/bin/chromium
+      PUPPETEER_EXECUTABLE_PATH: /usr/bin/chromium
+      WHATSAPP_WEB_CLEAN_PROFILE_LOCKS_ON_START: "true"
+      WHATSAPP_WEB_KILL_ORPHAN_CHROMIUM_ON_START: "true"
+      WHATSAPP_WEB_WEB_VERSION_CACHE: "none"
+      WHATSAPP_WEB_INIT_RETRIES: "3"
+      WHATSAPP_WEB_INIT_RETRY_DELAY_MS: "5000"
+      WHATSAPP_WEB_PUPPETEER_PROTOCOL_TIMEOUT_MS: "180000"
+      WHATSAPP_WEB_PUPPETEER_TIMEOUT_MS: "180000"
+      WHATSAPP_WEB_RUNTIME_RECOVERY_DELAY_MS: "5000"
+      WHATSAPP_WEB_CHROME_EXTRA_ARGS: "--disable-features=Translate,BackForwardCache,AcceptCHFrame,MediaRouter,OptimizationHints|--disable-background-timer-throttling|--disable-backgrounding-occluded-windows|--disable-renderer-backgrounding"
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    ports:
+      - "3001:3001"
+      - "6080:6080"
+    shm_size: "2gb"
+    volumes:
+      - whatsapp-webjs-session-data:/app/.wwebjs_auth
+      - whatsapp-webjs-cache-data:/app/.wwebjs_cache
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"fetch('http://127.0.0.1:3001/health').then((response) => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))\"",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  public-tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: asistente-whatsapp-public-tunnel
+    profiles:
+      - public-link
+    depends_on:
+      frontend-react:
+        condition: service_healthy
+    environment:
+      TZ: ${TZ:-America/Santiago}
+    command: tunnel --no-autoupdate --url http://frontend-react:8080
+    restart: unless-stopped
+
+
+volumes:
+  postgres-data:
+  whatsapp-webjs-session-data:
+  whatsapp-webjs-cache-data:

@@ -1,0 +1,14 @@
+diff -ruN /mnt/data/v234_orig/asistente-whatsapp-mvp/backend-java/src/main/java/com/asistentewhatsapp/aesthetic/application/AestheticCenterService.java /mnt/data/v234_fix_work/asistente-whatsapp-mvp/backend-java/src/main/java/com/asistentewhatsapp/aesthetic/application/AestheticCenterService.java
+--- /mnt/data/v234_orig/asistente-whatsapp-mvp/backend-java/src/main/java/com/asistentewhatsapp/aesthetic/application/AestheticCenterService.java	2026-06-09 15:39:47.000000000 +0000
++++ /mnt/data/v234_fix_work/asistente-whatsapp-mvp/backend-java/src/main/java/com/asistentewhatsapp/aesthetic/application/AestheticCenterService.java	2026-06-09 17:51:15.525069899 +0000
+@@ -750,9 +750,7 @@
+         String durationText = matchedService == null ? "" : " Duración aproximada: " + matchedService.durationMinutes() + " minutos.";
+         return "Perfecto ✅ Tengo los datos principales para revisar disponibilidad de " + displayService + locationText
+                 + " para " + date + " a las " + time + "." + durationText
+-                + "
+-
+-Voy a validar la agenda digital antes de confirmar. Si está disponible, crearé una reserva temporal y enviaré el enlace de confirmación por WhatsApp.";
++                + "\n\nVoy a validar la agenda digital antes de confirmar. Si está disponible, crearé una reserva temporal y enviaré el enlace de confirmación por WhatsApp.";
+ 
+     }
+ 

@@ -1,0 +1,24 @@
+--- /mnt/data/v23_compile_fix/original/asistente-whatsapp-mvp/backend-java/src/main/java/com/asistentewhatsapp/aesthetic/application/AestheticCenterService.java	2026-06-09 14:22:30.000000000 +0000
++++ /mnt/data/v23_fix_compile/asistente-whatsapp-mvp/backend-java/src/main/java/com/asistentewhatsapp/aesthetic/application/AestheticCenterService.java	2026-06-09 14:27:54.713830057 +0000
+@@ -958,8 +958,7 @@
+             if ("dirección no configurada".equals(address)) {
+                 return "Tengo registrada la sucursal " + location.name() + ", pero falta configurar su dirección o enlace de mapa. Te derivaré con una persona del equipo para confirmarlo.";
+             }
+-            return "La sucursal " + location.name() + " está ubicada en:
+-" + address;
++            return "La sucursal " + location.name() + " está ubicada en:\n" + address;
+         }
+         if (activeLocations.isEmpty()) {
+             return "No encontré sucursales activas configuradas. Te derivaré con una persona del equipo para confirmar la ubicación.";
+--- /mnt/data/v23_compile_fix/original/asistente-whatsapp-mvp/backend-java/src/main/java/com/asistentewhatsapp/aiagents/application/SupportAgent.java	2026-06-09 14:19:07.000000000 +0000
++++ /mnt/data/v23_fix_compile/asistente-whatsapp-mvp/backend-java/src/main/java/com/asistentewhatsapp/aiagents/application/SupportAgent.java	2026-06-09 14:27:54.715630589 +0000
+@@ -61,8 +61,7 @@
+             if (location.address() == null || location.address().isBlank()) {
+                 return "Tengo registrada la sucursal " + location.name() + ", pero falta configurar su dirección o enlace de mapa. Te derivaré con una persona del equipo para confirmarlo.";
+             }
+-            return "La sucursal " + location.name() + " está ubicada en:
+-" + location.address();
++            return "La sucursal " + location.name() + " está ubicada en:\n" + location.address();
+         }
+         if (locations.isEmpty()) {
+             return "No encontré sucursales activas configuradas. Te derivaré con una persona del equipo para confirmar la ubicación.";

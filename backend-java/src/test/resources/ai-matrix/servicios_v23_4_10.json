@@ -1,0 +1,506 @@
+[
+  {
+    "code": "FAC-LIMPIEZA",
+    "name": "Limpieza facial profunda",
+    "durationMinutes": 60,
+    "priceText": "$34.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "FAC-HIDRATACION",
+    "name": "Hidratacion facial",
+    "durationMinutes": 45,
+    "priceText": "$29.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "FAC-PEELING",
+    "name": "Peeling estetico",
+    "durationMinutes": 50,
+    "priceText": "$39.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "true",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "FAC-RADIOFRECUENCIA",
+    "name": "Radiofrecuencia facial",
+    "durationMinutes": 45,
+    "priceText": "$42.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "true",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "FAC-REJUVENECIMIENTO",
+    "name": "Rejuvenecimiento facial no invasivo",
+    "durationMinutes": 75,
+    "priceText": "$59.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "true",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "FAC-DERMAPEN",
+    "name": "Dermapen estetico",
+    "durationMinutes": 60,
+    "priceText": "$54.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "true",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "FAC-MICRODERMO",
+    "name": "Microdermoabrasion",
+    "durationMinutes": 45,
+    "priceText": "$36.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "CORP-REDUCCION",
+    "name": "Tratamiento reductivo",
+    "durationMinutes": 60,
+    "priceText": "$44.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "true",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "CORP-DRENAJE",
+    "name": "Drenaje linfatico",
+    "durationMinutes": 60,
+    "priceText": "$38.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "CORP-MASAJE-REDUCTIVO",
+    "name": "Masaje reductivo",
+    "durationMinutes": 60,
+    "priceText": "$36.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "CORP-MASAJE-RELAJANTE",
+    "name": "Masaje relajante",
+    "durationMinutes": 60,
+    "priceText": "$34.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "CORP-CAVITACION",
+    "name": "Cavitacion",
+    "durationMinutes": 45,
+    "priceText": "$42.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "true",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "CORP-PRESOTERAPIA",
+    "name": "Presoterapia",
+    "durationMinutes": 40,
+    "priceText": "$29.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "CORP-RADIOFRECUENCIA",
+    "name": "Radiofrecuencia corporal",
+    "durationMinutes": 50,
+    "priceText": "$46.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "true",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "DEP-LASER",
+    "name": "Depilacion laser",
+    "durationMinutes": 30,
+    "priceText": "$24.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "true",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "DEP-CERA",
+    "name": "Depilacion con cera",
+    "durationMinutes": 30,
+    "priceText": "$15.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "DEP-CEJAS",
+    "name": "Perfilado de cejas",
+    "durationMinutes": 25,
+    "priceText": "$12.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "DEP-BOZO",
+    "name": "Depilacion bozo",
+    "durationMinutes": 15,
+    "priceText": "$8.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "DEP-AXILAS",
+    "name": "Depilacion axilas",
+    "durationMinutes": 25,
+    "priceText": "$19.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "DEP-PIERNAS",
+    "name": "Depilacion piernas",
+    "durationMinutes": 45,
+    "priceText": "$29.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "DEP-ROSTRO",
+    "name": "Depilacion rostro",
+    "durationMinutes": 30,
+    "priceText": "$18.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "MAN-TRADICIONAL",
+    "name": "Manicure tradicional",
+    "durationMinutes": 45,
+    "priceText": "$15.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "MAN-PERMANENTE",
+    "name": "Manicure permanente",
+    "durationMinutes": 60,
+    "priceText": "$22.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "PED-SPA",
+    "name": "Pedicure spa",
+    "durationMinutes": 60,
+    "priceText": "$24.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "MAN-ACRILICAS",
+    "name": "Unas acrilicas",
+    "durationMinutes": 90,
+    "priceText": "$39.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "MAN-GEL",
+    "name": "Unas gel",
+    "durationMinutes": 75,
+    "priceText": "$34.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "MAN-RETIRO",
+    "name": "Retiro de esmalte",
+    "durationMinutes": 25,
+    "priceText": "$8.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "PC-LIFTING-PESTANAS",
+    "name": "Lifting de pestanas",
+    "durationMinutes": 60,
+    "priceText": "$26.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "PC-EXTENSION-PESTANAS",
+    "name": "Extension de pestanas",
+    "durationMinutes": 120,
+    "priceText": "$44.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "PC-LAMINADO-CEJAS",
+    "name": "Laminado de cejas",
+    "durationMinutes": 45,
+    "priceText": "$24.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "PC-TINTE-CEJAS",
+    "name": "Tinte de cejas",
+    "durationMinutes": 30,
+    "priceText": "$14.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "PEL-CORTE",
+    "name": "Corte de cabello",
+    "durationMinutes": 45,
+    "priceText": "$18.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "PEL-LAVADO",
+    "name": "Lavado de cabello",
+    "durationMinutes": 25,
+    "priceText": "$9.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "PEL-BRUSHING",
+    "name": "Brushing",
+    "durationMinutes": 45,
+    "priceText": "$16.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "PEL-TINTURA",
+    "name": "Tintura",
+    "durationMinutes": 120,
+    "priceText": "$49.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "PEL-BALAYAGE",
+    "name": "Balayage",
+    "durationMinutes": 180,
+    "priceText": "$89.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "PEL-ALISADO",
+    "name": "Alisado",
+    "durationMinutes": 180,
+    "priceText": "$79.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "true",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "PEL-TRATAMIENTO-CAPILAR",
+    "name": "Tratamiento capilar",
+    "durationMinutes": 60,
+    "priceText": "$29.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "MAQ-SOCIAL",
+    "name": "Maquillaje social",
+    "durationMinutes": 60,
+    "priceText": "$34.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "MAQ-NOVIA",
+    "name": "Maquillaje novia",
+    "durationMinutes": 90,
+    "priceText": "$69.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "MAQ-EVENTOS",
+    "name": "Maquillaje eventos",
+    "durationMinutes": 60,
+    "priceText": "$39.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "MAQ-AUTOMAQUILLAJE",
+    "name": "Clase de automaquillaje",
+    "durationMinutes": 120,
+    "priceText": "$59.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "MED-EVALUACION",
+    "name": "Evaluacion estetica",
+    "durationMinutes": 45,
+    "priceText": "$19.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "MED-ASESORIA",
+    "name": "Asesoria estetica",
+    "durationMinutes": 45,
+    "priceText": "$24.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "MED-NO-QUIRURGICO",
+    "name": "Tratamiento no quirurgico permitido",
+    "durationMinutes": 60,
+    "priceText": "$59.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "true",
+    "source": "V7__aesthetic_center_module.sql"
+  },
+  {
+    "code": "MAN-SPA",
+    "name": "Manicure spa",
+    "durationMinutes": 60,
+    "priceText": "$24.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V8__aesthetic_center_full_catalog_rules.sql"
+  },
+  {
+    "code": "PED-TRADICIONAL",
+    "name": "Pedicure tradicional",
+    "durationMinutes": 50,
+    "priceText": "$19.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V8__aesthetic_center_full_catalog_rules.sql"
+  },
+  {
+    "code": "PED-PERMANENTE",
+    "name": "Pedicure permanente",
+    "durationMinutes": 65,
+    "priceText": "$27.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V8__aesthetic_center_full_catalog_rules.sql"
+  },
+  {
+    "code": "PED-RETIRO",
+    "name": "Retiro de esmalte pies",
+    "durationMinutes": 25,
+    "priceText": "$8.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V8__aesthetic_center_full_catalog_rules.sql"
+  },
+  {
+    "code": "DEP-LASER-ROSTRO",
+    "name": "Depilacion laser rostro",
+    "durationMinutes": 30,
+    "priceText": "$29.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "true",
+    "source": "V8__aesthetic_center_full_catalog_rules.sql"
+  },
+  {
+    "code": "DEP-LASER-AXILAS",
+    "name": "Depilacion laser axilas",
+    "durationMinutes": 25,
+    "priceText": "$24.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "true",
+    "source": "V8__aesthetic_center_full_catalog_rules.sql"
+  },
+  {
+    "code": "DEP-LASER-PIERNAS",
+    "name": "Depilacion laser piernas completas",
+    "durationMinutes": 60,
+    "priceText": "$59.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "true",
+    "source": "V8__aesthetic_center_full_catalog_rules.sql"
+  },
+  {
+    "code": "DEP-BIKINI",
+    "name": "Depilacion bikini",
+    "durationMinutes": 35,
+    "priceText": "$24.990",
+    "requiresEvaluation": "true",
+    "requiresConsent": "false",
+    "source": "V8__aesthetic_center_full_catalog_rules.sql"
+  },
+  {
+    "code": "PC-DISENO-CEJAS",
+    "name": "Diseno de cejas",
+    "durationMinutes": 30,
+    "priceText": "$16.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V8__aesthetic_center_full_catalog_rules.sql"
+  },
+  {
+    "code": "PEL-EVALUACION-CAPILAR",
+    "name": "Evaluacion capilar",
+    "durationMinutes": 30,
+    "priceText": "$14.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V8__aesthetic_center_full_catalog_rules.sql"
+  },
+  {
+    "code": "MAQ-PRUEBA-NOVIA",
+    "name": "Prueba maquillaje novia",
+    "durationMinutes": 90,
+    "priceText": "$49.990",
+    "requiresEvaluation": "false",
+    "requiresConsent": "false",
+    "source": "V8__aesthetic_center_full_catalog_rules.sql"
+  }
+]

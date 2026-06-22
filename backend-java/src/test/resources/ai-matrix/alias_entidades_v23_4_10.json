@@ -1,0 +1,135 @@
+[
+  {
+    "alias": "limpieza cutis",
+    "entityKey": "servicio_o_producto",
+    "entityValue": "Limpieza facial profunda",
+    "priority": 355,
+    "source": "V23__complete_specialized_ai_agents_for_business.sql"
+  },
+  {
+    "alias": "limpieza de cutis",
+    "entityKey": "servicio_o_producto",
+    "entityValue": "Limpieza facial profunda",
+    "priority": 355,
+    "source": "V23__complete_specialized_ai_agents_for_business.sql"
+  },
+  {
+    "alias": "higiene de rostro",
+    "entityKey": "servicio_o_producto",
+    "entityValue": "Limpieza facial profunda",
+    "priority": 340,
+    "source": "V23__complete_specialized_ai_agents_for_business.sql"
+  },
+  {
+    "alias": "tratamiento de rostro",
+    "entityKey": "servicio_o_producto",
+    "entityValue": "Limpieza facial profunda",
+    "priority": 330,
+    "source": "V23__complete_specialized_ai_agents_for_business.sql"
+  },
+  {
+    "alias": "esta semana",
+    "entityKey": "fecha_relativa",
+    "entityValue": "esta semana",
+    "priority": 125,
+    "source": "V23__complete_specialized_ai_agents_for_business.sql"
+  },
+  {
+    "alias": "próxima semana",
+    "entityKey": "fecha_relativa",
+    "entityValue": "próxima semana",
+    "priority": 125,
+    "source": "V23__complete_specialized_ai_agents_for_business.sql"
+  },
+  {
+    "alias": "la otra semana",
+    "entityKey": "fecha_relativa",
+    "entityValue": "próxima semana",
+    "priority": 125,
+    "source": "V23__complete_specialized_ai_agents_for_business.sql"
+  },
+  {
+    "alias": "mañana en la tarde",
+    "entityKey": "fecha_relativa",
+    "entityValue": "mañana",
+    "priority": 126,
+    "source": "V23__complete_specialized_ai_agents_for_business.sql"
+  },
+  {
+    "alias": "no me llegó el link",
+    "entityKey": "intencion",
+    "entityValue": "reenviar_enlace_confirmacion",
+    "priority": 500,
+    "source": "V23__complete_specialized_ai_agents_for_business.sql"
+  },
+  {
+    "alias": "el enlace expiró",
+    "entityKey": "intencion",
+    "entityValue": "enlace_expirado",
+    "priority": 500,
+    "source": "V23__complete_specialized_ai_agents_for_business.sql"
+  },
+  {
+    "alias": "quiero reprogramar",
+    "entityKey": "intencion",
+    "entityValue": "reprogramar_reserva",
+    "priority": 500,
+    "source": "V23__complete_specialized_ai_agents_for_business.sql"
+  },
+  {
+    "alias": "cancelar mi reserva",
+    "entityKey": "intencion",
+    "entityValue": "cancelar_reserva",
+    "priority": 500,
+    "source": "V23__complete_specialized_ai_agents_for_business.sql"
+  },
+  {
+    "alias": "quiero hablar con una persona",
+    "entityKey": "intencion",
+    "entityValue": "solicitar_humano",
+    "priority": 500,
+    "source": "V23__complete_specialized_ai_agents_for_business.sql"
+  },
+  {
+    "alias": "tuve una reacción",
+    "entityKey": "intencion",
+    "entityValue": "caso_sensible_post_tratamiento",
+    "priority": 500,
+    "source": "V23__complete_specialized_ai_agents_for_business.sql"
+  },
+  {
+    "alias": "dónde queda",
+    "entityKey": "intencion",
+    "entityValue": "consultar_ubicacion",
+    "priority": 470,
+    "source": "V23__complete_specialized_ai_agents_for_business.sql"
+  },
+  {
+    "alias": "tengo que pagar una señal",
+    "entityKey": "intencion",
+    "entityValue": "consultar_pago_senal",
+    "priority": 500,
+    "source": "V23__complete_specialized_ai_agents_for_business.sql"
+  },
+  {
+    "alias": "en providencia",
+    "entityKey": "sede",
+    "entityValue": "Providencia",
+    "priority": 620,
+    "source": "V26__complete_booking_transactional_link_flow.sql"
+  },
+  {
+    "alias": "sucursal providencia",
+    "entityKey": "sede",
+    "entityValue": "Providencia",
+    "priority": 620,
+    "source": "V26__complete_booking_transactional_link_flow.sql"
+  },
+  {
+    "alias": "provi",
+    "entityKey": "sede",
+    "entityValue": "Providencia",
+    "priority": 500,
+    "source": "V26__complete_booking_transactional_link_flow.sql"
+  }
+]
