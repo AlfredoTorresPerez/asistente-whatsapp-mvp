@@ -23,5 +23,6 @@ public record PublicBookingConfirmationResponse(
         BigDecimal depositAmount,
         String paymentStatus,
         OffsetDateTime expiresAt,
-        OffsetDateTime confirmedAt) {
+        OffsetDateTime confirmedAt,
+        int minMinutesAhead) {
 }

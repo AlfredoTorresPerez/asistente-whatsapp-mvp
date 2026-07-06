@@ -5,16 +5,27 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "app.booking-payment")
 public class BookingPaymentProperties {
 
-    private boolean webhookSignatureEnabled = false;
+    private String provider = "SIMULATED";
+    private boolean webhookSignatureEnabled = true;
     private String webhookSecret = "";
     private long webhookToleranceSeconds = 300;
     private String checkoutPublicBaseUrl = "http://localhost:5173/reservas/pagar";
     private int checkoutExpirationMinutes = 30;
     private boolean dispatchWhatsApp = false;
     private boolean dispatchEmail = true;
+    private boolean dispatchPostPaymentWhatsApp = false;
+    private boolean dispatchPostPaymentEmail = true;
     private long expirationScanMs = 60000;
     private int expirationBatchSize = 100;
     private String externalCheckoutUrlTemplate = "";
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
 
     public boolean isWebhookSignatureEnabled() {
         return webhookSignatureEnabled;
@@ -70,6 +81,22 @@ public class BookingPaymentProperties {
 
     public void setDispatchEmail(boolean dispatchEmail) {
         this.dispatchEmail = dispatchEmail;
+    }
+
+    public boolean isDispatchPostPaymentWhatsApp() {
+        return dispatchPostPaymentWhatsApp;
+    }
+
+    public void setDispatchPostPaymentWhatsApp(boolean dispatchPostPaymentWhatsApp) {
+        this.dispatchPostPaymentWhatsApp = dispatchPostPaymentWhatsApp;
+    }
+
+    public boolean isDispatchPostPaymentEmail() {
+        return dispatchPostPaymentEmail;
+    }
+
+    public void setDispatchPostPaymentEmail(boolean dispatchPostPaymentEmail) {
+        this.dispatchPostPaymentEmail = dispatchPostPaymentEmail;
     }
 
     public long getExpirationScanMs() {

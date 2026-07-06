@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reserva cancelada - {{business_name}}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#F8F6F3;font-family:Arial,Helvetica,'Segoe UI',sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F8F6F3;">
+<tr>
+<td align="center" style="padding:24px 16px;">
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+<tr>
+<td style="background:linear-gradient(135deg,#C8A97E,#B8956A);padding:32px 24px;border-radius:16px 16px 0 0;text-align:center;">
+{{business_logo}}
+<h1 style="margin:12px 0 4px;font-size:24px;color:#FFFFFF;font-weight:700;">{{business_name}}</h1>
+<p style="margin:0;font-size:13px;color:rgba(255,255,255,0.85);letter-spacing:2px;text-transform:uppercase;">Belleza &bull; Bienestar &bull; Estetica Avanzada</p>
+</td>
+</tr>
+<tr>
+<td style="background-color:#FFFFFF;padding:0;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td style="background:linear-gradient(135deg,#FFF0F0,#FFE0E0);padding:40px 24px 32px;text-align:center;">
+<div style="font-size:48px;margin-bottom:12px;">❌</div>
+<h2 style="margin:0 0 8px;font-size:26px;color:#CC4444;font-weight:700;">Reserva cancelada</h2>
+<p style="margin:0;font-size:16px;color:#666666;">Tu cita ha sido cancelada. Si fue un error, puedes agendar una nueva.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td style="background-color:#FFFFFF;padding:0 24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FFFFFF;border:1px solid #E8E8E8;border-radius:12px;margin-bottom:24px;box-shadow:0 4px 16px rgba(0,0,0,0.06);">
+<tr>
+<td style="padding:32px 24px;text-align:center;">
+<div style="font-size:40px;line-height:1;margin-bottom:16px;">📅</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr><td style="padding:8px 0;font-size:16px;color:#333333;"><strong style="color:#C8A97E;">Fecha:</strong> {{appointment_date}}</td></tr>
+<tr><td style="padding:8px 0;font-size:16px;color:#333333;"><strong style="color:#C8A97E;">Hora:</strong> {{appointment_time}}</td></tr>
+<tr><td style="padding:8px 0;font-size:16px;color:#333333;"><strong style="color:#C8A97E;">Sucursal:</strong> {{branch_name}}</td></tr>
+</table>
+<div style="margin:20px 0 0;padding:10px 20px;background:#FFF0F0;border-radius:8px;display:inline-block;font-size:14px;color:#CC4444;">🔴 Cancelada</div>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td style="background-color:#FFFFFF;padding:0 24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+<tr>
+<td align="center">
+<a href="{{reservation_details_url}}" target="_blank" style="display:inline-block;background:#A67C52;color:#FFFFFF;padding:14px 40px;border-radius:10px;text-decoration:none;font-size:16px;font-weight:700;">Agendar nueva cita</a>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+{{whatsapp_url}}
+<tr>
+<td style="background-color:#FFFFFF;padding:0 24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F8F6F3;border:1px solid #E8E8E8;border-radius:12px;margin-bottom:24px;">
+<tr>
+<td style="padding:24px;text-align:center;">
+<p style="margin:0 0 12px;font-size:16px;color:#333333;font-weight:600;">Tienes dudas?</p>
+<a href="{{whatsapp_url}}" target="_blank" style="display:inline-block;background:#25D366;color:#FFFFFF;padding:14px 40px;border-radius:10px;text-decoration:none;font-size:16px;font-weight:700;">Hablar por WhatsApp</a>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td style="background:linear-gradient(135deg,#1a1a2e,#0f172a);padding:32px 24px;border-radius:0 0 16px 16px;text-align:center;">
+<p style="margin:0 0 4px;font-size:15px;color:rgba(255,255,255,0.9);font-weight:600;">Centro de Estetica {{business_name}}</p>
+<p style="margin:0 0 2px;font-size:14px;color:rgba(255,255,255,0.6);">{{address}}</p>
+<p style="margin:0 0 2px;font-size:14px;color:rgba(255,255,255,0.6);">{{phone}}</p>
+<p style="margin:0 0 16px;font-size:14px;color:rgba(255,255,255,0.6);">{{email}}</p>
+<p style="margin:0;font-size:12px;color:rgba(255,255,255,0.4);">Este correo fue generado automaticamente. No responder este mensaje.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>

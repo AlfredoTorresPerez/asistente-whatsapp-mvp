@@ -59,25 +59,31 @@ Para reuniones, construir las imagenes previamente.
 
 ## Credenciales demo
 
-Las credenciales salen del seed Flyway `V4__seed_demo_data.sql`:
+Todas usan la contrasena `Cambiar123!`:
 
-- usuario: `admin@demo.cl`
-- contrasena: `Cambiar123!`
+| Usuario | Rol | Descripcion |
+|---|---|---|
+| `admin@demo.cl` | OWNER | Acceso total a la plataforma |
+| `admin2@demo.cl` | ADMIN | Administracion operativa |
+| `supervisor@demo.cl` | SUPERVISOR | Solo lectura/supervision |
+| `agente@demo.cl` | AGENT | Operacion diaria (conversaciones, citas, pedidos) |
 
 No usar estas credenciales en produccion.
 
-## Flujo sugerido de 8 a 10 minutos
+## Flujo sugerido de 10 a 12 minutos
 
 1. Login en http://localhost:5173 con `admin@demo.cl` / `Cambiar123!`.
-2. Revisar Dashboard y explicar que usa datos semilla.
-3. Ir a Conversaciones.
-4. Abrir una conversacion existente.
-5. Enviar un mensaje manual corto.
-6. Ir a Administracion y abrir Conexion WhatsApp Web.
-7. Abrir noVNC para mostrar Chromium/QR si esta disponible.
-8. Simular o recibir mensaje entrante.
-9. Crear prospecto desde la conversacion.
-10. Crear cita o pedido desde la conversacion.
+2. Revisar Dashboard con datos semilla actualizados a Junio 2026.
+3. Ir a Conversaciones y abrir la conversacion con Sofia Rojas.
+4. Enviar un mensaje manual corto.
+5. Ir a Agenda para ver las reservas de los proximos dias.
+6. Crear una nueva reserva desde una conversacion.
+7. Generar link de pago para la reserva (modo SIMULATED).
+8. Abrir el link de pago publico en `/reservas/pagar/{paymentId}`.
+9. Ir a Administracion > Conexion WhatsApp Web (mostrar estado).
+10. Simular mensaje entrante (ver abajo) si WhatsApp Web no conecta.
+11. Crear prospecto desde la conversacion.
+12. Crear pedido desde la conversacion.
 
 ## Simulacion de mensaje entrante
 

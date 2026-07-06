@@ -110,16 +110,22 @@ app:
     public-base-url: ${APP_BOOKING_CONFIRMATION_PUBLIC_BASE_URL:http://localhost:5173/reservas/confirmar}
     dispatch-whatsapp: ${APP_BOOKING_CONFIRMATION_DISPATCH_WHATSAPP:false}
   booking-payment:
-    webhook-signature-enabled: ${APP_BOOKING_PAYMENT_WEBHOOK_SIGNATURE_ENABLED:false}
+    provider: ${APP_BOOKING_PAYMENT_PROVIDER:SIMULATED}
+    webhook-signature-enabled: ${APP_BOOKING_PAYMENT_WEBHOOK_SIGNATURE_ENABLED:true}
     webhook-secret: ${APP_BOOKING_PAYMENT_WEBHOOK_SECRET:}
     webhook-tolerance-seconds: ${APP_BOOKING_PAYMENT_WEBHOOK_TOLERANCE_SECONDS:300}
     checkout-public-base-url: ${APP_BOOKING_PAYMENT_CHECKOUT_PUBLIC_BASE_URL:http://localhost:5173/reservas/pagar}
     checkout-expiration-minutes: ${APP_BOOKING_PAYMENT_CHECKOUT_EXPIRATION_MINUTES:30}
     dispatch-whatsapp: ${APP_BOOKING_PAYMENT_DISPATCH_WHATSAPP:false}
     dispatch-email: ${APP_BOOKING_PAYMENT_DISPATCH_EMAIL:true}
+    dispatch-post-payment-whatsapp: ${APP_BOOKING_PAYMENT_DISPATCH_POST_PAYMENT_WHATSAPP:false}
+    dispatch-post-payment-email: ${APP_BOOKING_PAYMENT_DISPATCH_POST_PAYMENT_EMAIL:true}
     expiration-scan-ms: ${APP_BOOKING_PAYMENT_EXPIRATION_SCAN_MS:60000}
     expiration-batch-size: ${APP_BOOKING_PAYMENT_EXPIRATION_BATCH_SIZE:100}
     external-checkout-url-template: ${APP_BOOKING_PAYMENT_EXTERNAL_CHECKOUT_URL_TEMPLATE:}
+    mercadopago:
+      access-token: ${APP_MERCADOPAGO_ACCESS_TOKEN:}
+      notification-url: ${APP_MERCADOPAGO_NOTIFICATION_URL:}
   booking-reschedule:
     public-base-url: ${APP_BOOKING_RESCHEDULE_PUBLIC_BASE_URL:http://localhost:5173/reservas/reprogramar}
   booking-cancellation:
@@ -129,6 +135,17 @@ app:
     from: ${APP_EMAIL_FROM:no-reply@localhost}
     from-name: ${APP_EMAIL_FROM_NAME:Centro estetico}
     simulation-enabled: ${APP_EMAIL_SIMULATION_ENABLED:true}
+  calendar:
+    encryption-secret: ${APP_CALENDAR_ENCRYPTION_SECRET:}
+    google:
+      enabled: ${APP_CALENDAR_GOOGLE_ENABLED:false}
+      client-id: ${APP_CALENDAR_GOOGLE_CLIENT_ID:}
+      client-secret: ${APP_CALENDAR_GOOGLE_CLIENT_SECRET:}
+      redirect-uri: ${APP_CALENDAR_GOOGLE_REDIRECT_URI:}
+    sync:
+      enabled: ${APP_CALENDAR_SYNC_ENABLED:true}
+      retry-interval-ms: ${APP_CALENDAR_SYNC_RETRY_INTERVAL_MS:300000}
+      max-retries: ${APP_CALENDAR_SYNC_MAX_RETRIES:5}
   frontend:
     public-base-url: ${APP_FRONTEND_PUBLIC_BASE_URL:http://localhost:5173}
   observability:

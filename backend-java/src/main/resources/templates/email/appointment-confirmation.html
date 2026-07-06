@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Confirma tu reserva - {{business_name}}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#F8F6F3;font-family:Arial,Helvetica,'Segoe UI',sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F8F6F3;">
+<tr>
+<td align="center" style="padding:24px 16px;">
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+
+<!-- HEADER -->
+<tr>
+<td style="background:linear-gradient(135deg,#C8A97E,#B8956A);padding:32px 24px;border-radius:16px 16px 0 0;text-align:center;">
+{{business_logo}}
+<h1 style="margin:12px 0 4px;font-size:24px;color:#FFFFFF;font-weight:700;letter-spacing:0.5px;">{{business_name}}</h1>
+<p style="margin:0;font-size:13px;color:rgba(255,255,255,0.85);letter-spacing:2px;text-transform:uppercase;">Belleza &bull; Bienestar &bull; Estetica Avanzada</p>
+</td>
+</tr>
+
+<!-- BANNER -->
+<tr>
+<td style="background-color:#FFFFFF;padding:0;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td style="background:linear-gradient(135deg,#F8F6F3,#EDE8E0);padding:40px 24px 32px;text-align:center;">
+<h2 style="margin:0 0 8px;font-size:26px;color:#333333;font-weight:700;">Tu reserva esta casi lista</h2>
+<p style="margin:0;font-size:16px;color:#666666;">Solo debes confirmar tu cita.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- MAIN CARD -->
+<tr>
+<td style="background-color:#FFFFFF;padding:0 24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FFFFFF;border:1px solid #E8E8E8;border-radius:12px;margin-bottom:24px;box-shadow:0 4px 16px rgba(0,0,0,0.06);">
+<tr>
+<td style="padding:32px 24px;text-align:center;">
+<div style="font-size:40px;line-height:1;margin-bottom:16px;">📅</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td style="padding:8px 0;font-size:16px;color:#333333;">
+<strong style="color:#C8A97E;">Fecha:</strong> {{appointment_date}}
+</td>
+</tr>
+<tr>
+<td style="padding:8px 0;font-size:16px;color:#333333;">
+<strong style="color:#C8A97E;">Hora:</strong> {{appointment_time}}
+</td>
+</tr>
+<tr>
+<td style="padding:8px 0;font-size:16px;color:#333333;">
+<strong style="color:#C8A97E;">Sucursal:</strong> {{branch_name}}
+</td>
+</tr>
+</table>
+
+<!-- STATUS INDICATOR -->
+<div style="margin:20px 0 16px;padding:10px 20px;background:#FFF8E7;border-radius:8px;display:inline-block;font-size:14px;color:#B8860B;">🟡 Pendiente de confirmacion</div>
+
+<!-- CONFIRM BUTTON -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td align="center" style="padding:16px 0 8px;">
+<a href="{{confirmation_url}}" target="_blank" style="display:inline-block;background:#A67C52;color:#FFFFFF;padding:16px 48px;border-radius:10px;text-decoration:none;font-size:17px;font-weight:700;letter-spacing:0.3px;">Confirmar mi reserva</a>
+</td>
+</tr>
+</table>
+
+{{reschedule_url}}
+<!-- SECONDARY BUTTONS -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td align="center" style="padding:8px 0;">
+<a href="{{reschedule_url}}" target="_blank" style="display:inline-block;background:#F0F0F0;color:#666666;padding:12px 36px;border-radius:8px;text-decoration:none;font-size:15px;font-weight:600;margin:4px;">Modificar reserva</a>
+{{/reschedule_url}}
+{{cancel_url}}
+<a href="{{cancel_url}}" target="_blank" style="display:inline-block;background:#FFF0F0;color:#CC4444;padding:12px 36px;border-radius:8px;text-decoration:none;font-size:15px;font-weight:600;margin:4px;">Cancelar reserva</a>
+</td>
+</tr>
+</table>
+{{/cancel_url}}
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- RESERVATION CODE -->
+<tr>
+<td style="background-color:#FFFFFF;padding:0 24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F8F6F3;border:1px solid #E8E8E8;border-radius:12px;margin-bottom:24px;">
+<tr>
+<td style="padding:16px 24px;text-align:center;font-size:14px;color:#666666;">
+Codigo de reserva: <strong style="color:#333333;font-size:16px;">{{reservation_code}}</strong>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- APPOINTMENT SUMMARY -->
+<tr>
+<td style="background-color:#FFFFFF;padding:0 24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FFFFFF;border:1px solid #E8E8E8;border-radius:12px;margin-bottom:24px;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+<tr>
+<td style="padding:24px;">
+<h3 style="margin:0 0 16px;font-size:18px;color:#333333;border-bottom:2px solid #C8A97E;padding-bottom:8px;">Resumen de la cita</h3>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr><td style="padding:6px 0;font-size:15px;color:#666666;width:40%;">Paciente</td><td style="padding:6px 0;font-size:15px;color:#333333;font-weight:600;">{{patient_name}}</td></tr>
+<tr><td style="padding:6px 0;font-size:15px;color:#666666;">Servicio</td><td style="padding:6px 0;font-size:15px;color:#333333;font-weight:600;">{{service_name}}</td></tr>
+<tr><td style="padding:6px 0;font-size:15px;color:#666666;">Categoria</td><td style="padding:6px 0;font-size:15px;color:#333333;font-weight:600;">{{service_category}}</td></tr>
+<tr><td style="padding:6px 0;font-size:15px;color:#666666;">Profesional</td><td style="padding:6px 0;font-size:15px;color:#333333;font-weight:600;">{{professional_name}}</td></tr>
+<tr><td style="padding:6px 0;font-size:15px;color:#666666;">Duracion</td><td style="padding:6px 0;font-size:15px;color:#333333;font-weight:600;">{{duration}}</td></tr>
+<tr><td style="padding:6px 0;font-size:15px;color:#666666;">Precio</td><td style="padding:6px 0;font-size:15px;color:#333333;font-weight:600;">{{price}}</td></tr>
+<tr><td style="padding:6px 0;font-size:15px;color:#666666;">Sucursal</td><td style="padding:6px 0;font-size:15px;color:#333333;font-weight:600;">{{branch_name}}</td></tr>
+<tr><td style="padding:6px 0;font-size:15px;color:#666666;">Direccion</td><td style="padding:6px 0;font-size:15px;color:#333333;font-weight:600;">{{address}}</td></tr>
+<tr><td style="padding:6px 0;font-size:15px;color:#666666;">Telefono</td><td style="padding:6px 0;font-size:15px;color:#333333;font-weight:600;">{{phone}}</td></tr>
+<tr><td style="padding:6px 0;font-size:15px;color:#666666;">Correo</td><td style="padding:6px 0;font-size:15px;color:#333333;font-weight:600;">{{email}}</td></tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- PROFESSIONAL CARD -->
+{{professional_photo}}
+<tr>
+<td style="background-color:#FFFFFF;padding:0 24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FFFFFF;border:1px solid #E8E8E8;border-radius:12px;margin-bottom:24px;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+<tr>
+<td style="padding:24px;text-align:center;">
+<img src="{{professional_photo}}" alt="{{professional_name}}" width="80" height="80" style="border-radius:50%;width:80px;height:80px;object-fit:cover;border:3px solid #C8A97E;">
+<h4 style="margin:12px 0 4px;font-size:17px;color:#333333;">{{professional_name}}</h4>
+<p style="margin:0;font-size:14px;color:#C8A97E;font-weight:600;">Especialista en {{service_category}}</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- SERVICE IMAGE & DESCRIPTION -->
+{{service_image}}
+<tr>
+<td style="background-color:#FFFFFF;padding:0 24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FFFFFF;border:1px solid #E8E8E8;border-radius:12px;margin-bottom:24px;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+<tr>
+<td style="padding:0;">
+<img src="{{service_image}}" alt="{{service_name}}" width="600" height="200" style="width:100%;max-width:600px;height:auto;border-radius:12px 12px 0 0;display:block;">
+</td>
+</tr>
+<tr>
+<td style="padding:24px;">
+<h4 style="margin:0 0 8px;font-size:17px;color:#333333;">{{service_name}}</h4>
+<p style="margin:0 0 16px;font-size:15px;color:#666666;line-height:1.6;">{{service_description}}</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- WHAT THIS INCLUDES -->
+{{service_description}}
+<tr>
+<td style="background-color:#FFFFFF;padding:0 24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F8F6F3;border:1px solid #E8E8E8;border-radius:12px;margin-bottom:24px;">
+<tr>
+<td style="padding:24px;">
+<h4 style="margin:0 0 12px;font-size:16px;color:#333333;">Que incluye este tratamiento?</h4>
+<p style="margin:0;font-size:15px;color:#666666;line-height:1.6;">{{service_description}}</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- PREPARATION INSTRUCTIONS -->
+{{preparation_instructions}}
+<tr>
+<td style="background-color:#FFFFFF;padding:0 24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FFFBF5;border:1px solid #E8E8E8;border-radius:12px;margin-bottom:24px;">
+<tr>
+<td style="padding:24px;">
+<h4 style="margin:0 0 12px;font-size:16px;color:#333333;">Preparacion antes de asistir</h4>
+<p style="margin:0;font-size:15px;color:#666666;line-height:1.6;white-space:pre-line;">{{preparation_instructions}}</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- SPECIAL INSTRUCTIONS -->
+{{special_instructions}}
+<tr>
+<td style="background-color:#FFFFFF;padding:0 24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FFF8F0;border:1px solid #E8E8E8;border-radius:12px;margin-bottom:24px;">
+<tr>
+<td style="padding:24px;">
+<h4 style="margin:0 0 12px;font-size:16px;color:#333333;">Requisitos especiales</h4>
+<p style="margin:0;font-size:15px;color:#666666;line-height:1.6;white-space:pre-line;">{{special_instructions}}</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- AFTERCARE INSTRUCTIONS -->
+{{aftercare_instructions}}
+<tr>
+<td style="background-color:#FFFFFF;padding:0 24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F0F8F0;border:1px solid #E8E8E8;border-radius:12px;margin-bottom:24px;">
+<tr>
+<td style="padding:24px;">
+<h4 style="margin:0 0 12px;font-size:16px;color:#333333;">Cuidados posteriores</h4>
+<p style="margin:0;font-size:15px;color:#666666;line-height:1.6;white-space:pre-line;">{{aftercare_instructions}}</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- IMPORTANT INFO -->
+<tr>
+<td style="background-color:#FFFFFF;padding:0 24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F8F6F3;border:1px solid #E8E8E8;border-radius:12px;margin-bottom:24px;">
+<tr>
+<td style="padding:24px;">
+<h4 style="margin:0 0 12px;font-size:16px;color:#333333;">Informacion importante</h4>
+<ul style="margin:0;padding-left:20px;font-size:15px;color:#666666;line-height:1.8;">
+<li>Si llegas con mas de 15 minutos de atraso tu reserva puede ser reagendada.</li>
+<li>Puedes modificar tu cita hasta 24 horas antes.</li>
+<li>Para algunos tratamientos se requiere evaluacion previa.</li>
+<li>Si necesitas ayuda contactanos.</li>
+</ul>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- QR CODE -->
+{{qr_code_url}}
+<tr>
+<td style="background-color:#FFFFFF;padding:0 24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FFFFFF;border:1px solid #E8E8E8;border-radius:12px;margin-bottom:24px;text-align:center;">
+<tr>
+<td style="padding:24px;">
+<img src="{{qr_code_url}}" alt="QR de la reserva" width="120" height="120" style="width:120px;height:120px;">
+<p style="margin:8px 0 0;font-size:13px;color:#999999;">Escanea para ver tu reserva</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- MAP BUTTON -->
+{{google_maps_url}}
+<tr>
+<td style="background-color:#FFFFFF;padding:0 24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+<tr>
+<td align="center">
+<a href="{{google_maps_url}}" target="_blank" style="display:inline-block;background:#FFFFFF;color:#A67C52;padding:14px 40px;border:2px solid #A67C52;border-radius:10px;text-decoration:none;font-size:16px;font-weight:700;">Ver ubicacion</a>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- ADD TO CALENDAR -->
+{{google_calendar_url}}
+<tr>
+<td style="background-color:#FFFFFF;padding:0 24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+<tr>
+<td align="center" style="padding:8px 0;">
+<p style="margin:0 0 12px;font-size:14px;color:#666666;">Agregar al calendario</p>
+<div style="display:inline-block;">
+<a href="{{google_calendar_url}}" target="_blank" style="display:inline-block;background:#FFFFFF;color:#333333;padding:10px 18px;border:1px solid #E8E8E8;border-radius:6px;text-decoration:none;font-size:13px;font-weight:600;margin:2px;">Google Calendar</a>
+<a href="{{outlook_calendar_url}}" target="_blank" style="display:inline-block;background:#FFFFFF;color:#333333;padding:10px 18px;border:1px solid #E8E8E8;border-radius:6px;text-decoration:none;font-size:13px;font-weight:600;margin:2px;">Outlook</a>
+<a href="{{ics_download_url}}" target="_blank" style="display:inline-block;background:#FFFFFF;color:#333333;padding:10px 18px;border:1px solid #E8E8E8;border-radius:6px;text-decoration:none;font-size:13px;font-weight:600;margin:2px;">Apple Calendar</a>
+</div>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- RESERVATION DETAILS LINK -->
+<tr>
+<td style="background-color:#FFFFFF;padding:0 24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+<tr>
+<td align="center">
+<a href="{{reservation_details_url}}" target="_blank" style="display:inline-block;background:#FFFFFF;color:#333333;padding:14px 40px;border:2px solid #E8E8E8;border-radius:10px;text-decoration:none;font-size:16px;font-weight:600;">Ver mi reserva</a>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- WHATSAPP -->
+<tr>
+<td style="background-color:#FFFFFF;padding:0 24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F8F6F3;border:1px solid #E8E8E8;border-radius:12px;margin-bottom:24px;">
+<tr>
+<td style="padding:24px;text-align:center;">
+<p style="margin:0 0 12px;font-size:16px;color:#333333;font-weight:600;">Tienes dudas?</p>
+<a href="{{whatsapp_url}}" target="_blank" style="display:inline-block;background:#25D366;color:#FFFFFF;padding:14px 40px;border-radius:10px;text-decoration:none;font-size:16px;font-weight:700;">Hablar por WhatsApp</a>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- SOCIAL MEDIA -->
+{{instagram}}
+<tr>
+<td style="background-color:#FFFFFF;padding:0 24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+<tr>
+<td align="center" style="padding:8px 0;">
+{{instagram}}
+{{facebook}}
+{{tiktok}}
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- FOOTER -->
+<tr>
+<td style="background:linear-gradient(135deg,#1a1a2e,#0f172a);padding:32px 24px;border-radius:0 0 16px 16px;text-align:center;">
+<p style="margin:0 0 4px;font-size:15px;color:rgba(255,255,255,0.9);font-weight:600;">Centro de Estetica {{business_name}}</p>
+<p style="margin:0 0 2px;font-size:14px;color:rgba(255,255,255,0.6);">{{address}}</p>
+<p style="margin:0 0 2px;font-size:14px;color:rgba(255,255,255,0.6);">{{phone}}</p>
+<p style="margin:0 0 16px;font-size:14px;color:rgba(255,255,255,0.6);">{{email}}</p>
+<p style="margin:0;font-size:12px;color:rgba(255,255,255,0.4);">Este correo fue generado automaticamente. No responder este mensaje.</p>
+</td>
+</tr>
+
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>

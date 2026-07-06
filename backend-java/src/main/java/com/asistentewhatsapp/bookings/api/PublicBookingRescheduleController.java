@@ -27,8 +27,18 @@ public class PublicBookingRescheduleController {
         return bookingPublicActionService.confirmReschedule(token);
     }
 
+    @GetMapping("/confirm")
+    public PublicBookingRescheduleResponse confirmViaGetFallback(@PathVariable String token) {
+        return bookingPublicActionService.confirmReschedule(token);
+    }
+
     @PostMapping("/reject")
     public PublicBookingRescheduleResponse reject(@PathVariable String token) {
+        return bookingPublicActionService.rejectReschedule(token);
+    }
+
+    @GetMapping("/reject")
+    public PublicBookingRescheduleResponse rejectViaGetFallback(@PathVariable String token) {
         return bookingPublicActionService.rejectReschedule(token);
     }
 }

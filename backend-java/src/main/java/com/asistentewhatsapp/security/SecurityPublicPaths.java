@@ -24,7 +24,11 @@ public final class SecurityPublicPaths {
         "/api/webhooks/whatsapp-web/messages",
         "/api/v1/public/booking-confirmations/**",
         "/api/v1/public/booking-reschedules/**",
-        "/api/v1/public/booking-cancellations/**"
+        "/api/v1/public/booking-cancellations/**",
+        "/api/v1/public/booking-payments/**",
+        "/api/v1/public/landing/**",
+        "/api/v1/calendar-integrations/google/callback",
+        "/api/v1/calendar-integrations/outlook/callback"
     };
 
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();

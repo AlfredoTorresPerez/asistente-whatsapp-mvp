@@ -58,15 +58,17 @@ public class AestheticCenterJdbcRepository {
         }
         Long totalItems = jdbcTemplate.queryForObject("select count(*) from " + tableName + where, parameters, Long.class);
         long resolvedTotalItems = totalItems == null ? 0 : totalItems;
+        boolean isServiceCategory = tableName.equals("aesthetic_service_category");
+        String displayOrderCol = isServiceCategory ? ", display_order" : "";
         List<AestheticCategoryResponse> items = jdbcTemplate.query(
                 """
-                        select id, code, name, description, active
+                        select id, code, name, description, active%s
                         from %s
                         %s
                         order by name asc
                         limit :limit
                         offset :offset
-                        """.formatted(tableName, where),
+                        """.formatted(displayOrderCol, tableName, where),
                 parameters,
                 categoryRowMapper());
         return new PagedResponse<>(items, page, size, resolvedTotalItems, totalPages(resolvedTotalItems, size));
@@ -800,12 +802,20 @@ public class AestheticCenterJdbcRepository {
     }
 
     private RowMapper<AestheticCategoryResponse> categoryRowMapper() {
-        return (resultSet, rowNumber) -> new AestheticCategoryResponse(
-                resultSet.getObject("id", UUID.class),
-                resultSet.getString("code"),
-                resultSet.getString("name"),
-                resultSet.getString("description"),
-                resultSet.getBoolean("active"));
+        return (resultSet, rowNumber) -> {
+            Integer displayOrder = null;
+            try {
+                displayOrder = resultSet.getObject("display_order", Integer.class);
+            } catch (Exception ignored) {
+            }
+            return new AestheticCategoryResponse(
+                    resultSet.getObject("id", UUID.class),
+                    resultSet.getString("code"),
+                    resultSet.getString("name"),
+                    resultSet.getString("description"),
+                    resultSet.getBoolean("active"),
+                    displayOrder);
+        };
     }
 
     private RowMapper<AestheticServiceResponse> serviceRowMapper() {
@@ -882,6 +892,39 @@ public class AestheticCenterJdbcRepository {
                 resultSet.getString("suggested_response"),
                 resultSet.getString("model_name"),
                 resultSet.getObject("created_at", OffsetDateTime.class));
+    }
+
+    public List<ServiceBranchRecord> findServiceBranches(UUID businessId, UUID serviceId) {
+        return jdbcTemplate.query(
+                """
+                        select bl.id, bl.name, bl.address, bl.commune, bl.phone,
+                               (select count(*) from aesthetic_professional_location pl
+                                where pl.business_id = bl.business_id and pl.location_id = bl.id and pl.active = true) as professional_count
+                        from business_location bl
+                        where bl.business_id = :businessId
+                          and bl.active = true
+                          and exists (
+                              select 1 from aesthetic_service_location sl
+                              where sl.business_id = bl.business_id
+                                and sl.location_id = bl.id
+                                and sl.service_id = :serviceId
+                                and sl.active = true
+                          )
+                        order by bl.name asc
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("businessId", businessId)
+                        .addValue("serviceId", serviceId),
+                (rs, rowNum) -> new ServiceBranchRecord(
+                        rs.getObject("id", UUID.class),
+                        rs.getString("name"),
+                        rs.getString("address"),
+                        rs.getString("commune"),
+                        rs.getString("phone"),
+                        rs.getInt("professional_count")));
+    }
+
+    public record ServiceBranchRecord(UUID id, String name, String address, String commune, String phone, int professionalCount) {
     }
 
     public record AestheticPromotionSummary(

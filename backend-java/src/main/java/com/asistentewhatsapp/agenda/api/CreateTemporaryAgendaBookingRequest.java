@@ -22,5 +22,6 @@ public record CreateTemporaryAgendaBookingRequest(
         @Size(max = 2000) String notes,
         Integer expirationMinutes,
         Boolean generateConfirmationLink,
-        Boolean sendWhatsApp) {
+        Boolean sendWhatsApp,
+        @Size(max = 255) String idempotencyKey) {
 }

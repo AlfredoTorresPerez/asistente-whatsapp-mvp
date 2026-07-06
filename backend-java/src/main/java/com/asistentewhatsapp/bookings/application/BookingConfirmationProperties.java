@@ -8,6 +8,7 @@ public class BookingConfirmationProperties {
     private int expirationMinutes = 60;
     private String publicBaseUrl = "http://localhost:5173/reservas/confirmar";
     private boolean dispatchWhatsApp = false;
+    private int minMinutesAhead = 1440;
 
     public int getExpirationMinutes() { return expirationMinutes; }
     public void setExpirationMinutes(int expirationMinutes) { this.expirationMinutes = expirationMinutes; }
@@ -19,6 +20,8 @@ public class BookingConfirmationProperties {
     public void setPublicBaseUrl(String publicBaseUrl) { this.publicBaseUrl = publicBaseUrl; }
     public boolean isDispatchWhatsApp() { return dispatchWhatsApp; }
     public void setDispatchWhatsApp(boolean dispatchWhatsApp) { this.dispatchWhatsApp = dispatchWhatsApp; }
+    public int getMinMinutesAhead() { return minMinutesAhead; }
+    public void setMinMinutesAhead(int minMinutesAhead) { this.minMinutesAhead = minMinutesAhead; }
 
     private String sanitizePublicBaseUrl(String value) {
         if (value == null || value.isBlank()) {

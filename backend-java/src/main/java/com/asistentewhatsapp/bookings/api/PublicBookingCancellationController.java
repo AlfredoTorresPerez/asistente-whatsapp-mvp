@@ -29,4 +29,9 @@ public class PublicBookingCancellationController {
             @RequestBody(required = false) PublicBookingCancellationRequest request) {
         return bookingPublicActionService.confirmCancellation(token, request);
     }
+
+    @GetMapping("/confirm")
+    public PublicBookingCancellationResponse confirmViaGetFallback(@PathVariable String token) {
+        return bookingPublicActionService.confirmCancellation(token, null);
+    }
 }

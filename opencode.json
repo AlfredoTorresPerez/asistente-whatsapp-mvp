@@ -1,0 +1,15 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "ollama/qwen2.5-coder:7b",
+  "small_model": "ollama/qwen2.5:7b",
+  "agent": {
+    "qwen3.6": {
+      "description": "Usa Qwen 3.6 para tareas complejas que requieren razonamiento profundo.",
+      "model": "ollama/qwen3.6:latest"
+    },
+    "gemma4": {
+      "description": "Usa Gemma 4 para tareas de analisis y generacion de texto.",
+      "model": "ollama/gemma4:latest"
+    }
+  }
+}

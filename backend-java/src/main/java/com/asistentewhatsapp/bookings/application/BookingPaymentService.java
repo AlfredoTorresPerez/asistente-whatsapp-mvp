@@ -1,11 +1,13 @@
 package com.asistentewhatsapp.bookings.application;
 
+import com.asistentewhatsapp.calendar.application.CalendarSyncService;
 import com.asistentewhatsapp.bookings.api.BookingPaymentWebhookRequest;
 import com.asistentewhatsapp.bookings.api.BookingPaymentWebhookResponse;
 import com.asistentewhatsapp.bookings.api.BookingPaymentResponse;
 import com.asistentewhatsapp.bookings.api.CreateBookingPaymentLinkRequest;
 import com.asistentewhatsapp.bookings.api.RefundBookingPaymentRequest;
 import com.asistentewhatsapp.bookings.api.RegisterBookingManualPaymentRequest;
+import com.asistentewhatsapp.bookings.domain.BookingPaymentProvider;
 import com.asistentewhatsapp.bookings.infrastructure.BookingPaymentJdbcRepository;
 import com.asistentewhatsapp.bookings.infrastructure.BookingPaymentJdbcRepository.BookingPaymentBookingRecord;
 import com.asistentewhatsapp.bookings.infrastructure.BookingPaymentJdbcRepository.BookingPaymentNotificationRecord;
@@ -19,6 +21,7 @@ import com.asistentewhatsapp.security.domain.AuthenticatedUser;
 import com.asistentewhatsapp.shared.exception.ApiException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
@@ -34,6 +37,8 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,74 +47,214 @@ public class BookingPaymentService {
 
     private final BookingPaymentJdbcRepository repository;
     private final BookingPaymentProperties properties;
+    private final BookingPaymentProviderRegistry providerRegistry;
     private final AuditService auditService;
     private final ObjectMapper objectMapper;
     private final ChannelDispatchService channelDispatchService;
     private final BookingEmailService bookingEmailService;
+    private final CalendarSyncService calendarSyncService;
 
     public BookingPaymentService(
             BookingPaymentJdbcRepository repository,
             BookingPaymentProperties properties,
+            BookingPaymentProviderRegistry providerRegistry,
             AuditService auditService,
             ObjectMapper objectMapper,
             ChannelDispatchService channelDispatchService,
-            BookingEmailService bookingEmailService) {
+            BookingEmailService bookingEmailService,
+            CalendarSyncService calendarSyncService) {
         this.repository = repository;
         this.properties = properties;
+        this.providerRegistry = providerRegistry;
         this.auditService = auditService;
         this.objectMapper = objectMapper;
         this.channelDispatchService = channelDispatchService;
         this.bookingEmailService = bookingEmailService;
+        this.calendarSyncService = calendarSyncService;
     }
 
     @Transactional
     public BookingPaymentWebhookResponse handleWebhook(String rawBody, String timestampHeader, String signatureHeader) {
         validateSignature(rawBody, timestampHeader, signatureHeader);
-        BookingPaymentWebhookRequest request = parse(rawBody);
-        NormalizedPayment normalized = normalize(request);
+        BookingPaymentProvider provider = providerRegistry.getDefaultProvider();
+        if (provider.supportsWebhook()) {
+            Map<String, String> headers = new LinkedHashMap<>();
+            headers.put("X-Booking-Payment-Timestamp", timestampHeader);
+            headers.put("X-Booking-Payment-Signature", signatureHeader);
+            Optional<BookingPaymentProvider.PaymentNotification> notification = provider.parseWebhook(rawBody, headers);
+            if (notification.isPresent()) {
+                return processProviderNotification(notification.get(), rawBody, provider.providerName());
+            }
+        }
+        BookingPaymentWebhookRequest request = parseWebhookBody(rawBody);
+        return processStandardWebhook(request, rawBody);
+    }
+
+    private BookingPaymentWebhookResponse processProviderNotification(BookingPaymentProvider.PaymentNotification notification, String rawBody, String providerName) {
+        String rawPayloadJson = rawBody == null || rawBody.isBlank() ? "{}" : rawBody;
+        return doProcessPayment(null, null, notification.providerPaymentId(), notification.idempotencyKey(), notification.amount(),
+                notification.currency(), notification.status(), notification.occurredAt(), notification.metadata(),
+                providerName, rawPayloadJson);
+    }
+
+    private BookingPaymentWebhookResponse processStandardWebhook(BookingPaymentWebhookRequest request, String rawBody) {
+        String rawPayloadJson = rawBody == null || rawBody.isBlank() ? "{}" : rawBody;
+        String provider = normalizeProvider(request.provider());
+        return doProcessPayment(request.businessId(), request.bookingId(), request.providerPaymentId(), request.idempotencyKey(), request.amount(),
+                request.currency(), request.status(), request.occurredAt(),
+                request.metadata() == null ? Map.of() : request.metadata(),
+                provider, rawPayloadJson);
+    }
+
+    private record IntegratePaymentResult(BookingPaymentRecord payment, boolean duplicate, String bookingStatus) {}
+
+    private BookingPaymentWebhookResponse doProcessPayment(
+            UUID businessId, UUID bookingId, String providerPaymentId, String idempotencyKey, BigDecimal amount, String currency,
+            String status, OffsetDateTime occurredAt, Map<String, Object> metadata,
+            String provider, String rawPayloadJson) {
+        if (providerPaymentId == null && idempotencyKey == null) {
+            throw validationError("idempotencyKey", "El webhook debe incluir providerPaymentId o idempotencyKey.");
+        }
+        if (amount == null || amount.signum() < 0) {
+            throw validationError("amount", "El monto del pago no puede ser negativo.");
+        }
+        String resolvedCurrency = currency == null || currency.isBlank() ? "CLP" : currency.trim().toUpperCase(Locale.ROOT);
+        if (resolvedCurrency.length() != 3) {
+            throw validationError("currency", "La moneda debe usar codigo ISO de 3 letras.");
+        }
+        String resolvedStatus = normalizeStatus(status);
+        OffsetDateTime resolvedOccurredAt = occurredAt == null ? OffsetDateTime.now(ZoneOffset.UTC) : occurredAt;
+        NormalizedPayment normalized = new NormalizedPayment(businessId, bookingId, provider,
+                providerPaymentId, idempotencyKey, amount, resolvedCurrency, resolvedStatus, resolvedOccurredAt, metadata);
+
+        IntegratePaymentResult result = integratePayment(normalized, rawPayloadJson);
+        return new BookingPaymentWebhookResponse(
+                result.payment().id(),
+                result.payment().bookingId(),
+                null,
+                result.bookingStatus(),
+                result.duplicate(),
+                false);
+    }
+
+    private IntegratePaymentResult integratePayment(NormalizedPayment normalized, String rawPayloadJson) {
+        String metadataJson = toJson(normalized.metadata());
         BookingPaymentBookingRecord booking = repository.findBookingForUpdate(normalized.businessId(), normalized.bookingId());
         Optional<BookingPaymentRecord> existing = repository.findExisting(
-                normalized.businessId(),
-                normalized.provider(),
-                normalized.providerPaymentId(),
-                normalized.idempotencyKey());
+                normalized.businessId(), normalized.provider(),
+                normalized.providerPaymentId(), normalized.idempotencyKey());
         if (existing.isPresent() && existing.get().status().equals(normalized.status())) {
-            return new BookingPaymentWebhookResponse(
-                    existing.get().id(),
-                    existing.get().bookingId(),
-                    booking.paymentStatus(),
-                    BookingStateMachine.canonical(booking.bookingStatus()),
-                    true,
-                    false);
+            return new IntegratePaymentResult(existing.get(), true, booking.bookingStatus());
         }
-
-        String rawPayloadJson = rawBody == null || rawBody.isBlank() ? "{}" : rawBody;
-        String metadataJson = toJson(normalized.metadata());
-        BookingPaymentRecord payment = existing
-                .map(current -> updateExistingPayment(current, normalized, rawPayloadJson, metadataJson))
-                .orElseGet(() -> repository.insertPayment(
-                        normalized.businessId(),
-                        normalized.bookingId(),
-                        normalized.provider(),
-                        normalized.providerPaymentId(),
-                        normalized.idempotencyKey(),
-                        normalized.amount(),
-                        normalized.currency(),
-                        normalized.status(),
-                        rawPayloadJson,
-                        metadataJson,
-                        normalized.occurredAt()));
-
+        if (existing.isPresent() && isTerminal(existing.get().status())) {
+            return new IntegratePaymentResult(existing.get(), true, booking.bookingStatus());
+        }
+        BookingPaymentRecord payment;
+        if (existing.isPresent()) {
+            payment = repository.updatePaymentStatus(existing.get().id(), normalized.status(), rawPayloadJson, metadataJson, normalized.occurredAt());
+        } else {
+            payment = repository.insertPayment(
+                    normalized.businessId(), normalized.bookingId(), normalized.provider(),
+                    normalized.providerPaymentId(), normalized.idempotencyKey(),
+                    normalized.amount(), normalized.currency(), normalized.status(),
+                    rawPayloadJson, metadataJson, normalized.occurredAt());
+        }
         repository.recalculateBookingPaymentStatus(normalized.businessId(), normalized.bookingId());
         BookingPaymentBookingRecord updatedBooking = repository.findBookingForUpdate(normalized.businessId(), normalized.bookingId());
         recordPaymentAudit(payment, updatedBooking, existing.isPresent());
-        return new BookingPaymentWebhookResponse(
-                payment.id(),
-                payment.bookingId(),
-                updatedBooking.paymentStatus(),
-                BookingStateMachine.canonical(updatedBooking.bookingStatus()),
-                false,
-                false);
+        if ("APPROVED".equals(normalized.status()) && isPaidOrOverpaid(updatedBooking)) {
+            transitionToConfirmed(normalized.businessId(), normalized.bookingId(), updatedBooking);
+        }
+        if ("APPROVED".equals(normalized.status())) {
+            sendPostPaymentNotifications(normalized.businessId(), payment);
+        }
+        return new IntegratePaymentResult(payment, false, updatedBooking.bookingStatus());
+    }
+
+    private boolean isPaidOrOverpaid(BookingPaymentBookingRecord booking) {
+        if (!booking.requiresDeposit()) {
+            return true;
+        }
+        return repository.hasApprovedRequiredDeposit(booking.businessId(), booking.bookingId());
+    }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BookingPaymentService.class);
+
+    private void transitionToConfirmed(UUID businessId, UUID bookingId, BookingPaymentBookingRecord booking) {
+        BookingStateMachine.assertTransition(booking.bookingStatus(), BookingStateMachine.CONFIRMED, "confirmarse por pago");
+        repository.updateBookingStatus(businessId, bookingId, BookingStateMachine.CONFIRMED, "PAGO_APROBADO",
+                "Reserva confirmada automaticamente por pago aprobado.");
+        auditService.record(businessId, null, "BOOKING_AUTO_CONFIRMED_BY_PAYMENT", "BOOKING", bookingId,
+                "Reserva confirmada automaticamente tras pago aprobado.",
+                AuditMetadata.of("previousBookingStatus", BookingStateMachine.canonical(booking.bookingStatus()),
+                        "paymentStatus", booking.paymentStatus()));
+        try { calendarSyncService.syncConfirmed(bookingId, businessId); }
+        catch (Exception e) { LOGGER.warn("CALENDAR_SYNC_CONFIRMED_FAILED bookingId={}", bookingId, e); }
+    }
+
+    private void sendPostPaymentNotifications(UUID businessId, BookingPaymentRecord payment) {
+        boolean sendWhatsApp = properties.isDispatchPostPaymentWhatsApp();
+        boolean sendEmail = properties.isDispatchPostPaymentEmail();
+        if (!sendWhatsApp && !sendEmail) {
+            return;
+        }
+        BookingPaymentNotificationRecord booking;
+        try {
+            booking = repository.findNotificationContext(businessId, payment.bookingId());
+        } catch (RuntimeException exception) {
+            return;
+        }
+        if (sendEmail) {
+            sendPostPaymentEmail(booking, payment);
+        }
+        if (sendWhatsApp) {
+            sendPostPaymentWhatsApp(booking, payment);
+        }
+    }
+
+    private void sendPostPaymentEmail(BookingPaymentNotificationRecord booking, BookingPaymentRecord payment) {
+        String body = bookingEmailService.buildAppointmentEmailBody(
+                booking.customerName(),
+                "Pago recibido. Tu reserva esta confirmada.",
+                booking.serviceName() == null ? booking.subject() : booking.serviceName(),
+                formatDateTime(booking.startsAt()),
+                booking.locationName() == null ? booking.location() : booking.locationName(),
+                booking.professionalName(),
+                booking.roomName(),
+                null,
+                "Monto pagado: " + payment.currency() + " " + payment.amount() + ".");
+        bookingEmailService.sendBookingEmail(booking.businessId(), booking.bookingId(), booking.customerEmail(),
+                "BOOKING_PAYMENT_RECEIVED", "Pago recibido - Reserva confirmada", body);
+        auditService.record(booking.businessId(), null, "BOOKING_POST_PAYMENT_EMAIL_SENT", "BOOKING", booking.bookingId(),
+                "Correo de confirmacion de pago enviado.",
+                AuditMetadata.of("paymentId", payment.id(), "amount", payment.amount()));
+    }
+
+    private void sendPostPaymentWhatsApp(BookingPaymentNotificationRecord booking, BookingPaymentRecord payment) {
+        String body = """
+                Pago recibido - Reserva confirmada
+
+                Cliente: %s
+                Servicio: %s
+                Fecha: %s
+                Monto pagado: %s %s
+                """.formatted(
+                valueOrFallback(booking.customerName(), "Cliente"),
+                valueOrFallback(booking.serviceName(), booking.subject()),
+                formatDateTime(booking.startsAt()),
+                payment.currency(),
+                payment.amount());
+        try {
+            channelDispatchService.dispatch(new ChannelDispatchRequest(
+                    booking.businessId(), MessageChannelType.WHATSAPP, booking.customerPhone(), body));
+            auditService.record(booking.businessId(), null, "BOOKING_POST_PAYMENT_WHATSAPP_SENT", "BOOKING", booking.bookingId(),
+                    "WhatsApp de confirmacion de pago enviado.",
+                    AuditMetadata.of("paymentId", payment.id()));
+        } catch (RuntimeException exception) {
+            auditService.record(booking.businessId(), null, "BOOKING_POST_PAYMENT_WHATSAPP_FAILED", "BOOKING", booking.bookingId(),
+                    "Fallo envio WhatsApp post-pago: " + safeMessage(exception),
+                    AuditMetadata.of("paymentId", payment.id()));
+        }
     }
 
     public boolean hasApprovedRequiredDeposit(UUID businessId, UUID bookingId) {
@@ -151,44 +296,73 @@ public class BookingPaymentService {
         if (amount == null || amount.signum() <= 0) {
             throw validationError("amount", "El monto del enlace de pago debe ser mayor a cero.");
         }
-        String provider = normalizeProvider(request == null ? null : request.provider(), "SIMULATED");
+        String providerName = normalizeProvider(request == null ? null : request.provider(), properties.getProvider());
         String currency = normalizeCurrency(request == null ? null : request.currency());
         int expirationMinutes = request != null && request.expirationMinutes() != null
                 ? Math.min(Math.max(request.expirationMinutes(), 5), 1440)
                 : Math.min(Math.max(properties.getCheckoutExpirationMinutes(), 5), 1440);
-        OffsetDateTime expiresAt = now.plusMinutes(expirationMinutes);
         String idempotencyKey = "checkout:" + bookingId + ":" + now.toEpochSecond();
+
+        BookingPaymentProvider provider = providerRegistry.getProvider(providerName);
+        String description = "Reserva #" + bookingId.toString().substring(0, 8);
+        String returnUrl = properties.getCheckoutPublicBaseUrl() + "/" + bookingId;
+        String notificationUrl = "";
+        String baseUrl = properties.getCheckoutPublicBaseUrl();
+        if (baseUrl != null && !baseUrl.isBlank()) {
+            notificationUrl = baseUrl.replace("/reservas/pagar", "/api/v1/integrations/booking-payments/webhook");
+        }
+
+        BookingPaymentProvider.CreateCheckoutResult checkout = provider.createCheckout(
+                user.businessId(), bookingId, null, amount, currency, description, returnUrl, notificationUrl, expirationMinutes);
+        OffsetDateTime expiresAt = checkout.expiresAt() != null ? checkout.expiresAt() : now.plusMinutes(expirationMinutes);
         Map<String, Object> metadata = new LinkedHashMap<>();
-        metadata.put("source", "INTERNAL_CHECKOUT_LINK");
+        metadata.put("source", "PROVIDER_CHECKOUT_LINK");
+        metadata.put("provider", providerName);
         metadata.put("actorUserId", user.userId());
         metadata.put("bookingStatus", BookingStateMachine.canonical(booking.bookingStatus()));
         metadata.put("bookingPaymentStatus", booking.paymentStatus());
+        metadata.putAll(checkout.metadata());
         if (request != null && request.metadata() != null) {
             metadata.putAll(request.metadata());
         }
 
-        BookingPaymentRecord payment = repository.insertCheckoutPayment(
-                user.businessId(),
-                bookingId,
-                provider,
-                idempotencyKey,
-                amount,
-                currency,
-                resolveCheckoutUrlTemplate(provider),
-                expiresAt,
-                toJson(metadata));
+        UUID paymentId = UUID.randomUUID();
+        BookingPaymentRecord payment = insertPaymentFromCheckout(
+                user.businessId(), bookingId, providerName, provider.providerName(),
+                checkout.providerPaymentId(), idempotencyKey, amount, currency,
+                checkout.checkoutUrl(), expiresAt, toJson(metadata), paymentId);
+
+        if (checkout.providerPaymentId() != null && !checkout.providerPaymentId().isBlank()) {
+            repository.updatePaymentProviderId(paymentId, checkout.providerPaymentId());
+        }
+
+        if (booking.bookingStatus() != null
+                && !BookingStateMachine.PENDING_PAYMENT.equals(BookingStateMachine.canonical(booking.bookingStatus()))) {
+            BookingStateMachine.assertTransition(booking.bookingStatus(), BookingStateMachine.PENDING_PAYMENT, "generar link de pago");
+            repository.updateBookingStatus(user.businessId(), bookingId, BookingStateMachine.PENDING_PAYMENT, "PAGO_LINK_CREADO",
+                    "Reserva pasa a pendiente de pago por generacion de link.");
+        }
+
         auditService.record(user.businessId(), user.userId(), "BOOKING_PAYMENT_LINK_CREATED", "BOOKING", bookingId,
-                "Se genero enlace de pago para reserva.",
+                "Se genero enlace de pago para reserva via " + providerName + ".",
                 AuditMetadata.of(
                         "paymentId", payment.id(),
-                        "provider", payment.provider(),
+                        "provider", providerName,
                         "amount", payment.amount(),
                         "currency", payment.currency(),
                         "checkoutExpiresAt", payment.checkoutExpiresAt(),
-                        "bookingStatus", BookingStateMachine.canonical(booking.bookingStatus()),
-                        "bookingPaymentStatus", booking.paymentStatus()));
+                        "bookingStatus", BookingStateMachine.canonical(booking.bookingStatus())));
         sendPaymentLinkNotifications(user, payment, request);
         return toResponse(payment);
+    }
+
+    private BookingPaymentRecord insertPaymentFromCheckout(
+            UUID businessId, UUID bookingId, String provider, String providerName,
+            String providerPaymentId, String idempotencyKey, BigDecimal amount, String currency,
+            String checkoutUrl, OffsetDateTime expiresAt, String metadata, UUID paymentId) {
+        repository.insertPaymentFromCheckout(businessId, bookingId, provider, providerPaymentId,
+                idempotencyKey, amount, currency, checkoutUrl, expiresAt, metadata, paymentId);
+        return repository.findById(paymentId);
     }
 
     @Transactional
@@ -225,20 +399,17 @@ public class BookingPaymentService {
             metadata.putAll(request.metadata());
         }
         BookingPaymentRecord payment = repository.insertManualPayment(
-                user.businessId(),
-                bookingId,
-                provider,
-                providerPaymentId,
-                idempotencyKey,
-                amount,
-                normalizeCurrency(request.currency()),
-                status,
-                "{}",
-                toJson(metadata),
-                occurredAt);
+                user.businessId(), bookingId, provider, providerPaymentId, idempotencyKey,
+                amount, normalizeCurrency(request.currency()), status, "{}", toJson(metadata), occurredAt);
         repository.recalculateBookingPaymentStatus(user.businessId(), bookingId);
         BookingPaymentBookingRecord updatedBooking = repository.findBookingForUpdate(user.businessId(), bookingId);
         recordManualPaymentAudit(user, payment, updatedBooking);
+        if ("APPROVED".equals(status) && isPaidOrOverpaid(updatedBooking)) {
+            transitionToConfirmed(user.businessId(), bookingId, updatedBooking);
+        }
+        if ("APPROVED".equals(status)) {
+            sendPostPaymentNotifications(user.businessId(), payment);
+        }
         return toResponse(payment);
     }
 
@@ -250,21 +421,14 @@ public class BookingPaymentService {
         List<BookingPaymentRecord> expired = repository.findExpiredPendingCheckouts(now, limit);
         for (BookingPaymentRecord payment : expired) {
             BookingPaymentRecord updated = repository.updatePaymentStatus(
-                    payment.id(),
-                    "EXPIRED",
-                    "{}",
-                    toJson(AuditMetadata.of(
-                            "source", "BOOKING_PAYMENT_EXPIRATION_SCHEDULER",
-                            "checkoutExpiresAt", payment.checkoutExpiresAt())),
-                    now);
+                    payment.id(), "EXPIRED", "{}",
+                    toJson(AuditMetadata.of("source", "BOOKING_PAYMENT_EXPIRATION_SCHEDULER",
+                            "checkoutExpiresAt", payment.checkoutExpiresAt())), now);
             repository.recalculateBookingPaymentStatus(updated.businessId(), updated.bookingId());
             auditService.record(updated.businessId(), null, "BOOKING_PAYMENT_LINK_EXPIRED", "BOOKING", updated.bookingId(),
                     "Link de pago de reserva expirado automaticamente.",
-                    AuditMetadata.of(
-                            "paymentId", updated.id(),
-                            "provider", updated.provider(),
-                            "amount", updated.amount(),
-                            "currency", updated.currency(),
+                    AuditMetadata.of("paymentId", updated.id(), "provider", updated.provider(),
+                            "amount", updated.amount(), "currency", updated.currency(),
                             "checkoutExpiresAt", updated.checkoutExpiresAt()));
         }
     }
@@ -283,39 +447,32 @@ public class BookingPaymentService {
                     "Solo se puede reembolsar un pago aprobado.",
                     Map.of("paymentStatus", current.status()));
         }
-        Map<String, Object> metadata = AuditMetadata.of(
-                "source", "INTERNAL_REFUND",
-                "actorUserId", user.userId(),
-                "reason", request == null ? null : request.reason(),
-                "previousStatus", current.status(),
-                "bookingStatus", BookingStateMachine.canonical(booking.bookingStatus()));
-        BookingPaymentRecord payment = repository.updatePaymentStatus(
-                current.id(),
-                "REFUNDED",
-                "{}",
-                toJson(metadata),
-                OffsetDateTime.now(ZoneOffset.UTC));
-        repository.recalculateBookingPaymentStatus(user.businessId(), bookingId);
-        auditService.record(user.businessId(), user.userId(), "BOOKING_PAYMENT_REFUNDED", "BOOKING", bookingId,
-                "Se registro reembolso de pago de reserva.",
-                AuditMetadata.of(
-                        "paymentId", payment.id(),
-                        "provider", payment.provider(),
-                        "amount", payment.amount(),
-                        "currency", payment.currency(),
-                        "reason", request == null ? null : request.reason()));
-        return toResponse(payment);
-    }
-
-    private BookingPaymentRecord updateExistingPayment(
-            BookingPaymentRecord current,
-            NormalizedPayment normalized,
-            String rawPayloadJson,
-            String metadataJson) {
-        if (isTerminal(current.status())) {
-            return current;
+        BookingPaymentProvider provider = providerRegistry.getProvider(current.provider());
+        try {
+            BookingPaymentProvider.RefundResult refundResult = provider.refund(
+                    user.businessId(), bookingId, paymentId, current.providerPaymentId(),
+                    current.amount(), request == null ? null : request.reason());
+            Map<String, Object> metadata = new LinkedHashMap<>();
+            metadata.put("source", "PROVIDER_REFUND");
+            metadata.put("actorUserId", user.userId());
+            metadata.put("reason", request == null ? null : request.reason());
+            metadata.put("previousStatus", current.status());
+            metadata.put("providerRefundId", refundResult.providerRefundId());
+            metadata.putAll(refundResult.metadata());
+            BookingPaymentRecord payment = repository.updatePaymentStatus(
+                    current.id(), "REFUNDED", "{}", toJson(metadata), OffsetDateTime.now(ZoneOffset.UTC));
+            repository.recalculateBookingPaymentStatus(user.businessId(), bookingId);
+            auditService.record(user.businessId(), user.userId(), "BOOKING_PAYMENT_REFUNDED", "BOOKING", bookingId,
+                    "Reembolso procesado via " + provider.providerName() + ".",
+                    AuditMetadata.of("paymentId", payment.id(), "provider", current.provider(),
+                            "amount", current.amount(), "providerRefundId", refundResult.providerRefundId()));
+            return toResponse(payment);
+        } catch (RuntimeException exception) {
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "BOOKING_PAYMENT_REFUND_FAILED",
+                    "Error al procesar reembolso: " + safeMessage(exception),
+                    Map.of("error", safeMessage(exception)));
         }
-        return repository.updatePaymentStatus(current.id(), normalized.status(), rawPayloadJson, metadataJson, normalized.occurredAt());
     }
 
     private void recordPaymentAudit(BookingPaymentRecord payment, BookingPaymentBookingRecord booking, boolean update) {
@@ -326,121 +483,22 @@ public class BookingPaymentService {
             case "REFUNDED" -> "BOOKING_PAYMENT_REFUNDED";
             default -> "BOOKING_PAYMENT_PENDING";
         };
-        boolean bookingClosed = BookingStateMachine.isClosed(booking.bookingStatus());
         auditService.record(payment.businessId(), null, eventName, "BOOKING", payment.bookingId(),
                 "Webhook de pago de reserva procesado.",
                 AuditMetadata.of(
-                        "paymentId", payment.id(),
-                        "provider", payment.provider(),
-                        "providerPaymentId", payment.providerPaymentId(),
-                        "idempotencyKey", payment.idempotencyKey(),
-                        "amount", payment.amount(),
-                        "currency", payment.currency(),
-                        "paymentStatus", payment.status(),
+                        "paymentId", payment.id(), "provider", payment.provider(),
+                        "providerPaymentId", payment.providerPaymentId(), "idempotencyKey", payment.idempotencyKey(),
+                        "amount", payment.amount(), "currency", payment.currency(), "paymentStatus", payment.status(),
                         "bookingStatus", BookingStateMachine.canonical(booking.bookingStatus()),
                         "bookingPaymentStatus", booking.paymentStatus(),
                         "requiresDeposit", booking.requiresDeposit(),
                         "depositAmount", booking.depositAmount(),
-                        "lateOrClosedBooking", bookingClosed,
                         "updatedExistingPayment", update));
     }
 
-    private BookingPaymentWebhookRequest parse(String rawBody) {
-        try {
-            return objectMapper.readValue(rawBody, BookingPaymentWebhookRequest.class);
-        } catch (JsonProcessingException exception) {
-            throw new ApiException(HttpStatus.BAD_REQUEST,
-                    "INVALID_PAYMENT_WEBHOOK_PAYLOAD",
-                    "El payload del webhook de pago no es valido.",
-                    Map.of("payload", "JSON invalido."));
-        }
-    }
-
-    private NormalizedPayment normalize(BookingPaymentWebhookRequest request) {
-        if (request == null || request.businessId() == null || request.bookingId() == null) {
-            throw validationError("bookingId", "El pago debe indicar negocio y reserva.");
-        }
-        String provider = normalizeProvider(request.provider());
-        String providerPaymentId = normalizeOptional(request.providerPaymentId(), 160);
-        String idempotencyKey = normalizeOptional(request.idempotencyKey(), 160);
-        if (providerPaymentId == null && idempotencyKey == null) {
-            throw validationError("idempotencyKey", "El webhook debe incluir providerPaymentId o idempotencyKey.");
-        }
-        BigDecimal amount = request.amount();
-        if (amount == null || amount.signum() < 0) {
-            throw validationError("amount", "El monto del pago no puede ser negativo.");
-        }
-        String currency = request.currency() == null || request.currency().isBlank()
-                ? "CLP"
-                : request.currency().trim().toUpperCase(Locale.ROOT);
-        if (currency.length() != 3) {
-            throw validationError("currency", "La moneda debe usar codigo ISO de 3 letras.");
-        }
-        return new NormalizedPayment(
-                request.businessId(),
-                request.bookingId(),
-                provider,
-                providerPaymentId,
-                idempotencyKey,
-                amount,
-                currency,
-                normalizeStatus(request.status()),
-                request.occurredAt() == null ? OffsetDateTime.now(ZoneOffset.UTC) : request.occurredAt(),
-                request.metadata() == null ? Map.of() : request.metadata());
-    }
-
-    private String normalizeProvider(String provider) {
-        return normalizeProvider(provider, null);
-    }
-
-    private String normalizeProvider(String provider, String defaultProvider) {
-        if ((provider == null || provider.isBlank()) && defaultProvider != null) {
-            return defaultProvider;
-        }
-        if (provider == null || provider.isBlank()) {
-            throw validationError("provider", "El proveedor de pago es obligatorio.");
-        }
-        String normalized = provider.trim().toUpperCase(Locale.ROOT);
-        if (normalized.length() > 60) {
-            throw validationError("provider", "El proveedor de pago supera el largo permitido.");
-        }
-        return normalized;
-    }
-
-    private String normalizeCurrency(String currency) {
-        String resolved = currency == null || currency.isBlank()
-                ? "CLP"
-                : currency.trim().toUpperCase(Locale.ROOT);
-        if (resolved.length() != 3) {
-            throw validationError("currency", "La moneda debe usar codigo ISO de 3 letras.");
-        }
-        return resolved;
-    }
-
-    private String normalizeStatus(String status) {
-        if (status == null || status.isBlank()) {
-            throw validationError("status", "El estado del pago es obligatorio.");
-        }
-        return switch (status.trim().toUpperCase(Locale.ROOT)) {
-            case "APPROVED", "PAID", "SUCCEEDED", "SUCCESS", "COMPLETED" -> "APPROVED";
-            case "REJECTED", "FAILED", "DECLINED", "CANCELED", "CANCELLED" -> "REJECTED";
-            case "EXPIRED" -> "EXPIRED";
-            case "REFUNDED" -> "REFUNDED";
-            case "PENDING", "CREATED", "PROCESSING" -> "PENDING";
-            default -> throw validationError("status", "El estado del pago no es soportado.");
-        };
-    }
-
-    private String normalizeOptional(String value, int maxLength) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-        String normalized = value.trim();
-        return normalized.length() > maxLength ? normalized.substring(0, maxLength) : normalized;
-    }
-
-    private boolean isTerminal(String status) {
-        return "APPROVED".equals(status) || "REJECTED".equals(status) || "EXPIRED".equals(status) || "REFUNDED".equals(status);
+    public BookingPaymentResponse getPaymentStatus(UUID paymentId) {
+        BookingPaymentRecord payment = repository.findById(paymentId);
+        return toResponse(payment);
     }
 
     private void validateSignature(String rawBody, String timestampHeader, String signatureHeader) {
@@ -486,6 +544,17 @@ public class BookingPaymentService {
             return "sha256=" + HexFormat.of().formatHex(mac.doFinal(value.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception exception) {
             throw new IllegalStateException("No se pudo calcular firma HMAC de pago.", exception);
+        }
+    }
+
+    private BookingPaymentWebhookRequest parseWebhookBody(String rawBody) {
+        try {
+            return objectMapper.readValue(rawBody, BookingPaymentWebhookRequest.class);
+        } catch (IOException exception) {
+            throw new ApiException(HttpStatus.BAD_REQUEST,
+                    "INVALID_PAYMENT_WEBHOOK_BODY",
+                    "El cuerpo del webhook de pago no es valido.",
+                    Map.of("body", "Cuerpo no procesable."));
         }
     }
 
@@ -541,16 +610,6 @@ public class BookingPaymentService {
         return value;
     }
 
-    private String resolveCheckoutUrlTemplate(String provider) {
-        if (!"SIMULATED".equals(provider)
-                && properties.getExternalCheckoutUrlTemplate() != null
-                && !properties.getExternalCheckoutUrlTemplate().isBlank()) {
-            return properties.getExternalCheckoutUrlTemplate().trim();
-        }
-        String value = properties.getCheckoutPublicBaseUrl();
-        return (value == null || value.isBlank() ? "http://localhost:5173/reservas/pagar" : value.trim()).replaceAll("/+$", "");
-    }
-
     private void sendPaymentLinkNotifications(AuthenticatedUser user, BookingPaymentRecord payment, CreateBookingPaymentLinkRequest request) {
         boolean sendWhatsApp = request != null && request.sendWhatsApp() != null ? request.sendWhatsApp() : properties.isDispatchWhatsApp();
         boolean sendEmail = request != null && request.sendEmail() != null ? request.sendEmail() : properties.isDispatchEmail();
@@ -569,7 +628,7 @@ public class BookingPaymentService {
     private void sendPaymentEmail(BookingPaymentNotificationRecord booking, BookingPaymentRecord payment) {
         String body = bookingEmailService.buildAppointmentEmailBody(
                 booking.customerName(),
-                "Tu reserva requiere abono para quedar lista para confirmacion.",
+                "Tu reserva requiere abono para quedar lista.",
                 booking.serviceName() == null ? booking.subject() : booking.serviceName(),
                 formatDateTime(booking.startsAt()),
                 booking.locationName() == null ? booking.location() : booking.locationName(),
@@ -581,7 +640,7 @@ public class BookingPaymentService {
         bookingEmailService.sendBookingEmail(booking.businessId(), booking.bookingId(), booking.customerEmail(),
                 "BOOKING_PAYMENT_LINK", "Abono de reserva pendiente", body);
         auditService.record(booking.businessId(), null, "BOOKING_PAYMENT_EMAIL_SENT", "BOOKING", booking.bookingId(),
-                "Correo de link de pago generado o simulado.",
+                "Correo de link de pago generado.",
                 AuditMetadata.of("paymentId", payment.id(), "checkoutExpiresAt", payment.checkoutExpiresAt()));
     }
 
@@ -589,10 +648,7 @@ public class BookingPaymentService {
         String body = buildPaymentWhatsAppMessage(booking, payment);
         try {
             channelDispatchService.dispatch(new ChannelDispatchRequest(
-                    booking.businessId(),
-                    MessageChannelType.WHATSAPP,
-                    booking.customerPhone(),
-                    body));
+                    booking.businessId(), MessageChannelType.WHATSAPP, booking.customerPhone(), body));
             auditService.record(booking.businessId(), user.userId(), "BOOKING_PAYMENT_WHATSAPP_SENT", "BOOKING", booking.bookingId(),
                     "Link de pago enviado por WhatsApp.",
                     AuditMetadata.of("paymentId", payment.id(), "checkoutUrl", payment.checkoutUrl()));
@@ -617,8 +673,7 @@ public class BookingPaymentService {
                 valueOrFallback(booking.customerName(), "Cliente"),
                 valueOrFallback(booking.serviceName(), booking.subject()),
                 formatDateTime(booking.startsAt()),
-                payment.currency(),
-                payment.amount(),
+                payment.currency(), payment.amount(),
                 payment.checkoutUrl(),
                 formatDateTime(payment.checkoutExpiresAt()));
     }
@@ -646,36 +701,72 @@ public class BookingPaymentService {
         auditService.record(user.businessId(), user.userId(), eventName, "BOOKING", payment.bookingId(),
                 "Pago manual de reserva registrado.",
                 AuditMetadata.of(
-                        "paymentId", payment.id(),
-                        "provider", payment.provider(),
-                        "providerPaymentId", payment.providerPaymentId(),
-                        "idempotencyKey", payment.idempotencyKey(),
-                        "amount", payment.amount(),
-                        "currency", payment.currency(),
-                        "paymentStatus", payment.status(),
+                        "paymentId", payment.id(), "provider", payment.provider(),
+                        "providerPaymentId", payment.providerPaymentId(), "idempotencyKey", payment.idempotencyKey(),
+                        "amount", payment.amount(), "currency", payment.currency(), "paymentStatus", payment.status(),
                         "bookingStatus", BookingStateMachine.canonical(booking.bookingStatus()),
-                        "bookingPaymentStatus", booking.paymentStatus(),
-                        "lateOrClosedBooking", BookingStateMachine.isClosed(booking.bookingStatus())));
+                        "bookingPaymentStatus", booking.paymentStatus()));
     }
 
     private BookingPaymentResponse toResponse(BookingPaymentRecord payment) {
         return new BookingPaymentResponse(
-                payment.id(),
-                payment.bookingId(),
-                payment.provider(),
-                payment.providerPaymentId(),
-                payment.idempotencyKey(),
-                payment.amount(),
-                payment.currency(),
-                payment.status(),
-                payment.checkoutUrl(),
-                payment.checkoutExpiresAt(),
-                payment.manual(),
-                payment.approvedAt(),
-                payment.rejectedAt(),
-                payment.expiredAt(),
-                payment.refundedAt(),
+                payment.id(), payment.bookingId(), payment.provider(), payment.providerPaymentId(),
+                payment.idempotencyKey(), payment.amount(), payment.currency(), payment.status(),
+                payment.checkoutUrl(), payment.checkoutExpiresAt(), payment.manual(),
+                payment.approvedAt(), payment.rejectedAt(), payment.expiredAt(), payment.refundedAt(),
                 payment.createdAt());
+    }
+
+    private String normalizeProvider(String provider) {
+        return normalizeProvider(provider, null);
+    }
+
+    private String normalizeProvider(String provider, String defaultProvider) {
+        if ((provider == null || provider.isBlank()) && defaultProvider != null) {
+            return defaultProvider;
+        }
+        if (provider == null || provider.isBlank()) {
+            throw validationError("provider", "El proveedor de pago es obligatorio.");
+        }
+        String normalized = provider.trim().toUpperCase(Locale.ROOT);
+        if (normalized.length() > 60) {
+            throw validationError("provider", "El proveedor de pago supera el largo permitido.");
+        }
+        return normalized;
+    }
+
+    private String normalizeCurrency(String currency) {
+        String resolved = currency == null || currency.isBlank() ? "CLP" : currency.trim().toUpperCase(Locale.ROOT);
+        if (resolved.length() != 3) {
+            throw validationError("currency", "La moneda debe usar codigo ISO de 3 letras.");
+        }
+        return resolved;
+    }
+
+    private String normalizeStatus(String status) {
+        if (status == null || status.isBlank()) {
+            throw validationError("status", "El estado del pago es obligatorio.");
+        }
+        return switch (status.trim().toUpperCase(Locale.ROOT)) {
+            case "APPROVED", "PAID", "SUCCEEDED", "SUCCESS", "COMPLETED" -> "APPROVED";
+            case "REJECTED", "FAILED", "DECLINED", "CANCELED", "CANCELLED" -> "REJECTED";
+            case "EXPIRED" -> "EXPIRED";
+            case "REFUNDED" -> "REFUNDED";
+            case "PENDING", "CREATED", "PROCESSING" -> "PENDING";
+            default -> throw validationError("status", "El estado del pago no es soportado.");
+        };
+    }
+
+    private String normalizeOptional(String value, int maxLength) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        String normalized = value.trim();
+        return normalized.length() > maxLength ? normalized.substring(0, maxLength) : normalized;
+    }
+
+    private boolean isTerminal(String status) {
+        return "APPROVED".equals(status) || "REJECTED".equals(status) || "EXPIRED".equals(status) || "REFUNDED".equals(status);
     }
 
     private ApiException validationError(String field, String message) {
@@ -683,16 +774,9 @@ public class BookingPaymentService {
     }
 
     private record NormalizedPayment(
-            UUID businessId,
-            UUID bookingId,
-            String provider,
-            String providerPaymentId,
-            String idempotencyKey,
-            BigDecimal amount,
-            String currency,
-            String status,
-            OffsetDateTime occurredAt,
-            Map<String, Object> metadata) {
+            UUID businessId, UUID bookingId, String provider, String providerPaymentId,
+            String idempotencyKey, BigDecimal amount, String currency, String status,
+            OffsetDateTime occurredAt, Map<String, Object> metadata) {
     }
 
     private static final class MessageDigestSupport {

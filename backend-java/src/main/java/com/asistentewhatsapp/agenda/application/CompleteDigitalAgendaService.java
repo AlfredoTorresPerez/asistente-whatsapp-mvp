@@ -22,6 +22,7 @@ import com.asistentewhatsapp.bookings.api.CreateBookingConfirmationLinkRequest;
 import com.asistentewhatsapp.bookings.application.BookingStateMachine;
 import com.asistentewhatsapp.bookings.application.BookingConfirmationService;
 import com.asistentewhatsapp.bookings.infrastructure.BookingJdbcRepository;
+import com.asistentewhatsapp.calendar.application.CalendarSyncService;
 import com.asistentewhatsapp.channels.application.ChannelDispatchRequest;
 import com.asistentewhatsapp.channels.application.ChannelDispatchService;
 import com.asistentewhatsapp.channels.domain.MessageChannelType;
@@ -30,6 +31,7 @@ import com.asistentewhatsapp.security.application.AuditMetadata;
 import com.asistentewhatsapp.security.domain.AuthenticatedUser;
 import com.asistentewhatsapp.shared.exception.ApiException;
 import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -53,6 +55,7 @@ public class CompleteDigitalAgendaService {
     private final CompleteAgendaJdbcRepository repository;
     private final BookingJdbcRepository bookingJdbcRepository;
     private final BookingConfirmationService bookingConfirmationService;
+    private final CalendarSyncService calendarSyncService;
     private final AuditService auditService;
     private final ChannelDispatchService channelDispatchService;
 
@@ -60,11 +63,13 @@ public class CompleteDigitalAgendaService {
             CompleteAgendaJdbcRepository repository,
             BookingJdbcRepository bookingJdbcRepository,
             BookingConfirmationService bookingConfirmationService,
+            CalendarSyncService calendarSyncService,
             AuditService auditService,
             ChannelDispatchService channelDispatchService) {
         this.repository = repository;
         this.bookingJdbcRepository = bookingJdbcRepository;
         this.bookingConfirmationService = bookingConfirmationService;
+        this.calendarSyncService = calendarSyncService;
         this.auditService = auditService;
         this.channelDispatchService = channelDispatchService;
     }
@@ -134,9 +139,9 @@ public class CompleteDigitalAgendaService {
         UUID professionalId = resolveRequiredProfessional(user, request, service);
         UUID roomId = resolveRoom(user, request, service);
         OffsetDateTime startsAt = normalizeStartsAt(request.startsAt());
+        assertSlotBookable(user.businessId(), location.id(), service.id(), professionalId, roomId, startsAt, null);
         OffsetDateTime effectiveStart = startsAt.minusMinutes(service.preparationMinutes());
         OffsetDateTime endsAt = startsAt.plusMinutes(service.durationMinutes()).plusMinutes(service.cleanupMinutes());
-        validateSlot(user.businessId(), null, location.id(), professionalId, roomId, effectiveStart, endsAt);
 
         CompleteAgendaJdbcRepository.CustomerRecord customer = repository.findOrCreateCustomer(
                 user.businessId(), request.customerId(), normalizeCustomerName(request.customerName()), normalizePhone(request.customerPhone()), request.customerEmail());
@@ -204,9 +209,9 @@ public class CompleteDigitalAgendaService {
             throw validationError("roomId", "Selecciona la cabina para reprogramar.");
         }
         OffsetDateTime startsAt = normalizeStartsAt(request.startsAt());
+        assertSlotBookable(user.businessId(), location.id(), service.id(), professionalId, roomId, startsAt, bookingId);
         OffsetDateTime effectiveStart = startsAt.minusMinutes(service.preparationMinutes());
         OffsetDateTime endsAt = startsAt.plusMinutes(service.durationMinutes()).plusMinutes(service.cleanupMinutes());
-        validateSlot(user.businessId(), bookingId, location.id(), professionalId, roomId, effectiveStart, endsAt);
         repository.updateBookingSchedule(user.businessId(), bookingId, user.userId(), location.id(), service.id(), professionalId, roomId,
                 startsAt, endsAt, service.durationMinutes(), request.reason(), historySource(user));
         scheduleDefaultReminders(user.businessId(), bookingId, startsAt);
@@ -223,6 +228,7 @@ public class CompleteDigitalAgendaService {
                         "startsAt", startsAt,
                         "endsAt", endsAt,
                         "reason", request.reason()));
+        try { calendarSyncService.syncRescheduled(bookingId, user.businessId()); } catch (Exception ignored) {}
         return bookingJdbcRepository.findBookingDetail(user.businessId(), bookingId);
     }
 
@@ -238,6 +244,7 @@ public class CompleteDigitalAgendaService {
                         "previousStatus", BookingStateMachine.canonical(currentBooking.status()),
                         "newStatus", BookingStateMachine.CANCELLED,
                         "reason", request.reason()));
+        try { calendarSyncService.syncCancelled(bookingId, user.businessId()); } catch (Exception ignored) {}
         return bookingJdbcRepository.findBookingDetail(user.businessId(), bookingId);
     }
 
@@ -317,16 +324,90 @@ public class CompleteDigitalAgendaService {
         return rooms.getFirst().id();
     }
 
-    private void validateSlot(UUID businessId, UUID bookingId, UUID locationId, UUID professionalId, UUID roomId,
-            OffsetDateTime startsAt, OffsetDateTime endsAt) {
-        if (repository.hasConflict(businessId, bookingId, locationId, professionalId, roomId, startsAt, endsAt)) {
-            throw new ApiException(HttpStatus.CONFLICT, "AGENDA_SLOT_NOT_AVAILABLE", "El horario ya esta ocupado.",
+    public void assertSlotBookable(
+            UUID businessId,
+            UUID locationId,
+            UUID serviceId,
+            UUID professionalId,
+            UUID roomId,
+            OffsetDateTime startsAt,
+            UUID excludeBookingId) {
+        if (startsAt == null) {
+            throw validationError("startsAt", "La fecha y hora son obligatorias.");
+        }
+        if (startsAt.isBefore(OffsetDateTime.now(ZoneOffset.UTC))) {
+            throw validationError("startsAt", "La fecha y hora deben ser futuras.");
+        }
+
+        LocationRecord location = repository.findLocation(businessId, locationId);
+        ServiceRecord service = repository.findService(businessId, locationId, serviceId);
+        ZoneId zone = resolveLocationZone(location);
+        OffsetDateTime effectiveStart = startsAt.minusMinutes(service.preparationMinutes());
+        OffsetDateTime endsAt = startsAt.plusMinutes(service.durationMinutes()).plusMinutes(service.cleanupMinutes());
+
+        LocalDate slotDate = startsAt.atZoneSameInstant(zone).toLocalDate();
+        if (repository.isHoliday(businessId, locationId, slotDate)) {
+            throw conflict("AGENDA_HOLIDAY", "La fecha seleccionada es feriado.",
+                    Map.of("startsAt", "Selecciona otra fecha."));
+        }
+
+        int dayOfWeek = startsAt.getDayOfWeek().getValue();
+        List<TimeWindowRecord> businessHours = repository.findBusinessHours(businessId, locationId, dayOfWeek);
+        if (businessHours.isEmpty()) {
+            throw conflict("AGENDA_OUTSIDE_BUSINESS_HOURS", "El negocio no atiende el dia seleccionado.",
+                    Map.of("startsAt", "Selecciona un dia habil."));
+        }
+        if (businessHours.stream().noneMatch(w -> fitsInWindow(effectiveStart, endsAt, w, zone))) {
+            throw conflict("AGENDA_OUTSIDE_BUSINESS_HOURS", "El horario esta fuera del horario de atencion del negocio.",
+                    Map.of("startsAt", "Selecciona un horario dentro del horario de atencion."));
+        }
+
+        List<TimeWindowRecord> professionalHours = repository.findProfessionalHours(businessId, locationId, professionalId, dayOfWeek);
+        if (professionalHours.isEmpty()) {
+            throw conflict("AGENDA_PROFESSIONAL_NOT_AVAILABLE", "El profesional no atiende el dia seleccionado.",
+                    Map.of("professionalId", "Selecciona otro profesional o fecha."));
+        }
+        if (professionalHours.stream().noneMatch(w -> fitsInWindow(effectiveStart, endsAt, w, zone))) {
+            throw conflict("AGENDA_PROFESSIONAL_NOT_AVAILABLE", "El profesional no esta disponible en el horario seleccionado.",
+                    Map.of("startsAt", "Selecciona un horario dentro del horario del profesional."));
+        }
+
+        List<ProfessionalRecord> candidates = repository.findProfessionalCandidates(businessId, locationId, serviceId, professionalId);
+        if (candidates.isEmpty()) {
+            throw conflict("AGENDA_PROFESSIONAL_NOT_CANDIDATE", "El profesional no realiza este servicio en esta sucursal.",
+                    Map.of("professionalId", "Selecciona otro profesional."));
+        }
+
+        if (service.requiresRoom()) {
+            if (roomId == null) {
+                throw validationError("roomId", "El servicio requiere una cabina.");
+            }
+            List<RoomRecord> rooms = repository.findRoomCandidates(businessId, locationId, serviceId, roomId);
+            if (rooms.isEmpty()) {
+                throw conflict("AGENDA_ROOM_NOT_CANDIDATE", "La cabina no esta disponible para este servicio.",
+                        Map.of("roomId", "Selecciona otra cabina."));
+            }
+        }
+
+        if (repository.hasConflict(businessId, excludeBookingId, locationId, professionalId, roomId, effectiveStart, endsAt)) {
+            throw conflict("AGENDA_SLOT_NOT_AVAILABLE", "El horario ya esta ocupado.",
                     Map.of("startsAt", "Selecciona otro horario disponible."));
         }
-        if (repository.hasBlock(businessId, locationId, professionalId, roomId, startsAt, endsAt)) {
-            throw new ApiException(HttpStatus.CONFLICT, "AGENDA_SLOT_BLOCKED", "El horario esta bloqueado.",
+
+        if (repository.hasBlock(businessId, locationId, professionalId, roomId, effectiveStart, endsAt)) {
+            throw conflict("AGENDA_SLOT_BLOCKED", "El horario esta bloqueado.",
                     Map.of("startsAt", "Selecciona otro horario disponible."));
         }
+    }
+
+    private boolean fitsInWindow(OffsetDateTime slotStart, OffsetDateTime slotEnd, TimeWindowRecord window, ZoneId zone) {
+        LocalTime startLocal = slotStart.atZoneSameInstant(zone).toLocalTime();
+        LocalTime endLocal = slotEnd.atZoneSameInstant(zone).toLocalTime();
+        return !startLocal.isBefore(window.startTime()) && !endLocal.isAfter(window.endTime());
+    }
+
+    private ApiException conflict(String code, String message, Map<String, String> fieldErrors) {
+        return new ApiException(HttpStatus.CONFLICT, code, message, fieldErrors);
     }
 
     private String historySource(AuthenticatedUser user) {

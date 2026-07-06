@@ -15,7 +15,10 @@ import com.asistentewhatsapp.bookings.api.CreateBookingPaymentLinkRequest;
 import com.asistentewhatsapp.bookings.api.RegisterBookingManualPaymentRequest;
 import com.asistentewhatsapp.bookings.infrastructure.BookingPaymentJdbcRepository;
 import com.asistentewhatsapp.bookings.infrastructure.BookingPaymentJdbcRepository.BookingPaymentBookingRecord;
+import com.asistentewhatsapp.bookings.application.BookingPaymentProviderRegistry;
+import com.asistentewhatsapp.bookings.domain.BookingPaymentProvider;
 import com.asistentewhatsapp.bookings.infrastructure.BookingPaymentJdbcRepository.BookingPaymentRecord;
+import com.asistentewhatsapp.calendar.application.CalendarSyncService;
 import com.asistentewhatsapp.channels.application.ChannelDispatchService;
 import com.asistentewhatsapp.security.application.AuditService;
 import com.asistentewhatsapp.security.domain.AuthenticatedUser;
@@ -35,7 +38,11 @@ class BookingPaymentServiceTest {
     void approvedWebhookRecordsPaymentAndDoesNotConfirmExpiredBooking() {
         BookingPaymentJdbcRepository repository = mock(BookingPaymentJdbcRepository.class);
         AuditService auditService = mock(AuditService.class);
-        BookingPaymentService service = service(repository, new BookingPaymentProperties(), auditService);
+        BookingPaymentProperties properties = new BookingPaymentProperties();
+        properties.setWebhookSignatureEnabled(false);
+        properties.setDispatchPostPaymentWhatsApp(false);
+        properties.setDispatchPostPaymentEmail(false);
+        BookingPaymentService service = service(repository, properties, auditService);
         UUID businessId = UUID.randomUUID();
         UUID bookingId = UUID.randomUUID();
         UUID paymentId = UUID.randomUUID();
@@ -72,7 +79,11 @@ class BookingPaymentServiceTest {
     void duplicateApprovedWebhookIsIdempotentAndDoesNotAuditAgain() {
         BookingPaymentJdbcRepository repository = mock(BookingPaymentJdbcRepository.class);
         AuditService auditService = mock(AuditService.class);
-        BookingPaymentService service = service(repository, new BookingPaymentProperties(), auditService);
+        BookingPaymentProperties properties = new BookingPaymentProperties();
+        properties.setWebhookSignatureEnabled(false);
+        properties.setDispatchPostPaymentWhatsApp(false);
+        properties.setDispatchPostPaymentEmail(false);
+        BookingPaymentService service = service(repository, properties, auditService);
         UUID businessId = UUID.randomUUID();
         UUID bookingId = UUID.randomUUID();
         BookingPaymentRecord existing = payment(UUID.randomUUID(), businessId, bookingId, "APPROVED");
@@ -265,12 +276,18 @@ class BookingPaymentServiceTest {
             BookingPaymentJdbcRepository repository,
             BookingPaymentProperties properties,
             AuditService auditService) {
+        BookingPaymentProviderRegistry registry = mock(BookingPaymentProviderRegistry.class);
+        BookingPaymentProvider defaultProvider = mock(BookingPaymentProvider.class);
+        when(defaultProvider.supportsWebhook()).thenReturn(false);
+        when(registry.getDefaultProvider()).thenReturn(defaultProvider);
         return new BookingPaymentService(
                 repository,
                 properties,
+                registry,
                 auditService,
                 new ObjectMapper(),
                 mock(ChannelDispatchService.class),
-                mock(BookingEmailService.class));
+                mock(BookingEmailService.class),
+                mock(CalendarSyncService.class));
     }
 }

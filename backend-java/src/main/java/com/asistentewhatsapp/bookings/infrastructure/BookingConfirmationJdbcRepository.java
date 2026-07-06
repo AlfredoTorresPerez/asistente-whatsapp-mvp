@@ -53,7 +53,7 @@ public class BookingConfirmationJdbcRepository {
     }
 
     public ConfirmationLinkRecord findByTokenHashForUpdate(String tokenHash) {
-        return findOneLink("where l.token_hash = :tokenHash for update of l, b", new MapSqlParameterSource().addValue("tokenHash", tokenHash));
+        return findOneLink("where l.token_hash = :tokenHash for update of l", new MapSqlParameterSource().addValue("tokenHash", tokenHash));
     }
 
     private ConfirmationLinkRecord findOneLink(String whereClause, MapSqlParameterSource params) {

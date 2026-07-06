@@ -104,7 +104,11 @@ public class CompleteAgendaJdbcRepository {
                             s.requires_deposit,
                             coalesce(s.deposit_amount, 0) as deposit_amount,
                             s.preparation_minutes,
-                            s.cleanup_minutes
+                            s.cleanup_minutes,
+                            s.active,
+                            s.price_base,
+                            s.requires_prior_evaluation,
+                            s.requires_informed_consent
                         from aesthetic_service s
                         left join aesthetic_service_location sl
                           on sl.business_id = s.business_id
@@ -133,7 +137,11 @@ public class CompleteAgendaJdbcRepository {
                         rs.getBoolean("requires_deposit"),
                         rs.getBigDecimal("deposit_amount"),
                         rs.getInt("preparation_minutes"),
-                        rs.getInt("cleanup_minutes")));
+                        rs.getInt("cleanup_minutes"),
+                        rs.getBoolean("active"),
+                        rs.getBigDecimal("price_base"),
+                        rs.getBoolean("requires_prior_evaluation"),
+                        rs.getBoolean("requires_informed_consent")));
         if (items.isEmpty()) {
             throw new ResourceNotFoundException("El servicio no esta disponible en la sucursal seleccionada.");
         }
@@ -293,6 +301,192 @@ public class CompleteAgendaJdbcRepository {
         return result;
     }
 
+    public boolean isCustomerBlocked(UUID businessId, String phone) {
+        logInput("isCustomerBlocked", businessId, phone);
+        if (phone == null || phone.isBlank()) {
+            logOutput("isCustomerBlocked", false);
+            return false;
+        }
+        String normalized = phone.replaceAll("\\D", "");
+        Integer count = jdbcTemplate.queryForObject(
+                """
+                        select count(*)
+                        from customer
+                        where business_id = :businessId
+                          and active = false
+                          and (normalized_phone = :phone or regexp_replace(coalesce(phone, ''), '\\D', '', 'g') = :phone)
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("businessId", businessId)
+                        .addValue("phone", normalized),
+                Integer.class);
+        boolean result = count != null && count > 0;
+        logOutput("isCustomerBlocked", result);
+        return result;
+    }
+
+    public boolean hasExcessiveNoShows(UUID businessId, String phone) {
+        logInput("hasExcessiveNoShows", businessId, phone);
+        if (phone == null || phone.isBlank()) {
+            logOutput("hasExcessiveNoShows", false);
+            return false;
+        }
+        String normalized = phone.replaceAll("\\D", "");
+        Integer count = jdbcTemplate.queryForObject(
+                """
+                        select count(*)
+                        from booking b
+                        join customer c on c.id = b.customer_id and c.business_id = b.business_id
+                        where b.business_id = :businessId
+                          and b.status = 'NO_ASISTE'
+                          and b.starts_at >= current_timestamp - interval '6 months'
+                          and (c.normalized_phone = :phone or regexp_replace(coalesce(c.phone, ''), '\\D', '', 'g') = :phone)
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("businessId", businessId)
+                        .addValue("phone", normalized),
+                Integer.class);
+        boolean result = count != null && count >= 3;
+        logOutput("hasExcessiveNoShows", result);
+        return result;
+    }
+
+    public boolean isServiceCategoryActive(UUID businessId, UUID serviceId) {
+        logInput("isServiceCategoryActive", businessId, serviceId);
+        String categoryActive = jdbcTemplate.queryForObject(
+                """
+                        select c.active::text
+                        from aesthetic_service s
+                        join aesthetic_service_category c on c.id = s.category_id and c.business_id = s.business_id
+                        where s.business_id = :businessId and s.id = :serviceId
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("businessId", businessId)
+                        .addValue("serviceId", serviceId),
+                String.class);
+        boolean result = "true".equals(categoryActive);
+        logOutput("isServiceCategoryActive", result);
+        return result;
+    }
+
+    public boolean isLocationServingService(UUID businessId, UUID locationId, UUID serviceId) {
+        logInput("isLocationServingService", businessId, locationId, serviceId);
+        Integer count = jdbcTemplate.queryForObject(
+                """
+                        select count(*)
+                        from aesthetic_service_location sl
+                        where sl.business_id = :businessId
+                          and sl.location_id = :locationId
+                          and sl.service_id = :serviceId
+                          and sl.active = true
+                        union all
+                        select count(*)
+                        from aesthetic_service s
+                        where s.business_id = :businessId
+                          and s.id = :serviceId
+                          and s.active = true
+                          and not exists (
+                              select 1 from aesthetic_service_location x
+                              where x.business_id = s.business_id
+                                and x.service_id = s.id
+                                and x.active = true
+                          )
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("businessId", businessId)
+                        .addValue("locationId", locationId)
+                        .addValue("serviceId", serviceId),
+                Integer.class);
+        boolean result = count != null && count > 0;
+        logOutput("isLocationServingService", result);
+        return result;
+    }
+
+    public boolean isLocationClosedForMaintenance(UUID businessId, UUID locationId, OffsetDateTime startsAt) {
+        logInput("isLocationClosedForMaintenance", businessId, locationId, startsAt);
+        Integer count = jdbcTemplate.queryForObject(
+                """
+                        select count(*)
+                        from agenda_block b
+                        where b.business_id = :businessId
+                          and b.active = true
+                          and b.location_id = :locationId
+                          and b.professional_id is null
+                          and b.room_id is null
+                          and b.starts_at <= :startsAt
+                          and b.ends_at > :startsAt
+                          and b.reason = 'MAINTENANCE'
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("businessId", businessId)
+                        .addValue("locationId", locationId)
+                        .addValue("startsAt", startsAt),
+                Integer.class);
+        boolean result = count != null && count > 0;
+        logOutput("isLocationClosedForMaintenance", result);
+        return result;
+    }
+
+    public boolean isProfessionalActive(UUID businessId, UUID professionalId) {
+        logInput("isProfessionalActive", businessId, professionalId);
+        Integer count = jdbcTemplate.queryForObject(
+                """
+                        select count(*)
+                        from aesthetic_professional
+                        where business_id = :businessId
+                          and id = :professionalId
+                          and active = true
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("businessId", businessId)
+                        .addValue("professionalId", professionalId),
+                Integer.class);
+        boolean result = count != null && count > 0;
+        logOutput("isProfessionalActive", result);
+        return result;
+    }
+
+    public UUID findBookingByNotesIdempotency(UUID businessId, String idempotencyKey) {
+        logInput("findBookingByNotesIdempotency", businessId, idempotencyKey);
+        String searchPattern = "[IDEM:" + idempotencyKey + "]";
+        List<UUID> items = jdbcTemplate.query(
+                """
+                        select id from booking
+                        where business_id = :businessId
+                          and notes like :pattern
+                          and status in (:activeStatuses)
+                        order by created_at desc limit 1
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("businessId", businessId)
+                        .addValue("pattern", "%" + searchPattern + "%")
+                        .addValue("activeStatuses", ACTIVE_BOOKING_STATUSES),
+                (rs, rowNum) -> rs.getObject("id", UUID.class));
+        UUID result = items.isEmpty() ? null : items.getFirst();
+        logOutput("findBookingByNotesIdempotency", result);
+        return result;
+    }
+
+    public void storeIdempotencyInNotes(UUID businessId, UUID bookingId, String idempotencyKey) {
+        logInput("storeIdempotencyInNotes", businessId, bookingId, idempotencyKey);
+        String tag = "[IDEM:" + idempotencyKey + "]";
+        jdbcTemplate.update(
+                """
+                        update booking
+                        set notes = case
+                            when notes is null or notes = '' then :tag
+                            else :tag || ' ' || notes
+                        end,
+                        updated_at = current_timestamp
+                        where business_id = :businessId and id = :bookingId
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("businessId", businessId)
+                        .addValue("bookingId", bookingId)
+                        .addValue("tag", tag));
+        logOutput("storeIdempotencyInNotes", "done");
+    }
+
     public List<ProfessionalRecord> findProfessionalCandidates(UUID businessId, UUID locationId, UUID serviceId, UUID professionalId) {
         logInput("findProfessionalCandidates", businessId, locationId, serviceId, professionalId);
         StringBuilder sql = new StringBuilder("""
@@ -370,6 +564,15 @@ public class CompleteAgendaJdbcRepository {
     public boolean hasConflict(UUID businessId, UUID bookingId, UUID locationId, UUID professionalId, UUID roomId,
             OffsetDateTime startsAt, OffsetDateTime endsAt) {
         logInput("hasConflict", businessId, bookingId, locationId, professionalId, roomId, startsAt, endsAt);
+        if (professionalId != null) {
+            return hasProfessionalConflict(businessId, bookingId, professionalId, startsAt, endsAt);
+        }
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("businessId", businessId)
+                .addValue("locationId", locationId)
+                .addValue("startsAt", startsAt)
+                .addValue("endsAt", endsAt)
+                .addValue("activeStatuses", ACTIVE_BOOKING_STATUSES);
         StringBuilder sql = new StringBuilder("""
                         select count(*)
                         from booking b
@@ -379,37 +582,43 @@ public class CompleteAgendaJdbcRepository {
                           and b.starts_at < :endsAt
                           and coalesce(b.ends_at, b.starts_at + (b.duration_minutes || ' minutes')::interval) > :startsAt
                         """);
-        MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("businessId", businessId)
-                .addValue("locationId", locationId)
-                .addValue("startsAt", startsAt)
-                .addValue("endsAt", endsAt)
-                .addValue("activeStatuses", ACTIVE_BOOKING_STATUSES);
         if (bookingId != null) {
             sql.append(" and b.id <> :bookingId\n");
             params.addValue("bookingId", bookingId);
         }
-        if (professionalId != null || roomId != null) {
-            sql.append(" and (");
-            boolean hasPredicate = false;
-            if (professionalId != null) {
-                sql.append("b.professional_id = :professionalId");
-                params.addValue("professionalId", professionalId);
-                hasPredicate = true;
-            }
-            if (roomId != null) {
-                if (hasPredicate) {
-                    sql.append(" or ");
-                }
-                sql.append("b.room_id = :roomId");
-                params.addValue("roomId", roomId);
-                        }
-            sql.append(")\n");
+        if (roomId != null) {
+            sql.append(" and b.room_id = :roomId\n");
+            params.addValue("roomId", roomId);
         }
         Integer count = jdbcTemplate.queryForObject(sql.toString(), params, Integer.class);
         boolean result = count != null && count > 0;
         logOutput("hasConflict", result);
         return result;
+    }
+
+    private boolean hasProfessionalConflict(UUID businessId, UUID bookingId, UUID professionalId,
+            OffsetDateTime startsAt, OffsetDateTime endsAt) {
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("businessId", businessId)
+                .addValue("professionalId", professionalId)
+                .addValue("startsAt", startsAt)
+                .addValue("endsAt", endsAt)
+                .addValue("activeStatuses", ACTIVE_BOOKING_STATUSES);
+        StringBuilder sql = new StringBuilder("""
+                        select count(*)
+                        from booking b
+                        where b.business_id = :businessId
+                          and b.status in (:activeStatuses)
+                          and b.professional_id = :professionalId
+                          and b.starts_at < :endsAt
+                          and coalesce(b.ends_at, b.starts_at + (b.duration_minutes || ' minutes')::interval) > :startsAt
+                        """);
+        if (bookingId != null) {
+            sql.append(" and b.id <> :bookingId\n");
+            params.addValue("bookingId", bookingId);
+        }
+        Integer count = jdbcTemplate.queryForObject(sql.toString(), params, Integer.class);
+        return count != null && count > 0;
     }
 
     public boolean hasBlock(UUID businessId, UUID locationId, UUID professionalId, UUID roomId,
@@ -1280,7 +1489,14 @@ public class CompleteAgendaJdbcRepository {
     }
 
     public record ServiceRecord(UUID id, String name, int durationMinutes, boolean requiresRoom, boolean requiresDeposit,
-            BigDecimal depositAmount, int preparationMinutes, int cleanupMinutes) {
+            BigDecimal depositAmount, int preparationMinutes, int cleanupMinutes, boolean active,
+            BigDecimal priceBase, boolean requiresPriorEvaluation, boolean requiresInformedConsent) {
+
+        public ServiceRecord(UUID id, String name, int durationMinutes, boolean requiresRoom, boolean requiresDeposit,
+                BigDecimal depositAmount, int preparationMinutes, int cleanupMinutes) {
+            this(id, name, durationMinutes, requiresRoom, requiresDeposit, depositAmount, preparationMinutes, cleanupMinutes,
+                    true, null, false, false);
+        }
     }
 
     public record ProfessionalRecord(UUID id, String name) {

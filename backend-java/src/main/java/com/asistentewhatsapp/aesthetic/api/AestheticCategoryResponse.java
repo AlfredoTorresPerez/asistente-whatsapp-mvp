@@ -7,5 +7,6 @@ public record AestheticCategoryResponse(
         String code,
         String name,
         String description,
-        boolean active) {
+        boolean active,
+        Integer displayOrder) {
 }

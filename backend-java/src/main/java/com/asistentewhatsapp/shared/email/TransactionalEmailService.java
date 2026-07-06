@@ -29,14 +29,17 @@ public class TransactionalEmailService {
     private final boolean simulationEnabled;
     private final String from;
     private final String fromName;
+    private final EmailTemplateRenderer templateRenderer;
 
     public TransactionalEmailService(
             JavaMailSender mailSender,
+            EmailTemplateRenderer templateRenderer,
             @Value("${app.email.enabled:false}") boolean enabled,
             @Value("${app.email.simulation-enabled:true}") boolean simulationEnabled,
             @Value("${app.email.from:no-reply@localhost}") String from,
             @Value("${app.email.from-name:Centro estetico}") String fromName) {
         this.mailSender = mailSender;
+        this.templateRenderer = templateRenderer;
         this.enabled = enabled;
         this.simulationEnabled = simulationEnabled;
         this.from = from;
@@ -162,6 +165,92 @@ public class TransactionalEmailService {
         String localPart = email.substring(0, atIndex);
         String domainPart = email.substring(atIndex);
         return localPart.substring(0, Math.min(2, localPart.length())) + "***" + domainPart;
+    }
+
+    public DeliveryStatus sendBookingConfirmationEmail(AppointmentConfirmationEmailDTO dto) {
+        if (dto.getEmail() == null || dto.getEmail().isBlank()) {
+            return DeliveryStatus.SIMULATED;
+        }
+
+        boolean simulated = simulationEnabled || !enabled;
+        String recipient = dto.getEmail().trim();
+        String businessName = dto.getBusinessName() != null ? dto.getBusinessName() : fromName;
+        String subject = "Confirma tu reserva - " + businessName;
+
+        String htmlBody = templateRenderer.render("appointment-confirmation", dto);
+        String textBody = buildFallbackText(
+                dto.getPatientName(),
+                dto.getServiceName(),
+                dto.getBranchName(),
+                dto.getAppointmentDate() + " " + dto.getAppointmentTime(),
+                dto.getDuration(),
+                dto.getProfessionalName(),
+                businessName,
+                dto.getConfirmationUrl());
+
+        if (simulated) {
+            LOGGER.info(
+                    "BOOKING_CONFIRMATION_EMAIL_SIMULATED emailMasked={} emailEnabled={} simulationEnabled={}",
+                    maskEmail(recipient),
+                    enabled,
+                    simulationEnabled);
+            return DeliveryStatus.SIMULATED;
+        }
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setTo(recipient);
+            helper.setFrom(fromAddress());
+            helper.setSubject(subject);
+            helper.setText(textBody, htmlBody);
+            mailSender.send(message);
+            LOGGER.info("BOOKING_CONFIRMATION_EMAIL_SENT provider=smtp emailMasked={}", maskEmail(recipient));
+            return DeliveryStatus.SENT;
+        } catch (Exception exception) {
+            LOGGER.warn(
+                    "BOOKING_CONFIRMATION_EMAIL_FAILED emailMasked={} reason={}",
+                    maskEmail(recipient),
+                    exception.getClass().getSimpleName());
+            throw new MailSendException("No se pudo enviar el correo de confirmacion de reserva.", exception);
+        }
+    }
+
+    private String buildFallbackText(String customerName, String serviceName, String locationName,
+            String startsAtText, String durationMinutes, String professionalName, String businessName,
+            String confirmationUrl) {
+        String linkSection = confirmationUrl != null && !confirmationUrl.isBlank()
+                ? "\nConfirma tu reserva aqui: %s\n".formatted(confirmationUrl)
+                : "\nRecibiras un mensaje por WhatsApp con un enlace para confirmar tu cita y mantener el cupo.\n";
+        return """
+                %s
+
+                Hola %s,
+
+                Tu reserva fue creada exitosamente.
+
+                Servicio: %s
+                Fecha y hora: %s
+                Duracion: %s
+                Sucursal: %s
+                Profesional: %s
+                %s
+                Si no recibes el mensaje en los proximos minutos, contactanos directamente.
+
+                Gracias por confiar en nosotros.
+                """.formatted(
+                businessName != null ? businessName : fromName,
+                customerName,
+                valueOrFallback(serviceName, "Servicio de agenda"),
+                valueOrFallback(startsAtText, "Por confirmar"),
+                valueOrFallback(durationMinutes, "-"),
+                valueOrFallback(locationName, "Sucursal por confirmar"),
+                valueOrFallback(professionalName, "Por asignar"),
+                linkSection);
+    }
+
+    private String valueOrFallback(String value, String fallback) {
+        return value == null || value.isBlank() ? fallback : value;
     }
 
     private String htmlEscape(String value) {

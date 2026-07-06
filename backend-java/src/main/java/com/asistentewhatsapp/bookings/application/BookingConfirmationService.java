@@ -19,6 +19,7 @@ import com.asistentewhatsapp.bookings.api.PublicBookingRescheduleRequest;
 import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository;
 import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository.ConfirmationBookingRecord;
 import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository.ConfirmationLinkRecord;
+import com.asistentewhatsapp.calendar.application.CalendarSyncService;
 import com.asistentewhatsapp.channels.application.ChannelDispatchRequest;
 import com.asistentewhatsapp.channels.application.ChannelDispatchResponse;
 import com.asistentewhatsapp.channels.application.ChannelDispatchService;
@@ -29,6 +30,8 @@ import com.asistentewhatsapp.security.application.AuditMetadata;
 import com.asistentewhatsapp.security.application.TokenHashService;
 import com.asistentewhatsapp.security.domain.AuthenticatedUser;
 import com.asistentewhatsapp.shared.exception.ApiException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.security.SecureRandom;
 import java.time.DateTimeException;
 import java.time.LocalDate;
@@ -45,11 +48,17 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Service
 public class BookingConfirmationService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(BookingConfirmationService.class);
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     private static final String STATUS_PENDING_CONFIRMATION = BookingStateMachine.PENDING_CONFIRMATION;
     private static final String STATUS_CONFIRMED = BookingStateMachine.CONFIRMED;
@@ -66,6 +75,9 @@ public class BookingConfirmationService {
     private final WhatsAppWebChannelJdbcRepository whatsAppWebChannelJdbcRepository;
     private final BookingEmailService bookingEmailService;
     private final BookingPaymentService bookingPaymentService;
+    private final CalendarSyncService calendarSyncService;
+    private final BookingConfirmationNotificationsService notificationsService;
+    private final TransactionTemplate transactionTemplate;
 
     public BookingConfirmationService(
             BookingConfirmationJdbcRepository repository,
@@ -76,7 +88,10 @@ public class BookingConfirmationService {
             CompleteAgendaJdbcRepository completeAgendaJdbcRepository,
             WhatsAppWebChannelJdbcRepository whatsAppWebChannelJdbcRepository,
             BookingEmailService bookingEmailService,
-            BookingPaymentService bookingPaymentService) {
+            BookingPaymentService bookingPaymentService,
+            CalendarSyncService calendarSyncService,
+            BookingConfirmationNotificationsService notificationsService,
+            PlatformTransactionManager transactionManager) {
         this.repository = repository;
         this.properties = properties;
         this.tokenHashService = tokenHashService;
@@ -86,6 +101,10 @@ public class BookingConfirmationService {
         this.whatsAppWebChannelJdbcRepository = whatsAppWebChannelJdbcRepository;
         this.bookingEmailService = bookingEmailService;
         this.bookingPaymentService = bookingPaymentService;
+        this.calendarSyncService = calendarSyncService;
+        this.notificationsService = notificationsService;
+        this.transactionTemplate = new TransactionTemplate(transactionManager);
+        this.transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
     }
 
     @Transactional
@@ -148,10 +167,9 @@ public class BookingConfirmationService {
         return toPublicResponse(repository.findByTokenHash(tokenHash));
     }
 
-    @Transactional
     public PublicBookingConfirmationResponse confirm(String rawToken) {
         String tokenHash = tokenHashService.sha256(normalizeToken(rawToken));
-        ConfirmationLinkRecord link = repository.findByTokenHashForUpdate(tokenHash);
+        ConfirmationLinkRecord link = repository.findByTokenHash(tokenHash);
         if (LINK_STATUS_CONFIRMED.equals(link.linkStatus())
                 || BookingStateMachine.CONFIRMED.equals(BookingStateMachine.canonical(link.bookingStatus()))) {
             return toPublicResponse(link);
@@ -164,24 +182,31 @@ public class BookingConfirmationService {
         ensurePaymentAllowsConfirmation(link);
         BookingStateMachine.assertTransition(link.bookingStatus(), STATUS_CONFIRMED, "confirmarse");
         ensureAvailability(link);
-        repository.markConfirmed(link.linkId());
-        repository.updateBookingStatus(link.businessId(), link.bookingId(), STATUS_CONFIRMED);
-        completeAgendaJdbcRepository.insertStatusHistory(link.businessId(), link.bookingId(), link.bookingStatus(), STATUS_CONFIRMED,
-                "Reserva confirmada desde enlace publico.", null, "PUBLIC_LINK");
-        scheduleConfirmedBookingReminders(link);
-        sendConfirmedEmail(link);
-        auditService.record(link.businessId(), null, "BOOKING_CONFIRMED_BY_CUSTOMER_LINK", "BOOKING", link.bookingId(),
-                "El cliente confirmo la reserva desde enlace publico.",
-                AuditMetadata.of(
-                        "source", "PUBLIC_LINK",
-                        "linkId", link.linkId(),
-                        "previousStatus", BookingStateMachine.canonical(link.bookingStatus()),
-                        "newStatus", BookingStateMachine.CONFIRMED,
-                        "requiresDeposit", link.requiresDeposit(),
-                        "depositAmount", link.depositAmount(),
-                        "paymentStatus", link.paymentStatus(),
-                        "linkStatus", link.linkStatus(),
-                        "startsAt", link.startsAt()));
+        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus status) {
+                ConfirmationLinkRecord locked = repository.findByTokenHashForUpdate(tokenHash);
+                repository.markConfirmed(locked.linkId());
+                repository.updateBookingStatus(locked.businessId(), locked.bookingId(), STATUS_CONFIRMED);
+                completeAgendaJdbcRepository.insertStatusHistory(locked.businessId(), locked.bookingId(), locked.bookingStatus(), STATUS_CONFIRMED,
+                        "Reserva confirmada desde enlace publico.", null, "PUBLIC_LINK");
+            }
+        });
+        safelyRun(() -> notificationsService.scheduleReminders(link.businessId(), link.bookingId(), link.startsAt()),
+                "REMINDER_SCHEDULING_FAILED", link.bookingId());
+        if (properties.isDispatchWhatsApp()) {
+            safelyRun(() -> notificationsService.sendConfirmationWhatsApp(link),
+                    "CONFIRMED_WHATSAPP_DISPATCH_FAILED", link.bookingId());
+        }
+        safelyRun(() -> notificationsService.sendConfirmationEmail(link),
+                "CONFIRMED_EMAIL_SEND_FAILED", link.bookingId());
+        safelyRun(() -> notificationsService.auditRecord(
+                link.businessId(), link.bookingId(), link.linkId(),
+                link.bookingStatus(), link.linkStatus(),
+                link.requiresDeposit(), link.depositAmount(), link.paymentStatus(), link.startsAt()),
+                "CONFIRMED_AUDIT_FAILED", link.bookingId());
+        safelyRun(() -> notificationsService.syncCalendar(link.bookingId(), link.businessId()),
+                "CALENDAR_SYNC_CONFIRMED_FAILED", link.bookingId());
         return toPublicResponse(repository.findByTokenHash(tokenHash));
     }
 
@@ -255,6 +280,8 @@ public class BookingConfirmationService {
                         "startsAt", startsAt,
                         "endsAt", endsAt,
                         "reason", reason));
+        try { calendarSyncService.syncRescheduled(link.bookingId(), link.businessId()); }
+        catch (Exception e) { LOGGER.warn("CALENDAR_SYNC_RESCHEDULED_FAILED bookingId={}", link.bookingId(), e); }
         return toPublicResponse(repository.findByTokenHash(tokenHash));
     }
 
@@ -277,6 +304,8 @@ public class BookingConfirmationService {
                         "previousStatus", BookingStateMachine.canonical(link.bookingStatus()),
                         "newStatus", BookingStateMachine.CANCELLED,
                         "reason", reason));
+        try { calendarSyncService.syncCancelled(link.bookingId(), link.businessId()); }
+        catch (Exception e) { LOGGER.warn("CALENDAR_SYNC_CANCELLED_FAILED bookingId={}", link.bookingId(), e); }
         return toPublicResponse(repository.findByTokenHash(tokenHash));
     }
 
@@ -437,7 +466,7 @@ public class BookingConfirmationService {
                     OffsetDateTime endsAt = startsAt.plusMinutes(service.durationMinutes()).plusMinutes(service.cleanupMinutes());
                     boolean available = !completeAgendaJdbcRepository.hasConflict(businessId, null, location.id(), professional.id(), room.id(), effectiveStart, endsAt)
                             && !completeAgendaJdbcRepository.hasBlock(businessId, location.id(), professional.id(), room.id(), effectiveStart, endsAt)
-                            && startsAt.isAfter(nowAtLocation.plusHours(24));
+                            && startsAt.isAfter(nowAtLocation.plusMinutes(properties.getMinMinutesAhead()));
                     if (available) {
                         slots.add(new AgendaSlotResponse(startsAt, startsAt.plusMinutes(service.durationMinutes()), location.id(), location.name(),
                                 service.id(), service.name(), service.durationMinutes(), professional.id(), professional.name(), room.id(), room.name(),
@@ -455,9 +484,9 @@ public class BookingConfirmationService {
                     "El enlace publico ya expiro y la reserva no puede " + action + ".", Map.of("expiresAt", link.expiresAt().toString()));
         }
         validateBookingCanChange(link.bookingStatus(), action);
-        if (!link.startsAt().isAfter(OffsetDateTime.now(ZoneOffset.UTC).plusHours(24))) {
+        if (!link.startsAt().isAfter(OffsetDateTime.now(ZoneOffset.UTC).plusMinutes(properties.getMinMinutesAhead()))) {
             throw new ApiException(HttpStatus.CONFLICT, "BOOKING_CHANGE_WINDOW_CLOSED",
-                    "La reserva no puede " + action + " con menos de 24 horas de anticipacion.", Map.of("startsAt", link.startsAt().toString()));
+                    "La reserva no puede " + action + " con menos de " + properties.getMinMinutesAhead() + " minutos de anticipacion.", Map.of("startsAt", link.startsAt().toString()));
         }
     }
 
@@ -478,8 +507,8 @@ public class BookingConfirmationService {
     }
 
     private OffsetDateTime normalizeFutureStartsAt(OffsetDateTime startsAt) {
-        if (startsAt == null || !startsAt.isAfter(OffsetDateTime.now(ZoneOffset.UTC).plusHours(24))) {
-            throw validationError("startsAt", "La nueva fecha debe tener al menos 24 horas de anticipacion.");
+        if (startsAt == null || !startsAt.isAfter(OffsetDateTime.now(ZoneOffset.UTC).plusMinutes(properties.getMinMinutesAhead()))) {
+            throw validationError("startsAt", "La nueva fecha debe tener al menos " + properties.getMinMinutesAhead() + " minutos de anticipacion.");
         }
         return startsAt;
     }
@@ -550,7 +579,8 @@ public class BookingConfirmationService {
                 link.depositAmount(),
                 link.paymentStatus(),
                 link.expiresAt(),
-                link.confirmedAt());
+                link.confirmedAt(),
+                properties.getMinMinutesAhead());
     }
 
     private void scheduleConfirmedBookingReminders(ConfirmationLinkRecord link) {
@@ -671,6 +701,14 @@ public class BookingConfirmationService {
                     Map.of("token", "Token ausente o invalido."));
         }
         return token.trim();
+    }
+
+    private void safelyRun(Runnable task, String warnCode, UUID bookingId) {
+        try {
+            task.run();
+        } catch (Exception e) {
+            LOGGER.warn("{} bookingId={}", warnCode, bookingId, e);
+        }
     }
 
     private String maskPhone(String phone) {

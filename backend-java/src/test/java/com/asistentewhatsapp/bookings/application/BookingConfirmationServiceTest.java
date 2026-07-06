@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository;
 import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository;
 import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository.ConfirmationLinkRecord;
+import com.asistentewhatsapp.calendar.application.CalendarSyncService;
 import com.asistentewhatsapp.channels.application.ChannelDispatchService;
 import com.asistentewhatsapp.channels.infrastructure.whatsappweb.WhatsAppWebChannelJdbcRepository;
 import com.asistentewhatsapp.security.application.AuditService;
@@ -21,6 +22,8 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 class BookingConfirmationServiceTest {
 
@@ -31,6 +34,7 @@ class BookingConfirmationServiceTest {
         UUID bookingId = UUID.randomUUID();
         ConfirmationLinkRecord link = confirmationLink(businessId, bookingId, true, "PENDING", BookingStateMachine.PENDING_PAYMENT);
         when(fixture.tokenHashService.sha256("token")).thenReturn("hash");
+        when(fixture.repository.findByTokenHash("hash")).thenReturn(link);
         when(fixture.repository.findByTokenHashForUpdate("hash")).thenReturn(link);
         when(fixture.bookingPaymentService.hasApprovedRequiredDeposit(businessId, bookingId)).thenReturn(false);
 
@@ -67,6 +71,29 @@ class BookingConfirmationServiceTest {
                 any(),
                 eq(null),
                 eq("PUBLIC_LINK"));
+    }
+
+    @Test
+    void confirmInvokesNotificationsServiceSideEffects() {
+        Fixture fixture = new Fixture();
+        fixture.properties.setDispatchWhatsApp(true);
+        UUID businessId = UUID.randomUUID();
+        UUID bookingId = UUID.randomUUID();
+        ConfirmationLinkRecord link = confirmationLink(businessId, bookingId, false, "PAID", "PENDING_PAYMENT");
+        when(fixture.tokenHashService.sha256("token")).thenReturn("hash");
+        when(fixture.repository.findByTokenHashForUpdate("hash")).thenReturn(link);
+        when(fixture.repository.findByTokenHash("hash")).thenReturn(link);
+        when(fixture.bookingPaymentService.hasApprovedRequiredDeposit(businessId, bookingId)).thenReturn(false);
+        when(fixture.repository.hasOverlappingActiveBooking(eq(businessId), eq(bookingId), any(), any(), any())).thenReturn(false);
+
+        fixture.service.confirm("token");
+
+        verify(fixture.notificationsService).scheduleReminders(link.businessId(), link.bookingId(), link.startsAt());
+        verify(fixture.notificationsService).sendConfirmationWhatsApp(link);
+        verify(fixture.notificationsService).sendConfirmationEmail(link);
+        verify(fixture.notificationsService).auditRecord(link.businessId(), link.bookingId(), link.linkId(),
+                link.bookingStatus(), link.linkStatus(), link.requiresDeposit(), link.depositAmount(), link.paymentStatus(), link.startsAt());
+        verify(fixture.notificationsService).syncCalendar(link.bookingId(), link.businessId());
     }
 
     private static ConfirmationLinkRecord confirmationLink(UUID businessId, UUID bookingId, boolean requiresDeposit, String paymentStatus, String bookingStatus) {
@@ -111,6 +138,9 @@ class BookingConfirmationServiceTest {
         private final WhatsAppWebChannelJdbcRepository whatsAppWebChannelJdbcRepository = mock(WhatsAppWebChannelJdbcRepository.class);
         private final BookingEmailService bookingEmailService = mock(BookingEmailService.class);
         private final BookingPaymentService bookingPaymentService = mock(BookingPaymentService.class);
+        private final CalendarSyncService calendarSyncService = mock(CalendarSyncService.class);
+        private final BookingConfirmationNotificationsService notificationsService = mock(BookingConfirmationNotificationsService.class);
+        private final PlatformTransactionManager transactionManager = mock(PlatformTransactionManager.class);
         private final BookingConfirmationService service = new BookingConfirmationService(
                 repository,
                 properties,
@@ -120,6 +150,9 @@ class BookingConfirmationServiceTest {
                 completeAgendaJdbcRepository,
                 whatsAppWebChannelJdbcRepository,
                 bookingEmailService,
-                bookingPaymentService);
+                bookingPaymentService,
+                calendarSyncService,
+                notificationsService,
+                transactionManager);
     }
 }

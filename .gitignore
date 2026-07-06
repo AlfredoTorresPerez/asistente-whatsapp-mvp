@@ -3,6 +3,7 @@
 **/coverage/
 **/.DS_Store
 **/target/
+.vite/
 *.log
 .env
 .env.*
@@ -23,3 +24,8 @@ whatsapp-web-service/sessions/
 whatsapp-web-service/.sessions/
 backend-java/logs/
 frontend-react/.vite/
+frontend-react/playwright-report/
+frontend-react/test-results/
+frontend-react/e2e/screenshots/
+*.tsbuildinfo
+*.tsbuildinfo.*

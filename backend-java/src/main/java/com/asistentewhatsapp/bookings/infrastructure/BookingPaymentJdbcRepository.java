@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -241,6 +242,84 @@ public class BookingPaymentJdbcRepository {
             return findExisting(businessId, provider, null, idempotencyKey).orElseThrow(() -> exception);
         }
         return findById(paymentId);
+    }
+
+    public BookingPaymentRecord insertPaymentFromCheckout(
+            UUID businessId,
+            UUID bookingId,
+            String provider,
+            String providerPaymentId,
+            String idempotencyKey,
+            BigDecimal amount,
+            String currency,
+            String checkoutUrl,
+            OffsetDateTime checkoutExpiresAt,
+            String metadata,
+            UUID paymentId) {
+        String resolvedCheckoutUrl = checkoutUrl.contains("{paymentId}")
+                ? checkoutUrl
+                        .replace("{paymentId}", paymentId.toString())
+                        .replace("{bookingId}", bookingId.toString())
+                        .replace("{businessId}", businessId.toString())
+                : checkoutUrl.endsWith("/")
+                ? checkoutUrl + paymentId
+                : checkoutUrl + "/" + paymentId;
+        try {
+            jdbcTemplate.update(
+                    """
+                            insert into booking_payment (
+                                id, business_id, booking_id, provider, provider_payment_id, idempotency_key,
+                                amount, currency, status, raw_payload, metadata,
+                                checkout_url, checkout_expires_at, manual
+                            ) values (
+                                :id, :businessId, :bookingId, :provider, :providerPaymentId, :idempotencyKey,
+                                :amount, :currency, 'PENDING', '{}'::jsonb, cast(:metadata as jsonb),
+                                :checkoutUrl, :checkoutExpiresAt, false
+                            )
+                            """,
+                    new MapSqlParameterSource()
+                            .addValue("id", paymentId)
+                            .addValue("businessId", businessId)
+                            .addValue("bookingId", bookingId)
+                            .addValue("provider", provider)
+                            .addValue("providerPaymentId", providerPaymentId)
+                            .addValue("idempotencyKey", idempotencyKey)
+                            .addValue("amount", amount)
+                            .addValue("currency", currency)
+                            .addValue("metadata", metadata)
+                            .addValue("checkoutUrl", resolvedCheckoutUrl)
+                            .addValue("checkoutExpiresAt", checkoutExpiresAt));
+        } catch (DuplicateKeyException exception) {
+            return findExisting(businessId, provider, null, idempotencyKey).orElseThrow(() -> exception);
+        }
+        return findById(paymentId);
+    }
+
+    public void updatePaymentProviderId(UUID paymentId, String providerPaymentId) {
+        jdbcTemplate.update(
+                "update booking_payment set provider_payment_id = :providerPaymentId, updated_at = current_timestamp where id = :paymentId",
+                new MapSqlParameterSource()
+                        .addValue("paymentId", paymentId)
+                        .addValue("providerPaymentId", providerPaymentId));
+    }
+
+    public void updateBookingStatus(UUID businessId, UUID bookingId, String status, String reason, String description) {
+        jdbcTemplate.update(
+                """
+                        update booking
+                        set status = :status,
+                            status_reason = :reason,
+                            status_description = :description,
+                            updated_at = current_timestamp
+                        where business_id = :businessId
+                          and id = :bookingId
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("businessId", businessId)
+                        .addValue("bookingId", bookingId)
+                        .addValue("status", status)
+                        .addValue("reason", reason)
+                        .addValue("description", description));
     }
 
     public Optional<BookingPaymentRecord> findActiveCheckout(UUID businessId, UUID bookingId, OffsetDateTime now) {

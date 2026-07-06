@@ -2,6 +2,7 @@ package com.asistentewhatsapp.bookings.application;
 
 import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository;
 import com.asistentewhatsapp.bookings.api.BookingPublicActionLinkResponse;
+import com.asistentewhatsapp.calendar.application.CalendarSyncService;
 import com.asistentewhatsapp.bookings.api.CreateBookingCancellationLinkRequest;
 import com.asistentewhatsapp.bookings.api.CreateBookingRescheduleLinkRequest;
 import com.asistentewhatsapp.bookings.api.PublicBookingCancellationRequest;
@@ -40,6 +41,7 @@ public class BookingPublicActionService {
     private final BookingActionLinkJdbcRepository repository;
     private final CompleteAgendaJdbcRepository agendaRepository;
     private final TokenHashService tokenHashService;
+    private final CalendarSyncService calendarSyncService;
     private final AuditService auditService;
     private final ChannelDispatchService channelDispatchService;
     private final BookingEmailService bookingEmailService;
@@ -50,6 +52,7 @@ public class BookingPublicActionService {
             BookingActionLinkJdbcRepository repository,
             CompleteAgendaJdbcRepository agendaRepository,
             TokenHashService tokenHashService,
+            CalendarSyncService calendarSyncService,
             AuditService auditService,
             ChannelDispatchService channelDispatchService,
             BookingEmailService bookingEmailService,
@@ -58,6 +61,7 @@ public class BookingPublicActionService {
         this.repository = repository;
         this.agendaRepository = agendaRepository;
         this.tokenHashService = tokenHashService;
+        this.calendarSyncService = calendarSyncService;
         this.auditService = auditService;
         this.channelDispatchService = channelDispatchService;
         this.bookingEmailService = bookingEmailService;
@@ -207,6 +211,7 @@ public class BookingPublicActionService {
                         "roomId", link.proposedRoomId()));
         sendEmail(booking, "BOOKING_RESCHEDULE_CONFIRMED", "Tu reserva fue reprogramada",
                 "Tu cita fue reprogramada correctamente.", link.proposedLocationName(), link.publicUrl());
+        try { calendarSyncService.syncRescheduled(link.bookingId(), link.businessId()); } catch (Exception ignored) {}
         return toRescheduleResponse(repository.findRescheduleByTokenHash(tokenHash, false));
     }
 
@@ -265,6 +270,7 @@ public class BookingPublicActionService {
                         "reason", reason));
         sendEmail(booking, "BOOKING_CANCELLATION_CONFIRMED", "Tu reserva fue cancelada",
                 "Tu cita fue cancelada y el cupo quedo liberado.", link.locationName(), link.publicUrl());
+        try { calendarSyncService.syncCancelled(link.bookingId(), link.businessId()); } catch (Exception ignored) {}
         return toCancellationResponse(repository.findCancellationByTokenHash(tokenHash, false));
     }
 
