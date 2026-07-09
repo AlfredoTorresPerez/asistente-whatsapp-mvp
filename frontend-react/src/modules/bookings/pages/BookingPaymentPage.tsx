@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
+import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { Button } from '../../../components/ui/Button'
 import { Card } from '../../../components/ui/Card'
@@ -45,6 +46,13 @@ export function BookingPaymentPage() {
     queryFn: () => getPublicBookingPaymentDetailRequest(paymentId ?? ''),
     enabled: Boolean(paymentId),
     retry: false,
+    refetchInterval: (query) => {
+      const data = query.state.data
+      if (data?.status === 'PENDING') {
+        return 5000
+      }
+      return false
+    },
   })
 
   const simulateMutation = useMutation({
@@ -57,10 +65,25 @@ export function BookingPaymentPage() {
 
   const data = paymentQuery.data
   const status = data?.status ?? ''
+  const provider = data?.provider ?? ''
   const statusLabel = STATUS_LABELS[status] ?? status
   const statusColor = STATUS_COLORS[status] ?? 'bg-slate-50 text-slate-900 border-slate-200'
   const isPending = status === 'PENDING'
   const isTerminal = ['APPROVED', 'REJECTED', 'EXPIRED', 'REFUNDED'].includes(status)
+  const isSimulated = provider === 'SIMULATED'
+  const isMercadoPago = provider === 'MERCADOPAGO'
+  const isExpired = status === 'EXPIRED'
+  const checkoutUrl = data?.checkoutUrl
+
+  useEffect(() => {
+    if (isMercadoPago && isPending && checkoutUrl) {
+      // Auto-redirect to Mercado Pago checkout after short delay
+      const timer = setTimeout(() => {
+        window.open(checkoutUrl, '_blank', 'noopener,noreferrer')
+      }, 500)
+      return () => clearTimeout(timer)
+    }
+  }, [isMercadoPago, isPending, checkoutUrl])
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(45,212,191,0.22),_transparent_38%),linear-gradient(180deg,_#f8fafc_0%,_#eef6f8_100%)] px-4 py-10">
@@ -85,8 +108,11 @@ export function BookingPaymentPage() {
             <div className={`rounded-2xl p-5 ${statusColor}`}>
               <p className="text-xs font-semibold uppercase tracking-[0.24em]">Estado</p>
               <h2 className="mt-2 text-2xl font-semibold">{statusLabel}</h2>
-              {isPending && (
+              {isPending && isSimulated && (
                 <p className="mt-2 text-sm">El pago esta pendiente. Usa los botones de simulacion para probar el flujo.</p>
+              )}
+              {isPending && isMercadoPago && (
+                <p className="mt-2 text-sm">Haz clic en "Pagar ahora" para completar el pago a traves de Mercado Pago.</p>
               )}
               {status === 'APPROVED' && (
                 <p className="mt-2 text-sm">El pago fue aprobado correctamente. La reserva quedo confirmada.</p>
@@ -94,7 +120,7 @@ export function BookingPaymentPage() {
               {status === 'REJECTED' && (
                 <p className="mt-2 text-sm">El pago fue rechazado. La reserva no sera confirmada hasta recibir el pago.</p>
               )}
-              {status === 'EXPIRED' && (
+              {isExpired && (
                 <p className="mt-2 text-sm">El enlace de pago expiro. Solicita un nuevo enlace por WhatsApp.</p>
               )}
             </div>
@@ -109,10 +135,12 @@ export function BookingPaymentPage() {
               <Info label="Monto" value={formatCurrency(data.amount, data.currency)} />
               <Info label="Estado del pago" value={statusLabel} />
               <Info label="Moneda" value={data.currency} />
+              <Info label="Proveedor" value={provider} />
               {data.checkoutExpiresAt && <Info label="Vence" value={formatDateTime(data.checkoutExpiresAt)} />}
             </div>
 
-            {isPending && (
+            {/* SIMULATED: mostrar botones de simulacion */}
+            {isPending && isSimulated && (
               <div className="flex flex-col gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:justify-center">
                 <Button
                   disabled={simulateMutation.isPending}
@@ -130,7 +158,30 @@ export function BookingPaymentPage() {
               </div>
             )}
 
-            {isTerminal && (
+            {/* MERCADOPAGO: mostrar boton de pago real */}
+            {isPending && isMercadoPago && checkoutUrl && (
+              <div className="flex flex-col gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:justify-center">
+                <a
+                  className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 hover:shadow-md"
+                  href={checkoutUrl}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  Pagar ahora
+                </a>
+              </div>
+            )}
+
+            {isExpired && (
+              <div className="rounded-2xl bg-rose-50 p-4 text-center">
+                <p className="text-sm text-rose-700">
+                  El enlace de pago ha vencido. No se puede completar el pago con este enlace.
+                  Solicita un nuevo enlace al administrador.
+                </p>
+              </div>
+            )}
+
+            {isTerminal && !isExpired && (
               <div className="rounded-2xl bg-slate-50 p-4 text-center">
                 <p className="text-sm text-slate-600">
                   {status === 'APPROVED'

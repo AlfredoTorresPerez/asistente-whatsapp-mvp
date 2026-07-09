@@ -124,6 +124,7 @@ app:
     expiration-scan-ms: ${APP_BOOKING_PAYMENT_EXPIRATION_SCAN_MS:60000}
     expiration-batch-size: ${APP_BOOKING_PAYMENT_EXPIRATION_BATCH_SIZE:100}
     external-checkout-url-template: ${APP_BOOKING_PAYMENT_EXTERNAL_CHECKOUT_URL_TEMPLATE:}
+    webhook-public-url: ${APP_BOOKING_PAYMENT_WEBHOOK_PUBLIC_URL:}
     mercadopago:
       access-token: ${APP_MERCADOPAGO_ACCESS_TOKEN:}
       notification-url: ${APP_MERCADOPAGO_NOTIFICATION_URL:}

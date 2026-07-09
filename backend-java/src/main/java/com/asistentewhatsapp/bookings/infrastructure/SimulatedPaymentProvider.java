@@ -12,23 +12,29 @@ import org.springframework.stereotype.Component;
 @Component
 public class SimulatedPaymentProvider implements BookingPaymentProvider {
 
-    private static final String NAME = "SIMULATED";
+    public static final String NAME = "SIMULATED";
 
     @Override
-    public String providerName() {
-        return NAME;
-    }
+    public String providerName() { return NAME; }
 
     @Override
-    public CreateCheckoutResult createCheckout(UUID businessId, UUID bookingId, UUID paymentId, BigDecimal amount, String currency, String description, String returnUrl, String notificationUrl, int expirationMinutes) {
+    public CreateCheckoutResult createCheckout(
+            UUID businessId, UUID bookingId, UUID paymentId,
+            BigDecimal amount, String currency, String description,
+            String returnUrl, String notificationUrl, int expirationMinutes) {
+        if (paymentId == null) {
+            throw new IllegalArgumentException("paymentId must not be null for simulated checkout");
+        }
         OffsetDateTime expiresAt = OffsetDateTime.now().plusMinutes(expirationMinutes);
-        String checkoutUrl = (returnUrl != null ? returnUrl : "http://localhost:5173/reservas/pagar")
-                + "/" + paymentId;
+        String checkoutUrl = notificationUrl != null && notificationUrl.contains("/webhook")
+                ? notificationUrl.replace("/webhook", "/pagar/" + paymentId)
+                : (returnUrl != null ? returnUrl : "http://localhost:5173/reservas/pagar") + "/" + paymentId;
         Map<String, Object> metadata = new LinkedHashMap<>();
         metadata.put("simulated", true);
         metadata.put("returnUrl", returnUrl);
         metadata.put("notificationUrl", notificationUrl);
-        return new CreateCheckoutResult(checkoutUrl, paymentId.toString(), metadata, expiresAt);
+        String externalRef = "sim-" + paymentId.toString();
+        return new CreateCheckoutResult(checkoutUrl, paymentId.toString(), "sim-pref-" + paymentId, externalRef, metadata, expiresAt);
     }
 
     @Override
@@ -37,7 +43,8 @@ public class SimulatedPaymentProvider implements BookingPaymentProvider {
     }
 
     @Override
-    public RefundResult refund(UUID businessId, UUID bookingId, UUID paymentId, String providerPaymentId, BigDecimal amount, String reason) {
+    public RefundResult refund(UUID businessId, UUID bookingId, UUID paymentId,
+            String providerPaymentId, BigDecimal amount, String reason) {
         Map<String, Object> metadata = new LinkedHashMap<>();
         metadata.put("simulated", true);
         metadata.put("reason", reason);
@@ -45,7 +52,5 @@ public class SimulatedPaymentProvider implements BookingPaymentProvider {
     }
 
     @Override
-    public boolean supportsWebhook() {
-        return false;
-    }
+    public boolean supportsWebhook() { return false; }
 }

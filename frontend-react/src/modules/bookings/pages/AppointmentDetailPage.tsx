@@ -24,6 +24,7 @@ import {
   refundBookingPaymentRequest,
   registerBookingManualPaymentRequest,
 } from '../../../services/api/bookingsApi'
+import type { CreateBookingPaymentLinkRequest } from '../../../services/api/types'
 import { getBookingStatusLabel, getBookingStatusTone } from '../bookingOptions'
 
 function formatDateTime(value: string | null) {
@@ -39,8 +40,10 @@ export function AppointmentDetailPage() {
   const [confirmationUrl, setConfirmationUrl] = useState<string | null>(null)
   const [publicActionUrl, setPublicActionUrl] = useState<string | null>(null)
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null)
+  const [paymentPurpose, setPaymentPurpose] = useState<'DEPOSIT' | 'FULL' | 'MANUAL'>('DEPOSIT')
   const [manualAmount, setManualAmount] = useState('')
   const [manualReference, setManualReference] = useState('')
+  const [fullAmount, setFullAmount] = useState('')
 
   const bookingQuery = useQuery({
     queryKey: ['bookings', 'detail', appointmentId],
@@ -139,7 +142,16 @@ export function AppointmentDetailPage() {
       if (!appointmentId) {
         throw new Error('No hay cita seleccionada.')
       }
-      return createBookingPaymentLinkRequest(appointmentId, { expirationMinutes: 30, sendWhatsApp: true, sendEmail: true })
+      const payload: CreateBookingPaymentLinkRequest = {
+        paymentPurpose,
+        expirationMinutes: 30,
+        sendWhatsApp: true,
+        sendEmail: true,
+      }
+      if (paymentPurpose === 'FULL' && fullAmount) {
+        payload.amount = Number(fullAmount)
+      }
+      return createBookingPaymentLinkRequest(appointmentId, payload)
     },
     onSuccess: async (response) => {
       setPaymentUrl(response.checkoutUrl)
@@ -417,9 +429,42 @@ export function AppointmentDetailPage() {
               </div>
             </div>
 
-            <div className="flex flex-wrap justify-end gap-3">
+            <div className="flex flex-wrap items-end gap-3">
+              <div className="flex-1 sm:flex-none">
+                <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500" htmlFor="payment-purpose">
+                  Proposito
+                </label>
+                <select
+                  className="mt-1 block w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-900 shadow-sm focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-300"
+                  disabled={!isOnline || paymentLinkMutation.isPending}
+                  id="payment-purpose"
+                  onChange={(e) => setPaymentPurpose(e.target.value as 'DEPOSIT' | 'FULL' | 'MANUAL')}
+                  value={paymentPurpose}
+                >
+                  <option value="DEPOSIT">Abono</option>
+                  <option value="FULL">Pago completo</option>
+                  <option value="MANUAL">Manual</option>
+                </select>
+              </div>
+              {paymentPurpose === 'FULL' && (
+                <div className="flex-1 sm:flex-none">
+                  <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500" htmlFor="full-amount">
+                    Monto total
+                  </label>
+                  <Input
+                    id="full-amount"
+                    label=""
+                    min="1"
+                    onChange={(event) => setFullAmount(event.target.value)}
+                    placeholder="Monto total del servicio"
+                    type="number"
+                    value={fullAmount}
+                    disabled={!isOnline || paymentLinkMutation.isPending}
+                  />
+                </div>
+              )}
               <Button
-                disabled={!isOnline || !bookingQuery.data.requiresDeposit || paymentLinkMutation.isPending}
+                disabled={!isOnline || (!bookingQuery.data.requiresDeposit && paymentPurpose === 'DEPOSIT') || (paymentPurpose === 'FULL' && !fullAmount) || paymentLinkMutation.isPending}
                 onClick={() => paymentLinkMutation.mutate()}
                 variant="secondary"
               >
@@ -432,12 +477,20 @@ export function AppointmentDetailPage() {
               items={(bookingQuery.data.payments ?? []).map((payment) => ({
                 id: payment.id,
                 title: `${payment.provider} · ${formatEstadoPago(payment.status)} · ${payment.currency} ${Number(payment.amount).toLocaleString('es-CL')}`,
-                detail: `${payment.manual ? 'Manual' : 'Proveedor'} · ${formatDateTime(payment.createdAt)}${payment.checkoutUrl ? ` · ${payment.checkoutUrl}` : ''}`,
+                detail: `${payment.manual ? 'Manual' : 'Proveedor'} · ${formatDateTime(payment.createdAt)}${payment.providerPaymentId ? ` · Ref: ${payment.providerPaymentId}` : ''}${payment.checkoutUrl ? ` · ${payment.checkoutUrl}` : ''}`,
                 action: payment.status === 'APPROVED'
                   ? {
                       label: 'Reembolsar',
                       onClick: () => refundPaymentMutation.mutate(payment.id),
                       disabled: refundPaymentMutation.isPending,
+                    }
+                  : payment.checkoutUrl
+                  ? {
+                      label: 'Copiar URL',
+                      onClick: () => {
+                        navigator.clipboard.writeText(payment.checkoutUrl!)
+                        showToast({ title: 'URL copiada', description: 'Enlace de pago copiado al portapapeles.', tone: 'success' })
+                      },
                     }
                   : undefined,
               }))}

@@ -649,6 +649,7 @@ export type CancelBookingRequest = {
 
 export type CreateBookingPaymentLinkRequest = {
   provider?: string
+  paymentPurpose?: 'DEPOSIT' | 'FULL' | 'MANUAL'
   amount?: number
   currency?: string
   expirationMinutes?: number
@@ -1506,6 +1507,12 @@ export type AgendaFilterOptionResponse = {
   detail: string | null
   locationId: string | null
   active: boolean
+}
+
+export type BusinessHoursResponse = {
+  dayOfWeek: number
+  startTime: string
+  endTime: string
 }
 
 export type AgendaFilterOptionsResponse = {
