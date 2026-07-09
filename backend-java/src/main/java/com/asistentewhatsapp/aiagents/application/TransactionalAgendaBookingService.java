@@ -337,9 +337,13 @@ public class TransactionalAgendaBookingService {
             }
             if (candidates.size() > 1) {
                 clearPendingBookingAction(entities);
-                String rawToken = customerBookingService.generateToken(businessId, digitsOnly(customerPhone));
-                String url = customerBookingService.buildPublicUrl(rawToken);
-                return WhatsAppMessageFormatter.multipleBookingsFound(url);
+                return WhatsAppMessageFormatter.multipleCancellationCandidates(candidates.stream()
+                        .map(c -> {
+                            String link = generateCancellationPublicLink(businessId, c.bookingId(), 60);
+                            return new WhatsAppMessageFormatter.CancellationCandidate(
+                                    bookingTitle(c), bookingDate(c), bookingTime(c), locationName(c), link);
+                        })
+                        .toList());
             }
             AgendaCalendarItemResponse candidate = candidates.getFirst();
             return buildCancellationLinkResponse(businessId, candidate);
@@ -439,9 +443,14 @@ public class TransactionalAgendaBookingService {
                     return "No encontre una reserva activa asociada a este numero. ¿Me puedes indicar la fecha, hora o servicio de la cita que quieres reprogramar?";
                 }
                 if (candidates.size() > 1) {
-                    entities.put("accion_pendiente", "RESCHEDULE_SELECT");
-                    putCandidateOptions(entities, candidates);
-                    return bookingOptionsMessage("Tienes mas de una reserva activa. ¿Cual deseas reprogramar?", candidates);
+                    return WhatsAppMessageFormatter.multipleRescheduleCandidates(candidates.stream()
+                            .map(c -> {
+                                String link = generateReschedulePublicLink(businessId, c.bookingId(),
+                                        null, null, null, null, null, null, 60);
+                                return new WhatsAppMessageFormatter.RescheduleCandidate(
+                                        bookingTitle(c), bookingDate(c), bookingTime(c), locationName(c), link);
+                            })
+                            .toList());
                 }
                 selected = Optional.of(candidates.getFirst());
             }

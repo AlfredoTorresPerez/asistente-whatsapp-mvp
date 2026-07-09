@@ -1,6 +1,7 @@
 package com.asistentewhatsapp.aiagents.application;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class WhatsAppMessageFormatter {
 
@@ -134,12 +135,34 @@ public final class WhatsAppMessageFormatter {
                 + "Responde *Sí* para cancelar o *No* para volver.";
     }
 
-    public static String multipleBookingsFound(String secureUrl) {
-        return "📋 *Tienes varias reservas activas*\n\n"
-                + "Encontré más de una reserva activa asociada a tu WhatsApp. Para evitar cancelar una hora equivocada, revisa tus reservas y selecciona cuál deseas cancelar aquí:\n\n"
-                + "👉 " + safe(secureUrl, "") + "\n\n"
-                + "El enlace es seguro y caduca en 60 minutos.";
+    public static String multipleCancellationCandidates(List<CancellationCandidate> candidates) {
+        var sb = new StringBuilder("🛑 *Tienes varias reservas activas - Cancelación*\n\n");
+        sb.append("Selecciona la reserva que deseas cancelar:\n\n");
+        for (int i = 0; i < candidates.size(); i++) {
+            var c = candidates.get(i);
+            sb.append("*" + (i + 1) + ". " + safe(c.service, "—") + "*\n");
+            sb.append("   " + safe(c.date, "—") + " a las " + safe(c.time, "—") + " en " + safe(c.location, "—") + "\n");
+            sb.append("   👉 " + safe(c.url, "") + "\n\n");
+        }
+        sb.append("_Cada enlace vence en 60 minutos._");
+        return sb.toString();
     }
+
+    public static String multipleRescheduleCandidates(List<RescheduleCandidate> candidates) {
+        var sb = new StringBuilder("🔄 *Tienes varias reservas activas - Reprogramación*\n\n");
+        sb.append("Selecciona la reserva que deseas reprogramar:\n\n");
+        for (int i = 0; i < candidates.size(); i++) {
+            var c = candidates.get(i);
+            sb.append("*" + (i + 1) + ". " + safe(c.service, "—") + "*\n");
+            sb.append("   " + safe(c.date, "—") + " a las " + safe(c.time, "—") + " en " + safe(c.location, "—") + "\n");
+            sb.append("   👉 " + safe(c.url, "") + "\n\n");
+        }
+        sb.append("_Cada enlace vence en 60 minutos._");
+        return sb.toString();
+    }
+
+    public record CancellationCandidate(String service, String date, String time, String location, String url) {}
+    public record RescheduleCandidate(String service, String date, String time, String location, String url) {}
 
     public static String bookingCancelledSuccess(String service, String date, String time, String location) {
         return "✅ *Reserva cancelada*\n\n"
