@@ -7,6 +7,7 @@ import com.asistentewhatsapp.channels.application.ChannelDispatchResponse;
 import com.asistentewhatsapp.channels.application.ChannelDispatchService;
 import com.asistentewhatsapp.channels.domain.MessageChannelType;
 import com.asistentewhatsapp.channels.infrastructure.whatsappweb.WhatsAppWebChannelJdbcRepository;
+import com.asistentewhatsapp.shared.observability.LogSanitizer;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -26,6 +27,7 @@ public class AiReplyOutboxProcessor {
     private final AestheticCenterService aestheticCenterService;
     private final AgentCoordinatorService agentCoordinatorService;
     private final ChannelDispatchService channelDispatchService;
+    private final AiAgentProperties properties;
     private final int batchSize;
     private final long processingTimeoutMs;
     private final long baseRetryDelayMs;
@@ -37,6 +39,7 @@ public class AiReplyOutboxProcessor {
             AestheticCenterService aestheticCenterService,
             AgentCoordinatorService agentCoordinatorService,
             ChannelDispatchService channelDispatchService,
+            AiAgentProperties properties,
             @Value("${app.ai.agents.outbox-batch-size:10}") int batchSize,
             @Value("${app.ai.agents.outbox-processing-timeout-ms:120000}") long processingTimeoutMs,
             @Value("${app.ai.agents.outbox-retry-base-delay-ms:30000}") long baseRetryDelayMs,
@@ -46,6 +49,7 @@ public class AiReplyOutboxProcessor {
         this.aestheticCenterService = aestheticCenterService;
         this.agentCoordinatorService = agentCoordinatorService;
         this.channelDispatchService = channelDispatchService;
+        this.properties = properties;
         this.batchSize = batchSize;
         this.processingTimeoutMs = processingTimeoutMs;
         this.baseRetryDelayMs = baseRetryDelayMs;
@@ -156,6 +160,32 @@ public class AiReplyOutboxProcessor {
                 assignedUserId,
                 responseBody,
                 OffsetDateTime.now(ZoneOffset.UTC));
+
+        if (properties.safeModeEnabled()) {
+            channelRepository.updateOutboundMessageAccepted(
+                    messageId,
+                    "safe-mode-simulated-" + UUID.randomUUID(),
+                    "SIMULATED",
+                    OffsetDateTime.now(ZoneOffset.UTC));
+            channelRepository.updateConversationOutboundActivity(job.conversationId(), responseBody, OffsetDateTime.now(ZoneOffset.UTC));
+            channelRepository.insertMessageDeliveryLog(
+                    job.businessId(),
+                    messageId,
+                    "SIMULATED",
+                    "safe-mode",
+                    Map.of(
+                            "source", "AI_REPLY_OUTBOX",
+                            "agentType", result.agentType().name(),
+                            "primaryIntent", result.primaryIntent().name(),
+                            "outboxId", job.id().toString(),
+                            "safeMode", "true"),
+                    OffsetDateTime.now(ZoneOffset.UTC));
+            AiTraceLogger.info("WHATSAPP_RESPONSE_SEND_RESULT", job.traceId(), job.conversationId(), messageId, "AiReplyOutboxProcessor",
+                    "sent=true adapterStatus=SIMULATED safeMode=true messageLength=" + responseBody.length());
+            AiTraceLogger.info("AI_SAFE_MODE_RESPONSE", job.traceId(), job.conversationId(), messageId, "AiReplyOutboxProcessor",
+                    "safeModeResponse=" + LogSanitizer.responseSummary(responseBody));
+            return;
+        }
 
         try {
             ChannelDispatchResponse delivery = channelDispatchService.dispatch(new ChannelDispatchRequest(

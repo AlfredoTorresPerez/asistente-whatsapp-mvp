@@ -29,3 +29,6 @@ frontend-react/test-results/
 frontend-react/e2e/screenshots/
 *.tsbuildinfo
 *.tsbuildinfo.*
+asistente-whatsapp-mvp/
+agenda_cambios_only.zip
+CAMBIOS_AGENDA_CELDAS_CONTENIDAS_HORA_ACTUAL.md

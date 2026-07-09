@@ -8,6 +8,8 @@ import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository.
 import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository.TimeWindowRecord;
 import com.asistentewhatsapp.shared.exception.ApiException;
 import java.time.DateTimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
@@ -23,20 +25,27 @@ import org.springframework.stereotype.Service;
 @Service
 public class BookingValidationService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(BookingValidationService.class);
+
     private static final Pattern CHILE_PHONE_PATTERN = Pattern.compile("^569\\d{8}$");
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
             "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
     private static final int MAX_ADVANCE_DAYS = 60;
 
     private final CompleteAgendaJdbcRepository agendaRepository;
+    private final AvailabilityService availabilityService;
 
-    public BookingValidationService(CompleteAgendaJdbcRepository agendaRepository) {
+    public BookingValidationService(CompleteAgendaJdbcRepository agendaRepository, AvailabilityService availabilityService) {
         this.agendaRepository = agendaRepository;
+        this.availabilityService = availabilityService;
     }
 
     public ValidationContext validateAll(UUID businessId, ValidateBookingRequest request) {
         ValidationContext ctx = new ValidationContext(businessId, request);
+        return validateAll(ctx);
+    }
 
+    public ValidationContext validateAll(ValidationContext ctx) {
         validateCustomer(ctx);
         if (ctx.hasErrors()) return ctx;
 
@@ -53,6 +62,9 @@ public class BookingValidationService {
         if (ctx.hasErrors()) return ctx;
 
         validateOverlap(ctx);
+        if (ctx.hasErrors()) return ctx;
+
+        validateAvailability(ctx);
         return ctx;
     }
 
@@ -158,7 +170,7 @@ public class BookingValidationService {
             ctx.addError("startsAt", "No puedes agendar una hora que ya paso.");
         }
         long minutesAhead = java.time.Duration.between(now, ctx.startsAt()).toMinutes();
-        int minMinutesAhead = ctx.request.minMinutesAhead() > 0 ? ctx.request.minMinutesAhead() : 1440;
+        int minMinutesAhead = ctx.request.minMinutesAhead() > 0 ? ctx.request.minMinutesAhead() : 60;
         if (minutesAhead < minMinutesAhead) {
             ctx.addError("startsAt", "La reserva debe hacerse con al menos " + minMinutesAhead + " minutos de anticipacion.");
         }
@@ -203,8 +215,28 @@ public class BookingValidationService {
         }
     }
 
+    public void validateAvailability(ValidationContext ctx) {
+        ServiceRecord service = ctx.service();
+        if (service == null) return;
+        OffsetDateTime effectiveStart = ctx.startsAt().minusMinutes(service.preparationMinutes());
+        OffsetDateTime endsAt = ctx.startsAt().plusMinutes(service.durationMinutes()).plusMinutes(service.cleanupMinutes());
+
+        try {
+            availabilityService.checkProfessionalAbsence(ctx.businessId(), ctx.professionalId(), effectiveStart, endsAt);
+        } catch (ApiException e) {
+            ctx.addError("professionalId", e.getMessage());
+        }
+
+        try {
+            availabilityService.checkProfessionalDailyCapacity(ctx.businessId(), ctx.professionalId(), ctx.startsAt());
+        } catch (ApiException e) {
+            ctx.addError("startsAt", e.getMessage());
+        }
+    }
+
     public void throwIfErrors(ValidationContext ctx) {
         if (ctx.hasErrors()) {
+            LOGGER.warn("[diagnostico] Error de validacion al crear reserva: errors={}", ctx.errors());
             throw new ApiException(HttpStatus.CONFLICT, "BOOKING_VALIDATION_ERROR",
                     "La solicitud contiene errores de validacion.", ctx.errors());
         }
@@ -235,7 +267,7 @@ public class BookingValidationService {
         private UUID roomId;
         private boolean requiresConsent;
 
-        ValidationContext(UUID businessId, ValidateBookingRequest request) {
+        public ValidationContext(UUID businessId, ValidateBookingRequest request) {
             this.businessId = businessId;
             this.request = request;
         }
@@ -291,7 +323,7 @@ public class BookingValidationService {
         public ValidateBookingRequest(
                 UUID serviceId, UUID locationId, UUID professionalId, UUID roomId,
                 OffsetDateTime startsAt, CreateBookingCustomerData customer) {
-            this(serviceId, locationId, professionalId, roomId, startsAt, customer, null, 1440);
+            this(serviceId, locationId, professionalId, roomId, startsAt, customer, null, 60);
         }
     }
 }

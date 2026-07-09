@@ -44,9 +44,9 @@ grep -q 'TZ: ${TZ:-America/Santiago}' docker-compose.local.yml \
   || fail "docker-compose.local.yml no configura TZ America/Santiago"
 info "docker-compose.local.yml configura zona horaria America/Santiago"
 
-grep -q 'APP_BOOKING_CONFIRMATION_EXPIRATION_MINUTES: ${APP_BOOKING_CONFIRMATION_EXPIRATION_MINUTES:-720}' docker-compose.local.yml \
-  || fail "docker-compose.local.yml no deja expiracion de confirmacion en 720 minutos por defecto"
-info "docker-compose.local.yml deja enlaces de confirmacion en 12 horas por defecto"
+grep -q 'APP_BOOKING_CONFIRMATION_EXPIRATION_MINUTES: ${APP_BOOKING_CONFIRMATION_EXPIRATION_MINUTES:-60}' docker-compose.local.yml \
+  || fail "docker-compose.local.yml no deja expiracion de confirmacion en 60 minutos por defecto"
+info "docker-compose.local.yml deja enlaces de confirmacion en 1 hora por defecto"
 
 grep -q 'location /api/v1/' frontend-react/nginx.conf \
   || fail "frontend-react/nginx.conf no proxifica /api/v1 hacia backend"
@@ -62,5 +62,17 @@ if command -v node >/dev/null 2>&1; then
 else
   echo "WARN: Node.js no disponible; se omite node --check"
 fi
+
+grep -q 'APP_AI_AGENTS_AUTO_REPLY_ENABLED.*false' docker-compose.local.yml \
+  || fail "AI auto-reply no esta deshabilitado en docker-compose.local.yml"
+info "AI auto-reply deshabilitado en docker-compose.local.yml"
+
+grep -q 'APP_CALENDAR_GOOGLE_ENABLED.*false' docker-compose.local.yml \
+  || fail "Calendar Google no esta deshabilitado en docker-compose.local.yml"
+info "Calendar Google deshabilitado en docker-compose.local.yml"
+
+grep -q 'class SystemController' backend-java/src/main/java/com/asistentewhatsapp/shared/api/SystemController.java \
+  || fail "SystemController no encontrado"
+info "SystemController existe en backend"
 
 echo "Validacion local rapida finalizada."

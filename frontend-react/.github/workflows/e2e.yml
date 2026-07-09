@@ -1,0 +1,98 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  e2e-chromium:
+    name: E2E Chromium
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium
+
+      - name: Run E2E tests (Chromium)
+        run: npx playwright test --project=smoke --project=auth --project=agenda-basica --project=agenda-visual --project=whatsapp-reserva --project=whatsapp-cancelacion --project=whatsapp-reprogramacion --project=confirmacion-publica --project=seguridad --project=all-chromium
+        env:
+          CI: 'true'
+
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-chromium
+          path: e2e/reports/html-report/
+          retention-days: 14
+
+      - name: Upload screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-screenshots
+          path: e2e/screenshots/
+          retention-days: 7
+
+      - name: Upload traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: e2e/traces/
+          retention-days: 7
+
+  e2e-cross-browser:
+    name: E2E Cross-browser
+    runs-on: ubuntu-latest
+    needs: e2e-chromium
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: npx playwright install firefox webkit
+
+      - name: Run cross-browser tests
+        run: npx playwright test --project=smoke-firefox --project=smoke-webkit --project=confirmacion-publica-firefox --project=confirmacion-publica-webkit --project=seguridad-firefox --project=seguridad-webkit
+        env:
+          CI: 'true'
+
+      - name: Upload cross-browser report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-cross-browser
+          path: e2e/reports/html-report/
+          retention-days: 14

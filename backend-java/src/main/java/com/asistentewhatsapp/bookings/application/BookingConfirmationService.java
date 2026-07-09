@@ -15,7 +15,7 @@ import com.asistentewhatsapp.bookings.api.BookingConfirmationLinkResponse;
 import com.asistentewhatsapp.bookings.api.CreateBookingConfirmationLinkRequest;
 import com.asistentewhatsapp.bookings.api.PublicBookingCancellationRequest;
 import com.asistentewhatsapp.bookings.api.PublicBookingConfirmationResponse;
-import com.asistentewhatsapp.bookings.api.PublicBookingRescheduleRequest;
+import com.asistentewhatsapp.bookings.api.PublicBookingConfirmationRescheduleRequest;
 import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository;
 import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository.ConfirmationBookingRecord;
 import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository.ConfirmationLinkRecord;
@@ -234,7 +234,7 @@ public class BookingConfirmationService {
     }
 
     @Transactional
-    public PublicBookingConfirmationResponse rescheduleFromConfirmation(String rawToken, PublicBookingRescheduleRequest request) {
+    public PublicBookingConfirmationResponse rescheduleFromConfirmation(String rawToken, PublicBookingConfirmationRescheduleRequest request) {
         String tokenHash = tokenHashService.sha256(normalizeToken(rawToken));
         ConfirmationLinkRecord link = repository.findByTokenHashForUpdate(tokenHash);
         ensurePublicActionAllowed(link, "reprogramarse");

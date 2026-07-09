@@ -536,6 +536,34 @@ export type BookingPaymentResponse = {
   createdAt: string
 }
 
+export type PublicBookingPaymentDetailResponse = {
+  id: string
+  bookingId: string
+  provider: string
+  providerPaymentId: string | null
+  amount: number
+  currency: string
+  status: string
+  checkoutUrl: string | null
+  checkoutExpiresAt: string | null
+  manual: boolean
+  approvedAt: string | null
+  rejectedAt: string | null
+  expiredAt: string | null
+  refundedAt: string | null
+  createdAt: string
+  bookingStatus: string
+  bookingPaymentStatus: string
+  subject: string
+  serviceName: string
+  professionalName: string | null
+  roomName: string | null
+  startsAt: string
+  durationMinutes: number
+  locationName: string | null
+  customerName: string
+}
+
 export type BookingStatusHistoryResponse = {
   id: string
   previousStatus: string | null
@@ -767,6 +795,31 @@ export type PublicBookingRescheduleResponse = {
   expiresAt: string
   usedAt: string | null
   reason: string | null
+  bookings: CustomerBookingItemResponse[]
+  services: Array<{
+    id: string
+    name: string
+    categoryName: string
+    durationMinutes: number
+    requiresRoom: boolean
+  }>
+  locations: Array<{
+    id: string
+    name: string
+    address: string | null
+    commune: string | null
+  }>
+}
+
+export type PublicBookingRescheduleRequest = {
+  bookingId: string
+  serviceId: string
+  locationId: string
+  professionalId?: string | null
+  roomId?: string | null
+  date: string
+  startsAt: string
+  reason?: string
 }
 
 export type PublicBookingCancellationResponse = {
@@ -785,6 +838,90 @@ export type PublicBookingCancellationResponse = {
   expiresAt: string
   usedAt: string | null
   cancellationReason: string | null
+}
+
+export type PublicCategoryResponse = {
+  id: string
+  code: string
+  name: string
+  description: string | null
+  active: boolean
+}
+
+export type PublicServiceItemResponse = {
+  id: string
+  code: string
+  name: string
+  description: string | null
+  durationMinutes: number
+  priceBase: number
+  categoryCode: string
+  categoryName: string
+  active: boolean
+  requiresPriorEvaluation: boolean
+  requiresInformedConsent: boolean
+}
+
+export type PublicServiceDetailResponse = {
+  id: string
+  code: string
+  name: string
+  description: string | null
+  categoryCode: string
+  categoryName: string
+  durationMinutes: number
+  priceBase: number
+  requiresPriorEvaluation: boolean
+  requiresInformedConsent: boolean
+  professionalRequired: string
+  supplies: string | null
+  contraindications: string | null
+  aftercareRecommendations: string | null
+  requiresDeposit: boolean
+  depositAmount: number
+  active: boolean
+}
+
+export type PublicServiceBranchResponse = {
+  id: string
+  code: string
+  name: string
+  address: string | null
+  city: string | null
+  commune: string | null
+  phone: string | null
+}
+
+export type CreatePublicBookingRequest = {
+  locationId: string
+  serviceId: string
+  professionalId?: string
+  roomId?: string
+  startsAt: string
+  customerName: string
+  customerPhone: string
+  customerEmail?: string
+}
+
+export type PublicCustomerInfoResponse = {
+  customerName: string | null
+  customerPhone: string | null
+  customerEmail: string | null
+  lastLocationId: string | null
+  lastLocationName: string | null
+}
+
+export type CreatePublicBookingResponse = {
+  bookingId: string
+  status: string
+  startsAt: string
+  durationMinutes: number
+  locationName: string
+  serviceName: string
+  professionalName: string | null
+  roomName: string | null
+  customerName: string
+  message: string
 }
 
 export type AestheticServiceResponse = {
@@ -1408,4 +1545,48 @@ export type AgendaRescheduleRequest = {
 
 export type AgendaCancelRequest = {
   reason: string
+}
+
+export type CustomerBookingItemResponse = {
+  bookingId: string
+  locationId: string | null
+  serviceId: string | null
+  professionalId: string | null
+  roomId: string | null
+  serviceName: string
+  locationName: string
+  professionalName: string
+  startsAt: string
+  endsAt: string
+  durationMinutes: number
+  status: string
+  customerName: string
+  maskedPhone: string
+}
+
+export type CustomerBookingReschedulePreviewResponse = {
+  booking: CustomerBookingItemResponse
+  services: Array<{
+    id: string
+    name: string
+    categoryName: string
+    durationMinutes: number
+    requiresRoom: boolean
+  }>
+  locations: Array<{
+    id: string
+    name: string
+    address: string | null
+    commune: string | null
+  }>
+}
+
+export type CustomerBookingRescheduleRequest = {
+  serviceId: string
+  locationId: string
+  professionalId?: string
+  roomId?: string
+  date: string
+  startsAt: string
+  reason?: string
 }

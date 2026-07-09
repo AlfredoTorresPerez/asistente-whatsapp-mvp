@@ -57,8 +57,8 @@ class CompleteAgendaJdbcRepositoryTest {
     @Test
     void updateBookingScheduleUsesVersionAndActiveStatusGuard() {
         NamedParameterJdbcTemplate jdbcTemplate = mock(NamedParameterJdbcTemplate.class);
-        when(jdbcTemplate.queryForObject(anyString(), any(MapSqlParameterSource.class), org.mockito.ArgumentMatchers.eq(String.class)))
-                .thenReturn("CONFIRMED");
+        when(jdbcTemplate.query(anyString(), any(MapSqlParameterSource.class), any(org.springframework.jdbc.core.RowMapper.class)))
+                .thenReturn(List.of("CONFIRMED"));
         when(jdbcTemplate.update(anyString(), any(MapSqlParameterSource.class))).thenReturn(1);
         CompleteAgendaJdbcRepository repository = new CompleteAgendaJdbcRepository(jdbcTemplate);
 
@@ -89,8 +89,8 @@ class CompleteAgendaJdbcRepositoryTest {
     @Test
     void cancelBookingUsesVersionAndActiveStatusGuard() {
         NamedParameterJdbcTemplate jdbcTemplate = mock(NamedParameterJdbcTemplate.class);
-        when(jdbcTemplate.queryForObject(anyString(), any(MapSqlParameterSource.class), org.mockito.ArgumentMatchers.eq(String.class)))
-                .thenReturn("CONFIRMED");
+        when(jdbcTemplate.query(anyString(), any(MapSqlParameterSource.class), any(org.springframework.jdbc.core.RowMapper.class)))
+                .thenReturn(List.of("CONFIRMED"));
         when(jdbcTemplate.update(anyString(), any(MapSqlParameterSource.class))).thenReturn(1);
         CompleteAgendaJdbcRepository repository = new CompleteAgendaJdbcRepository(jdbcTemplate);
 

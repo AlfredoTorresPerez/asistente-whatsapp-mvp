@@ -18,7 +18,9 @@ import com.asistentewhatsapp.channels.application.ChannelDispatchRequest;
 import com.asistentewhatsapp.channels.application.ChannelDispatchResponse;
 import com.asistentewhatsapp.channels.application.ChannelDispatchService;
 import com.asistentewhatsapp.channels.domain.MessageChannelType;
+import com.asistentewhatsapp.customerbookings.application.CustomerBookingService;
 import com.asistentewhatsapp.landing.api.CreatePublicBookingRequest;
+import com.asistentewhatsapp.landing.api.PublicCustomerInfoResponse;
 import com.asistentewhatsapp.landing.api.LandingLocationItemResponse;
 import com.asistentewhatsapp.landing.api.LandingPageResponse;
 import com.asistentewhatsapp.landing.api.LandingPageResponse.LandingCompanyResponse;
@@ -85,6 +87,7 @@ public class PublicLandingService {
     private final AuditService auditService;
     private final BookingValidationService bookingValidationService;
     private final BookingReceiptService bookingReceiptService;
+    private final CustomerBookingService customerBookingService;
     private final String frontendPublicBaseUrl;
 
     public PublicLandingService(
@@ -101,6 +104,7 @@ public class PublicLandingService {
             AuditService auditService,
             BookingValidationService bookingValidationService,
             BookingReceiptService bookingReceiptService,
+            CustomerBookingService customerBookingService,
             @Value("${app.frontend.public-base-url:http://localhost:5173}") String frontendPublicBaseUrl) {
         this.businessRepository = businessRepository;
         this.aestheticRepository = aestheticRepository;
@@ -115,6 +119,7 @@ public class PublicLandingService {
         this.auditService = auditService;
         this.bookingValidationService = bookingValidationService;
         this.bookingReceiptService = bookingReceiptService;
+        this.customerBookingService = customerBookingService;
         this.frontendPublicBaseUrl = frontendPublicBaseUrl;
     }
 
@@ -204,6 +209,14 @@ public class PublicLandingService {
                 service.durationMinutes(), service.requiresRoom(), service.requiresDeposit(), slots);
     }
 
+    public PublicCustomerInfoResponse getCustomerInfo(String token) {
+        try {
+            return customerBookingService.getCustomerInfoByToken(token);
+        } catch (Exception e) {
+            return new PublicCustomerInfoResponse(null, null, null, null, null);
+        }
+    }
+
     @Transactional
     public UUID createBooking(CreatePublicBookingRequest request) {
         UUID businessId = findDefaultBusiness().getId();
@@ -256,17 +269,27 @@ public class PublicLandingService {
                 request.serviceId(), request.locationId(), professionalId, roomId, startsAt, customerData,
                 null, bookingConfirmationProperties.getMinMinutesAhead());
 
-        ValidationContext vctx = bookingValidationService.validateAll(businessId, validateReq);
+        ValidationContext vctx = new ValidationContext(businessId, validateReq);
         vctx.setLocation(location);
         vctx.setService(service);
         vctx.setZone(locationZone);
         vctx.setStartsAt(startsAt);
         vctx.setProfessionalId(professionalId);
         vctx.setRoomId(roomId);
+        bookingValidationService.validateAll(vctx);
         bookingValidationService.throwIfErrors(vctx);
 
         CompleteAgendaJdbcRepository.CustomerRecord customer = agendaRepository.findOrCreateCustomer(
                 businessId, null, request.customerName(), request.customerPhone(), request.customerEmail());
+
+        UUID existingBooking = agendaRepository.findActiveBookingByCustomerProfessionalAndStart(
+                businessId, customer.id(), professionalId, startsAt);
+        if (existingBooking != null) {
+            LOGGER.info("Active booking already exists for customer={} professional={} startsAt={}, returning existing bookingId={}",
+                    customer.id(), professionalId, startsAt, existingBooking);
+            return existingBooking;
+        }
+
         OffsetDateTime expiresAt = OffsetDateTime.now(ZoneOffset.UTC).plusMinutes(60);
         OffsetDateTime endsAt = startsAt.plusMinutes(service.durationMinutes()).plusMinutes(service.cleanupMinutes());
         UUID bookingId = agendaRepository.insertTemporaryBooking(

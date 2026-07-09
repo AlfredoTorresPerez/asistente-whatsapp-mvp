@@ -1,5 +1,7 @@
 import { ApiClientError, apiFetch } from './httpClient'
 import type {
+  AgendaAvailabilityRequest,
+  AgendaAvailabilityResponse,
   BookingConfirmationLinkResponse,
   BookingDetailResponse,
   BookingPaymentResponse,
@@ -7,21 +9,32 @@ import type {
   BookingSummaryResponse,
   CancelBookingRequest,
   CreateBookingCancellationLinkRequest,
-  CreateBookingFromConversationRequest,
   CreateBookingConfirmationLinkRequest,
+  CreateBookingFromConversationRequest,
   CreateBookingFromLeadRequest,
   CreateBookingPaymentLinkRequest,
   CreateBookingRequest,
   CreateBookingRescheduleLinkRequest,
+  CreatePublicBookingRequest,
+  CreatePublicBookingResponse,
+  CustomerBookingItemResponse,
+  CustomerBookingRescheduleRequest,
+  CustomerBookingReschedulePreviewResponse,
   PagedResponse,
   PublicBookingCancellationFromConfirmationRequest,
   PublicBookingCancellationResponse,
   PublicBookingConfirmationResponse,
+  PublicBookingPaymentDetailResponse,
   PublicBookingRescheduleFromConfirmationRequest,
+  PublicBookingRescheduleRequest,
   PublicBookingRescheduleResponse,
+  PublicCategoryResponse,
+  PublicCustomerInfoResponse,
+  PublicServiceBranchResponse,
+  PublicServiceDetailResponse,
+  PublicServiceItemResponse,
   RefundBookingPaymentRequest,
   RegisterBookingManualPaymentRequest,
-  AgendaAvailabilityResponse,
   RescheduleBookingRequest,
   UpdateBookingRequest,
 } from './types'
@@ -215,6 +228,20 @@ export function reschedulePublicBookingFromConfirmationRequest(
   })
 }
 
+export function getPublicBookingPaymentDetailRequest(paymentId: string) {
+  return apiFetch<PublicBookingPaymentDetailResponse>(`/public/booking-payments/${paymentId}/detail`, {
+    auth: false,
+  })
+}
+
+export function simulateBookingPaymentRequest(paymentId: string, action: 'APPROVED' | 'REJECTED') {
+  return apiFetch<BookingPaymentResponse>(`/public/booking-payments/${paymentId}/simulate`, {
+    method: 'POST',
+    auth: false,
+    body: JSON.stringify({ action }),
+  })
+}
+
 export function cancelPublicBookingFromConfirmationRequest(
   token: string,
   payload: PublicBookingCancellationFromConfirmationRequest,
@@ -246,6 +273,32 @@ export function rejectPublicBookingRescheduleRequest(token: string) {
   })
 }
 
+export function getPublicBookingRescheduleAvailabilityRequest(
+  token: string,
+  bookingId: string,
+  serviceId: string,
+  locationId: string,
+  date: string,
+  maxSlots = 40,
+) {
+  const searchParams = new URLSearchParams({ serviceId, locationId, date, maxSlots: String(maxSlots) })
+  return apiFetch<AgendaAvailabilityResponse>(`/public/booking-reschedules/${token}/${bookingId}/availability?${searchParams.toString()}`, {
+    auth: false,
+  })
+}
+
+export function reschedulePublicBookingRequest(
+  token: string,
+  bookingId: string,
+  payload: PublicBookingRescheduleRequest,
+) {
+  return apiFetch<CustomerBookingItemResponse>(`/public/booking-reschedules/${token}/${bookingId}/reschedule`, {
+    method: 'POST',
+    auth: false,
+    body: JSON.stringify(payload),
+  })
+}
+
 export function getPublicBookingCancellationRequest(token: string) {
   return apiFetch<PublicBookingCancellationResponse>(`/public/booking-cancellations/${token}`, {
     auth: false,
@@ -257,5 +310,86 @@ export function confirmPublicBookingCancellationRequest(token: string, reason?: 
     method: 'POST',
     auth: false,
     body: JSON.stringify({ reason }),
+  })
+}
+
+export function getPublicLandingCategoriesRequest() {
+  return apiFetch<PublicCategoryResponse[]>('/public/landing/categories', { auth: false })
+}
+
+export function getPublicLandingServicesByCategoryRequest(categoryCode: string) {
+  return apiFetch<PublicServiceItemResponse[]>(`/public/landing/categories/${categoryCode}/services`, { auth: false })
+}
+
+export function getPublicLandingServiceDetailRequest(serviceId: string) {
+  return apiFetch<PublicServiceDetailResponse>(`/public/landing/services/${serviceId}`, { auth: false })
+}
+
+export function getPublicLandingServiceBranchesRequest(serviceId: string) {
+  return apiFetch<PublicServiceBranchResponse[]>(`/public/landing/services/${serviceId}/branches`, { auth: false })
+}
+
+export function getPublicLandingAvailabilityRequest(payload: AgendaAvailabilityRequest) {
+  return apiFetch<AgendaAvailabilityResponse>('/public/landing/availability', {
+    method: 'POST',
+    auth: false,
+    body: JSON.stringify(payload),
+  })
+}
+
+export function getPublicLandingCustomerInfoRequest(token: string) {
+  return apiFetch<PublicCustomerInfoResponse>(`/public/landing/customer-info/${token}`, { auth: false })
+}
+
+export function createPublicLandingBookingRequest(payload: CreatePublicBookingRequest) {
+  return apiFetch<CreatePublicBookingResponse>('/public/landing/bookings', {
+    method: 'POST',
+    auth: false,
+    body: JSON.stringify(payload),
+  })
+}
+
+export function getCustomerBookingsRequest(token: string) {
+  return apiFetch<CustomerBookingItemResponse[]>(`/public/customer-bookings/${token}`, {
+    auth: false,
+  })
+}
+
+export function cancelCustomerBookingRequest(token: string, bookingId: string, reason?: string) {
+  return apiFetch<{ status: string; bookingId: string }>(`/public/customer-bookings/${token}/${bookingId}/cancel`, {
+    method: 'POST',
+    auth: false,
+    body: JSON.stringify({ reason }),
+  })
+}
+
+export function getCustomerBookingReschedulePreviewRequest(token: string, bookingId: string) {
+  return apiFetch<CustomerBookingReschedulePreviewResponse>(`/public/customer-bookings/${token}/${bookingId}/reschedule`, {
+    auth: false,
+  })
+}
+
+export function getCustomerBookingRescheduleAvailabilityRequest(
+  token: string,
+  bookingId: string,
+  serviceId: string,
+  locationId: string,
+  date: string,
+) {
+  const searchParams = new URLSearchParams({ serviceId, locationId, date })
+  return apiFetch<AgendaAvailabilityResponse>(`/public/customer-bookings/${token}/${bookingId}/reschedule/availability?${searchParams.toString()}`, {
+    auth: false,
+  })
+}
+
+export function rescheduleCustomerBookingRequest(
+  token: string,
+  bookingId: string,
+  payload: CustomerBookingRescheduleRequest,
+) {
+  return apiFetch<CustomerBookingItemResponse>(`/public/customer-bookings/${token}/${bookingId}/reschedule`, {
+    method: 'POST',
+    auth: false,
+    body: JSON.stringify(payload),
   })
 }

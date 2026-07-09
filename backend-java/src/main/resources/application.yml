@@ -92,6 +92,7 @@ app:
       enabled: ${APP_AI_AGENTS_ENABLED:true}
       auto-reply-enabled: ${APP_AI_AGENTS_AUTO_REPLY_ENABLED:false}
       audit-enabled: ${APP_AI_AGENTS_AUDIT_ENABLED:true}
+      safe-mode-enabled: ${APP_AI_AGENTS_SAFE_MODE_ENABLED:false}
       default-confidence: ${APP_AI_AGENTS_DEFAULT_CONFIDENCE:0.78}
       outbox-worker-interval-ms: ${APP_AI_AGENTS_OUTBOX_WORKER_INTERVAL_MS:5000}
       outbox-batch-size: ${APP_AI_AGENTS_OUTBOX_BATCH_SIZE:10}
@@ -150,7 +151,7 @@ app:
     public-base-url: ${APP_FRONTEND_PUBLIC_BASE_URL:http://localhost:5173}
   observability:
     method-tracing:
-      enabled: ${APP_METHOD_TRACING_ENABLED:true}
+      enabled: ${APP_METHOD_TRACING_ENABLED:false}
       log-arguments: ${APP_METHOD_TRACING_LOG_ARGUMENTS:true}
       log-result: ${APP_METHOD_TRACING_LOG_RESULT:false}
       max-payload-length: ${APP_METHOD_TRACING_MAX_PAYLOAD_LENGTH:600}
@@ -161,5 +162,4 @@ logging:
     level: "%5p [correlationId:%X{correlationId:-sin-correlacion}]"
   level:
     com.asistentewhatsapp: INFO
-    APP_METHOD_TRACE: INFO
     AI_TRACE: INFO

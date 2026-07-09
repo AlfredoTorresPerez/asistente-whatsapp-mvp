@@ -9,6 +9,7 @@ import type {
   PagedResponse,
   SecurityPolicyRequest,
   SecurityPolicyResponse,
+  StatusResponse,
   WhatsAppWebActionResponse,
   WhatsAppWebStatusResponse,
   WhatsAppWebTestMessageRequest,
@@ -109,6 +110,20 @@ export function disconnectWhatsAppWebRequest() {
 
 export function sendWhatsAppWebTestMessageRequest(payload: WhatsAppWebTestMessageRequest) {
   return apiFetch<WhatsAppWebTestMessageResponse>('/whatsapp-web/test-message', {
+    body: JSON.stringify(payload),
+    method: 'POST',
+  })
+}
+
+export type WhatsAppSimulationRequest = {
+  from: string
+  body: string
+  externalMessageId: string
+  sessionKey: string
+}
+
+export function sendWhatsAppSimulationRequest(payload: WhatsAppSimulationRequest) {
+  return apiFetch<StatusResponse>('/test/whatsapp-inbound', {
     body: JSON.stringify(payload),
     method: 'POST',
   })

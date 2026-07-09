@@ -10,7 +10,13 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:report": "playwright show-report",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:generate-report": "npx tsx e2e/scripts/generate-report.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",

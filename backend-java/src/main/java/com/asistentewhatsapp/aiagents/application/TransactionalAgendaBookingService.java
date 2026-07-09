@@ -17,8 +17,11 @@ import com.asistentewhatsapp.bookings.api.CreateBookingConfirmationLinkRequest;
 import com.asistentewhatsapp.bookings.application.BookingConfirmationService;
 import com.asistentewhatsapp.bookings.application.BookingConfirmationProperties;
 import com.asistentewhatsapp.bookings.application.BookingStateMachine;
+import com.asistentewhatsapp.bookings.infrastructure.BookingActionLinkJdbcRepository;
+import com.asistentewhatsapp.customerbookings.application.CustomerBookingService;
 import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository;
 import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository.BusinessLocationRecord;
+import com.asistentewhatsapp.security.application.TokenHashService;
 import com.asistentewhatsapp.security.domain.AuthenticatedUser;
 import com.asistentewhatsapp.shared.api.PagedResponse;
 import com.asistentewhatsapp.shared.exception.ApiException;
@@ -40,6 +43,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,6 +68,12 @@ public class TransactionalAgendaBookingService {
     private final CompleteDigitalAgendaService completeDigitalAgendaService;
     private final BookingConfirmationService bookingConfirmationService;
     private final BookingConfirmationProperties bookingConfirmationProperties;
+    private final CustomerBookingService customerBookingService;
+    private final BookingActionLinkJdbcRepository bookingActionLinkRepository;
+    private final TokenHashService tokenHashService;
+    private final String cancellationPublicBaseUrl;
+    private final String reschedulePublicBaseUrl;
+    private final String frontendPublicBaseUrl;
 
     public TransactionalAgendaBookingService(
             AestheticCenterJdbcRepository aestheticCenterJdbcRepository,
@@ -71,13 +81,76 @@ public class TransactionalAgendaBookingService {
             CompleteAgendaJdbcRepository completeAgendaJdbcRepository,
             CompleteDigitalAgendaService completeDigitalAgendaService,
             BookingConfirmationService bookingConfirmationService,
-            BookingConfirmationProperties bookingConfirmationProperties) {
+            BookingConfirmationProperties bookingConfirmationProperties,
+            CustomerBookingService customerBookingService,
+            BookingActionLinkJdbcRepository bookingActionLinkRepository,
+            TokenHashService tokenHashService,
+            @Value("${app.booking-cancellation.public-base-url}") String cancellationPublicBaseUrl,
+            @Value("${app.booking-reschedule.public-base-url}") String reschedulePublicBaseUrl,
+            @Value("${app.frontend.public-base-url:http://localhost:5173}") String frontendPublicBaseUrl) {
         this.aestheticCenterJdbcRepository = aestheticCenterJdbcRepository;
         this.businessLocationJdbcRepository = businessLocationJdbcRepository;
         this.completeAgendaJdbcRepository = completeAgendaJdbcRepository;
         this.completeDigitalAgendaService = completeDigitalAgendaService;
         this.bookingConfirmationService = bookingConfirmationService;
         this.bookingConfirmationProperties = bookingConfirmationProperties;
+        this.customerBookingService = customerBookingService;
+        this.bookingActionLinkRepository = bookingActionLinkRepository;
+        this.tokenHashService = tokenHashService;
+        this.cancellationPublicBaseUrl = cancellationPublicBaseUrl;
+        this.reschedulePublicBaseUrl = reschedulePublicBaseUrl;
+        this.frontendPublicBaseUrl = frontendPublicBaseUrl;
+    }
+
+    public String generateCancellationPublicLink(UUID businessId, UUID bookingId, int expirationMinutes) {
+        String token = generatePublicToken();
+        String publicUrl = buildPublicUrl(cancellationPublicBaseUrl, token);
+        OffsetDateTime expiresAt = OffsetDateTime.now(ZoneOffset.UTC).plusMinutes(clampExpiration(expirationMinutes));
+        bookingActionLinkRepository.insertCancellationLink(businessId, bookingId, tokenHashService.sha256(token),
+                publicUrl, expiresAt, null, null, "WHATSAPP");
+        return publicUrl;
+    }
+
+    public String generateReschedulePublicLink(UUID businessId, UUID bookingId,
+            OffsetDateTime proposedStartsAt, OffsetDateTime proposedEndsAt,
+            UUID locationId, UUID serviceId, UUID professionalId, UUID roomId, int expirationMinutes) {
+        String token = generatePublicToken();
+        String publicUrl = buildPublicUrl(reschedulePublicBaseUrl, token);
+        OffsetDateTime expiresAt = OffsetDateTime.now(ZoneOffset.UTC).plusMinutes(clampExpiration(expirationMinutes));
+        bookingActionLinkRepository.insertRescheduleLink(businessId, bookingId, tokenHashService.sha256(token),
+                publicUrl, proposedStartsAt, proposedEndsAt, locationId, serviceId, professionalId,
+                roomId, expiresAt, null, null, "WHATSAPP");
+        return publicUrl;
+    }
+
+    private String generatePublicToken() {
+        byte[] bytes = new byte[32];
+        new java.security.SecureRandom().nextBytes(bytes);
+        return java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    private String buildPublicUrl(String baseUrl, String token) {
+        return baseUrl.endsWith("/") ? baseUrl + token : baseUrl + "/" + token;
+    }
+
+    private int clampExpiration(int minutes) {
+        return Math.max(MIN_EXPIRATION_MINUTES, Math.min(minutes, MAX_EXPIRATION_MINUTES));
+    }
+
+    public record BookingLinkResult(String url, boolean isKnownCustomer) {
+    }
+
+    public BookingLinkResult generateBookingLink(UUID businessId, String customerPhone) {
+        Optional<CompleteAgendaJdbcRepository.CustomerRecord> customerOpt =
+                completeAgendaJdbcRepository.findCustomerByPhone(businessId, customerPhone);
+        if (customerOpt.isPresent()) {
+            String phoneDigits = customerPhone.replaceAll("\\D", "");
+            String token = customerBookingService.generateToken(businessId, phoneDigits);
+            String url = customerBookingService.buildBookingPublicUrl(token);
+            return new BookingLinkResult(url, true);
+        }
+        String base = frontendPublicBaseUrl.endsWith("/") ? frontendPublicBaseUrl : frontendPublicBaseUrl + "/";
+        return new BookingLinkResult(base + "reservar", false);
     }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -240,59 +313,73 @@ public class TransactionalAgendaBookingService {
         try {
             String normalized = normalize(message);
             String pendingAction = value(entities, "accion_pendiente");
-            if ("CANCEL_CONFIRMATION".equals(pendingAction)) {
-                if (isNegative(normalized)) {
-                    clearPendingBookingAction(entities);
-                    return "Entendido, no cancelare la reserva. Si necesitas otra gestion, dime como te ayudo.";
-                }
-                if (isAffirmative(normalized) || containsAny(normalized, "cancelar", "anular")) {
-                    Optional<AgendaCalendarItemResponse> pending = findPendingBooking(businessId, customerId, conversationId, customerPhone, entities);
-                    if (pending.isEmpty()) {
-                        clearPendingBookingAction(entities);
-                        return "No encontre la reserva que estabamos revisando. ¿Me puedes indicar fecha, hora o servicio para ubicarla nuevamente?";
-                    }
-                    String response = cancelBookingCandidate(businessId, pending.get(), cancellationReason(message), traceId, traceConversationId);
-                    clearPendingBookingAction(entities);
-                    return response;
-                }
-                return "Para cancelar la reserva necesito que me confirmes con *si* o *confirmo*. Si prefieres mantenerla, responde *no*.";
-            }
-
             if ("CANCEL_SELECT".equals(pendingAction)) {
                 Optional<AgendaCalendarItemResponse> selected = selectPendingOption(businessId, customerId, conversationId, customerPhone, entities, normalized);
                 if (selected.isEmpty()) {
                     return "No pude identificar la opcion. Responde con el numero de la reserva que deseas cancelar.";
                 }
-                entities.put("accion_pendiente", "CANCEL_CONFIRMATION");
-                entities.put("booking_id_pendiente", selected.get().bookingId().toString());
-                return "Encontre tu reserva de " + bookingTitle(selected.get()) + " para " + bookingDateTime(selected.get())
-                        + locationSuffix(selected.get()) + ". ¿Confirmas que deseas cancelarla?";
+                clearPendingBookingAction(entities);
+                return buildCancellationLinkResponse(businessId, selected.get());
+            }
+
+            if (isAffirmative(normalized) && entities.containsKey("booking_id_pendiente")) {
+                Optional<AgendaCalendarItemResponse> pending = findPendingBooking(businessId, customerId, conversationId, customerPhone, entities);
+                if (pending.isPresent()) {
+                    clearPendingBookingAction(entities);
+                    return buildCancellationLinkResponse(businessId, pending.get());
+                }
             }
 
             List<AgendaCalendarItemResponse> candidates = findCandidateBookings(businessId, customerId, conversationId, customerPhone, message, entities, traceId, traceConversationId);
             if (candidates.isEmpty()) {
                 clearPendingBookingAction(entities);
-                return "No encontre una reserva activa asociada a este numero para ese horario. ¿Me puedes indicar el servicio, la fecha o la hora de la cita?";
+                return WhatsAppMessageFormatter.noActiveBookingsFound();
             }
             if (candidates.size() > 1) {
-                entities.put("accion_pendiente", "CANCEL_SELECT");
-                putCandidateOptions(entities, candidates);
-                return bookingOptionsMessage("Tienes mas de una reserva activa. ¿Cual deseas cancelar?", candidates);
+                clearPendingBookingAction(entities);
+                String rawToken = customerBookingService.generateToken(businessId, digitsOnly(customerPhone));
+                String url = customerBookingService.buildPublicUrl(rawToken);
+                return WhatsAppMessageFormatter.multipleBookingsFound(url);
             }
             AgendaCalendarItemResponse candidate = candidates.getFirst();
-            if (containsAny(normalized, "confirmo cancelar", "confirmo la cancelacion", "si cancela", "si cancelar")) {
-                String response = cancelBookingCandidate(businessId, candidate, cancellationReason(message), traceId, traceConversationId);
-                clearPendingBookingAction(entities);
-                return response;
-            }
-            entities.put("accion_pendiente", "CANCEL_CONFIRMATION");
-            entities.put("booking_id_pendiente", candidate.bookingId().toString());
-            return "Encontre tu reserva de " + bookingTitle(candidate) + " para " + bookingDateTime(candidate)
-                    + locationSuffix(candidate) + ". ¿Confirmas que deseas cancelarla?";
+            return buildCancellationLinkResponse(businessId, candidate);
         } catch (RuntimeException exception) {
             AiTraceLogger.error("WHATSAPP_CANCEL_FLOW_ERROR", traceId, traceConversationId, null, "TransactionalAgendaBookingService",
                     "functionalMessage=No pude completar la cancelacion en este momento.", exception);
             return "No pude completar la cancelacion en este momento. Puedo intentar nuevamente o derivarte con una persona del equipo.";
+        }
+    }
+
+    private String buildCancellationLinkResponse(UUID businessId, AgendaCalendarItemResponse booking) {
+        try {
+            String url = generateCancellationPublicLink(businessId, booking.bookingId(), 60);
+            return WhatsAppMessageFormatter.cancellationLinkGenerated(
+                    bookingTitle(booking), bookingDate(booking), bookingTime(booking),
+                    locationName(booking), url, 60);
+        } catch (Exception e) {
+            return "No pude generar el enlace de cancelacion. Puedo intentar nuevamente o derivarte con una persona del equipo.";
+        }
+    }
+
+    private String buildRescheduleLinkResponse(UUID businessId, AgendaCalendarItemResponse booking,
+            LocalDate targetDate, LocalTime targetTime, Map<String, String> entities,
+            String traceId, UUID traceConversationId) {
+        try {
+            BusinessLocationRecord location = businessLocationFor(businessId, booking);
+            String tz = location != null && location.timezone() != null ? location.timezone() : "America/Santiago";
+            ZoneId zone = ZoneId.of(tz);
+            OffsetDateTime proposedStartsAt = targetDate.atTime(targetTime).atZone(zone).toOffsetDateTime();
+            int durationMinutes = booking.durationMinutes() > 0 ? booking.durationMinutes() : 60;
+            OffsetDateTime proposedEndsAt = proposedStartsAt.plusMinutes(durationMinutes);
+            String url = generateReschedulePublicLink(businessId, booking.bookingId(),
+                    proposedStartsAt, proposedEndsAt,
+                    booking.locationId(), booking.serviceId(),
+                    booking.professionalId(), booking.roomId(), 60);
+            return WhatsAppMessageFormatter.rescheduleLinkGenerated(
+                    bookingTitle(booking), bookingDate(booking), bookingTime(booking),
+                    locationName(booking), url, 60);
+        } catch (Exception e) {
+            return "No pude generar el enlace de reprogramacion. Puedo intentar nuevamente o derivarte con una persona del equipo.";
         }
     }
 
@@ -340,7 +427,7 @@ public class TransactionalAgendaBookingService {
                 if (alternativeDate.isEmpty() || alternativeTime.isEmpty()) {
                     return "No pude identificar la opcion. Responde con el numero de una alternativa o con una hora de la lista.";
                 }
-                String response = rescheduleBookingCandidate(businessId, selected.get(), alternativeDate.get(), alternativeTime.get(), entities, traceId, traceConversationId);
+                String response = buildRescheduleLinkResponse(businessId, selected.get(), alternativeDate.get(), alternativeTime.get(), entities, traceId, traceConversationId);
                 clearPendingBookingAction(entities);
                 return response;
             }
@@ -374,7 +461,7 @@ public class TransactionalAgendaBookingService {
                 return "Perfecto. ¿A que hora prefieres asistir ese dia?";
             }
 
-            String response = rescheduleBookingCandidate(businessId, selected.get(), targetDate.get(), targetTime.get(), entities, traceId, traceConversationId);
+            String response = buildRescheduleLinkResponse(businessId, selected.get(), targetDate.get(), targetTime.get(), entities, traceId, traceConversationId);
             if (!"RESCHEDULE_SELECT_ALTERNATIVE".equals(value(entities, "accion_pendiente"))) {
                 clearPendingBookingAction(entities);
             }
@@ -390,13 +477,10 @@ public class TransactionalAgendaBookingService {
         if (isNotActionableStatus(candidate.status())) {
             return "Esa reserva no permite cancelacion porque su estado actual es " + candidate.status() + ".";
         }
-        BusinessLocationRecord location = businessLocationFor(businessId, candidate);
-        AuthenticatedUser systemUser = systemUser(businessId, location);
-        completeDigitalAgendaService.cancel(systemUser, candidate.bookingId(), new AgendaCancelRequest(reason));
+        completeDigitalAgendaService.cancelByCustomer(businessId, candidate.bookingId(), reason);
         AiTraceLogger.info("WHATSAPP_BOOKING_CANCELLED", traceId, traceConversationId, candidate.bookingId(), "TransactionalAgendaBookingService",
-                "bookingId=" + candidate.bookingId() + " source=WHATSAPP actor=CUSTOMER");
-        return "Listo, tu reserva de " + bookingTitle(candidate) + " para " + bookingDateTime(candidate)
-                + " fue cancelada correctamente.";
+                "bookingId=" + candidate.bookingId() + " source=WHATSAPP actor=CUSTOMER targetStatus=CANCELADA_POR_CLIENTE");
+        return WhatsAppMessageFormatter.bookingCancelledSuccess(bookingTitle(candidate), bookingDate(candidate), bookingTime(candidate), locationName(candidate));
     }
 
     private String rescheduleBookingCandidate(UUID businessId, AgendaCalendarItemResponse candidate, LocalDate targetDate, LocalTime targetTime,
@@ -756,6 +840,20 @@ public class TransactionalAgendaBookingService {
 
     private String locationSuffix(AgendaCalendarItemResponse candidate) {
         return candidate.locationName() == null || candidate.locationName().isBlank() ? "" : " en " + candidate.locationName();
+    }
+
+    private String bookingDate(AgendaCalendarItemResponse candidate) {
+        ZoneId zone = DEFAULT_BUSINESS_ZONE;
+        return formatDate(candidateLocalDate(candidate, zone));
+    }
+
+    private String bookingTime(AgendaCalendarItemResponse candidate) {
+        ZoneId zone = DEFAULT_BUSINESS_ZONE;
+        return formatTime(candidateLocalTime(candidate, zone));
+    }
+
+    private String locationName(AgendaCalendarItemResponse candidate) {
+        return candidate.locationName() != null && !candidate.locationName().isBlank() ? candidate.locationName() : null;
     }
 
     private String bookingOptionsMessage(String title, List<AgendaCalendarItemResponse> candidates) {
@@ -1441,6 +1539,10 @@ public class TransactionalAgendaBookingService {
 
     private String firstNonBlank(String first, String second) {
         return first != null && !first.isBlank() ? first : (second == null ? "" : second);
+    }
+
+    private String digitsOnly(String value) {
+        return value == null ? "" : value.replaceAll("\\D", "").trim();
     }
 
     private boolean containsWholeToken(String normalizedText, String token) {

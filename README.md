@@ -58,6 +58,60 @@ docker compose -f docker-compose.local.yml ps
 docker compose -f docker-compose.local.yml logs --tail=200 backend-java frontend-react whatsapp-web-service
 ```
 
+## Flujo de pagos
+
+El sistema soporta pagos de reservas en modo **simulado** (QA/demo) y con proveedor real **MercadoPago** (producción). El modo se selecciona por variable de entorno.
+
+### Variables de entorno
+
+```env
+# SIMULATED (default para local/demo) o MERCADOPAGO
+APP_PAYMENT_PROVIDER=SIMULATED
+
+# Solo necesario en MERCADOPAGO
+APP_MERCADOPAGO_ACCESS_TOKEN=...
+APP_MERCADOPAGO_POS_ID=...
+APP_MERCADOPAGO_WEBHOOK_SECRET=...
+```
+
+### Endpoints públicos (sin autenticación)
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `GET` | `/api/v1/public/booking-payments/{paymentId}/detail` | Datos del pago + reserva asociada |
+| `POST` | `/api/v1/public/booking-payments/{paymentId}/simulate` | Simular aprobación/rechazo (solo modo SIMULATED) |
+
+`POST /simulate` acepta `{"action": "APPROVED"}` o `{"action": "REJECTED"}`.
+
+### Página pública de pago
+
+```
+/reservas/pagar/:paymentId
+```
+
+### Gestión interna (requiere auth)
+
+La página `AppointmentDetailPage` (admin) permite generar link de pago, registrar pago manual offline y reembolsar.
+
+### Pruebas E2E de pago
+
+```powershell
+cd frontend-react
+npx playwright test --project=all-chromium --grep "Pago" --reporter=list
+```
+
+Requiere que el backend esté corriendo y que no haya otro proceso (como contenedores Docker) ocupando el puerto 5173.
+
+### Arquitectura
+
+- `BookingPaymentService` — orquestación (crear, actualizar estado, expirar, reembolsar)
+- `SimulatedPaymentProvider` — simulación local sin llamadas externas
+- `MercadoPagoPaymentProvider` — integración real con API de MercadoPago
+- `BookingPaymentController` — endpoints privados (admin)
+- `PublicBookingPaymentController` — endpoints públicos (checkout)
+- `BookingPaymentJdbcRepository` — persistencia + JOIN con `bookings`
+- Migraciones Flyway: `V20__create_booking_payments.sql`, `V35__booking_payment_indexes.sql`, `V36__booking_payment_cascade_fix.sql`
+
 ## Restricciones
 
 - WhatsApp Web es experimental y no debe presentarse como canal productivo final.

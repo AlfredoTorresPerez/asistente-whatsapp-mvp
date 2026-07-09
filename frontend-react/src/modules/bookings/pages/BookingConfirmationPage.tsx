@@ -82,7 +82,7 @@ export function BookingConfirmationPage() {
         startsAt: slot.startsAt,
         professionalId: slot.professionalId,
         roomId: slot.roomId,
-        reason: rescheduleReason.trim() || undefined,
+        reason: (rescheduleReason ?? '').trim() || undefined,
       }),
     onSuccess: async () => {
       setRescheduleReason('')

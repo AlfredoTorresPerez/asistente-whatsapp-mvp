@@ -280,8 +280,8 @@ export function AdminLocationsPage() {
               </div>
             </div>
 
-            <div className="overflow-hidden rounded-2xl border border-[var(--color-border)] bg-white">
-              <div className="hidden grid-cols-[110px_minmax(150px,1.1fr)_minmax(220px,1.3fr)_140px_150px_170px_160px_120px_120px] items-center border-b border-[var(--color-border)] bg-slate-50 px-4 py-3 text-xs font-bold uppercase tracking-[0.14em] text-slate-500 xl:grid">
+            <div className="overflow-x-auto rounded-2xl border border-[var(--color-border)] bg-white">
+              <div className="hidden grid-cols-[70px_minmax(120px,1.4fr)_minmax(110px,1fr)_minmax(80px,0.7fr)_minmax(95px,0.7fr)_minmax(95px,0.7fr)_minmax(95px,0.7fr)_80px_180px] items-center border-b border-[var(--color-border)] bg-slate-50 px-4 py-3 text-xs font-bold uppercase tracking-[0.14em] text-slate-500 xl:grid">
                 <span>Código</span>
                 <span>Sucursal</span>
                 <span>Dirección</span>
@@ -295,30 +295,31 @@ export function AdminLocationsPage() {
 
               {filteredLocations.map((location) => (
                 <div
-                  className="grid gap-3 border-b border-[var(--color-border)] px-4 py-4 last:border-b-0 xl:grid-cols-[110px_minmax(150px,1.1fr)_minmax(220px,1.3fr)_140px_150px_170px_160px_120px_120px] xl:items-center"
+                  className="grid gap-2 border-b border-[var(--color-border)] px-4 py-3 last:border-b-0 xl:grid-cols-[70px_minmax(120px,1.4fr)_minmax(110px,1fr)_minmax(80px,0.7fr)_minmax(95px,0.7fr)_minmax(95px,0.7fr)_minmax(95px,0.7fr)_80px_180px] xl:items-center"
                   key={location.id}
                 >
                   <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">{location.code}</span>
                   <div>
-                    <p className="font-semibold text-slate-950">{location.name}</p>
+                    <p className="truncate font-semibold text-slate-950">{location.name}</p>
                     {location.code.toLowerCase() === 'principal' ? (
                       <span className="mt-1 inline-flex rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
                         Principal
                       </span>
                     ) : null}
                   </div>
-                  <p className="text-sm text-slate-600">{location.address ?? 'Sin dirección'}</p>
-                  <p className="text-sm text-slate-600">{location.commune ?? location.city ?? 'Sin comuna'}</p>
-                  <p className="text-sm font-semibold text-blue-600">{location.phone ?? 'Sin teléfono'}</p>
-                  <p className="text-sm text-slate-600">{location.whatsappNumber ?? 'Sin WhatsApp'}</p>
-                  <p className="text-sm text-slate-600">{location.timezone}</p>
+                  <p className="truncate text-sm text-slate-600">{location.address ?? 'Sin dirección'}</p>
+                  <p className="truncate text-sm text-slate-600">{location.commune ?? location.city ?? 'Sin comuna'}</p>
+                  <p className="truncate text-sm font-semibold text-blue-600">{location.phone ?? 'Sin teléfono'}</p>
+                  <p className="truncate text-sm text-slate-600">{location.whatsappNumber ?? 'Sin WhatsApp'}</p>
+                  <p className="truncate text-sm text-slate-600">{location.timezone}</p>
                   <StatusBadge label={location.active ? 'Activa' : 'Inactiva'} tone={location.active ? 'success' : 'neutral'} />
-                  <div className="flex flex-wrap gap-2">
-                    <Button onClick={() => editLocation(location)} size="sm" variant="secondary">
+                  <div className="flex shrink-0 gap-1.5">
+                    <Button className="px-2.5 text-xs" onClick={() => editLocation(location)} size="sm" variant="secondary">
                       Editar
                     </Button>
                     {location.active ? (
                       <Button
+                        className="px-2.5 text-xs"
                         loading={deactivateMutation.isPending && form.id === location.id}
                         onClick={() => {
                           setForm(toFormState(location))

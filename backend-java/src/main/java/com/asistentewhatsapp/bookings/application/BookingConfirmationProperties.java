@@ -8,7 +8,7 @@ public class BookingConfirmationProperties {
     private int expirationMinutes = 60;
     private String publicBaseUrl = "http://localhost:5173/reservas/confirmar";
     private boolean dispatchWhatsApp = false;
-    private int minMinutesAhead = 1440;
+    private int minMinutesAhead = 60;
 
     public int getExpirationMinutes() { return expirationMinutes; }
     public void setExpirationMinutes(int expirationMinutes) { this.expirationMinutes = expirationMinutes; }

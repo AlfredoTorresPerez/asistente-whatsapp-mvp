@@ -55,6 +55,19 @@ public class WhatsAppWebChannelJdbcRepository {
         return items.stream().findFirst();
     }
 
+    public Optional<ChannelAccountRecord> findFirstChannelAccount() {
+        List<ChannelAccountRecord> items = jdbcTemplate.query(
+                """
+                        select id, business_id, session_key, status, phone_number, last_qr_code, last_event_at
+                        from channel_account
+                        where channel_type = 'WHATSAPP'
+                        order by created_at asc
+                        limit 1
+                        """,
+                new ChannelAccountRowMapper());
+        return items.stream().findFirst();
+    }
+
     public void updateChannelAccount(
             UUID channelAccountId,
             String status,

@@ -14,6 +14,7 @@ public final class BookingStateMachine {
     public static final String RESCHEDULE_PENDING = "REPROGRAMACION_PENDIENTE";
     public static final String RESCHEDULED = "REPROGRAMADA";
     public static final String CANCELLED = "CANCELADA";
+    public static final String CANCELLED_BY_CUSTOMER = "CANCELADA_POR_CLIENTE";
     public static final String EXPIRED = "EXPIRADA";
     public static final String ATTENDED = "ATENDIDA";
     public static final String NO_SHOW = "NO_ASISTE";
@@ -33,6 +34,7 @@ public final class BookingStateMachine {
             case "RESCHEDULE_PENDING", "REPROGRAMACION_PENDIENTE" -> RESCHEDULE_PENDING;
             case "RESCHEDULED", "REPROGRAMADA" -> RESCHEDULED;
             case "CANCELLED", "CANCELED", "CANCELADA" -> CANCELLED;
+            case "CANCELLED_BY_CUSTOMER", "CANCELADA_POR_CLIENTE" -> CANCELLED_BY_CUSTOMER;
             case "EXPIRED", "RELEASED", "LIBERADA", "EXPIRADA" -> EXPIRED;
             case "COMPLETED", "ATTENDED", "ATENDIDA" -> ATTENDED;
             case "NO_SHOW", "NO_ASISTE" -> NO_SHOW;
@@ -76,7 +78,7 @@ public final class BookingStateMachine {
 
     public static boolean isClosed(String status) {
         String current = canonical(status);
-        return CANCELLED.equals(current) || EXPIRED.equals(current) || ATTENDED.equals(current) || NO_SHOW.equals(current);
+        return CANCELLED.equals(current) || CANCELLED_BY_CUSTOMER.equals(current) || EXPIRED.equals(current) || ATTENDED.equals(current) || NO_SHOW.equals(current);
     }
 
     private static boolean isOpen(String status) {
@@ -107,6 +109,8 @@ public final class BookingStateMachine {
             case RESCHEDULED -> REQUESTED.equals(current) || PENDING_CONFIRMATION.equals(current) || PENDING_PAYMENT.equals(current)
                     || CONFIRMED.equals(current) || RESCHEDULE_PENDING.equals(current) || RESCHEDULED.equals(current);
             case CANCELLED -> REQUESTED.equals(current) || PENDING_CONFIRMATION.equals(current) || PENDING_PAYMENT.equals(current)
+                    || CONFIRMED.equals(current) || RESCHEDULE_PENDING.equals(current) || RESCHEDULED.equals(current);
+            case CANCELLED_BY_CUSTOMER -> REQUESTED.equals(current) || PENDING_CONFIRMATION.equals(current) || PENDING_PAYMENT.equals(current)
                     || CONFIRMED.equals(current) || RESCHEDULE_PENDING.equals(current) || RESCHEDULED.equals(current);
             case EXPIRED -> REQUESTED.equals(current) || PENDING_CONFIRMATION.equals(current) || PENDING_PAYMENT.equals(current);
             case ATTENDED, NO_SHOW -> CONFIRMED.equals(current) || RESCHEDULED.equals(current);

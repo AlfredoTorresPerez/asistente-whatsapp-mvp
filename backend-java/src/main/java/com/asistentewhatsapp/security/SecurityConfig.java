@@ -100,6 +100,8 @@ public class SecurityConfig {
                         .hasAnyRole("OWNER", "ADMIN")
                         .requestMatchers("/api/v1/security/audit-log", "/api/security/audit-log")
                         .hasAnyRole("OWNER", "ADMIN")
+                        .requestMatchers("/api/v1/system/status")
+                        .hasAnyRole("OWNER", "ADMIN")
                         .anyRequest()
                         .authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

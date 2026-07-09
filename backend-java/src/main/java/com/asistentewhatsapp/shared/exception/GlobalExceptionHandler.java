@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -132,6 +133,27 @@ public class GlobalExceptionHandler {
                 "No tienes permisos para realizar esta accion.",
                 request,
                 Map.of());
+    }
+
+    @ExceptionHandler(DuplicateKeyException.class)
+    public ResponseEntity<ApiErrorResponse> handleDuplicateKeyException(
+            DuplicateKeyException exception,
+            HttpServletRequest request) {
+        String message = exception.getMostSpecificCause() != null
+                ? exception.getMostSpecificCause().getMessage()
+                : exception.getMessage();
+        boolean isBookingDuplicate = message != null
+                && message.contains("uq_booking_customer_professional_active");
+        if (isBookingDuplicate) {
+            LOGGER.warn("Intento de reserva duplicada: {}", message);
+            return buildResponse(
+                    HttpStatus.CONFLICT,
+                    "BOOKING_DUPLICATE",
+                    "Ya existe una reserva activa para este cliente, profesional y horario.",
+                    request,
+                    Map.of());
+        }
+        return handleUnexpectedException(exception, request);
     }
 
     @ExceptionHandler(Exception.class)

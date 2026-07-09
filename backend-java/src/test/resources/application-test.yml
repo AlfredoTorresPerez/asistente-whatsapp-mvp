@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:16-alpine:///testdb?TC_REUSABLE=true
+    username: test
+    password: test
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  security:
+    filter:
+      order: 2147483642
+
+app:
+  environment: test
+  logging:
+    include-message-body: false
+  security:
+    jwt:
+      secret: test-jwt-secret-for-integration-tests-minimum-32-chars!!
+      access-token-expires-in-seconds: 900
+      reset-token-expires-in-minutes: 30
+    cors-allowed-origins: http://localhost:5173
+  channels:
+    whatsapp-web:
+      enabled: true
+      webhook-secret: test-webhook-secret
+      webhook-tolerance-seconds: 86400
+  ai:
+    agents:
+      auto-reply-enabled: false
+      enabled: false
+    openai:
+      enabled: false

@@ -157,6 +157,15 @@ function NavIcon({ path }: { path: string }) {
           <path d="M5 19C5 16.79 8.13 15 12 15C15.87 15 19 16.79 19 19" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
         </svg>
       )
+    case '/agenda':
+      return (
+        <svg {...iconProps}>
+          <rect height="14" rx="2" stroke="currentColor" strokeWidth="1.8" width="16" x="4" y="5" />
+          <path d="M8 3V7" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
+          <path d="M16 3V7" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
+          <path d="M4 11H20" stroke="currentColor" strokeWidth="1.8" />
+        </svg>
+      )
     case '/appointments':
       return (
         <svg {...iconProps}>

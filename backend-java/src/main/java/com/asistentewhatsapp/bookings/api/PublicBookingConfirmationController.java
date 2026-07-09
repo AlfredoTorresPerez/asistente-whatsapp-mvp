@@ -48,7 +48,7 @@ public class PublicBookingConfirmationController {
     @PostMapping("/reschedule")
     public PublicBookingConfirmationResponse reschedule(
             @PathVariable String token,
-            @Valid @RequestBody PublicBookingRescheduleRequest request) {
+            @Valid @RequestBody PublicBookingConfirmationRescheduleRequest request) {
         return bookingConfirmationService.rescheduleFromConfirmation(token, request);
     }
 

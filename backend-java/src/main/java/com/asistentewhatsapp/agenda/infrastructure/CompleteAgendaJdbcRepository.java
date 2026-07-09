@@ -8,11 +8,14 @@ import com.asistentewhatsapp.shared.observability.CorrelationIdFilter;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -373,24 +376,26 @@ public class CompleteAgendaJdbcRepository {
         logInput("isLocationServingService", businessId, locationId, serviceId);
         Integer count = jdbcTemplate.queryForObject(
                 """
-                        select count(*)
-                        from aesthetic_service_location sl
-                        where sl.business_id = :businessId
-                          and sl.location_id = :locationId
-                          and sl.service_id = :serviceId
-                          and sl.active = true
-                        union all
-                        select count(*)
-                        from aesthetic_service s
-                        where s.business_id = :businessId
-                          and s.id = :serviceId
-                          and s.active = true
-                          and not exists (
-                              select 1 from aesthetic_service_location x
-                              where x.business_id = s.business_id
-                                and x.service_id = s.id
-                                and x.active = true
-                          )
+                        select count(*) from (
+                            select sl.service_id
+                            from aesthetic_service_location sl
+                            where sl.business_id = :businessId
+                              and sl.location_id = :locationId
+                              and sl.service_id = :serviceId
+                              and sl.active = true
+                            union all
+                            select s.id
+                            from aesthetic_service s
+                            where s.business_id = :businessId
+                              and s.id = :serviceId
+                              and s.active = true
+                              and not exists (
+                                  select 1 from aesthetic_service_location x
+                                  where x.business_id = s.business_id
+                                    and x.service_id = s.id
+                                    and x.active = true
+                              )
+                        ) combined
                         """,
                 new MapSqlParameterSource()
                         .addValue("businessId", businessId)
@@ -789,12 +794,15 @@ public class CompleteAgendaJdbcRepository {
             UUID professionalId, UUID roomId, OffsetDateTime startsAt, OffsetDateTime endsAt, int durationMinutes, String reason, String source) {
         logInput("updateBookingSchedule", businessId, bookingId, actorUserId, locationId, serviceId, professionalId, roomId, startsAt, endsAt,
                 durationMinutes, reason, source);
-        String previousStatus = jdbcTemplate.queryForObject(
+        String previousStatus = jdbcTemplate.query(
                 """
                         select status from booking where business_id = :businessId and id = :bookingId
                         """,
                 new MapSqlParameterSource().addValue("businessId", businessId).addValue("bookingId", bookingId),
-                String.class);
+                (rs, rowNum) -> rs.getString("status"))
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("No se encontro la reserva indicada para reprogramar."));
         int updated = jdbcTemplate.update(
                 """
                         update booking
@@ -842,16 +850,30 @@ public class CompleteAgendaJdbcRepository {
 
     public void cancelBooking(UUID businessId, UUID bookingId, UUID actorUserId, String reason, String source) {
         logInput("cancelBooking", businessId, bookingId, actorUserId, reason, source);
-        String previousStatus = jdbcTemplate.queryForObject(
+        cancelBookingWithStatus(businessId, bookingId, actorUserId, reason, source, "CANCELADA");
+        logOutput("cancelBooking", "done");
+    }
+
+    public void cancelBookingByCustomer(UUID businessId, UUID bookingId, String reason, String source) {
+        logInput("cancelBookingByCustomer", businessId, bookingId, reason, source);
+        cancelBookingWithStatus(businessId, bookingId, null, reason, source, "CANCELADA_POR_CLIENTE");
+        logOutput("cancelBookingByCustomer", "done");
+    }
+
+    private void cancelBookingWithStatus(UUID businessId, UUID bookingId, UUID actorUserId, String reason, String source, String targetStatus) {
+        String previousStatus = jdbcTemplate.query(
                 """
                         select status from booking where business_id = :businessId and id = :bookingId
                         """,
                 new MapSqlParameterSource().addValue("businessId", businessId).addValue("bookingId", bookingId),
-                String.class);
+                (rs, rowNum) -> rs.getString("status"))
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("No se encontro la reserva indicada para cancelar."));
         int updated = jdbcTemplate.update(
                 """
                         update booking
-                        set status = 'CANCELADA',
+                        set status = :targetStatus,
                             cancellation_reason = :reason,
                             cancelled_at = coalesce(cancelled_at, current_timestamp),
                             version = version + 1,
@@ -864,13 +886,13 @@ public class CompleteAgendaJdbcRepository {
                         .addValue("businessId", businessId)
                         .addValue("bookingId", bookingId)
                         .addValue("reason", reason)
+                        .addValue("targetStatus", targetStatus)
                         .addValue("mutableStatuses", ACTIVE_BOOKING_STATUSES));
         if (updated == 0) {
             throw new ResourceNotFoundException("No se encontro una reserva activa para cancelar.");
         }
-        insertStatusHistory(businessId, bookingId, previousStatus, "CANCELADA", reason, actorUserId, source == null || source.isBlank() ? "ADMIN" : source);
+        insertStatusHistory(businessId, bookingId, previousStatus, targetStatus, reason, actorUserId, source == null || source.isBlank() ? "ADMIN" : source);
         cancelPendingReminders(businessId, bookingId);
-        logOutput("cancelBooking", "done");
     }
 
     public void insertStatusHistory(UUID businessId, UUID bookingId, String previousStatus, String newStatus, String reason, UUID actorUserId, String source) {
@@ -1149,6 +1171,50 @@ public class CompleteAgendaJdbcRepository {
         return result;
     }
 
+    public List<AgendaCalendarItemResponse> findActiveBookingsByPhone(
+            UUID businessId, String phoneDigits) {
+        logInput("findActiveBookingsByPhone", businessId, phoneDigits);
+        String sql = """
+                select
+                    b.id as booking_id,
+                    b.subject,
+                    b.status,
+                    b.starts_at,
+                    coalesce(b.ends_at, b.starts_at + (b.duration_minutes || ' minutes')::interval) as ends_at,
+                    b.duration_minutes,
+                    b.location_id,
+                    coalesce(bl.name, b.location) as location_name,
+                    coalesce(bl.timezone, 'America/Santiago') as calendar_timezone,
+                    b.service_id,
+                    s.name as service_name,
+                    b.professional_id,
+                    p.full_name as professional_name,
+                    b.room_id,
+                    r.name as room_name,
+                    c.display_name as customer_name,
+                    c.phone as customer_phone,
+                    b.source_channel
+                from booking b
+                join customer c on c.id = b.customer_id and c.business_id = b.business_id
+                left join business_location bl on bl.id = b.location_id and bl.business_id = b.business_id
+                left join aesthetic_service s on s.id = b.service_id and s.business_id = b.business_id
+                left join aesthetic_professional p on p.id = b.professional_id and p.business_id = b.business_id
+                left join agenda_room r on r.id = b.room_id and r.business_id = b.business_id
+                where b.business_id = :businessId
+                  and b.status in (:activeStatuses)
+                  and b.starts_at >= current_timestamp
+                  and regexp_replace(coalesce(c.normalized_phone, c.phone, ''), '\\D', '', 'g') = :phoneDigits
+                order by b.starts_at asc limit 10
+                """;
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("businessId", businessId)
+                .addValue("activeStatuses", ACTIVE_BOOKING_STATUSES)
+                .addValue("phoneDigits", normalizePhoneDigits(phoneDigits));
+        List<AgendaCalendarItemResponse> result = jdbcTemplate.query(sql, params, calendarMapper());
+        logOutput("findActiveBookingsByPhone", result);
+        return result;
+    }
+
     public List<AgendaCalendarItemResponse> findActiveBookingsForCustomerContext(
             UUID businessId,
             UUID customerId,
@@ -1188,32 +1254,41 @@ public class CompleteAgendaJdbcRepository {
                         left join agenda_room r on r.id = b.room_id and r.business_id = b.business_id
                         where b.business_id = :businessId
                           and b.status in (:activeStatuses)
-                          and (
-                                (:customerId is not null and b.customer_id = :customerId)
-                             or (:conversationId is not null and b.conversation_id = :conversationId)
-                             or (:phoneDigits is not null and (
-                                    regexp_replace(coalesce(c.normalized_phone, c.phone, ''), '\\D', '', 'g') = :phoneDigits
-                                 or right(regexp_replace(coalesce(c.normalized_phone, c.phone, ''), '\\D', '', 'g'), 9) = :phoneLast9
-                                 or right(regexp_replace(coalesce(c.normalized_phone, c.phone, ''), '\\D', '', 'g'), 8) = :phoneLast8
-                                 or (:phoneLast4 is not null and right(regexp_replace(coalesce(c.normalized_phone, c.phone, ''), '\\D', '', 'g'), 4) = :phoneLast4)
-                                 or (:phoneLast4Like is not null and lower(coalesce(c.display_name, '')) like :phoneLast4Like)
-                             ))
-                          )
                         """);
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("businessId", businessId)
-                .addValue("activeStatuses", ACTIVE_BOOKING_STATUSES)
-                .addValue("customerId", customerId)
-                .addValue("conversationId", conversationId)
-                .addValue("phoneDigits", normalizePhoneDigits(normalizedPhone))
-                .addValue("phoneLast9", lastDigits(normalizedPhone, 9))
-                .addValue("phoneLast8", lastDigits(normalizedPhone, 8))
-                .addValue("phoneLast4", normalizePhoneDigits(normalizedPhone) == null ? null : lastDigits(normalizedPhone, 4))
-                .addValue("phoneLast4Like", normalizePhoneDigits(normalizedPhone) == null ? null : "%" + lastDigits(normalizedPhone, 4) + "%");
+                .addValue("activeStatuses", ACTIVE_BOOKING_STATUSES);
+        List<String> orConditions = new ArrayList<>();
+        if (customerId != null) {
+            orConditions.add("b.customer_id = :customerId");
+            params.addValue("customerId", customerId);
+        }
+        if (conversationId != null) {
+            orConditions.add("b.conversation_id = :conversationId");
+            params.addValue("conversationId", conversationId);
+        }
+        String phoneDigits = normalizePhoneDigits(normalizedPhone);
+        if (phoneDigits != null) {
+            orConditions.add("""
+                    (regexp_replace(coalesce(c.normalized_phone, c.phone, ''), '\\D', '', 'g') = :phoneDigits
+                 or right(regexp_replace(coalesce(c.normalized_phone, c.phone, ''), '\\D', '', 'g'), 9) = :phoneLast9
+                 or right(regexp_replace(coalesce(c.normalized_phone, c.phone, ''), '\\D', '', 'g'), 8) = :phoneLast8
+                 or (:phoneLast4 is not null and right(regexp_replace(coalesce(c.normalized_phone, c.phone, ''), '\\D', '', 'g'), 4) = :phoneLast4)
+                 or (:phoneLast4Like is not null and lower(coalesce(c.display_name, '')) like :phoneLast4Like))
+                    """.stripIndent());
+            params.addValue("phoneDigits", phoneDigits);
+            params.addValue("phoneLast9", lastDigits(normalizedPhone, 9));
+            params.addValue("phoneLast8", lastDigits(normalizedPhone, 8));
+            params.addValue("phoneLast4", lastDigits(normalizedPhone, 4));
+            params.addValue("phoneLast4Like", "%" + lastDigits(normalizedPhone, 4) + "%");
+        }
+        if (!orConditions.isEmpty()) {
+            sql.append(" and (").append(String.join(" or ", orConditions)).append(")\n");
+        }
         if (from != null && to != null) {
             sql.append(" and b.starts_at >= :from and b.starts_at < :to\n");
-            params.addValue("from", from);
-            params.addValue("to", to);
+            params.addValue("from", from, Types.TIMESTAMP_WITH_TIMEZONE);
+            params.addValue("to", to, Types.TIMESTAMP_WITH_TIMEZONE);
         }
         if (locationId != null) {
             sql.append(" and b.location_id = :locationId\n");
@@ -1485,6 +1560,15 @@ public class CompleteAgendaJdbcRepository {
         }
     }
 
+    private ZoneId resolveBusinessDefaultZone(UUID businessId) {
+        List<String> timezones = jdbcTemplate.query(
+                "select timezone from business_location where business_id = :businessId and active = true and timezone is not null limit 1",
+                new MapSqlParameterSource().addValue("businessId", businessId),
+                (rs, rowNum) -> rs.getString("timezone"));
+        String zone = timezones.isEmpty() ? null : timezones.getFirst();
+        return resolveZone(zone);
+    }
+
     public record LocationRecord(UUID id, String name, String timezone) {
     }
 
@@ -1512,6 +1596,252 @@ public class CompleteAgendaJdbcRepository {
     }
 
     private record ExpiredBookingRecord(UUID id, UUID businessId, String status) {
+    }
+
+    public boolean hasActiveAbsence(UUID businessId, UUID professionalId, OffsetDateTime startsAt, OffsetDateTime endsAt) {
+        logInput("hasActiveAbsence", businessId, professionalId, startsAt, endsAt);
+        if (professionalId == null) {
+            logOutput("hasActiveAbsence", false);
+            return false;
+        }
+        Integer count = jdbcTemplate.queryForObject(
+                """
+                        select count(*)
+                        from professional_absence a
+                        where a.business_id = :businessId
+                          and a.professional_id = :professionalId
+                          and a.active = true
+                          and a.starts_at < :endsAt
+                          and a.ends_at > :startsAt
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("businessId", businessId)
+                        .addValue("professionalId", professionalId)
+                        .addValue("startsAt", startsAt)
+                        .addValue("endsAt", endsAt),
+                Integer.class);
+        boolean result = count != null && count > 0;
+        logOutput("hasActiveAbsence", result);
+        return result;
+    }
+
+    public Integer findProfessionalMaxDailyBookings(UUID businessId, UUID professionalId) {
+        logInput("findProfessionalMaxDailyBookings", businessId, professionalId);
+        if (professionalId == null) {
+            logOutput("findProfessionalMaxDailyBookings", null);
+            return null;
+        }
+        Integer result = jdbcTemplate.queryForObject(
+                """
+                        select max_daily_bookings
+                        from aesthetic_professional
+                        where business_id = :businessId
+                          and id = :professionalId
+                          and active = true
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("businessId", businessId)
+                        .addValue("professionalId", professionalId),
+                Integer.class);
+        logOutput("findProfessionalMaxDailyBookings", result);
+        return result;
+    }
+
+    public int countProfessionalBookingsOnDate(UUID businessId, UUID professionalId, OffsetDateTime date) {
+        logInput("countProfessionalBookingsOnDate", businessId, professionalId, date);
+        if (professionalId == null) {
+            logOutput("countProfessionalBookingsOnDate", 0);
+            return 0;
+        }
+        ZoneId zone = resolveBusinessDefaultZone(businessId);
+        OffsetDateTime dayStart = date.atZoneSameInstant(zone).toLocalDate().atStartOfDay(zone).toOffsetDateTime();
+        OffsetDateTime dayEnd = dayStart.plusDays(1);
+        Integer count = jdbcTemplate.queryForObject(
+                """
+                        select count(*)
+                        from booking b
+                        where b.business_id = :businessId
+                          and b.professional_id = :professionalId
+                          and b.starts_at >= :dayStart
+                          and b.starts_at < :dayEnd
+                          and b.status not in ('CANCELADA', 'EXPIRADA', 'NO_ASISTE')
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("businessId", businessId)
+                        .addValue("professionalId", professionalId)
+                        .addValue("dayStart", dayStart)
+                        .addValue("dayEnd", dayEnd),
+                Integer.class);
+        int result = count != null ? count : 0;
+        logOutput("countProfessionalBookingsOnDate", result);
+        return result;
+    }
+
+    public int countCustomerActiveOverlappingBookingsExcluding(UUID businessId, UUID customerId, UUID professionalId,
+            OffsetDateTime startsAt, OffsetDateTime endsAt, UUID excludeBookingId) {
+        logInput("countCustomerActiveOverlappingBookingsExcluding", businessId, customerId, professionalId, startsAt, endsAt, excludeBookingId);
+        if (customerId == null) {
+            logOutput("countCustomerActiveOverlappingBookingsExcluding", 0);
+            return 0;
+        }
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("businessId", businessId)
+                .addValue("customerId", customerId)
+                .addValue("startsAt", startsAt)
+                .addValue("endsAt", endsAt)
+                .addValue("activeStatuses", ACTIVE_BOOKING_STATUSES);
+        StringBuilder sql = new StringBuilder("""
+                        select count(*)
+                        from booking b
+                        where b.business_id = :businessId
+                          and b.customer_id = :customerId
+                          and b.status in (:activeStatuses)
+                          and b.starts_at < :endsAt
+                          and coalesce(b.ends_at, b.starts_at + (b.duration_minutes || ' minutes')::interval) > :startsAt
+                        """);
+        if (professionalId != null) {
+            sql.append(" and b.professional_id = :professionalId\n");
+            params.addValue("professionalId", professionalId);
+        }
+        if (excludeBookingId != null) {
+            sql.append(" and b.id <> :excludeBookingId\n");
+            params.addValue("excludeBookingId", excludeBookingId);
+        }
+        Integer count = jdbcTemplate.queryForObject(sql.toString(), params, Integer.class);
+        int result = count != null ? count : 0;
+        logOutput("countCustomerActiveOverlappingBookingsExcluding", result);
+        return result;
+    }
+
+    public UUID findActiveBookingByCustomerProfessionalAndStart(UUID businessId, UUID customerId, UUID professionalId,
+            OffsetDateTime startsAt) {
+        logInput("findActiveBookingByCustomerProfessionalAndStart", businessId, customerId, professionalId, startsAt);
+        if (customerId == null || professionalId == null || startsAt == null) {
+            logOutput("findActiveBookingByCustomerProfessionalAndStart", null);
+            return null;
+        }
+        List<UUID> items = jdbcTemplate.query(
+                """
+                        select id from booking
+                        where business_id = :businessId
+                          and customer_id = :customerId
+                          and professional_id = :professionalId
+                          and starts_at = :startsAt
+                          and status in (:activeStatuses)
+                        order by created_at desc limit 1
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("businessId", businessId)
+                        .addValue("customerId", customerId)
+                        .addValue("professionalId", professionalId)
+                        .addValue("startsAt", startsAt)
+                        .addValue("activeStatuses", ACTIVE_BOOKING_STATUSES),
+                (rs, rowNum) -> rs.getObject("id", UUID.class));
+        UUID result = items.isEmpty() ? null : items.getFirst();
+        logOutput("findActiveBookingByCustomerProfessionalAndStart", result);
+        return result;
+    }
+
+    public int countCustomerActiveOverlappingBookings(UUID businessId, UUID customerId, UUID professionalId,
+            OffsetDateTime startsAt, OffsetDateTime endsAt) {
+        logInput("countCustomerActiveOverlappingBookings", businessId, customerId, professionalId, startsAt, endsAt);
+        if (customerId == null) {
+            logOutput("countCustomerActiveOverlappingBookings", 0);
+            return 0;
+        }
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("businessId", businessId)
+                .addValue("customerId", customerId)
+                .addValue("startsAt", startsAt)
+                .addValue("endsAt", endsAt)
+                .addValue("activeStatuses", ACTIVE_BOOKING_STATUSES);
+        StringBuilder sql = new StringBuilder("""
+                        select count(*)
+                        from booking b
+                        where b.business_id = :businessId
+                          and b.customer_id = :customerId
+                          and b.status in (:activeStatuses)
+                          and b.starts_at < :endsAt
+                          and coalesce(b.ends_at, b.starts_at + (b.duration_minutes || ' minutes')::interval) > :startsAt
+                        """);
+        if (professionalId != null) {
+            sql.append(" and b.professional_id = :professionalId\n");
+            params.addValue("professionalId", professionalId);
+        }
+        Integer count = jdbcTemplate.queryForObject(sql.toString(), params, Integer.class);
+        int result = count != null ? count : 0;
+        logOutput("countCustomerActiveOverlappingBookings", result);
+        return result;
+    }
+
+    public Optional<UUID> findLastCustomerLocationId(UUID businessId, String phoneDigits) {
+        logInput("findLastCustomerLocationId", businessId, phoneDigits);
+        List<UUID> items = jdbcTemplate.query(
+                """
+                        select b.location_id
+                        from booking b
+                        join customer c on c.id = b.customer_id and c.business_id = b.business_id
+                        where b.business_id = :businessId
+                          and regexp_replace(coalesce(c.normalized_phone, c.phone, ''), '\\D', '', 'g') = :phoneDigits
+                          and b.location_id is not null
+                        order by b.starts_at desc
+                        limit 1
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("businessId", businessId)
+                        .addValue("phoneDigits", normalizePhoneDigits(phoneDigits)),
+                (rs, rowNum) -> rs.getObject("location_id", UUID.class));
+        Optional<UUID> result = items.stream().findFirst();
+        logOutput("findLastCustomerLocationId", result);
+        return result;
+    }
+
+    public int findMinAdvanceNoticeMinutes(UUID businessId, UUID locationId, int dayOfWeek, UUID professionalId) {
+        logInput("findMinAdvanceNoticeMinutes", businessId, locationId, dayOfWeek, professionalId);
+        // Professional-specific min advance takes precedence
+        if (professionalId != null) {
+            List<Integer> profResults = jdbcTemplate.query(
+                    """
+                            select ph.min_advance_notice_minutes
+                            from agenda_professional_hours ph
+                            where ph.business_id = :businessId
+                              and ph.location_id = :locationId
+                              and ph.professional_id = :professionalId
+                              and ph.day_of_week = :dayOfWeek
+                              and ph.active = true
+                            limit 1
+                            """,
+                    new MapSqlParameterSource()
+                            .addValue("businessId", businessId)
+                            .addValue("locationId", locationId)
+                            .addValue("professionalId", professionalId)
+                            .addValue("dayOfWeek", dayOfWeek),
+                    (rs, rowNum) -> rs.getInt("min_advance_notice_minutes"));
+            if (!profResults.isEmpty()) {
+                int profMinAdvance = profResults.get(0);
+                logOutput("findMinAdvanceNoticeMinutes", profMinAdvance);
+                return profMinAdvance;
+            }
+        }
+        // Fallback to business hours min advance
+        List<Integer> bizResults = jdbcTemplate.query(
+                """
+                        select min_advance_notice_minutes
+                        from agenda_business_hours bh
+                        where bh.business_id = :businessId
+                          and bh.location_id = :locationId
+                          and bh.day_of_week = :dayOfWeek
+                          and bh.active = true
+                        limit 1
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("businessId", businessId)
+                        .addValue("locationId", locationId)
+                        .addValue("dayOfWeek", dayOfWeek),
+                (rs, rowNum) -> rs.getInt("min_advance_notice_minutes"));
+        int result = bizResults.isEmpty() ? 60 : bizResults.get(0);
+        logOutput("findMinAdvanceNoticeMinutes", result);
+        return result;
     }
 
     public record DueReminderRecord(UUID id, UUID businessId, UUID bookingId, String reminderType, String channelType,

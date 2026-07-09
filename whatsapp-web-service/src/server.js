@@ -1233,9 +1233,12 @@ if (autoConnectEnabled) {
   startClientInBackground();
 }
 
-app.listen(port, () => {
-  console.log(`whatsapp-webjs-service ${state.adapterMode} listening on port ${port}`);
+app.listen(port, "0.0.0.0", () => {
+  console.log(`whatsapp-webjs-service ${state.adapterMode} listening on 0.0.0.0:${port}`);
+  console.log(`[health] GET http://0.0.0.0:${port}/health responded with UP`);
+  console.log(`[config] visualMode=${visualMode} headlessMode=${headlessMode} autoConnect=${autoConnectEnabled} realEnabled=${realWhatsAppWebEnabled}`);
   if (state.browserViewerUrl) {
-    console.log(`Visual browser available at ${state.browserViewerUrl}`);
+    console.log(`[visual] browser viewer at ${state.browserViewerUrl}`);
   }
+  console.log(`[paths] sessionData=${sessionDataPath} cache=${cachePath} chrome=${chromeExecutablePath}`);
 });

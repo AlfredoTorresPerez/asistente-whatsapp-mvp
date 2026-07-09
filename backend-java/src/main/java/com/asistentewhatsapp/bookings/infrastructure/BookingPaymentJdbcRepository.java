@@ -411,6 +411,65 @@ public class BookingPaymentJdbcRepository {
         return findById(paymentId);
     }
 
+    public PublicBookingPaymentDetailRecord findPaymentDetail(UUID paymentId) {
+        List<PublicBookingPaymentDetailRecord> items = jdbcTemplate.query(
+                """
+                        select p.id, p.business_id, p.booking_id, p.provider, p.provider_payment_id,
+                               p.amount, p.currency, p.status, p.checkout_url, p.checkout_expires_at,
+                               p.manual, p.approved_at, p.rejected_at, p.expired_at, p.refunded_at,
+                               p.created_at,
+                               b.status as booking_status,
+                               b.payment_status as booking_payment_status,
+                               coalesce(s.name, b.subject) as service_name,
+                               b.subject,
+                               prof.full_name as professional_name,
+                               r.name as room_name,
+                               b.starts_at,
+                               b.duration_minutes,
+                               coalesce(l.name, b.location) as location_name,
+                               c.display_name as customer_name
+                        from booking_payment p
+                        join booking b on b.id = p.booking_id and b.business_id = p.business_id
+                        join customer c on c.id = b.customer_id and c.business_id = b.business_id
+                        left join aesthetic_service s on s.id = b.service_id
+                        left join aesthetic_professional prof on prof.id = b.professional_id
+                        left join agenda_room r on r.id = b.room_id
+                        left join business_location l on l.id = b.location_id
+                        where p.id = :paymentId
+                        """,
+                new MapSqlParameterSource().addValue("paymentId", paymentId),
+                (resultSet, rowNum) -> new PublicBookingPaymentDetailRecord(
+                        resultSet.getObject("id", UUID.class),
+                        resultSet.getObject("booking_id", UUID.class),
+                        resultSet.getString("provider"),
+                        resultSet.getString("provider_payment_id"),
+                        resultSet.getBigDecimal("amount"),
+                        resultSet.getString("currency"),
+                        resultSet.getString("status"),
+                        resultSet.getString("checkout_url"),
+                        resultSet.getObject("checkout_expires_at", OffsetDateTime.class),
+                        resultSet.getBoolean("manual"),
+                        resultSet.getObject("approved_at", OffsetDateTime.class),
+                        resultSet.getObject("rejected_at", OffsetDateTime.class),
+                        resultSet.getObject("expired_at", OffsetDateTime.class),
+                        resultSet.getObject("refunded_at", OffsetDateTime.class),
+                        resultSet.getObject("created_at", OffsetDateTime.class),
+                        resultSet.getString("booking_status"),
+                        resultSet.getString("booking_payment_status"),
+                        resultSet.getString("subject"),
+                        resultSet.getString("service_name"),
+                        resultSet.getString("professional_name"),
+                        resultSet.getString("room_name"),
+                        resultSet.getObject("starts_at", OffsetDateTime.class),
+                        resultSet.getInt("duration_minutes"),
+                        resultSet.getString("location_name"),
+                        resultSet.getString("customer_name")));
+        if (items.isEmpty()) {
+            throw new ResourceNotFoundException("No se encontro el pago de reserva.");
+        }
+        return items.getFirst();
+    }
+
     public BookingPaymentRecord findById(UUID paymentId) {
         List<BookingPaymentRecord> items = jdbcTemplate.query(
                 """
@@ -616,6 +675,34 @@ public class BookingPaymentJdbcRepository {
             String customerName,
             String customerPhone,
             String customerEmail) {
+    }
+
+    public record PublicBookingPaymentDetailRecord(
+            UUID id,
+            UUID bookingId,
+            String provider,
+            String providerPaymentId,
+            BigDecimal amount,
+            String currency,
+            String status,
+            String checkoutUrl,
+            OffsetDateTime checkoutExpiresAt,
+            boolean manual,
+            OffsetDateTime approvedAt,
+            OffsetDateTime rejectedAt,
+            OffsetDateTime expiredAt,
+            OffsetDateTime refundedAt,
+            OffsetDateTime createdAt,
+            String bookingStatus,
+            String bookingPaymentStatus,
+            String subject,
+            String serviceName,
+            String professionalName,
+            String roomName,
+            OffsetDateTime startsAt,
+            int durationMinutes,
+            String locationName,
+            String customerName) {
     }
 
     public record BookingPaymentRecord(

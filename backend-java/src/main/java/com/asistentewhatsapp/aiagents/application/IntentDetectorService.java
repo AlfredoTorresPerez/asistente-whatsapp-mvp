@@ -31,9 +31,14 @@ public class IntentDetectorService {
     private static final List<String> CHANGE_BOOKING_WORDS = List.of(
             "reagendar", "reprogramar", "reprogramacion", "reprogramación", "cambiar hora", "cambiar mi hora",
             "cambiar reserva", "cambiar mi reserva", "cambiar cita", "cambiar mi cita", "cambio de hora",
-            "modificar cita", "modificar mi cita", "mover", "mover mi hora", "mover mi reserva");
-    private static final List<String> CANCEL_BOOKING_WORDS = List.of("cancelar", "anular", "cancelacion", "cancelación");
-    private static final List<String> PRICE_WORDS = List.of("precio", "valor", "cuanto cuesta", "cuánto cuesta", "tarifa", "sale");
+            "cambio la hora", "cambiarme", "cámbiame", "cambieme", "cambiar la hora", "cambiar de hora",
+            "modificar cita", "modificar mi cita", "mover", "mover mi hora", "mover mi reserva",
+            "cambio de fecha", "cambiar de fecha");
+    private static final List<String> CANCEL_BOOKING_WORDS = List.of(
+            "cancelar", "cancela", "cancele", "canceló", "cancelada", "cancelado",
+            "anular", "anule", "anula",
+            "cancelacion", "cancelación");
+    private static final List<String> PRICE_WORDS = List.of("precio", "valor", "cuanto cuesta", "cuánto cuesta", "cuanto vale", "cuánto vale", "tarifa", "sale", "cuesta");
     private static final List<String> QUOTE_WORDS = List.of("cotizar", "cotizacion", "cotización", "presupuesto");
     private static final List<String> SALES_WORDS = List.of(
             "producto", "servicio", "plan", "promocion", "promoción", "comprar", "contratar", "disponible", "stock",

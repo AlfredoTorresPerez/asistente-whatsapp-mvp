@@ -231,7 +231,10 @@ public class AgentCoordinatorService {
             Optional<AiAgentJdbcRepository.ConversationContextSnapshot> previousContext,
             Map<String, String> entities) {
         if (current.primaryIntent() == AgentIntent.BOOKING_CANCEL
-                || current.primaryIntent() == AgentIntent.BOOKING_CHANGE) {
+                || current.primaryIntent() == AgentIntent.BOOKING_CHANGE
+                || current.primaryIntent() == AgentIntent.BOOKING_STATUS
+                || current.primaryIntent() == AgentIntent.HUMAN_REQUEST
+                || current.primaryIntent() == AgentIntent.PRICE_REQUEST) {
             return current;
         }
         if (previousContext.isPresent()) {

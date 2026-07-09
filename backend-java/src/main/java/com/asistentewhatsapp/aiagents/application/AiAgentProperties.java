@@ -23,6 +23,12 @@ public class AiAgentProperties {
      */
     private boolean auditEnabled = true;
 
+    /**
+     * Modo seguro: cuando esta activo, la IA procesa y genera respuestas pero NO las envía
+     * realmente a WhatsApp. Las respuestas se registran en logs y BD para validación.
+     */
+    private boolean safeModeEnabled = false;
+
     private double defaultConfidence = 0.78;
 
     public boolean enabled() {
@@ -47,6 +53,14 @@ public class AiAgentProperties {
 
     public void setAuditEnabled(boolean auditEnabled) {
         this.auditEnabled = auditEnabled;
+    }
+
+    public boolean safeModeEnabled() {
+        return safeModeEnabled;
+    }
+
+    public void setSafeModeEnabled(boolean safeModeEnabled) {
+        this.safeModeEnabled = safeModeEnabled;
     }
 
     public double defaultConfidence() {

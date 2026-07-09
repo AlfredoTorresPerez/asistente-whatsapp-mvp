@@ -1,0 +1,70 @@
+{
+  "fecha": "2026-07-07T01:06:51.494Z",
+  "ambiente": "local",
+  "frontendUrl": "http://localhost:5173",
+  "backendUrl": "http://localhost:8080",
+  "total": 7,
+  "passed": 0,
+  "failed": 0,
+  "skipped": 0,
+  "blocked": 7,
+  "results": [
+    {
+      "id": "POST-RES-001",
+      "nivel": "",
+      "modulo": "",
+      "caso": "",
+      "estado": "BLOCKED",
+      "error": "No hay conexión segura a base de datos de pruebas. Se requiere configuración de testcontainers o DB de test con credenciales read-only."
+    },
+    {
+      "id": "POST-RES-003",
+      "nivel": "",
+      "modulo": "",
+      "caso": "",
+      "estado": "BLOCKED",
+      "error": "Requiere verificar índice único parcial uq_booking_customer_professional_active en DB"
+    },
+    {
+      "id": "POST-RES-004",
+      "nivel": "",
+      "modulo": "",
+      "caso": "",
+      "estado": "BLOCKED",
+      "error": "Requiere verificar exclusión constraint ex_booking_professional_no_overlap_active"
+    },
+    {
+      "id": "TST-034",
+      "nivel": "",
+      "modulo": "",
+      "caso": "",
+      "estado": "BLOCKED",
+      "error": "Requiere verificación de exclusión constraint + manejo de error concurrente en API"
+    },
+    {
+      "id": "TST-112",
+      "nivel": "",
+      "modulo": "",
+      "caso": "",
+      "estado": "BLOCKED",
+      "error": "Requiere verificar tabla booking_status_history tras cambio de estado"
+    },
+    {
+      "id": "TST-034",
+      "nivel": "",
+      "modulo": "",
+      "caso": "",
+      "estado": "BLOCKED",
+      "error": "Prueba de concurrencia requiere: 1) Token de autenticación real, 2) Endpoint de creación de reserva, 3) Ejecución de 2 requests paralelos al mismo slot. Sin endpoint de simulación de autenticación en tests, esta prueba queda bloqueada.",
+      "recomendacion": "Crear endpoint de test que permita bypass de auth en ambiente de pruebas"
+    },
+    {
+      "id": "TST-034-2",
+      "nivel": "",
+      "modulo": "",
+      "caso": "",
+      "estado": "BLOCKED",
+      "error": "Requiere validar que lectura de disponibilidad no muestre slot como libre si hay transacción concurrente"
+    }
+  ]
+}

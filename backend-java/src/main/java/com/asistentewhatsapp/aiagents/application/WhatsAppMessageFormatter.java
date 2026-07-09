@@ -113,11 +113,90 @@ public final class WhatsAppMessageFormatter {
                 + "*Sucursal*, *fecha* u *hora* de la reserva.";
     }
 
+    public static String noActiveBookingsFound() {
+        return "📭 *Sin reservas activas*\n\n"
+                + "No encontré reservas futuras activas asociadas a este WhatsApp.\n\n"
+                + "Si deseas agendar una nueva hora, solo dime el servicio, la fecha y la hora que prefieres.";
+    }
+
+    public static String singleBookingFound(String service, String date, String time, String location, String professional, String status, String duration, String amount) {
+        return "📋 *Encontré una reserva activa*\n\n"
+                + "Revisa los datos antes de cancelar:\n\n"
+                + "*Servicio:* " + safe(service, "—") + "\n"
+                + "*Fecha:* " + safe(date, "—") + "\n"
+                + "*Hora:* " + safe(time, "—") + "\n"
+                + "*Sucursal:* " + safe(location, "—") + "\n"
+                + "*Profesional:* " + safe(professional, "Por asignar") + "\n"
+                + "*Estado:* " + safe(status, "—") + "\n"
+                + (duration != null && !duration.isBlank() ? "*Duración:* " + duration + "\n" : "")
+                + (amount != null && !amount.isBlank() ? "*Monto:* " + amount + "\n" : "")
+                + "\n¿Confirmas que deseas cancelar esta reserva?\n\n"
+                + "Responde *Sí* para cancelar o *No* para volver.";
+    }
+
+    public static String multipleBookingsFound(String secureUrl) {
+        return "📋 *Tienes varias reservas activas*\n\n"
+                + "Encontré más de una reserva activa asociada a tu WhatsApp. Para evitar cancelar una hora equivocada, revisa tus reservas y selecciona cuál deseas cancelar aquí:\n\n"
+                + "👉 " + safe(secureUrl, "") + "\n\n"
+                + "El enlace es seguro y caduca en 60 minutos.";
+    }
+
+    public static String bookingCancelledSuccess(String service, String date, String time, String location) {
+        return "✅ *Reserva cancelada*\n\n"
+                + "Tu reserva fue cancelada correctamente:\n\n"
+                + "*Servicio:* " + safe(service, "—") + "\n"
+                + "*Fecha:* " + safe(date, "—") + "\n"
+                + "*Hora:* " + safe(time, "—") + "\n"
+                + "*Sucursal:* " + safe(location, "—") + "\n\n"
+                + "El cupo quedó liberado. Si necesitas agendar una nueva hora, solo dímelo.";
+    }
+
     public static String rescheduleRequest() {
         return "🔄 *Solicitud de reprogramación*\n\n"
                 + "Puedo ayudarte a reprogramar tu cita.\n\n"
                 + "Para identificar la *cita actual*, indícame la fecha de la cita o el servicio.\n\n"
                 + "También dime el nuevo *día* u *horario* que prefieres.";
+    }
+
+    public static String cancellationLinkGenerated(String service, String date, String time, String location, String url, int expirationMinutes) {
+        return "🛑 *Solicitud de cancelación*\n\n"
+                + "He encontrado tu reserva:\n\n"
+                + "*Servicio:* " + safe(service, "—") + "\n"
+                + "*Fecha:* " + safe(date, "—") + "\n"
+                + "*Hora:* " + safe(time, "—") + "\n"
+                + "*Sucursal:* " + safe(location, "—") + "\n\n"
+                + "👉 *Toca o copia este enlace para cancelar tu reserva:*\n\n"
+                + safe(url, "") + "\n\n"
+                + "_Si WhatsApp no lo abre al tocarlo, copia el enlace y pégalo en el navegador._\n\n"
+                + "⏳ *Importante:* este enlace vence en *" + formatDuration(expirationMinutes) + "*.";
+    }
+
+    public static String rescheduleLinkGenerated(String service, String date, String time, String location, String url, int expirationMinutes) {
+        return "🔄 *Reprogramación de reserva*\n\n"
+                + "He encontrado tu reserva:\n\n"
+                + "*Servicio:* " + safe(service, "—") + "\n"
+                + "*Fecha actual:* " + safe(date, "—") + "\n"
+                + "*Hora actual:* " + safe(time, "—") + "\n"
+                + "*Sucursal:* " + safe(location, "—") + "\n\n"
+                + "👉 *Toca o copia este enlace para elegir un nuevo horario:*\n\n"
+                + safe(url, "") + "\n\n"
+                + "_Si WhatsApp no lo abre al tocarlo, copia el enlace y pégalo en el navegador._\n\n"
+                + "⏳ *Importante:* este enlace vence en *" + formatDuration(expirationMinutes) + "*.";
+    }
+
+    public static String bookingLink(String url, boolean isKnownCustomer) {
+        if (isKnownCustomer) {
+            return "✅ *Reserva en línea*\n\n"
+                    + "Hola, ya te tengo registrado 😊\n\n"
+                    + "👉 *Toca o copia este enlace para seleccionar servicio, fecha y hora:*\n\n"
+                    + safe(url, "") + "\n\n"
+                    + "_Si WhatsApp no lo abre al tocarlo, copia el enlace y pégalo en el navegador._";
+        }
+        return "✅ *Reserva en línea*\n\n"
+                + "Para agendar tu hora, completa tus datos en el siguiente enlace:\n\n"
+                + "👉 *Toca o copia este enlace para reservar:*\n\n"
+                + safe(url, "") + "\n\n"
+                + "_Si WhatsApp no lo abre al tocarlo, copia el enlace y pégalo en el navegador._";
     }
 
     public static String sensitiveCase() {

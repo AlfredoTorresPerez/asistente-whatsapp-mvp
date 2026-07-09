@@ -8,6 +8,7 @@ import {
   AdminUsersPage,
   AdministrationPage,
   CompanySettingsPage,
+  WhatsAppSimulatorPage,
   WhatsAppWebConnectionPage,
 } from '../modules/administration'
 import {
@@ -15,7 +16,10 @@ import {
   AppointmentsPage,
   BookingCancellationPage,
   BookingConfirmationPage,
+  BookingPaymentPage,
   BookingReschedulePage,
+  CreatePublicBookingPage,
+  CustomerBookingsPage,
   EditAppointmentPage,
   NewAppointmentFromConversationPage,
   NewAppointmentFromProspectPage,
@@ -65,6 +69,9 @@ export const appRoutes: RouteObject[] = [
   { path: '/reservas/confirmar/:token', element: <BookingConfirmationPage /> },
   { path: '/reservas/reprogramar/:token', element: <BookingReschedulePage /> },
   { path: '/reservas/cancelar/:token', element: <BookingCancellationPage /> },
+  { path: '/reservas/pagar/:paymentId', element: <BookingPaymentPage /> },
+  { path: '/reservar', element: <CreatePublicBookingPage /> },
+  { path: '/reservas/mis-reservas/:token', element: <CustomerBookingsPage /> },
   {
     path: '/',
     element: <PublicRouteShell />,
@@ -128,6 +135,7 @@ export const appRoutes: RouteObject[] = [
       { path: 'admin/users/new', element: <RequireRole allowedRoles={['OWNER', 'ADMIN']}><AdminUserFormPage /></RequireRole> },
       { path: 'admin/users/:userId/edit', element: <RequireRole allowedRoles={['OWNER', 'ADMIN']}><AdminUserFormPage /></RequireRole> },
       { path: 'admin/whatsapp-web', element: <RequireRole allowedRoles={['OWNER', 'ADMIN']}><WhatsAppWebConnectionPage /></RequireRole> },
+      { path: 'admin/whatsapp-simulator', element: <RequireRole allowedRoles={['OWNER', 'ADMIN']}><WhatsAppSimulatorPage /></RequireRole> },
       { path: 'admin/security', element: <RequireRole allowedRoles={['OWNER', 'ADMIN']}><AdminSecurityPage /></RequireRole> },
     ],
   },

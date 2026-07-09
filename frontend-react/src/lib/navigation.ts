@@ -62,6 +62,7 @@ export const PRIMARY_NAV_ITEMS: NavigationItem[] = [
     label: 'Reportes',
     path: '/reports',
     description: 'Indicadores basicos filtrados por rango y responsable.',
+    allowedRoles: ['OWNER', 'ADMIN'],
   },
   {
     label: 'Sedes del negocio',
@@ -86,6 +87,12 @@ export const PRIMARY_NAV_ITEMS: NavigationItem[] = [
     path: '/configuration',
     description: 'Conexion, dispositivos, QR y preferencias de WhatsApp Web.',
     allowedRoles: ['OWNER', 'ADMIN', 'SUPERVISOR'],
+  },
+  {
+    label: 'Simulador WhatsApp',
+    path: '/admin/whatsapp-simulator',
+    description: 'Simular mensajes entrantes de WhatsApp para pruebas.',
+    allowedRoles: ['OWNER', 'ADMIN'],
   },
 ]
 
@@ -321,6 +328,11 @@ const ROUTE_METADATA: RouteMeta[] = [
     path: '/admin/security',
     title: 'Seguridad',
     description: 'Politicas de contrasena, sesion y bloqueo del negocio.',
+  },
+  {
+    path: '/admin/whatsapp-simulator',
+    title: 'Simulador WhatsApp',
+    description: 'Simular mensajes entrantes de WhatsApp para pruebas sin Postman.',
   },
   {
     path: '/admin',

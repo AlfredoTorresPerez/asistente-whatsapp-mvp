@@ -1,7 +1,9 @@
 package com.asistentewhatsapp.bookings.api;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
+import com.asistentewhatsapp.customerbookings.api.CustomerBookingItemResponse;
 
 public record PublicBookingRescheduleResponse(
         UUID bookingId,
@@ -22,5 +24,12 @@ public record PublicBookingRescheduleResponse(
         String maskedCustomerPhone,
         OffsetDateTime expiresAt,
         OffsetDateTime usedAt,
-        String reason) {
+        String reason,
+        List<CustomerBookingItemResponse> bookings,
+        List<ServiceOption> services,
+        List<LocationOption> locations) {
+
+    public record ServiceOption(UUID id, String name, String categoryName, int durationMinutes, boolean requiresRoom) {}
+
+    public record LocationOption(UUID id, String name, String address, String commune) {}
 }

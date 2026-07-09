@@ -10,6 +10,7 @@ import { Select } from '../../../components/ui/Select'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { Textarea } from '../../../components/ui/Textarea'
 import { useToast } from '../../../lib/toast'
+import { ApiClientError } from '../../../services/api/httpClient'
 import {
   cancelAgendaBookingRequest,
   createTemporaryAgendaBookingRequest,
@@ -20,237 +21,35 @@ import {
 import { getBusinessLocationsRequest } from '../../../services/api/businessLocationsApi'
 import { createBookingConfirmationLinkRequest, getBookingDetailRequest } from '../../../services/api/bookingsApi'
 import type { AgendaCalendarItemResponse, BookingDetailResponse } from '../../../services/api/types'
+import { CalendarWeekNavigation } from '../components/CalendarWeekNavigation'
+import { WeeklyCalendarView } from '../components/WeeklyCalendarView'
+import {
+  agendaTimeZone,
+  buildVisibleDays,
+  calendarDays,
+  formatAgendaTime,
+  formatLongDate,
+  formatTimeRange,
+  getAgendaDateKey,
+  getStatusLabel,
+  getStatusStyle,
+  getWeekStart,
+} from '../components/agendaUtils'
 
 const today = dayjs().format('YYYY-MM-DD')
-const scheduleStartHour = 9
-const scheduleEndHour = 21
-const baseHourHeight = 96
-const eventCardHeight = 56
-const eventGap = 8
-const rowVerticalPadding = 12
-const calendarDays = 7
-
-const weekDayLabels = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab']
-const agendaTimeZone = 'America/Santiago'
-
-function getAgendaDateKey(value: string) {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: agendaTimeZone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(new Date(value))
-}
-
-function getAgendaHourMinute(value: string) {
-  const parts = new Intl.DateTimeFormat('en-GB', {
-    timeZone: agendaTimeZone,
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  }).formatToParts(new Date(value))
-  const hour = Number(parts.find((part) => part.type === 'hour')?.value ?? '0')
-  const minute = Number(parts.find((part) => part.type === 'minute')?.value ?? '0')
-  return { hour, minute }
-}
-
-function formatAgendaTime(value: string) {
-  return new Intl.DateTimeFormat('es-CL', {
-    timeZone: agendaTimeZone,
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  }).format(new Date(value))
-}
 
 const statusOptions = [
   { label: 'Reservas activas', value: '' },
-  { label: 'Reservas confirmadas', value: 'CONFIRMED' },
+  { label: 'Confirmadas', value: 'CONFIRMED' },
   { label: 'Pendientes de confirmacion', value: 'PENDIENTE_CONFIRMACION' },
-  { label: 'Recordatorio enviado', value: 'RECORDATORIO_ENVIADO' },
   { label: 'Canceladas', value: 'CANCELLED' },
   { label: 'Reprogramadas', value: 'RESCHEDULED' },
   { label: 'Atendidas', value: 'COMPLETED' },
+  { label: 'Solicitadas', value: 'REQUESTED' },
+  { label: 'Pendientes pago', value: 'PENDING_PAYMENT' },
   { label: 'No asistio', value: 'NO_SHOW' },
+  { label: 'Vencidas', value: 'EXPIRED' },
 ]
-
-const serviceColorClasses = [
-  'border-emerald-200 bg-emerald-50 text-emerald-950 shadow-emerald-100',
-  'border-blue-200 bg-blue-50 text-blue-950 shadow-blue-100',
-  'border-violet-200 bg-violet-50 text-violet-950 shadow-violet-100',
-  'border-amber-200 bg-amber-50 text-amber-950 shadow-amber-100',
-  'border-orange-200 bg-orange-50 text-orange-950 shadow-orange-100',
-  'border-sky-200 bg-sky-50 text-sky-950 shadow-sky-100',
-]
-
-function getWeekStart(value: string) {
-  const current = dayjs(value).startOf('day')
-  const daysFromMonday = (current.day() + 6) % 7
-  return current.subtract(daysFromMonday, 'day')
-}
-
-function buildVisibleDays(value: string) {
-  const weekStart = getWeekStart(value)
-  return Array.from({ length: calendarDays }, (_, index) => weekStart.add(index, 'day'))
-}
-
-function formatCalendarDay(value: dayjs.Dayjs) {
-  return {
-    label: weekDayLabels[value.day()],
-    dayNumber: value.format('DD'),
-    month: value.format('MM'),
-    key: value.format('YYYY-MM-DD'),
-  }
-}
-
-function formatTimeRange(item: AgendaCalendarItemResponse) {
-  const start = item.startTimeLocal ?? formatAgendaTime(item.startsAt)
-  const end = item.endTimeLocal ?? formatAgendaTime(item.endsAt)
-  return `${start} - ${end}`
-}
-
-function formatLongDate(value: string) {
-  const dateKey = getAgendaDateKey(value)
-  const dateValue = dayjs(dateKey)
-  return `${weekDayLabels[dateValue.day()]}, ${dateValue.format('DD/MM/YYYY')}`
-}
-
-function getStatusLabel(status: string) {
-  const normalized = status.toUpperCase()
-  const labels: Record<string, string> = {
-    CONFIRMED: 'Confirmada',
-    CONFIRMADA: 'Confirmada',
-    PENDIENTE_CONFIRMACION: 'Pendiente',
-    PENDING_CONFIRMATION: 'Pendiente',
-    RECORDATORIO_ENVIADO: 'Recordatorio enviado',
-    REMINDER_SENT: 'Recordatorio enviado',
-    CANCELLED: 'Cancelada',
-    CANCELADA: 'Cancelada',
-    RESCHEDULED: 'Reprogramada',
-    REPROGRAMADA: 'Reprogramada',
-    COMPLETED: 'Atendida',
-    ATENDIDA: 'Atendida',
-    NO_SHOW: 'No asistio',
-    TEMPORARY: 'Temporal',
-  }
-  return labels[normalized] ?? status
-}
-
-function getStatusTone(status: string): 'success' | 'warning' | 'danger' | 'neutral' | 'info' {
-  const normalized = status.toUpperCase()
-  if (['CONFIRMED', 'CONFIRMADA', 'COMPLETED', 'ATENDIDA'].includes(normalized)) {
-    return 'success'
-  }
-  if (['PENDIENTE_CONFIRMACION', 'PENDING_CONFIRMATION', 'TEMPORARY'].includes(normalized)) {
-    return 'warning'
-  }
-  if (['CANCELLED', 'CANCELADA', 'NO_SHOW'].includes(normalized)) {
-    return 'danger'
-  }
-  if (['RESCHEDULED', 'REPROGRAMADA', 'RECORDATORIO_ENVIADO', 'REMINDER_SENT'].includes(normalized)) {
-    return 'info'
-  }
-  return 'neutral'
-}
-
-function getItemColorClass(item: AgendaCalendarItemResponse) {
-  const key = item.serviceId ?? item.serviceName ?? item.subject
-  const hash = key.split('').reduce((current, char) => current + char.charCodeAt(0), 0)
-  return serviceColorClasses[hash % serviceColorClasses.length]
-}
-
-function getScheduleHours() {
-  return Array.from({ length: scheduleEndHour - scheduleStartHour + 1 }, (_, index) => scheduleStartHour + index)
-}
-
-type AgendaHourLayout = {
-  byHour: Record<number, { top: number; height: number; maxItems: number }>
-  totalHeight: number
-}
-
-function getLocalHourMinute(item: AgendaCalendarItemResponse) {
-  if (item.startTimeLocal) {
-    return {
-      hour: Number(item.startTimeLocal.slice(0, 2)),
-      minute: Number(item.startTimeLocal.slice(3, 5)),
-    }
-  }
-  return getAgendaHourMinute(item.startsAt)
-}
-
-function getItemStartHour(item: AgendaCalendarItemResponse) {
-  return getLocalHourMinute(item).hour
-}
-
-function buildAgendaHourLayout(items: AgendaCalendarItemResponse[], visibleDays: dayjs.Dayjs[]): AgendaHourLayout {
-  const visibleDayKeys = new Set(visibleDays.map((day) => day.format('YYYY-MM-DD')))
-  const itemsByDayHour = new Map<string, number>()
-
-  items.forEach((item) => {
-    const dateKey = item.dateLocal ?? getAgendaDateKey(item.startsAt)
-    const hour = getItemStartHour(item)
-
-    if (!visibleDayKeys.has(dateKey) || hour < scheduleStartHour || hour > scheduleEndHour) {
-      return
-    }
-
-    const key = `${dateKey}-${hour}`
-    itemsByDayHour.set(key, (itemsByDayHour.get(key) ?? 0) + 1)
-  })
-
-  const byHour: AgendaHourLayout['byHour'] = {}
-  let accumulatedTop = 0
-
-  getScheduleHours().forEach((hour) => {
-    const maxItems = Math.max(
-      1,
-      ...visibleDays.map((day) => itemsByDayHour.get(`${day.format('YYYY-MM-DD')}-${hour}`) ?? 0),
-    )
-    const height = Math.max(
-      baseHourHeight,
-      rowVerticalPadding * 2 + maxItems * eventCardHeight + Math.max(0, maxItems - 1) * eventGap,
-    )
-    byHour[hour] = { top: accumulatedTop, height, maxItems }
-    accumulatedTop += height
-  })
-
-  return { byHour, totalHeight: accumulatedTop }
-}
-
-function getEventsForDayAndHour(items: AgendaCalendarItemResponse[], dayKey: string, hour: number) {
-  return items
-    .filter((item) => {
-      const itemDayKey = item.dateLocal ?? getAgendaDateKey(item.startsAt)
-      return itemDayKey === dayKey && getItemStartHour(item) === hour
-    })
-    .sort((first, second) => {
-      const firstTime = first.startTimeLocal ?? formatAgendaTime(first.startsAt)
-      const secondTime = second.startTimeLocal ?? formatAgendaTime(second.startsAt)
-      return firstTime.localeCompare(secondTime)
-    })
-}
-
-function getCurrentTimeIndicator(visibleDays: dayjs.Dayjs[], hourLayout: AgendaHourLayout) {
-  const now = new Date()
-  const currentDateKey = getAgendaDateKey(now.toISOString())
-  const isVisible = visibleDays.some((day) => day.format('YYYY-MM-DD') === currentDateKey)
-
-  if (!isVisible) {
-    return null
-  }
-
-  const { hour, minute } = getAgendaHourMinute(now.toISOString())
-
-  if (hour < scheduleStartHour || hour > scheduleEndHour) {
-    return null
-  }
-
-  const hourSlot = hourLayout.byHour[hour] ?? { top: 0, height: baseHourHeight, maxItems: 1 }
-  return {
-    top: hourSlot.top + (minute / 60) * hourSlot.height,
-    label: formatAgendaTime(now.toISOString()),
-  }
-}
 
 function buildFilterLabel(name: string, detail?: string | null) {
   return detail ? `${name} · ${detail}` : name
@@ -265,7 +64,7 @@ function getInitials(name: string) {
 }
 
 function getWhatsAppStatus(item: AgendaCalendarItemResponse | null, detail?: BookingDetailResponse) {
-  const lastWhatsAppReminder = detail?.reminders
+  const lastWhatsAppReminder = (detail?.reminders ?? [])
     .filter((reminder) => reminder.channelType === 'WHATSAPP')
     .sort((first, second) => dayjs(second.sentAt ?? second.scheduledAt).valueOf() - dayjs(first.sentAt ?? first.scheduledAt).valueOf())[0]
 
@@ -327,6 +126,18 @@ function getAgentRows(item: AgendaCalendarItemResponse | null, detail?: BookingD
   ]
 }
 
+function DetailRow({ icon, label, value }: { icon: string; label: string; value: string }) {
+  return (
+    <div className="grid grid-cols-[72px_1fr] gap-3">
+      <span className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">{icon}</span>
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{label}</p>
+        <p className="mt-1 font-medium text-slate-800">{value}</p>
+      </div>
+    </div>
+  )
+}
+
 export function CompleteAgendaPage() {
   const navigate = useNavigate()
   const { showToast } = useToast()
@@ -342,6 +153,7 @@ export function CompleteAgendaPage() {
   const [notes, setNotes] = useState('')
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null)
   const [cancelReason, setCancelReason] = useState('')
+  const [showDetailPanel, setShowDetailPanel] = useState(false)
 
   const visibleDays = useMemo(() => buildVisibleDays(date), [date])
   const weekStart = visibleDays[0]
@@ -424,12 +236,6 @@ export function CompleteAgendaPage() {
     [calendarQuery.data],
   )
 
-  const hourLayout = useMemo(() => buildAgendaHourLayout(calendarItems, visibleDays), [calendarItems, visibleDays])
-  const currentTimeIndicator = useMemo(
-    () => getCurrentTimeIndicator(visibleDays, hourLayout),
-    [hourLayout, visibleDays],
-  )
-
   const selectedItem = useMemo(
     () => calendarItems.find((item) => item.bookingId === selectedBookingId) ?? calendarItems[0] ?? null,
     [calendarItems, selectedBookingId],
@@ -474,8 +280,8 @@ export function CompleteAgendaPage() {
   })
 
   const createMutation = useMutation({
-    mutationFn: (startsAt: string) =>
-      createTemporaryAgendaBookingRequest({
+    mutationFn: (startsAt: string) => {
+      const payload = {
         locationId,
         serviceId,
         professionalId: professionalId || undefined,
@@ -488,7 +294,10 @@ export function CompleteAgendaPage() {
         expirationMinutes: 30,
         generateConfirmationLink: true,
         sendWhatsApp: true,
-      }),
+      }
+      console.log('[diagnostico] createTemporaryAgendaBookingRequest payload:', payload)
+      return createTemporaryAgendaBookingRequest(payload)
+    },
     onSuccess: (booking) => {
       showToast({
         title: 'Reserva temporal creada',
@@ -497,12 +306,23 @@ export function CompleteAgendaPage() {
       })
       navigate(`/appointments/${booking.id}`)
     },
-    onError: () => {
-      showToast({
-        title: 'No se pudo crear la reserva',
-        description: 'El horario pudo quedar ocupado o faltan datos obligatorios.',
-        tone: 'error',
-      })
+    onError: (error) => {
+      const apiError = error as ApiClientError
+      console.log('[diagnostico] createMutation error:', { code: apiError.code, status: apiError.status, message: apiError.message, fieldErrors: apiError.fieldErrors })
+      if (apiError?.fieldErrors && Object.keys(apiError.fieldErrors).length > 0) {
+        const firstFieldError = Object.values(apiError.fieldErrors)[0]
+        showToast({
+          title: 'No se pudo crear la reserva',
+          description: firstFieldError,
+          tone: 'error',
+        })
+      } else {
+        showToast({
+          title: 'No se pudo crear la reserva',
+          description: apiError?.message ?? 'El horario pudo quedar ocupado o faltan datos obligatorios.',
+          tone: 'error',
+        })
+      }
     },
   })
 
@@ -542,10 +362,14 @@ export function CompleteAgendaPage() {
       void bookingDetailQuery.refetch()
       void calendarQuery.refetch()
     },
-    onError: () => {
+    onError: (error) => {
+      const apiError = error as ApiClientError
+      const description = apiError?.fieldErrors && Object.keys(apiError.fieldErrors).length > 0
+        ? Object.values(apiError.fieldErrors)[0]
+        : apiError?.message ?? 'El motivo es obligatorio o la reserva ya no permite cambios.'
       showToast({
         title: 'No se pudo cancelar la reserva',
-        description: 'El motivo es obligatorio o la reserva ya no permite cambios.',
+        description,
         tone: 'error',
       })
     },
@@ -555,7 +379,12 @@ export function CompleteAgendaPage() {
   const canCreate = customerName.trim().length > 0 && customerPhone.trim().length >= 8
   const slots = availabilityMutation.data?.slots ?? []
   const activityItems = buildRecentActivity(bookingDetail)
-  const selectedStatusTone = getStatusTone(selectedItem?.status ?? bookingDetail?.status ?? '')
+  const selectedStatusStyle = getStatusStyle(selectedItem?.status ?? bookingDetail?.status ?? '')
+
+  function handleSelectBooking(bookingId: string) {
+    setSelectedBookingId(bookingId)
+    setShowDetailPanel(true)
+  }
 
   return (
     <section className="space-y-6">
@@ -621,229 +450,109 @@ export function CompleteAgendaPage() {
         </div>
       </Card>
 
-      <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_380px]">
-        <Card className="overflow-hidden p-0">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 p-5">
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900">Calendario semanal de reservas</h2>
-              <p className="mt-1 text-sm text-slate-500">
-                {weekStart.format('DD/MM/YYYY')} - {weekStart.add(calendarDays - 1, 'day').format('DD/MM/YYYY')} · GMT-04 / America/Santiago ·{' '}
-                {calendarItems.length} reservas visibles
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Button onClick={() => setDate(dayjs(date).subtract(7, 'day').format('YYYY-MM-DD'))} variant="secondary">
-                Semana anterior
-              </Button>
-              <Button onClick={() => setDate(today)} variant="secondary">
-                Hoy
-              </Button>
-              <Button onClick={() => setDate(dayjs(date).add(7, 'day').format('YYYY-MM-DD'))} variant="secondary">
-                Semana siguiente
-              </Button>
-            </div>
-          </div>
+      <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+        <div className="min-w-0">
+          <CalendarWeekNavigation
+            currentDate={date}
+            itemsCount={calendarItems.length}
+            today={today}
+            onDateChange={setDate}
+          />
+          <WeeklyCalendarView
+            calendarItems={calendarItems}
+            selectedBookingId={selectedBookingId}
+            visibleDays={visibleDays}
+            onSelectBooking={handleSelectBooking}
+          />
+        </div>
 
-          <div className="overflow-x-auto">
-            <div className="min-w-[1020px]">
-              <div
-                className="grid border-b border-slate-100 bg-slate-50"
-                style={{ gridTemplateColumns: `76px repeat(${visibleDays.length}, minmax(145px, 1fr))` }}
-              >
-                <div className="border-r border-slate-100 px-3 py-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-                  Hora
-                </div>
-                {visibleDays.map((day) => {
-                  const formattedDay = formatCalendarDay(day)
-                  const isToday = day.isSame(dayjs(), 'day')
-                  return (
-                    <div className="border-r border-slate-100 px-4 py-3 text-center" key={formattedDay.key}>
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{formattedDay.label}</p>
-                      <div className="mt-1 flex items-center justify-center gap-1">
-                        <span
-                          className={[
-                            'inline-flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold',
-                            isToday ? 'bg-emerald-500 text-white' : 'text-slate-900',
-                          ].join(' ')}
-                        >
-                          {formattedDay.dayNumber}
-                        </span>
-                        <span className="text-xs font-semibold text-emerald-500">/{formattedDay.month}</span>
-                      </div>
+        {/* Detail Panel */}
+        <div className={showDetailPanel ? 'block' : 'hidden lg:block'}>
+          <Card className="h-fit space-y-5 lg:sticky lg:top-6">
+            {selectedItem ? (
+              <>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-slate-100 to-slate-200 text-base font-bold text-slate-700">
+                      {getInitials(selectedItem.customerName)}
                     </div>
-                  )
-                })}
-              </div>
+                    <div>
+                      <h2 className="text-lg font-bold text-slate-900">{selectedItem.customerName}</h2>
+                      <p className="text-sm text-slate-500">{bookingDetail?.customerPhone ?? selectedItem.customerPhone}</p>
+                    </div>
+                  </div>
+                  <StatusBadge label={getStatusLabel(selectedItem.status)} tone={
+                    selectedStatusStyle.hex === '#10b981' ? 'success' :
+                    selectedStatusStyle.hex === '#f59e0b' ? 'warning' :
+                    selectedStatusStyle.hex === '#f87171' ? 'danger' : 'info'
+                  } />
+                </div>
 
-              <div className="relative bg-white">
-                {currentTimeIndicator ? (
-                  <div
-                    aria-hidden="true"
-                    className="pointer-events-none absolute right-0 z-30 border-t-2 border-dashed border-rose-500/80"
-                    style={{ left: 76, top: currentTimeIndicator.top }}
+                <div className="grid gap-3 rounded-3xl border border-slate-100 bg-slate-50 p-4 text-sm">
+                  <DetailRow icon="Servicio" label="Servicio" value={selectedItem.serviceName ?? selectedItem.subject} />
+                  <DetailRow icon="Fecha" label="Fecha y hora" value={`${formatLongDate(selectedItem.startsAt)} · ${formatTimeRange(selectedItem)}`} />
+                  <DetailRow icon="Equipo" label="Profesional" value={selectedItem.professionalName ?? 'Profesional por asignar'} />
+                  <DetailRow icon="Lugar" label="Ubicacion" value={selectedItem.roomName ?? selectedItem.locationName ?? 'Sin ubicacion'} />
+                  <DetailRow icon="Tiempo" label="Duracion" value={`${selectedItem.durationMinutes} minutos`} />
+                  <DetailRow icon="WA" label="Estado WhatsApp" value={getWhatsAppStatus(selectedItem, bookingDetail)} />
+                </div>
+
+                <div className="space-y-2">
+                  <h3 className="text-sm font-semibold text-slate-800">Notas internas</h3>
+                  <div className="rounded-2xl border border-slate-100 bg-white p-4 text-sm text-slate-600">
+                    {bookingDetailQuery.isLoading ? 'Cargando detalle...' : bookingDetail?.notes ?? 'Sin notas registradas.'}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <Button
+                    className="bg-emerald-600 hover:bg-emerald-700"
+                    fullWidth
+                    loading={confirmWhatsAppMutation.isPending}
+                    onClick={() => confirmWhatsAppMutation.mutate(selectedItem.bookingId)}
                   >
-                    <span className="absolute -left-[72px] -top-3 rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-bold text-rose-600 shadow-sm">
-                      Ahora {currentTimeIndicator.label}
-                    </span>
-                  </div>
-                ) : null}
-
-                {getScheduleHours().map((hour) => {
-                  const rowHeight = hourLayout.byHour[hour]?.height ?? baseHourHeight
-                  return (
-                    <div
-                      className="grid border-t border-slate-100"
-                      key={hour}
-                      style={{ gridTemplateColumns: `76px repeat(${visibleDays.length}, minmax(145px, 1fr))`, minHeight: rowHeight }}
-                    >
-                      <div className="border-r border-slate-100 bg-slate-50 px-3 pt-3 text-xs font-semibold text-slate-500">
-                        {String(hour).padStart(2, '0')}:00
-                      </div>
-
-                      {visibleDays.map((day) => {
-                        const dayKey = day.format('YYYY-MM-DD')
-                        const dayItems = calendarItems.filter((item) => (item.dateLocal ?? getAgendaDateKey(item.startsAt)) === dayKey)
-                        const eventsForHour = getEventsForDayAndHour(calendarItems, dayKey, hour)
-                        return (
-                          <div
-                            className="relative overflow-hidden border-r border-slate-100"
-                            key={`${dayKey}-${hour}`}
-                            style={{ minHeight: rowHeight }}
-                          >
-                            {dayItems.length === 0 && hour === scheduleStartHour ? (
-                              <div className="mx-3 mt-4 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-3 text-center text-xs font-semibold text-slate-400">
-                                Sin reservas
-                              </div>
-                            ) : null}
-
-                            {eventsForHour.length > 0 ? (
-                              <div className="flex h-full flex-col gap-2 px-2 py-3">
-                                {eventsForHour.map((item) => {
-                                  const isSelected = selectedItem?.bookingId === item.bookingId
-                                  return (
-                                    <button
-                                      aria-label={`Ver detalle de ${item.customerName}`}
-                                      className={[
-                                        'relative min-h-[56px] w-full flex-none overflow-hidden rounded-2xl border p-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300',
-                                        getItemColorClass(item),
-                                        isSelected ? 'ring-2 ring-blue-500' : '',
-                                      ]
-                                        .join(' ')
-                                        .trim()}
-                                      key={item.bookingId}
-                                      onClick={() => setSelectedBookingId(item.bookingId)}
-                                      onFocus={() => setSelectedBookingId(item.bookingId)}
-                                      onMouseEnter={() => setSelectedBookingId(item.bookingId)}
-                                      style={{ zIndex: isSelected ? 20 : 10 }}
-                                      type="button"
-                                    >
-                                      <div className="flex items-start justify-between gap-2">
-                                        <span className="text-[11px] font-bold">{formatTimeRange(item)}</span>
-                                        <span className="rounded-full bg-white/70 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em]">
-                                          {item.sourceChannel?.toUpperCase().includes('WHATSAPP') ? 'WA' : 'APP'}
-                                        </span>
-                                      </div>
-                                      <p className="mt-1 line-clamp-1 text-xs font-bold">{item.serviceName ?? item.subject}</p>
-                                      <p className="line-clamp-1 text-xs opacity-80">{item.customerName}</p>
-                                      <p className="mt-1 line-clamp-1 text-[11px] opacity-70">
-                                        {item.professionalName ?? 'Profesional por asignar'}
-                                      </p>
-                                    </button>
-                                  )
-                                })}
-                              </div>
-                            ) : null}
-                          </div>
-                        )
-                      })}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="h-fit space-y-5 2xl:sticky 2xl:top-6">
-          {selectedItem ? (
-            <>
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-slate-100 to-slate-200 text-base font-bold text-slate-700">
-                    {getInitials(selectedItem.customerName)}
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-bold text-slate-900">{selectedItem.customerName}</h2>
-                    <p className="text-sm text-slate-500">{bookingDetail?.customerPhone ?? selectedItem.customerPhone}</p>
-                  </div>
+                    Confirmar por WhatsApp
+                  </Button>
+                  <Button fullWidth onClick={() => navigate(`/appointments/${selectedItem.bookingId}/reschedule`)} variant="secondary">
+                    Reprogramar
+                  </Button>
+                  <Button fullWidth onClick={() => navigate(`/appointments/${selectedItem.bookingId}/edit`)} variant="secondary">
+                    Editar notas
+                  </Button>
+                  <Button fullWidth onClick={() => navigate(`/appointments/${selectedItem.bookingId}`)} variant="secondary">
+                    Ver historial del cliente
+                  </Button>
                 </div>
-                <StatusBadge label={getStatusLabel(selectedItem.status)} tone={selectedStatusTone} />
-              </div>
 
-              <div className="grid gap-3 rounded-3xl border border-slate-100 bg-slate-50 p-4 text-sm">
-                <DetailRow icon="Servicio" label="Servicio" value={selectedItem.serviceName ?? selectedItem.subject} />
-                <DetailRow icon="Fecha" label="Fecha y hora" value={`${formatLongDate(selectedItem.startsAt)} · ${formatTimeRange(selectedItem)}`} />
-                <DetailRow icon="Equipo" label="Profesional" value={selectedItem.professionalName ?? 'Profesional por asignar'} />
-                <DetailRow icon="Lugar" label="Ubicacion" value={selectedItem.roomName ?? selectedItem.locationName ?? 'Sin ubicacion'} />
-                <DetailRow icon="Tiempo" label="Duracion" value={`${selectedItem.durationMinutes} minutos`} />
-                <DetailRow icon="WA" label="Estado WhatsApp" value={getWhatsAppStatus(selectedItem, bookingDetail)} />
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-sm font-semibold text-slate-800">Notas internas</h3>
-                <div className="rounded-2xl border border-slate-100 bg-white p-4 text-sm text-slate-600">
-                  {bookingDetailQuery.isLoading ? 'Cargando detalle...' : bookingDetail?.notes ?? 'Sin notas registradas.'}
+                <div className="space-y-2 rounded-3xl border border-red-100 bg-red-50 p-4">
+                  <Textarea
+                    label="Motivo de cancelacion"
+                    onChange={(event) => setCancelReason(event.target.value)}
+                    placeholder="Indica el motivo obligatorio antes de cancelar"
+                    rows={3}
+                    value={cancelReason}
+                  />
+                  <Button
+                    disabled={cancelReason.trim().length < 5}
+                    fullWidth
+                    loading={cancelMutation.isPending}
+                    onClick={() => cancelMutation.mutate(selectedItem.bookingId)}
+                    variant="danger"
+                  >
+                    Cancelar cita
+                  </Button>
                 </div>
+              </>
+            ) : (
+              <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center">
+                <h2 className="text-base font-semibold text-slate-800">Selecciona una reserva</h2>
+                <p className="mt-2 text-sm text-slate-500">
+                  Al posicionarte sobre una cita se mostrara el cliente, el servicio, la trazabilidad y las acciones disponibles.
+                </p>
               </div>
-
-              <div className="space-y-3">
-                <Button
-                  className="bg-emerald-600 hover:bg-emerald-700"
-                  fullWidth
-                  loading={confirmWhatsAppMutation.isPending}
-                  onClick={() => confirmWhatsAppMutation.mutate(selectedItem.bookingId)}
-                >
-                  Confirmar por WhatsApp
-                </Button>
-                <Button fullWidth onClick={() => navigate(`/appointments/${selectedItem.bookingId}/reschedule`)} variant="secondary">
-                  Reprogramar
-                </Button>
-                <Button fullWidth onClick={() => navigate(`/appointments/${selectedItem.bookingId}/edit`)} variant="secondary">
-                  Editar notas
-                </Button>
-                <Button fullWidth onClick={() => navigate(`/appointments/${selectedItem.bookingId}`)} variant="secondary">
-                  Ver historial del cliente
-                </Button>
-              </div>
-
-              <div className="space-y-2 rounded-3xl border border-red-100 bg-red-50 p-4">
-                <Textarea
-                  label="Motivo de cancelacion"
-                  onChange={(event) => setCancelReason(event.target.value)}
-                  placeholder="Indica el motivo obligatorio antes de cancelar"
-                  rows={3}
-                  value={cancelReason}
-                />
-                <Button
-                  disabled={cancelReason.trim().length < 5}
-                  fullWidth
-                  loading={cancelMutation.isPending}
-                  onClick={() => cancelMutation.mutate(selectedItem.bookingId)}
-                  variant="danger"
-                >
-                  Cancelar cita
-                </Button>
-              </div>
-            </>
-          ) : (
-            <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center">
-              <h2 className="text-base font-semibold text-slate-800">Selecciona una reserva</h2>
-              <p className="mt-2 text-sm text-slate-500">
-                Al posicionarte sobre una cita se mostrara el cliente, el servicio, la trazabilidad y las acciones disponibles.
-              </p>
-            </div>
-          )}
-        </Card>
+            )}
+          </Card>
+        </div>
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
@@ -1002,17 +711,5 @@ export function CompleteAgendaPage() {
         </Card>
       </div>
     </section>
-  )
-}
-
-function DetailRow({ icon, label, value }: { icon: string; label: string; value: string }) {
-  return (
-    <div className="grid grid-cols-[72px_1fr] gap-3">
-      <span className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">{icon}</span>
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{label}</p>
-        <p className="mt-1 font-medium text-slate-800">{value}</p>
-      </div>
-    </div>
   )
 }

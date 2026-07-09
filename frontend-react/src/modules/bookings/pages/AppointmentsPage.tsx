@@ -18,7 +18,8 @@ import { useShellSession } from '../../../lib/shellSession'
 import { useOnlineStatus } from '../../../lib/useOnlineStatus'
 import { getBookingsRequest } from '../../../services/api/bookingsApi'
 import type { BookingSummaryResponse } from '../../../services/api/types'
-import { getBookingStatusLabel, getBookingStatusTone } from '../bookingOptions'
+import { AgendaEventCard } from '../../agenda/components/AgendaEventCard'
+import { agendaTimeZone, formatAgendaTime, getAgendaDateKey, getStatusStyle } from '../../agenda/components/agendaUtils'
 
 const fieldClassName =
   'w-full rounded-2xl border border-[var(--color-border)] bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100'
@@ -44,6 +45,39 @@ function formatDateTime(value: string) {
 function buildCalendarDays(visibleMonth: dayjs.Dayjs) {
   const firstDay = visibleMonth.startOf('month').startOf('week')
   return Array.from({ length: 42 }, (_, index) => firstDay.add(index, 'day'))
+}
+
+function bookingToAgendaItem(booking: BookingSummaryResponse) {
+  const endsAt = dayjs(booking.startsAt).add(booking.durationMinutes, 'minute').toISOString()
+  const startTimeLocal = formatAgendaTime(booking.startsAt)
+  const endTimeLocal = formatAgendaTime(endsAt)
+  const dateLocal = getAgendaDateKey(booking.startsAt)
+  return {
+    bookingId: booking.id,
+    subject: booking.subject,
+    status: booking.status,
+    startsAt: booking.startsAt,
+    endsAt,
+    durationMinutes: booking.durationMinutes,
+    locationId: booking.locationId,
+    locationName: booking.locationName ?? booking.location,
+    serviceId: null,
+    serviceName: booking.subject,
+    professionalId: null,
+    professionalName: booking.assignedUserName,
+    roomId: null,
+    roomName: null,
+    customerName: booking.customerName,
+    customerPhone: booking.customerPhone,
+    sourceChannel: '',
+    startsAtLocal: startTimeLocal,
+    endsAtLocal: endTimeLocal,
+    dateLocal,
+    startTimeLocal,
+    endTimeLocal,
+    timezone: agendaTimeZone,
+    type: 'BOOKING',
+  }
 }
 
 export function AppointmentsPage() {
@@ -126,6 +160,8 @@ export function AppointmentsPage() {
     reset(defaultFilters)
     setAppliedFilters(defaultFilters)
   }
+
+  const weekDayLabels = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab']
 
   return (
     <section className="space-y-6">
@@ -230,7 +266,7 @@ export function AppointmentsPage() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
-                  Vista mensual simple
+                  Vista mensual
                 </p>
                 <h2 className="mt-2 text-2xl font-semibold text-[var(--color-text)]">
                   {visibleMonth.format('MMMM YYYY')}
@@ -262,7 +298,7 @@ export function AppointmentsPage() {
             ) : null}
 
             <div className="grid grid-cols-7 gap-3">
-              {['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'].map((label) => (
+              {weekDayLabels.map((label) => (
                 <p
                   key={label}
                   className="px-2 text-center text-xs font-semibold uppercase tracking-[0.16em] text-slate-500"
@@ -276,6 +312,7 @@ export function AppointmentsPage() {
                   const items = groupedByDate.get(key) ?? []
                   const active = selectedDate === key
                   const isCurrentMonth = day.month() === visibleMonth.month()
+                  const isToday = day.isSame(dayjs(), 'day')
 
                   return (
                     <button
@@ -286,6 +323,7 @@ export function AppointmentsPage() {
                           ? 'border-blue-300 bg-blue-50'
                           : 'border-[var(--color-border)] bg-white hover:border-blue-200 hover:bg-slate-50',
                         isCurrentMonth ? '' : 'opacity-45',
+                        isToday && !active ? 'border-emerald-200 bg-emerald-50/40' : '',
                       ]
                         .join(' ')
                         .trim()}
@@ -293,26 +331,35 @@ export function AppointmentsPage() {
                       type="button"
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-sm font-semibold text-[var(--color-text)]">
+                        <span
+                          className={[
+                            'inline-flex h-7 w-7 items-center justify-center rounded-full text-sm font-semibold',
+                            isToday ? 'bg-emerald-500 text-white' : 'text-[var(--color-text)]',
+                          ].join(' ')}
+                        >
                           {day.format('D')}
                         </span>
                         {items.length > 0 ? (
-                          <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">
+                          <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-800">
                             {items.length}
                           </span>
                         ) : null}
                       </div>
 
-                      <div className="mt-3 space-y-2">
-                        {items.slice(0, 3).map((booking) => (
-                          <div
-                            key={booking.id}
-                            className="rounded-xl bg-white/90 px-2 py-1.5 text-xs text-slate-700 shadow-sm"
-                          >
-                            <p className="truncate font-semibold">{booking.subject}</p>
-                            <p className="truncate">{dayjs(booking.startsAt).format('HH:mm')}</p>
-                          </div>
-                        ))}
+                      <div className="mt-2 space-y-1">
+                        {items.slice(0, 3).map((booking) => {
+                          const ss = getStatusStyle(booking.status)
+                          return (
+                            <div
+                              key={booking.id}
+                              className={['rounded-lg px-2 py-1 text-[11px] shadow-sm', ss.bg, ss.text].join(' ')}
+                              style={{ borderLeft: `2px solid ${ss.hex}` }}
+                            >
+                              <p className="truncate font-semibold">{booking.subject}</p>
+                              <p className="truncate opacity-80">{dayjs(booking.startsAt).format('HH:mm')}</p>
+                            </div>
+                          )
+                        })}
                         {items.length > 3 ? (
                           <p className="text-xs font-semibold text-slate-500">
                             +{items.length - 3} mas
@@ -350,33 +397,21 @@ export function AppointmentsPage() {
               />
             ) : (
               <div className="space-y-3">
-                {selectedDayBookings.map((booking) => (
-                  <Link
-                    key={booking.id}
-                    className="block rounded-[22px] border border-[var(--color-border)] bg-slate-50 p-4 transition hover:border-blue-200 hover:bg-white"
-                    to={`/appointments/${booking.id}`}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-sm font-semibold text-[var(--color-text)]">
-                          {booking.subject}
-                        </p>
-                        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
-                          {booking.customerName}
-                        </p>
-                      </div>
-                      <StatusBadge
-                        label={getBookingStatusLabel(booking.status)}
-                        tone={getBookingStatusTone(booking.status)}
+                {selectedDayBookings.map((booking) => {
+                  const agendaItem = bookingToAgendaItem(booking)
+                  return (
+                    <Link
+                      key={booking.id}
+                      className="block transition hover:-translate-y-0.5"
+                      to={`/appointments/${booking.id}`}
+                    >
+                      <AgendaEventCard
+                        item={agendaItem}
+                        showStatus
                       />
-                    </div>
-
-                    <div className="mt-3 space-y-1 text-sm text-slate-600">
-                      <p>{formatDateTime(booking.startsAt)}</p>
-                      <p>{booking.durationMinutes} minutos · {booking.locationName ?? booking.location ?? 'Sin sede'}</p>
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  )
+                })}
               </div>
             )}
           </Card>

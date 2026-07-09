@@ -15,6 +15,7 @@ import { useToast } from '../../../lib/toast'
 import { useOnlineStatus } from '../../../lib/useOnlineStatus'
 import { createBookingRequest } from '../../../services/api/bookingsApi'
 import { getBusinessLocationsRequest } from '../../../services/api/businessLocationsApi'
+import { ApiClientError } from '../../../services/api/httpClient'
 import { BusinessLocationSelect } from '../BusinessLocationSelect'
 import { bookingStatusOptions } from '../bookingOptions'
 
@@ -65,8 +66,8 @@ export function NewAppointmentPage() {
   })
 
   const createMutation = useMutation({
-    mutationFn: async (values: FormValues) =>
-      createBookingRequest({
+    mutationFn: async (values: FormValues) => {
+      const payload = {
         subject: values.subject,
         customerName: values.customerName,
         customerPhone: values.customerPhone,
@@ -78,7 +79,10 @@ export function NewAppointmentPage() {
         location: values.location || undefined,
         notes: values.notes || undefined,
         assignedUserId: user?.id,
-      }),
+      }
+      console.log('[diagnostico] createBookingRequest payload:', payload)
+      return createBookingRequest(payload)
+    },
     onSuccess: (booking) => {
       showToast({
         title: 'Cita creada',
@@ -87,12 +91,23 @@ export function NewAppointmentPage() {
       })
       navigate(`/appointments/${booking.id}`)
     },
-    onError: () => {
-      showToast({
-        title: 'No se pudo crear la cita',
-        description: 'Revisa los datos ingresados y vuelve a intentarlo.',
-        tone: 'error',
-      })
+    onError: (error) => {
+      const apiError = error as ApiClientError
+      console.log('[diagnostico] createBookingRequest error:', { code: apiError.code, status: apiError.status, message: apiError.message, fieldErrors: apiError.fieldErrors })
+      if (apiError?.fieldErrors && Object.keys(apiError.fieldErrors).length > 0) {
+        const firstFieldError = Object.values(apiError.fieldErrors)[0]
+        showToast({
+          title: 'No se pudo crear la cita',
+          description: firstFieldError,
+          tone: 'error',
+        })
+      } else {
+        showToast({
+          title: 'No se pudo crear la cita',
+          description: apiError?.message ?? 'Revisa los datos ingresados y vuelve a intentarlo.',
+          tone: 'error',
+        })
+      }
     },
   })
 

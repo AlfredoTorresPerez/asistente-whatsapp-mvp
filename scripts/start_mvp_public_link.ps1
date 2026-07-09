@@ -1,4 +1,7 @@
 $ErrorActionPreference = "Stop"
+if (Get-Variable PSNativeCommandUseErrorActionPreference -ErrorAction SilentlyContinue) {
+    $PSNativeCommandUseErrorActionPreference = $false
+}
 
 $RootDir = Split-Path -Parent $PSScriptRoot
 Set-Location $RootDir
@@ -23,6 +26,20 @@ function Assert-Command {
     param([string]$CommandName)
     if (-not (Get-Command $CommandName -ErrorAction SilentlyContinue)) {
         Stop-WithError "No se encontro el comando requerido: $CommandName"
+    }
+}
+
+function Invoke-CheckedCommand {
+    param(
+        [Parameter(Mandatory = $true)]
+        [scriptblock]$Command,
+        [Parameter(Mandatory = $true)]
+        [string]$ErrorMessage
+    )
+
+    & $Command
+    if ($LASTEXITCODE -ne 0) {
+        Stop-WithError "$ErrorMessage Codigo de salida: $LASTEXITCODE"
     }
 }
 
@@ -76,10 +93,14 @@ function Get-TunnelUrl {
 Assert-Command "docker"
 
 Write-Step "Levantando MVP local..."
-docker compose -f $ComposeFile up -d --build
+Invoke-CheckedCommand -ErrorMessage "No se pudo levantar el MVP local." -Command {
+    docker compose -f $ComposeFile up -d --build
+}
 
 Write-Step "Levantando tunel publico HTTPS para el frontend..."
-docker compose -f $ComposeFile --profile $Profile up -d public-tunnel
+Invoke-CheckedCommand -ErrorMessage "No se pudo levantar el tunel publico." -Command {
+    docker compose -f $ComposeFile --profile $Profile up -d --force-recreate public-tunnel
+}
 
 Write-Step "Esperando URL publica del tunel..."
 $publicUrl = ""
@@ -96,9 +117,16 @@ if ([string]::IsNullOrWhiteSpace($publicUrl)) {
 }
 
 $confirmationUrl = $publicUrl.TrimEnd('/') + "/reservas/confirmar"
+$rescheduleUrl = $publicUrl.TrimEnd('/') + "/reservas/reprogramar"
+$cancellationUrl = $publicUrl.TrimEnd('/') + "/reservas/cancelar"
+$paymentUrl = $publicUrl.TrimEnd('/') + "/reservas/pagar"
 
 @(
+    "APP_FRONTEND_PUBLIC_BASE_URL=$publicUrl",
     "APP_BOOKING_CONFIRMATION_PUBLIC_BASE_URL=$confirmationUrl",
+    "APP_BOOKING_RESCHEDULE_PUBLIC_BASE_URL=$rescheduleUrl",
+    "APP_BOOKING_CANCELLATION_PUBLIC_BASE_URL=$cancellationUrl",
+    "APP_BOOKING_PAYMENT_CHECKOUT_PUBLIC_BASE_URL=$paymentUrl",
     "VITE_API_BASE_URL=/api/v1",
     "APP_BOOKING_CONFIRMATION_EXPIRATION_MINUTES=60",
     "TZ=America/Santiago",
@@ -110,8 +138,14 @@ $confirmationUrl = $publicUrl.TrimEnd('/') + "/reservas/confirmar"
 
 Write-Step "URL publica frontend: $publicUrl"
 Write-Step "URL publica de confirmacion: $confirmationUrl"
+Write-Step "URL publica de reprogramacion: $rescheduleUrl"
+Write-Step "URL publica de pago: $paymentUrl"
 Write-Step "Recreando backend con URL navegable..."
-docker compose -f $ComposeFile up -d --force-recreate backend-java whatsapp-web-service frontend-react
+Invoke-CheckedCommand -ErrorMessage "No se pudo recrear el backend con la URL publica." -Command {
+    docker compose -f $ComposeFile up -d --force-recreate backend-java whatsapp-web-service frontend-react
+}
 
-Write-Step "Listo. Los enlaces enviados por WhatsApp usaran: $confirmationUrl/{token}"
+Write-Step "Listo. Los enlaces de confirmacion usaran: $confirmationUrl/{token}"
+Write-Step "Listo. Los enlaces de reprogramacion usaran: $rescheduleUrl/{token}"
+Write-Step "Listo. Los enlaces de reserva asistida usaran: $publicUrl/reservar?token=..."
 Write-Step "Para ver el tunel: docker compose -f $ComposeFile logs -f public-tunnel"

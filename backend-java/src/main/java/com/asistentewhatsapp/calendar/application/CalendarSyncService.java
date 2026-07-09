@@ -190,7 +190,7 @@ public class CalendarSyncService {
                         b.starts_at,
                         b.ends_at,
                         b.subject as service_name,
-                        c.name as customer_name,
+                        c.display_name as customer_name,
                         c.email as customer_email,
                         bl.address as location_address,
                         bl.name as location_name

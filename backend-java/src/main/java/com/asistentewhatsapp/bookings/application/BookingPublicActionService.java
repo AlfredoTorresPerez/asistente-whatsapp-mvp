@@ -1,13 +1,19 @@
 package com.asistentewhatsapp.bookings.application;
 
 import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository;
+import com.asistentewhatsapp.agenda.api.AgendaAvailabilityResponse;
+import com.asistentewhatsapp.agenda.api.AgendaCalendarItemResponse;
+import com.asistentewhatsapp.agenda.api.AgendaSlotResponse;
 import com.asistentewhatsapp.bookings.api.BookingPublicActionLinkResponse;
+import com.asistentewhatsapp.bookings.api.PublicBookingRescheduleRequest;
 import com.asistentewhatsapp.calendar.application.CalendarSyncService;
 import com.asistentewhatsapp.bookings.api.CreateBookingCancellationLinkRequest;
 import com.asistentewhatsapp.bookings.api.CreateBookingRescheduleLinkRequest;
 import com.asistentewhatsapp.bookings.api.PublicBookingCancellationRequest;
 import com.asistentewhatsapp.bookings.api.PublicBookingCancellationResponse;
 import com.asistentewhatsapp.bookings.api.PublicBookingRescheduleResponse;
+import com.asistentewhatsapp.customerbookings.api.CustomerBookingItemResponse;
+import com.asistentewhatsapp.aesthetic.infrastructure.AestheticCenterJdbcRepository;
 import com.asistentewhatsapp.bookings.infrastructure.BookingActionLinkJdbcRepository;
 import com.asistentewhatsapp.bookings.infrastructure.BookingActionLinkJdbcRepository.ActionBookingRecord;
 import com.asistentewhatsapp.bookings.infrastructure.BookingActionLinkJdbcRepository.CancellationLinkRecord;
@@ -15,16 +21,24 @@ import com.asistentewhatsapp.bookings.infrastructure.BookingActionLinkJdbcReposi
 import com.asistentewhatsapp.channels.application.ChannelDispatchRequest;
 import com.asistentewhatsapp.channels.application.ChannelDispatchService;
 import com.asistentewhatsapp.channels.domain.MessageChannelType;
+import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository;
 import com.asistentewhatsapp.security.application.AuditService;
 import com.asistentewhatsapp.security.application.AuditMetadata;
 import com.asistentewhatsapp.security.application.TokenHashService;
 import com.asistentewhatsapp.security.domain.AuthenticatedUser;
 import com.asistentewhatsapp.shared.exception.ApiException;
 import java.security.SecureRandom;
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,34 +51,44 @@ public class BookingPublicActionService {
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private static final int SLOT_STEP_MINUTES = 15;
 
     private final BookingActionLinkJdbcRepository repository;
     private final CompleteAgendaJdbcRepository agendaRepository;
+    private final BusinessLocationJdbcRepository locationRepository;
+    private final AestheticCenterJdbcRepository aestheticRepository;
     private final TokenHashService tokenHashService;
     private final CalendarSyncService calendarSyncService;
     private final AuditService auditService;
     private final ChannelDispatchService channelDispatchService;
     private final BookingEmailService bookingEmailService;
+    private final AvailabilityService availabilityService;
     private final String reschedulePublicBaseUrl;
     private final String cancellationPublicBaseUrl;
 
     public BookingPublicActionService(
             BookingActionLinkJdbcRepository repository,
             CompleteAgendaJdbcRepository agendaRepository,
+            BusinessLocationJdbcRepository locationRepository,
+            AestheticCenterJdbcRepository aestheticRepository,
             TokenHashService tokenHashService,
             CalendarSyncService calendarSyncService,
             AuditService auditService,
             ChannelDispatchService channelDispatchService,
             BookingEmailService bookingEmailService,
+            AvailabilityService availabilityService,
             @Value("${app.booking-reschedule.public-base-url}") String reschedulePublicBaseUrl,
             @Value("${app.booking-cancellation.public-base-url}") String cancellationPublicBaseUrl) {
         this.repository = repository;
         this.agendaRepository = agendaRepository;
+        this.locationRepository = locationRepository;
+        this.aestheticRepository = aestheticRepository;
         this.tokenHashService = tokenHashService;
         this.calendarSyncService = calendarSyncService;
         this.auditService = auditService;
         this.channelDispatchService = channelDispatchService;
         this.bookingEmailService = bookingEmailService;
+        this.availabilityService = availabilityService;
         this.reschedulePublicBaseUrl = reschedulePublicBaseUrl;
         this.cancellationPublicBaseUrl = cancellationPublicBaseUrl;
     }
@@ -172,7 +196,7 @@ public class BookingPublicActionService {
             repository.markExpiredReschedule(link.linkId());
             link = repository.findRescheduleByTokenHash(tokenHashService.sha256(normalizeToken(rawToken)), false);
         }
-        return toRescheduleResponse(link);
+        return toRescheduleResponse(link, activeBookingsForPhone(link.businessId(), link.customerPhone()));
     }
 
     @Transactional
@@ -180,11 +204,12 @@ public class BookingPublicActionService {
         String tokenHash = tokenHashService.sha256(normalizeToken(rawToken));
         RescheduleLinkRecord link = repository.findRescheduleByTokenHash(tokenHash, true);
         if ("USED".equals(link.linkStatus()) || BookingStateMachine.RESCHEDULED.equals(BookingStateMachine.canonical(link.bookingStatus()))) {
-            return toRescheduleResponse(link);
+            return toRescheduleResponse(link, activeBookingsForPhone(link.businessId(), link.customerPhone()));
         }
         if (isExpired(link.expiresAt(), link.linkStatus())) {
             repository.markExpiredReschedule(link.linkId());
-            return toRescheduleResponse(repository.findRescheduleByTokenHash(tokenHash, false));
+            RescheduleLinkRecord refreshed = repository.findRescheduleByTokenHash(tokenHash, false);
+            return toRescheduleResponse(refreshed, activeBookingsForPhone(refreshed.businessId(), refreshed.customerPhone()));
         }
         ActionBookingRecord booking = repository.findBookingForUpdate(link.businessId(), link.bookingId());
         ensureCanChange(booking.bookingStatus(), "reprogramarse");
@@ -212,7 +237,79 @@ public class BookingPublicActionService {
         sendEmail(booking, "BOOKING_RESCHEDULE_CONFIRMED", "Tu reserva fue reprogramada",
                 "Tu cita fue reprogramada correctamente.", link.proposedLocationName(), link.publicUrl());
         try { calendarSyncService.syncRescheduled(link.bookingId(), link.businessId()); } catch (Exception ignored) {}
-        return toRescheduleResponse(repository.findRescheduleByTokenHash(tokenHash, false));
+        RescheduleLinkRecord refreshed = repository.findRescheduleByTokenHash(tokenHash, false);
+        return toRescheduleResponse(refreshed, activeBookingsForPhone(refreshed.businessId(), refreshed.customerPhone()));
+    }
+
+    @Transactional(readOnly = true)
+    public AgendaAvailabilityResponse getRescheduleAvailability(String rawToken, UUID bookingId,
+            UUID serviceId, UUID locationId, LocalDate date) {
+        RescheduleLinkRecord link = resolveActiveRescheduleLink(rawToken);
+        CustomerBookingItemResponse booking = activeBookingForToken(link, bookingId);
+        if (BookingStateMachine.isClosed(booking.status())) {
+            throw new ApiException(HttpStatus.CONFLICT, "BOOKING_ALREADY_CLOSED",
+                    "La reserva ya no esta activa.", Map.of("status", booking.status()));
+        }
+        return computeAvailability(link.businessId(), bookingId, locationId, serviceId, date, 40);
+    }
+
+    @Transactional
+    public CustomerBookingItemResponse rescheduleBooking(String rawToken, UUID bookingId, PublicBookingRescheduleRequest request) {
+        RescheduleLinkRecord link = resolveActiveRescheduleLink(rawToken);
+
+        CustomerBookingItemResponse booking = activeBookingForToken(link, bookingId);
+
+        if (BookingStateMachine.isClosed(booking.status())) {
+            throw new ApiException(HttpStatus.CONFLICT, "BOOKING_ALREADY_CLOSED",
+                    "La reserva ya no esta activa.", Map.of("status", booking.status()));
+        }
+
+        CompleteAgendaJdbcRepository.ServiceRecord service = agendaRepository.findService(
+                link.businessId(), request.locationId(), request.serviceId());
+        CompleteAgendaJdbcRepository.LocationRecord location = agendaRepository.findLocation(link.businessId(), request.locationId());
+        UUID professionalId = request.professionalId();
+        UUID roomId = service.requiresRoom() ? request.roomId() : null;
+
+        if (professionalId == null) {
+            List<CompleteAgendaJdbcRepository.ProfessionalRecord> candidates = agendaRepository.findProfessionalCandidates(
+                    link.businessId(), request.locationId(), request.serviceId(), null);
+            if (candidates.isEmpty()) {
+                throw new ApiException(HttpStatus.BAD_REQUEST, "NO_PROFESSIONAL_AVAILABLE",
+                        "No hay profesionales disponibles para el servicio y sucursal seleccionados.", Map.of());
+            }
+            professionalId = candidates.getFirst().id();
+        }
+        if (service.requiresRoom() && roomId == null) {
+            List<CompleteAgendaJdbcRepository.RoomRecord> candidates = agendaRepository.findRoomCandidates(
+                    link.businessId(), request.locationId(), request.serviceId(), null);
+            if (candidates.isEmpty()) {
+                throw new ApiException(HttpStatus.BAD_REQUEST, "NO_ROOM_AVAILABLE",
+                        "No hay cabinas disponibles para el servicio y sucursal seleccionados.", Map.of());
+            }
+            roomId = candidates.getFirst().id();
+        }
+
+        OffsetDateTime startsAt = request.startsAt();
+        if (!startsAt.isAfter(OffsetDateTime.now(ZoneOffset.UTC))) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "STARTS_AT_INVALID",
+                    "La nueva fecha debe ser futura.", Map.of("startsAt", "La nueva fecha debe ser futura."));
+        }
+        OffsetDateTime endsAt = startsAt.plusMinutes(service.durationMinutes()).plusMinutes(service.cleanupMinutes());
+        ensureAgendaSlotAvailable(link.businessId(), bookingId, location.id(), professionalId, roomId, startsAt, endsAt);
+
+        String reason = request.reason() == null || request.reason().isBlank()
+                ? "Reprogramacion solicitada por el cliente desde enlace publico."
+                : normalizeOptionalText(request.reason(), 2000);
+        agendaRepository.updateBookingSchedule(link.businessId(), bookingId, null,
+                location.id(), service.id(), professionalId, roomId,
+                startsAt, endsAt, service.durationMinutes(), reason, "PUBLIC_LINK");
+        repository.markRescheduleUsed(link.linkId());
+        try { calendarSyncService.syncRescheduled(bookingId, link.businessId()); } catch (Exception ignored) {}
+        return toCustomerBookingResponse(agendaRepository.findActiveBookingsByPhone(link.businessId(), link.customerPhone()).stream()
+                .filter(item -> item.bookingId().equals(bookingId))
+                .findFirst()
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "BOOKING_NOT_FOUND",
+                        "No se encontro la reserva actualizada.", Map.of())));
     }
 
     @Transactional
@@ -228,7 +325,8 @@ public class BookingPublicActionService {
                             "linkId", link.linkId(),
                             "linkStatus", link.linkStatus()));
         }
-        return toRescheduleResponse(repository.findRescheduleByTokenHash(tokenHash, false));
+        RescheduleLinkRecord refreshed = repository.findRescheduleByTokenHash(tokenHash, false);
+        return toRescheduleResponse(refreshed, activeBookingsForPhone(refreshed.businessId(), refreshed.customerPhone()));
     }
 
     @Transactional
@@ -336,6 +434,8 @@ public class BookingPublicActionService {
 
     private void ensureAgendaSlotAvailable(UUID businessId, UUID bookingId, UUID locationId, UUID professionalId, UUID roomId,
             OffsetDateTime startsAt, OffsetDateTime endsAt) {
+        availabilityService.checkProfessionalAbsence(businessId, professionalId, startsAt, endsAt);
+        availabilityService.checkProfessionalDailyCapacity(businessId, professionalId, startsAt);
         if (agendaRepository.hasConflict(businessId, bookingId, locationId, professionalId, roomId, startsAt, endsAt)) {
             throw new ApiException(HttpStatus.CONFLICT, "BOOKING_SLOT_NOT_AVAILABLE",
                     "El horario ya esta ocupado.", Map.of("startsAt", "Selecciona otro horario disponible."));
@@ -346,7 +446,7 @@ public class BookingPublicActionService {
         }
     }
 
-    private PublicBookingRescheduleResponse toRescheduleResponse(RescheduleLinkRecord link) {
+    private PublicBookingRescheduleResponse toRescheduleResponse(RescheduleLinkRecord link, List<CustomerBookingItemResponse> bookings) {
         return new PublicBookingRescheduleResponse(
                 link.bookingId(),
                 normalizeStatusForApi(link.bookingStatus()),
@@ -366,7 +466,169 @@ public class BookingPublicActionService {
                 maskPhone(link.customerPhone()),
                 link.expiresAt(),
                 link.usedAt(),
-                link.reason());
+                link.reason(),
+                bookings,
+                serviceOptions(link.businessId()),
+                locationOptions(link.businessId()));
+    }
+
+    private RescheduleLinkRecord resolveActiveRescheduleLink(String rawToken) {
+        String tokenHash = tokenHashService.sha256(normalizeToken(rawToken));
+        RescheduleLinkRecord link = repository.findRescheduleByTokenHash(tokenHash, false);
+        if (isExpired(link.expiresAt(), link.linkStatus())) {
+            repository.markExpiredReschedule(link.linkId());
+            throw new ApiException(HttpStatus.GONE, "BOOKING_RESCHEDULE_LINK_EXPIRED",
+                    "El enlace de reprogramacion ya vencio.", Map.of());
+        }
+        if (!"ACTIVE".equals(link.linkStatus())) {
+            throw new ApiException(HttpStatus.CONFLICT, "BOOKING_RESCHEDULE_LINK_NOT_ACTIVE",
+                    "El enlace de reprogramacion ya fue usado o invalidado.", Map.of("status", link.linkStatus()));
+        }
+        return link;
+    }
+
+    private CustomerBookingItemResponse activeBookingForToken(RescheduleLinkRecord link, UUID bookingId) {
+        return activeBookingsForPhone(link.businessId(), link.customerPhone()).stream()
+                .filter(item -> item.bookingId().equals(bookingId))
+                .findFirst()
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "BOOKING_NOT_FOUND",
+                        "No se encontro la reserva indicada.", Map.of("bookingId", "Reserva no encontrada o no activa.")));
+    }
+
+    private AgendaAvailabilityResponse computeAvailability(UUID businessId, UUID excludeBookingId, UUID locationId,
+            UUID serviceId, LocalDate date, Integer maxSlots) {
+        CompleteAgendaJdbcRepository.LocationRecord location = agendaRepository.findLocation(businessId, locationId);
+        CompleteAgendaJdbcRepository.ServiceRecord service = agendaRepository.findService(businessId, locationId, serviceId);
+        int dayOfWeek = date.getDayOfWeek().getValue();
+        ZoneId locationZone = resolveLocationZone(location);
+        OffsetDateTime nowAtLocation = OffsetDateTime.now(locationZone);
+
+        if (agendaRepository.isHoliday(businessId, locationId, date)) {
+            return emptyAvailability(location, service, date);
+        }
+
+        List<CompleteAgendaJdbcRepository.TimeWindowRecord> businessHours = agendaRepository.findBusinessHours(businessId, locationId, dayOfWeek);
+        if (businessHours.isEmpty()) {
+            return emptyAvailability(location, service, date);
+        }
+
+        List<CompleteAgendaJdbcRepository.ProfessionalRecord> professionals = agendaRepository.findProfessionalCandidates(
+                businessId, locationId, serviceId, null);
+        if (professionals.isEmpty()) {
+            return emptyAvailability(location, service, date);
+        }
+
+        List<CompleteAgendaJdbcRepository.RoomRecord> rooms = service.requiresRoom()
+                ? agendaRepository.findRoomCandidates(businessId, locationId, serviceId, null)
+                : List.of(new CompleteAgendaJdbcRepository.RoomRecord(null, null));
+        if (rooms.isEmpty()) {
+            return emptyAvailability(location, service, date);
+        }
+
+        int limit = normalizeLimit(maxSlots);
+        List<AgendaSlotResponse> slots = new ArrayList<>();
+
+        for (CompleteAgendaJdbcRepository.ProfessionalRecord professional : professionals) {
+            List<CompleteAgendaJdbcRepository.TimeWindowRecord> professionalHours = agendaRepository.findProfessionalHours(
+                    businessId, locationId, professional.id(), dayOfWeek);
+            if (professionalHours.isEmpty()) {
+                continue;
+            }
+
+            for (CompleteAgendaJdbcRepository.RoomRecord room : rooms) {
+                for (CompleteAgendaJdbcRepository.TimeWindowRecord businessWindow : businessHours) {
+                    for (CompleteAgendaJdbcRepository.TimeWindowRecord professionalWindow : professionalHours) {
+                        LocalTime start = max(businessWindow.startTime(), professionalWindow.startTime());
+                        LocalTime end = min(businessWindow.endTime(), professionalWindow.endTime());
+                        if (!end.isAfter(start)) {
+                            continue;
+                        }
+
+                        LocalTime cursor = start;
+                        while (!cursor.plusMinutes(service.durationMinutes()).isAfter(end) && slots.size() < limit) {
+                            OffsetDateTime slotStart = date.atTime(cursor).atZone(locationZone).toOffsetDateTime();
+                            OffsetDateTime effectiveStart = slotStart.minusMinutes(service.preparationMinutes());
+                            OffsetDateTime slotEnd = slotStart.plusMinutes(service.durationMinutes()).plusMinutes(service.cleanupMinutes());
+                            boolean available = !slotStart.isBefore(nowAtLocation)
+                                    && !agendaRepository.hasConflict(businessId, excludeBookingId, locationId,
+                                            professional.id(), room.id(), effectiveStart, slotEnd)
+                                    && !agendaRepository.hasBlock(businessId, locationId, professional.id(),
+                                            room.id(), effectiveStart, slotEnd);
+                            if (available) {
+                                slots.add(new AgendaSlotResponse(slotStart, slotEnd, locationId, location.name(),
+                                        serviceId, service.name(), service.durationMinutes(),
+                                        professional.id(), professional.name(), room.id(), room.name(),
+                                        true, "Disponible"));
+                            }
+                            cursor = cursor.plusMinutes(SLOT_STEP_MINUTES);
+                        }
+                        if (slots.size() >= limit) break;
+                    }
+                    if (slots.size() >= limit) break;
+                }
+                if (slots.size() >= limit) break;
+            }
+            if (slots.size() >= limit) break;
+        }
+
+        slots.sort(Comparator.comparing(AgendaSlotResponse::startsAt));
+        return new AgendaAvailabilityResponse(location.id(), location.name(), service.id(), service.name(), date,
+                service.durationMinutes(), service.requiresRoom(), service.requiresDeposit(), slots);
+    }
+
+    private AgendaAvailabilityResponse emptyAvailability(CompleteAgendaJdbcRepository.LocationRecord location,
+            CompleteAgendaJdbcRepository.ServiceRecord service, LocalDate date) {
+        return new AgendaAvailabilityResponse(location.id(), location.name(), service.id(), service.name(), date,
+                service.durationMinutes(), service.requiresRoom(), service.requiresDeposit(), List.of());
+    }
+
+    private List<CustomerBookingItemResponse> activeBookingsForPhone(UUID businessId, String phone) {
+        return agendaRepository.findActiveBookingsByPhone(businessId, normalizePhoneDigits(phone)).stream()
+                .map(this::toCustomerBookingResponse)
+                .toList();
+    }
+
+    private List<PublicBookingRescheduleResponse.ServiceOption> serviceOptions(UUID businessId) {
+        return aestheticRepository.findServices(businessId, 0, 1000, null, null, true).items().stream()
+                .map(service -> new PublicBookingRescheduleResponse.ServiceOption(
+                        service.id(),
+                        service.name(),
+                        service.categoryName(),
+                        service.durationMinutes() == null ? 0 : service.durationMinutes(),
+                        "REQUIRED".equalsIgnoreCase(service.professionalRequired())))
+                .toList();
+    }
+
+    private List<PublicBookingRescheduleResponse.LocationOption> locationOptions(UUID businessId) {
+        return locationRepository.findActive(businessId).stream()
+                .map(location -> new PublicBookingRescheduleResponse.LocationOption(
+                        location.id(),
+                        location.name(),
+                        location.address(),
+                        location.commune()))
+                .toList();
+    }
+
+    private CustomerBookingItemResponse toCustomerBookingResponse(AgendaCalendarItemResponse item) {
+        return new CustomerBookingItemResponse(
+                item.bookingId(),
+                item.locationId(),
+                item.serviceId(),
+                item.professionalId(),
+                item.roomId(),
+                item.serviceName() != null ? item.serviceName() : item.subject(),
+                item.locationName(),
+                item.professionalName(),
+                item.startsAt(),
+                item.endsAt(),
+                item.durationMinutes(),
+                normalizeStatusForApi(item.status()),
+                item.customerName(),
+                maskPhone(item.customerPhone()));
+    }
+
+    private String normalizePhoneDigits(String phone) {
+        return phone == null ? "" : phone.replaceAll("\\D", "");
     }
 
     private PublicBookingCancellationResponse toCancellationResponse(CancellationLinkRecord link) {
@@ -458,6 +720,30 @@ public class BookingPublicActionService {
 
     private String formatDateTime(OffsetDateTime value) {
         return value == null ? "Sin fecha" : value.toLocalDateTime().format(DATE_TIME_FORMATTER);
+    }
+
+    private ZoneId resolveLocationZone(CompleteAgendaJdbcRepository.LocationRecord location) {
+        String timezone = location.timezone();
+        if (timezone == null || timezone.isBlank()) {
+            return ZoneId.of("America/Santiago");
+        }
+        try {
+            return ZoneId.of(timezone.trim());
+        } catch (DateTimeException ignored) {
+            return ZoneId.of("America/Santiago");
+        }
+    }
+
+    private LocalTime max(LocalTime a, LocalTime b) {
+        return a.isAfter(b) ? a : b;
+    }
+
+    private LocalTime min(LocalTime a, LocalTime b) {
+        return a.isBefore(b) ? a : b;
+    }
+
+    private int normalizeLimit(Integer maxSlots) {
+        return maxSlots == null ? 12 : Math.min(Math.max(maxSlots, 1), 40);
     }
 
     private String valueOrFallback(String value, String fallback) {

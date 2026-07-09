@@ -41,7 +41,7 @@ services:
       APP_JWT_SECRET: change-this-secret-in-local-development-please-2026
       APP_ACCESS_TOKEN_EXPIRES_IN_SECONDS: 28800
       APP_RESET_TOKEN_EXPIRES_IN_MINUTES: 30
-      APP_CORS_ALLOWED_ORIGINS: http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173,http://127.0.0.1:4173
+      APP_SECURITY_CORS_ALLOWED_ORIGINS: "*"
       APP_WHATSAPP_CHANNEL_PROVIDER: WEB
       APP_WHATSAPP_WEB_ENABLED: "true"
       APP_WHATSAPP_CLOUD_API_ENABLED: "false"
@@ -54,6 +54,7 @@ services:
       APP_WHATSAPP_CLOUD_API_DRY_RUN_ENABLED: "false"
       APP_AI_AGENTS_ENABLED: "true"
       APP_AI_AGENTS_AUTO_REPLY_ENABLED: "true"
+      APP_AI_AGENTS_SAFE_MODE_ENABLED: "false"
       APP_AI_AGENTS_AUDIT_ENABLED: "true"
       APP_AI_AGENTS_OUTBOX_WORKER_INTERVAL_MS: "5000"
       APP_AI_AGENTS_OUTBOX_BATCH_SIZE: "10"
@@ -183,9 +184,10 @@ services:
           "CMD-SHELL",
           "node -e \"fetch('http://127.0.0.1:3001/health').then((response) => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))\"",
         ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      start_period: 120s
+      interval: 30s
+      timeout: 10s
+      retries: 10
 
   public-tunnel:
     image: cloudflare/cloudflared:latest

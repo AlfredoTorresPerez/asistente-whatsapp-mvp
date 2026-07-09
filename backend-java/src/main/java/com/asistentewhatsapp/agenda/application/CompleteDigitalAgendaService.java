@@ -12,6 +12,8 @@ import com.asistentewhatsapp.agenda.api.AgendaSlotResponse;
 import com.asistentewhatsapp.agenda.api.CreateTemporaryAgendaBookingRequest;
 import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository;
 import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository.LocationRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository.ProfessionalRecord;
 import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository.RoomRecord;
 import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository.ServiceRecord;
@@ -21,6 +23,7 @@ import com.asistentewhatsapp.bookings.api.BookingDetailResponse;
 import com.asistentewhatsapp.bookings.api.CreateBookingConfirmationLinkRequest;
 import com.asistentewhatsapp.bookings.application.BookingStateMachine;
 import com.asistentewhatsapp.bookings.application.BookingConfirmationService;
+import com.asistentewhatsapp.bookings.application.AvailabilityService;
 import com.asistentewhatsapp.bookings.infrastructure.BookingJdbcRepository;
 import com.asistentewhatsapp.calendar.application.CalendarSyncService;
 import com.asistentewhatsapp.channels.application.ChannelDispatchRequest;
@@ -49,6 +52,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class CompleteDigitalAgendaService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CompleteDigitalAgendaService.class);
     private static final int DEFAULT_EXPIRATION_MINUTES = 60;
     private static final int SLOT_STEP_MINUTES = 15;
 
@@ -58,6 +62,7 @@ public class CompleteDigitalAgendaService {
     private final CalendarSyncService calendarSyncService;
     private final AuditService auditService;
     private final ChannelDispatchService channelDispatchService;
+    private final AvailabilityService availabilityService;
 
     public CompleteDigitalAgendaService(
             CompleteAgendaJdbcRepository repository,
@@ -65,13 +70,15 @@ public class CompleteDigitalAgendaService {
             BookingConfirmationService bookingConfirmationService,
             CalendarSyncService calendarSyncService,
             AuditService auditService,
-            ChannelDispatchService channelDispatchService) {
+            ChannelDispatchService channelDispatchService,
+            AvailabilityService availabilityService) {
         this.repository = repository;
         this.bookingJdbcRepository = bookingJdbcRepository;
         this.bookingConfirmationService = bookingConfirmationService;
         this.calendarSyncService = calendarSyncService;
         this.auditService = auditService;
         this.channelDispatchService = channelDispatchService;
+        this.availabilityService = availabilityService;
     }
 
     @Transactional(readOnly = true)
@@ -248,6 +255,12 @@ public class CompleteDigitalAgendaService {
         return bookingJdbcRepository.findBookingDetail(user.businessId(), bookingId);
     }
 
+    public void cancelByCustomer(UUID businessId, UUID bookingId, String reason) {
+        BookingDetailResponse currentBooking = bookingJdbcRepository.findBookingDetail(businessId, bookingId);
+        BookingStateMachine.assertTransition(currentBooking.status(), BookingStateMachine.CANCELLED_BY_CUSTOMER, "cancelarse");
+        repository.cancelBookingByCustomer(businessId, bookingId, reason, "WHATSAPP");
+    }
+
     @Transactional
     public AgendaBlockResponse createBlock(AuthenticatedUser user, AgendaBlockRequest request) {
         if (!request.endsAt().isAfter(request.startsAt())) {
@@ -378,6 +391,9 @@ public class CompleteDigitalAgendaService {
                     Map.of("professionalId", "Selecciona otro profesional."));
         }
 
+        availabilityService.checkProfessionalAbsence(businessId, professionalId, effectiveStart, endsAt);
+        availabilityService.checkProfessionalDailyCapacity(businessId, professionalId, startsAt);
+
         if (service.requiresRoom()) {
             if (roomId == null) {
                 throw validationError("roomId", "El servicio requiere una cabina.");
@@ -407,6 +423,7 @@ public class CompleteDigitalAgendaService {
     }
 
     private ApiException conflict(String code, String message, Map<String, String> fieldErrors) {
+        LOGGER.warn("[diagnostico] Conflicto al crear reserva: code={} message={} fieldErrors={}", code, message, fieldErrors);
         return new ApiException(HttpStatus.CONFLICT, code, message, fieldErrors);
     }
 

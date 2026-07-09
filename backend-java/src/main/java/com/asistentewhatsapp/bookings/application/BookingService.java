@@ -10,11 +10,15 @@ import com.asistentewhatsapp.bookings.api.RescheduleBookingRequest;
 import com.asistentewhatsapp.bookings.api.UpdateBookingRequest;
 import com.asistentewhatsapp.bookings.infrastructure.BookingJdbcRepository;
 import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository;
+import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository;
 import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository;
 import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository.BusinessLocationRecord;
 import com.asistentewhatsapp.security.domain.AuthenticatedUser;
 import com.asistentewhatsapp.shared.api.PagedResponse;
 import com.asistentewhatsapp.shared.exception.ApiException;
+import java.time.ZoneId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
@@ -26,17 +30,25 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class BookingService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(BookingService.class);
+
     private final BookingJdbcRepository bookingJdbcRepository;
     private final BusinessLocationJdbcRepository businessLocationJdbcRepository;
     private final BookingConfirmationJdbcRepository bookingConfirmationJdbcRepository;
+    private final CompleteAgendaJdbcRepository agendaRepository;
+    private final AvailabilityService availabilityService;
 
     public BookingService(
             BookingJdbcRepository bookingJdbcRepository,
             BusinessLocationJdbcRepository businessLocationJdbcRepository,
-            BookingConfirmationJdbcRepository bookingConfirmationJdbcRepository) {
+            BookingConfirmationJdbcRepository bookingConfirmationJdbcRepository,
+            CompleteAgendaJdbcRepository agendaRepository,
+            AvailabilityService availabilityService) {
         this.bookingJdbcRepository = bookingJdbcRepository;
         this.businessLocationJdbcRepository = businessLocationJdbcRepository;
         this.bookingConfirmationJdbcRepository = bookingConfirmationJdbcRepository;
+        this.agendaRepository = agendaRepository;
+        this.availabilityService = availabilityService;
     }
 
     @Transactional(readOnly = true)
@@ -73,6 +85,7 @@ public class BookingService {
     public BookingDetailResponse create(AuthenticatedUser authenticatedUser, CreateBookingRequest request) {
         String subject = normalizeRequiredValue(request.subject(), "subject", 160);
         String status = normalizeStatus(request.status(), "PENDIENTE_CONFIRMACION");
+        BookingStateMachine.assertTransition(null, status, "crearse");
         OffsetDateTime startsAt = normalizeStartsAt(request.startsAt());
         int durationMinutes = normalizeDuration(request.durationMinutes());
         LocationResolution location = resolveLocation(
@@ -85,6 +98,19 @@ public class BookingService {
         UUID assignedUserId = resolveResponsibleUserId(authenticatedUser, request.assignedUserId());
 
         BookingJdbcRepository.CustomerRecord customer = resolveCustomer(authenticatedUser, request);
+        UUID professionalId = assignedUserId;
+        UUID customerId = customer.id();
+        ZoneId zone = resolveZoneId(authenticatedUser.businessId(), location.locationId());
+        availabilityService.checkMinAdvanceNotice(authenticatedUser.businessId(), location.locationId(), professionalId, startsAt, zone);
+        if (location.locationId() != null && professionalId != null) {
+            OffsetDateTime endsAt = startsAt.plusMinutes(durationMinutes);
+            availabilityService.checkProfessionalAbsence(authenticatedUser.businessId(), professionalId, startsAt, endsAt);
+            availabilityService.checkProfessionalDailyCapacity(authenticatedUser.businessId(), professionalId, startsAt);
+        }
+        if (customerId != null) {
+            OffsetDateTime endsAt = startsAt.plusMinutes(durationMinutes);
+            availabilityService.checkCustomerDuplicateActiveBooking(authenticatedUser.businessId(), customerId, professionalId, startsAt, endsAt, null);
+        }
         ensureSlotAvailable(authenticatedUser.businessId(), null, location.locationId(), startsAt, durationMinutes);
         UUID bookingId = bookingJdbcRepository.insertBooking(
                 authenticatedUser.businessId(),
@@ -117,6 +143,7 @@ public class BookingService {
                 authenticatedUser,
                 request.assignedUserId() != null ? request.assignedUserId() : conversation.assignedUserId());
         String status = normalizeStatus(request.status(), "PENDIENTE_CONFIRMACION");
+        BookingStateMachine.assertTransition(null, status, "crearse");
         OffsetDateTime startsAt = normalizeStartsAt(request.startsAt());
         LocationResolution location = resolveLocation(
                 authenticatedUser.businessId(),
@@ -125,7 +152,21 @@ public class BookingService {
                 conversation.locationId(),
                 true);
 
-        ensureSlotAvailable(authenticatedUser.businessId(), null, location.locationId(), startsAt, normalizeDuration(request.durationMinutes()));
+        int durationMinutes = normalizeDuration(request.durationMinutes());
+        UUID professionalId = assignedUserId;
+        UUID customerId = conversation.customerId();
+        ZoneId zone = resolveZoneId(authenticatedUser.businessId(), location.locationId());
+        availabilityService.checkMinAdvanceNotice(authenticatedUser.businessId(), location.locationId(), professionalId, startsAt, zone);
+        if (location.locationId() != null && professionalId != null) {
+            OffsetDateTime endsAt = startsAt.plusMinutes(durationMinutes);
+            availabilityService.checkProfessionalAbsence(authenticatedUser.businessId(), professionalId, startsAt, endsAt);
+            availabilityService.checkProfessionalDailyCapacity(authenticatedUser.businessId(), professionalId, startsAt);
+        }
+        if (customerId != null) {
+            OffsetDateTime endsAt = startsAt.plusMinutes(durationMinutes);
+            availabilityService.checkCustomerDuplicateActiveBooking(authenticatedUser.businessId(), customerId, professionalId, startsAt, endsAt, null);
+        }
+        ensureSlotAvailable(authenticatedUser.businessId(), null, location.locationId(), startsAt, durationMinutes);
 
         UUID bookingId = bookingJdbcRepository.insertBooking(
                 authenticatedUser.businessId(),
@@ -136,7 +177,7 @@ public class BookingService {
                 normalizeRequiredValue(request.subject(), "subject", 160),
                 status,
                 startsAt,
-                normalizeDuration(request.durationMinutes()),
+                durationMinutes,
                 location.locationId(),
                 location.locationText(),
                 normalizeOptionalText(request.notes(), "notes", 2000),
@@ -155,6 +196,7 @@ public class BookingService {
                 authenticatedUser,
                 request.assignedUserId() != null ? request.assignedUserId() : lead.assignedUserId());
         String status = normalizeStatus(request.status(), "PENDIENTE_CONFIRMACION");
+        BookingStateMachine.assertTransition(null, status, "crearse");
         OffsetDateTime startsAt = normalizeStartsAt(request.startsAt());
         LocationResolution location = resolveLocation(
                 authenticatedUser.businessId(),
@@ -163,7 +205,21 @@ public class BookingService {
                 null,
                 true);
 
-        ensureSlotAvailable(authenticatedUser.businessId(), null, location.locationId(), startsAt, normalizeDuration(request.durationMinutes()));
+        int durationMinutes = normalizeDuration(request.durationMinutes());
+        UUID professionalId = assignedUserId;
+        UUID customerId = lead.customerId();
+        ZoneId zone = resolveZoneId(authenticatedUser.businessId(), location.locationId());
+        availabilityService.checkMinAdvanceNotice(authenticatedUser.businessId(), location.locationId(), professionalId, startsAt, zone);
+        if (location.locationId() != null && professionalId != null) {
+            OffsetDateTime endsAt = startsAt.plusMinutes(durationMinutes);
+            availabilityService.checkProfessionalAbsence(authenticatedUser.businessId(), professionalId, startsAt, endsAt);
+            availabilityService.checkProfessionalDailyCapacity(authenticatedUser.businessId(), professionalId, startsAt);
+        }
+        if (customerId != null) {
+            OffsetDateTime endsAt = startsAt.plusMinutes(durationMinutes);
+            availabilityService.checkCustomerDuplicateActiveBooking(authenticatedUser.businessId(), customerId, professionalId, startsAt, endsAt, null);
+        }
+        ensureSlotAvailable(authenticatedUser.businessId(), null, location.locationId(), startsAt, durationMinutes);
 
         UUID bookingId = bookingJdbcRepository.insertBooking(
                 authenticatedUser.businessId(),
@@ -174,7 +230,7 @@ public class BookingService {
                 normalizeRequiredValue(request.subject(), "subject", 160),
                 status,
                 startsAt,
-                normalizeDuration(request.durationMinutes()),
+                durationMinutes,
                 location.locationId(),
                 location.locationText(),
                 normalizeOptionalText(request.notes(), "notes", 2000),
@@ -189,6 +245,7 @@ public class BookingService {
             UpdateBookingRequest request) {
         BookingDetailResponse current = bookingJdbcRepository.findBookingDetail(authenticatedUser.businessId(), bookingId);
         String status = normalizeStatus(request.status(), current.status());
+        BookingStateMachine.assertTransition(current.status(), status, "actualizarse");
         OffsetDateTime startsAt = normalizeStartsAt(request.startsAt());
         LocationResolution location = resolveLocation(
                 authenticatedUser.businessId(),
@@ -220,6 +277,7 @@ public class BookingService {
             UUID bookingId,
             RescheduleBookingRequest request) {
         BookingDetailResponse current = bookingJdbcRepository.findBookingDetail(authenticatedUser.businessId(), bookingId);
+        BookingStateMachine.assertTransition(current.status(), BookingStateMachine.RESCHEDULED, "reprogramarse");
         LocationResolution location = resolveLocation(
                 authenticatedUser.businessId(),
                 request.locationId(),
@@ -250,10 +308,9 @@ public class BookingService {
             UUID bookingId,
             CancelBookingRequest request) {
         BookingDetailResponse current = bookingJdbcRepository.findBookingDetail(authenticatedUser.businessId(), bookingId);
-        String reason = normalizeOptionalText(request.reason(), "reason", 2000);
-        String notes = reason == null
-                ? current.notes()
-                : appendCancellationReason(current.notes(), reason);
+        BookingStateMachine.assertTransition(current.status(), BookingStateMachine.CANCELLED, "cancelarse");
+        String reason = normalizeRequiredValue(request.reason(), "reason", 2000);
+        String notes = appendCancellationReason(current.notes(), reason);
         bookingJdbcRepository.cancelBooking(authenticatedUser.businessId(), bookingId, notes);
         return bookingJdbcRepository.findBookingDetail(authenticatedUser.businessId(), bookingId);
     }
@@ -395,6 +452,9 @@ public class BookingService {
         if (startsAt == null) {
             throw validationError("startsAt", "La fecha de inicio es obligatoria.");
         }
+        if (startsAt.isBefore(OffsetDateTime.now(ZoneOffset.UTC))) {
+            throw validationError("startsAt", "No puedes agendar una fecha u hora que ya paso.");
+        }
         return startsAt;
     }
 
@@ -472,16 +532,23 @@ public class BookingService {
     }
 
 
+    private ZoneId resolveZoneId(UUID businessId, UUID locationId) {
+        if (locationId == null) {
+            return ZoneId.of("America/Santiago");
+        }
+        BusinessLocationRecord location = businessLocationJdbcRepository.findActiveById(businessId, locationId);
+        return location.timezone() != null ? ZoneId.of(location.timezone()) : ZoneId.of("America/Santiago");
+    }
+
     private void ensureSlotAvailable(UUID businessId, UUID bookingId, UUID locationId, OffsetDateTime startsAt, int durationMinutes) {
         if (locationId == null) {
             return;
         }
+        OffsetDateTime endsAt = startsAt.plusMinutes(durationMinutes);
         if (bookingConfirmationJdbcRepository.hasOverlappingActiveBooking(
-                businessId,
-                bookingId,
-                locationId,
-                startsAt,
-                startsAt.plusMinutes(durationMinutes))) {
+                businessId, bookingId, locationId, startsAt, endsAt)) {
+            LOGGER.warn("[diagnostico] Slot ocupado: businessId={} locationId={} startsAt={} endsAt={}",
+                    businessId, locationId, startsAt, endsAt);
             throw new ApiException(
                     HttpStatus.CONFLICT,
                     "BOOKING_SLOT_NOT_AVAILABLE",

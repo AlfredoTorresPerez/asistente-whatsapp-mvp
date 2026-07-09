@@ -4,6 +4,7 @@ import com.asistentewhatsapp.calendar.application.CalendarSyncService;
 import com.asistentewhatsapp.bookings.api.BookingPaymentWebhookRequest;
 import com.asistentewhatsapp.bookings.api.BookingPaymentWebhookResponse;
 import com.asistentewhatsapp.bookings.api.BookingPaymentResponse;
+import com.asistentewhatsapp.bookings.api.PublicBookingPaymentDetailResponse;
 import com.asistentewhatsapp.bookings.api.CreateBookingPaymentLinkRequest;
 import com.asistentewhatsapp.bookings.api.RefundBookingPaymentRequest;
 import com.asistentewhatsapp.bookings.api.RegisterBookingManualPaymentRequest;
@@ -12,6 +13,7 @@ import com.asistentewhatsapp.bookings.infrastructure.BookingPaymentJdbcRepositor
 import com.asistentewhatsapp.bookings.infrastructure.BookingPaymentJdbcRepository.BookingPaymentBookingRecord;
 import com.asistentewhatsapp.bookings.infrastructure.BookingPaymentJdbcRepository.BookingPaymentNotificationRecord;
 import com.asistentewhatsapp.bookings.infrastructure.BookingPaymentJdbcRepository.BookingPaymentRecord;
+import com.asistentewhatsapp.bookings.infrastructure.BookingPaymentJdbcRepository.PublicBookingPaymentDetailRecord;
 import com.asistentewhatsapp.channels.application.ChannelDispatchRequest;
 import com.asistentewhatsapp.channels.application.ChannelDispatchService;
 import com.asistentewhatsapp.channels.domain.MessageChannelType;
@@ -499,6 +501,67 @@ public class BookingPaymentService {
     public BookingPaymentResponse getPaymentStatus(UUID paymentId) {
         BookingPaymentRecord payment = repository.findById(paymentId);
         return toResponse(payment);
+    }
+
+    public PublicBookingPaymentDetailResponse getPublicPaymentDetail(UUID paymentId) {
+        PublicBookingPaymentDetailRecord detail = repository.findPaymentDetail(paymentId);
+        return new PublicBookingPaymentDetailResponse(
+                detail.id(), detail.bookingId(), detail.provider(), detail.providerPaymentId(),
+                detail.amount(), detail.currency(), detail.status(),
+                detail.checkoutUrl(), detail.checkoutExpiresAt(), detail.manual(),
+                detail.approvedAt(), detail.rejectedAt(), detail.expiredAt(), detail.refundedAt(),
+                detail.createdAt(),
+                detail.bookingStatus(), detail.bookingPaymentStatus(),
+                detail.subject(), detail.serviceName(), detail.professionalName(), detail.roomName(),
+                detail.startsAt(), detail.durationMinutes(), detail.locationName(), detail.customerName());
+    }
+
+    @Transactional
+    public BookingPaymentResponse simulatePayment(UUID paymentId, String action) {
+        BookingPaymentRecord payment = repository.findById(paymentId);
+        if (!"PENDING".equals(payment.status())) {
+            throw new ApiException(HttpStatus.CONFLICT,
+                    "BOOKING_PAYMENT_ALREADY_PROCESSED",
+                    "El pago ya fue procesado (estado: " + payment.status() + "). No se puede simular.",
+                    Map.of("paymentStatus", payment.status()));
+        }
+        if (!"SIMULATED".equalsIgnoreCase(payment.provider())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST,
+                    "BOOKING_PAYMENT_NOT_SIMULATED",
+                    "Solo se puede simular pagos del proveedor SIMULATED.",
+                    Map.of("provider", payment.provider()));
+        }
+        String normalizedAction = action != null ? action.trim().toUpperCase(java.util.Locale.ROOT) : "";
+        String targetStatus = switch (normalizedAction) {
+            case "APPROVED" -> "APPROVED";
+            case "REJECTED" -> "REJECTED";
+            default -> throw new ApiException(HttpStatus.BAD_REQUEST,
+                    "BOOKING_PAYMENT_INVALID_ACTION",
+                    "Accion de simulacion no valida. Use APPROVED o REJECTED.",
+                    Map.of("action", normalizedAction));
+        };
+
+        var metadata = new java.util.LinkedHashMap<String, Object>();
+        metadata.put("source", "PUBLIC_SIMULATION");
+        metadata.put("simulatedAction", normalizedAction);
+        metadata.put("simulated", true);
+
+        String rawPayloadJson = "{}";
+        String metadataJson = toJson(metadata);
+
+        OffsetDateTime now = OffsetDateTime.now(java.time.ZoneOffset.UTC);
+
+        BookingPaymentRecord updated = repository.updatePaymentStatus(
+                paymentId, targetStatus, rawPayloadJson, metadataJson, now);
+        repository.recalculateBookingPaymentStatus(payment.businessId(), payment.bookingId());
+        BookingPaymentBookingRecord booking = repository.findBookingForUpdate(payment.businessId(), payment.bookingId());
+        if ("APPROVED".equals(targetStatus) && isPaidOrOverpaid(booking)) {
+            transitionToConfirmed(payment.businessId(), payment.bookingId(), booking);
+        }
+        if ("APPROVED".equals(targetStatus)) {
+            sendPostPaymentNotifications(payment.businessId(), updated);
+        }
+        return toResponse(updated);
     }
 
     private void validateSignature(String rawBody, String timestampHeader, String signatureHeader) {
