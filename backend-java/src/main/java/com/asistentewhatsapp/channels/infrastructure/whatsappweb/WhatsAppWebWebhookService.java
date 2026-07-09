@@ -25,6 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class WhatsAppWebWebhookService {
 
+    private static final java.util.Map<String, String> TEST_PHONE_MAP = java.util.Map.of(
+            "224145803620505", "56950954580");
+
     private final WhatsAppWebClientProperties properties;
     private final WhatsAppWebChannelJdbcRepository repository;
     private final AuditLogJdbcRepository auditLogJdbcRepository;
@@ -163,7 +166,8 @@ public class WhatsAppWebWebhookService {
         String body = requireText(payload, "body");
         String externalMessageId = readText(payload, "externalMessageId");
         String companyPhone = normalizePhone(readText(payload, "to"));
-        String normalizedPhone = normalizePhone(from);
+        String resolvedPhone = TEST_PHONE_MAP.getOrDefault(normalizePhone(from), normalizePhone(from));
+        String normalizedPhone = resolvedPhone;
         String displayName = deriveDisplayName(normalizedPhone);
         String traceId = AiTraceLogger.newTraceId("WA");
         AiTraceLogger.info("WHATSAPP_MESSAGE_RECEIVED", traceId, null, null, "WhatsAppWebWebhookService",

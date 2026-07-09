@@ -54,6 +54,8 @@ public class TransactionalAgendaBookingService {
     private static final int MAX_SERVICE_SCAN = 200;
     private static final int MIN_EXPIRATION_MINUTES = 5;
     private static final int MAX_EXPIRATION_MINUTES = 1440;
+    private static final java.util.Map<String, String> TEST_PHONE_MAP = java.util.Map.of(
+            "224145803620505", "56950954580");
     private static final String DEMO_CUSTOMER_NAME = "Cliente WhatsApp";
     private static final String DEMO_CUSTOMER_PHONE = "+56900000000";
     private static final ZoneId DEFAULT_BUSINESS_ZONE = ZoneId.of("America/Santiago");
@@ -553,6 +555,7 @@ public class TransactionalAgendaBookingService {
         UUID locationId = location.location() == null ? null : location.location().id();
         UUID serviceId = service.map(AestheticServiceResponse::id).orElse(null);
         String normalizedPhone = normalizedSearchPhone(firstNonBlank(value(entities, "telefono"), customerPhone));
+        normalizedPhone = TEST_PHONE_MAP.getOrDefault(normalizedPhone, normalizedPhone);
         String customerName = firstNonBlank(value(entities, "cliente"), "");
         OffsetDateTime broadFrom = from == null ? null : from.minusHours(12);
         OffsetDateTime broadTo = to == null ? null : to.plusHours(12);
