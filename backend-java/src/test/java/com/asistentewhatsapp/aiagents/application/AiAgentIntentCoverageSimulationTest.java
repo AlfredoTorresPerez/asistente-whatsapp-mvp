@@ -40,7 +40,7 @@ class AiAgentIntentCoverageSimulationTest {
     private final AgentRegistry registry = new AgentRegistry(List.of(
             new ReceptionAgent(),
             new SalesAgent(knowledgeService),
-            new BookingAgent(knowledgeService, locationRepository, transactionalAgendaBookingService),
+            new BookingAgent(knowledgeService, transactionalAgendaBookingService),
             new PaymentsAgent(knowledgeService),
             new SupportAgent(locationRepository),
             new KnowledgeAgent(),
@@ -81,6 +81,12 @@ class AiAgentIntentCoverageSimulationTest {
                         Mockito.any(),
                         Mockito.any()))
                 .thenReturn(Optional.empty());
+        Mockito.when(service.generateBookingLink(
+                        Mockito.any(),
+                        Mockito.any(),
+                        Mockito.any(),
+                        Mockito.any()))
+                .thenReturn(new TransactionalAgendaBookingService.BookingLinkResult("http://localhost/reservar", false));
         return service;
     }
 
@@ -180,12 +186,11 @@ class AiAgentIntentCoverageSimulationTest {
             assertThat(response).contains("zona");
         }
         if ("venta y agenda".equals(caseName)) {
-            assertThat(response).contains("depilación bozo", "mañana", "14:00");
-            assertThat(response).doesNotContain("a las a las");
+            assertThat(response).contains("/reservar");
             assertThat(response).doesNotContain("qué servicio quieres agendar");
         }
         if ("agenda facial con dia".equals(caseName)) {
-            assertThat(response).contains("limpieza facial", "viernes", "horario");
+            assertThat(response).contains("/reservar");
             assertThat(response).doesNotContain("servicio específico");
         }
         if ("cambio de agenda".equals(caseName)) {

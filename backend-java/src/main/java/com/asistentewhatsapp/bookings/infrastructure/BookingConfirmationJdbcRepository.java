@@ -80,6 +80,7 @@ public class BookingConfirmationJdbcRepository {
                                b.subject, b.status as booking_status, b.starts_at, b.duration_minutes,
                                b.location_id, b.location, b.service_id, b.professional_id, b.room_id, bl.name as location_name,
                                b.requires_deposit, coalesce(b.deposit_amount, 0) as deposit_amount, b.payment_status,
+                               b.conversation_id,
                                s.name as service_name, p.full_name as professional_name, r.name as room_name,
                                c.display_name as customer_name, c.phone as customer_phone, c.email as customer_email
                         from booking_confirmation_link l
@@ -297,7 +298,8 @@ public class BookingConfirmationJdbcRepository {
                 resultSet.getString("customer_email"),
                 resultSet.getBoolean("requires_deposit"),
                 resultSet.getBigDecimal("deposit_amount"),
-                resultSet.getString("payment_status"));
+                resultSet.getString("payment_status"),
+                resultSet.getObject("conversation_id", UUID.class));
     }
 
     public record ConfirmationBookingRecord(UUID bookingId, UUID businessId, String subject, String bookingStatus,
@@ -311,5 +313,6 @@ public class BookingConfirmationJdbcRepository {
             OffsetDateTime confirmedAt, String subject, String bookingStatus, String serviceName, String professionalName,
             String roomName, OffsetDateTime startsAt, int durationMinutes, UUID locationId, String location,
             UUID serviceId, UUID professionalId, UUID roomId, String locationName, String customerName,
-            String customerPhone, String customerEmail, boolean requiresDeposit, BigDecimal depositAmount, String paymentStatus) { }
+            String customerPhone, String customerEmail, boolean requiresDeposit, BigDecimal depositAmount, String paymentStatus,
+            UUID conversationId) { }
 }

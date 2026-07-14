@@ -14,7 +14,8 @@ public record AuthenticatedUser(
         String lastName,
         String email,
         String timezone,
-        List<String> roles) {
+        List<String> roles,
+        List<String> permissions) {
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
@@ -28,6 +29,22 @@ public record AuthenticatedUser(
 
     public String primaryRole() {
         return roles.isEmpty() ? "AGENT" : roles.getFirst();
+    }
+
+    public boolean hasPermission(String permission) {
+        return permissions != null && permissions.contains(permission);
+    }
+
+    public boolean hasAnyPermission(String... permissions) {
+        if (this.permissions == null) return false;
+        for (String p : permissions) {
+            if (this.permissions.contains(p)) return true;
+        }
+        return false;
+    }
+
+    public boolean hasRole(String role) {
+        return roles != null && roles.contains(role);
     }
 }
 

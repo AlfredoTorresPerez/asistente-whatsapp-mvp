@@ -11,6 +11,7 @@ import type {
   SecurityPolicyResponse,
   StatusResponse,
   WhatsAppWebActionResponse,
+  WhatsAppWebQrResponse,
   WhatsAppWebStatusResponse,
   WhatsAppWebTestMessageRequest,
   WhatsAppWebTestMessageResponse,
@@ -85,6 +86,10 @@ export function updateCompanySettingsRequest(payload: CompanySettingsRequest) {
 
 export function getWhatsAppWebStatusRequest() {
   return apiFetch<WhatsAppWebStatusResponse>('/whatsapp-web/status')
+}
+
+export function getWhatsAppWebQrRequest() {
+  return apiFetch<WhatsAppWebQrResponse>('/whatsapp-web/qr')
 }
 
 export function connectWhatsAppWebRequest() {

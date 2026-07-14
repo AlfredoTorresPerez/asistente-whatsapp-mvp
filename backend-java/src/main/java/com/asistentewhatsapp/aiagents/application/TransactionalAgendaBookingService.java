@@ -143,16 +143,44 @@ public class TransactionalAgendaBookingService {
     }
 
     public BookingLinkResult generateBookingLink(UUID businessId, String customerPhone) {
+        return generateBookingLink(businessId, customerPhone, null, null);
+    }
+
+    public BookingLinkResult generateBookingLink(UUID businessId, String customerPhone, UUID conversationId, UUID customerId) {
         Optional<CompleteAgendaJdbcRepository.CustomerRecord> customerOpt =
                 completeAgendaJdbcRepository.findCustomerByPhone(businessId, customerPhone);
+        String correlationParams = buildCorrelationQuery(conversationId, customerId);
         if (customerOpt.isPresent()) {
-            String phoneDigits = customerPhone.replaceAll("\\D", "");
+            String phoneDigits = mappedPhoneDigits(customerPhone);
             String token = customerBookingService.generateToken(businessId, phoneDigits);
             String url = customerBookingService.buildBookingPublicUrl(token);
+            if (!correlationParams.isEmpty()) {
+                url += (url.contains("?") ? "&" : "?") + correlationParams;
+            }
             return new BookingLinkResult(url, true);
         }
         String base = frontendPublicBaseUrl.endsWith("/") ? frontendPublicBaseUrl : frontendPublicBaseUrl + "/";
-        return new BookingLinkResult(base + "reservar", false);
+        String url = base + "reservar";
+        if (!correlationParams.isEmpty()) {
+            url += "?" + correlationParams;
+        }
+        return new BookingLinkResult(url, false);
+    }
+
+    private String buildCorrelationQuery(UUID conversationId, UUID customerId) {
+        StringBuilder sb = new StringBuilder();
+        if (conversationId != null) {
+            sb.append("conversation_id=").append(conversationId);
+        }
+        if (customerId != null) {
+            if (!sb.isEmpty()) sb.append("&");
+            sb.append("customer_id=").append(customerId);
+        }
+        if (!sb.isEmpty()) {
+            if (!sb.isEmpty()) sb.append("&");
+            sb.append("origin=whatsapp_ai");
+        }
+        return sb.toString();
     }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -321,14 +349,14 @@ public class TransactionalAgendaBookingService {
                     return "No pude identificar la opcion. Responde con el numero de la reserva que deseas cancelar.";
                 }
                 clearPendingBookingAction(entities);
-                return buildCancellationLinkResponse(businessId, selected.get());
+                return buildCancellationLinkResponse(businessId, customerPhone, selected.get());
             }
 
             if (isAffirmative(normalized) && entities.containsKey("booking_id_pendiente")) {
                 Optional<AgendaCalendarItemResponse> pending = findPendingBooking(businessId, customerId, conversationId, customerPhone, entities);
                 if (pending.isPresent()) {
                     clearPendingBookingAction(entities);
-                    return buildCancellationLinkResponse(businessId, pending.get());
+                    return buildCancellationLinkResponse(businessId, customerPhone, pending.get());
                 }
             }
 
@@ -339,16 +367,17 @@ public class TransactionalAgendaBookingService {
             }
             if (candidates.size() > 1) {
                 clearPendingBookingAction(entities);
-                return WhatsAppMessageFormatter.multipleCancellationCandidates(candidates.stream()
-                        .map(c -> {
-                            String link = generateCancellationPublicLink(businessId, c.bookingId(), 60);
-                            return new WhatsAppMessageFormatter.CancellationCandidate(
-                                    bookingTitle(c), bookingDate(c), bookingTime(c), locationName(c), link);
-                        })
-                        .toList());
+                String phoneDigits = mappedPhoneDigits(customerPhone);
+                String token = customerBookingService.generateToken(businessId, phoneDigits);
+                String url = customerBookingService.buildPublicUrl(token);
+                List<WhatsAppMessageFormatter.CancellationCandidate> cancellationCandidates = candidates.stream()
+                        .map(c -> new WhatsAppMessageFormatter.CancellationCandidate(
+                                bookingTitle(c), bookingDate(c), bookingTime(c), locationName(c), url))
+                        .toList();
+                return WhatsAppMessageFormatter.multipleCancellationCandidatesSingleLink(cancellationCandidates, url, 60);
             }
             AgendaCalendarItemResponse candidate = candidates.getFirst();
-            return buildCancellationLinkResponse(businessId, candidate);
+            return buildCancellationLinkResponse(businessId, customerPhone, candidate);
         } catch (RuntimeException exception) {
             AiTraceLogger.error("WHATSAPP_CANCEL_FLOW_ERROR", traceId, traceConversationId, null, "TransactionalAgendaBookingService",
                     "functionalMessage=No pude completar la cancelacion en este momento.", exception);
@@ -356,9 +385,11 @@ public class TransactionalAgendaBookingService {
         }
     }
 
-    private String buildCancellationLinkResponse(UUID businessId, AgendaCalendarItemResponse booking) {
+    private String buildCancellationLinkResponse(UUID businessId, String customerPhone, AgendaCalendarItemResponse booking) {
         try {
-            String url = generateCancellationPublicLink(businessId, booking.bookingId(), 60);
+            String phoneDigits = mappedPhoneDigits(customerPhone);
+            String token = customerBookingService.generateToken(businessId, phoneDigits);
+            String url = customerBookingService.buildPublicUrl(token);
             return WhatsAppMessageFormatter.cancellationLinkGenerated(
                     bookingTitle(booking), bookingDate(booking), bookingTime(booking),
                     locationName(booking), url, 60);
@@ -367,20 +398,13 @@ public class TransactionalAgendaBookingService {
         }
     }
 
-    private String buildRescheduleLinkResponse(UUID businessId, AgendaCalendarItemResponse booking,
+    private String buildRescheduleLinkResponse(UUID businessId, String customerPhone, AgendaCalendarItemResponse booking,
             LocalDate targetDate, LocalTime targetTime, Map<String, String> entities,
             String traceId, UUID traceConversationId) {
         try {
-            BusinessLocationRecord location = businessLocationFor(businessId, booking);
-            String tz = location != null && location.timezone() != null ? location.timezone() : "America/Santiago";
-            ZoneId zone = ZoneId.of(tz);
-            OffsetDateTime proposedStartsAt = targetDate.atTime(targetTime).atZone(zone).toOffsetDateTime();
-            int durationMinutes = booking.durationMinutes() > 0 ? booking.durationMinutes() : 60;
-            OffsetDateTime proposedEndsAt = proposedStartsAt.plusMinutes(durationMinutes);
-            String url = generateReschedulePublicLink(businessId, booking.bookingId(),
-                    proposedStartsAt, proposedEndsAt,
-                    booking.locationId(), booking.serviceId(),
-                    booking.professionalId(), booking.roomId(), 60);
+            String phoneDigits = mappedPhoneDigits(customerPhone);
+            String token = customerBookingService.generateToken(businessId, phoneDigits);
+            String url = customerBookingService.buildPublicUrl(token);
             return WhatsAppMessageFormatter.rescheduleLinkGenerated(
                     bookingTitle(booking), bookingDate(booking), bookingTime(booking),
                     locationName(booking), url, 60);
@@ -433,7 +457,7 @@ public class TransactionalAgendaBookingService {
                 if (alternativeDate.isEmpty() || alternativeTime.isEmpty()) {
                     return "No pude identificar la opcion. Responde con el numero de una alternativa o con una hora de la lista.";
                 }
-                String response = buildRescheduleLinkResponse(businessId, selected.get(), alternativeDate.get(), alternativeTime.get(), entities, traceId, traceConversationId);
+                String response = buildRescheduleLinkResponse(businessId, customerPhone, selected.get(), alternativeDate.get(), alternativeTime.get(), entities, traceId, traceConversationId);
                 clearPendingBookingAction(entities);
                 return response;
             }
@@ -445,14 +469,14 @@ public class TransactionalAgendaBookingService {
                     return "No encontre una reserva activa asociada a este numero. ¿Me puedes indicar la fecha, hora o servicio de la cita que quieres reprogramar?";
                 }
                 if (candidates.size() > 1) {
-                    return WhatsAppMessageFormatter.multipleRescheduleCandidates(candidates.stream()
-                            .map(c -> {
-                                String link = generateReschedulePublicLink(businessId, c.bookingId(),
-                                        null, null, null, null, null, null, 60);
-                                return new WhatsAppMessageFormatter.RescheduleCandidate(
-                                        bookingTitle(c), bookingDate(c), bookingTime(c), locationName(c), link);
-                            })
-                            .toList());
+                    String phoneDigits = mappedPhoneDigits(customerPhone);
+                    String token = customerBookingService.generateToken(businessId, phoneDigits);
+                    String url = customerBookingService.buildPublicUrl(token);
+                    List<WhatsAppMessageFormatter.RescheduleCandidate> rescheduleCandidates = candidates.stream()
+                            .map(c -> new WhatsAppMessageFormatter.RescheduleCandidate(
+                                    bookingTitle(c), bookingDate(c), bookingTime(c), locationName(c), url))
+                            .toList();
+                    return WhatsAppMessageFormatter.multipleRescheduleCandidatesSingleLink(rescheduleCandidates, url, 60);
                 }
                 selected = Optional.of(candidates.getFirst());
             }
@@ -472,7 +496,7 @@ public class TransactionalAgendaBookingService {
                 return "Perfecto. ¿A que hora prefieres asistir ese dia?";
             }
 
-            String response = buildRescheduleLinkResponse(businessId, selected.get(), targetDate.get(), targetTime.get(), entities, traceId, traceConversationId);
+            String response = buildRescheduleLinkResponse(businessId, customerPhone, selected.get(), targetDate.get(), targetTime.get(), entities, traceId, traceConversationId);
             if (!"RESCHEDULE_SELECT_ALTERNATIVE".equals(value(entities, "accion_pendiente"))) {
                 clearPendingBookingAction(entities);
             }
@@ -1503,7 +1527,8 @@ public class TransactionalAgendaBookingService {
                 "Negocio",
                 "ia@local",
                 location.timezone() == null || location.timezone().isBlank() ? "America/Santiago" : location.timezone(),
-                List.of("ADMIN"));
+                List.of("ADMIN"),
+                List.of());
     }
 
     private String normalizedCustomerName(String value) {
@@ -1520,6 +1545,14 @@ public class TransactionalAgendaBookingService {
         }
         String digits = value.replaceAll("\\D", "").trim();
         return digits.isBlank() ? null : digits;
+    }
+
+    private String mappedPhoneDigits(String value) {
+        String digits = normalizedSearchPhone(value);
+        if (digits == null) {
+            return "";
+        }
+        return TEST_PHONE_MAP.getOrDefault(digits, digits);
     }
 
     private String lastDigits(String value, int length) {

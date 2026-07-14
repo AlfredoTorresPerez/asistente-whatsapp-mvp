@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.UUID;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,8 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class WhatsAppWebWebhookService {
 
-    private static final java.util.Map<String, String> TEST_PHONE_MAP = java.util.Map.of(
-            "224145803620505", "56950954580");
+    private static final Logger LOG = LoggerFactory.getLogger(WhatsAppWebWebhookService.class);
 
     private final WhatsAppWebClientProperties properties;
     private final WhatsAppWebChannelJdbcRepository repository;
@@ -58,16 +59,37 @@ public class WhatsAppWebWebhookService {
             String deliveryIdHeader) {
         validateHeaders(rawBody, timestampHeader, signatureHeader, deliveryIdHeader);
 
+        if (properties.logRawPayload()) {
+            LOG.debug("Webhook payload received: {}", rawBody);
+        }
+
         try {
             WhatsAppWebWebhookPayload request = objectMapper.readValue(rawBody, WhatsAppWebWebhookPayload.class);
             String resolvedDeliveryId = resolveDeliveryId(request.deliveryId(), deliveryIdHeader);
+            if (resolvedDeliveryId == null || resolvedDeliveryId.isBlank()) {
+                resolvedDeliveryId = UUID.randomUUID().toString();
+                LOG.warn("Webhook deliveryId was blank, generated fallback: {}", resolvedDeliveryId);
+            }
             OffsetDateTime receivedAt = OffsetDateTime.now(ZoneOffset.UTC);
+
+            // Try to find channel account by sessionKey first
             WhatsAppWebChannelJdbcRepository.ChannelAccountRecord channelAccount = repository.findChannelAccountBySessionKey(
                             request.sessionKey())
-                    .orElseThrow(() -> new ApiException(
-                            HttpStatus.NOT_FOUND,
-                            "WHATSAPP_WEB_SESSION_NOT_FOUND",
-                            "No se encontro la sesion experimental informada por WhatsApp Web."));
+                    .orElseGet(() -> {
+                        // Fallback: try to find by phone number from payload
+                        String phoneNumber = extractPhoneFromPayload(request.payload());
+                        if (phoneNumber != null) {
+                            return repository.findChannelAccountByPhoneNumber(phoneNumber)
+                                    .orElseThrow(() -> new ApiException(
+                                            HttpStatus.NOT_FOUND,
+                                            "WHATSAPP_WEB_SESSION_NOT_FOUND",
+                                            "No se encontro la sesion experimental informada por WhatsApp Web."));
+                        }
+                        throw new ApiException(
+                                HttpStatus.NOT_FOUND,
+                                "WHATSAPP_WEB_SESSION_NOT_FOUND",
+                                "No se encontro la sesion experimental informada por WhatsApp Web.");
+                    });
 
             boolean inserted = repository.insertChannelEventLog(
                     channelAccount.businessId(),
@@ -78,6 +100,9 @@ public class WhatsAppWebWebhookService {
                     receivedAt);
 
             if (!inserted) {
+                if (properties.logRawPayload()) {
+                    LOG.debug("Duplicate webhook event ignored: deliveryId={}", resolvedDeliveryId);
+                }
                 return new StatusResponse("ACCEPTED");
             }
 
@@ -101,11 +126,20 @@ public class WhatsAppWebWebhookService {
         } catch (ApiException exception) {
             throw exception;
         } catch (Exception exception) {
+            LOG.error("Failed to process WhatsApp Web webhook", exception);
             throw new ApiException(
                     HttpStatus.BAD_REQUEST,
                     "WHATSAPP_WEB_WEBHOOK_INVALID",
                     "El evento experimental WhatsApp Web no pudo procesarse.");
         }
+    }
+
+    private String extractPhoneFromPayload(JsonNode payload) {
+        String to = readText(payload, "to");
+        String from = readText(payload, "from");
+        String normalizedTo = normalizePhone(to);
+        String normalizedFrom = normalizePhone(from);
+        return normalizedTo != null && !normalizedTo.isBlank() ? normalizedTo : normalizedFrom;
     }
 
     private void processEvent(
@@ -155,6 +189,9 @@ public class WhatsAppWebWebhookService {
                 channelAccount.phoneNumber(),
                 qrCode,
                 occurredAt);
+        if (qrCode != null && !qrCode.isBlank() && properties.logRawPayload()) {
+            LOG.debug("QR updated at {} for channel account {}", occurredAt, channelAccount.id());
+        }
     }
 
     private void handleMessageReceived(
@@ -166,10 +203,17 @@ public class WhatsAppWebWebhookService {
         String body = requireText(payload, "body");
         String externalMessageId = readText(payload, "externalMessageId");
         String companyPhone = normalizePhone(readText(payload, "to"));
-        String resolvedPhone = TEST_PHONE_MAP.getOrDefault(normalizePhone(from), normalizePhone(from));
+        
+        // Use configurable test phone map
+        String resolvedPhone = resolveTestPhone(normalizePhone(from));
         String normalizedPhone = resolvedPhone;
         String displayName = deriveDisplayName(normalizedPhone);
         String traceId = AiTraceLogger.newTraceId("WA");
+        
+        if (properties.logRawPayload()) {
+            LOG.debug("Raw inbound message payload: {}", payload);
+        }
+        
         AiTraceLogger.info("WHATSAPP_MESSAGE_RECEIVED", traceId, null, null, "WhatsAppWebWebhookService",
                 "deliveryId=" + deliveryId
                         + " phoneMasked=" + AiTraceLogger.maskPhone(normalizedPhone)
@@ -300,6 +344,11 @@ public class WhatsAppWebWebhookService {
         String normalizedPhone = normalizePhone(to);
         String displayName = deriveDisplayName(normalizedPhone);
         String traceId = AiTraceLogger.newTraceId("WA");
+        
+        if (properties.logRawPayload()) {
+            LOG.debug("Raw outbound external message payload: {}", payload);
+        }
+        
         AiTraceLogger.info("WHATSAPP_MESSAGE_RECEIVED", traceId, null, null, "WhatsAppWebWebhookService",
                 "deliveryId=" + deliveryId
                         + " phoneMasked=" + AiTraceLogger.maskPhone(normalizedPhone)
@@ -427,7 +476,10 @@ public class WhatsAppWebWebhookService {
         }
 
         long skewSeconds = Math.abs(Duration.between(timestamp, OffsetDateTime.now(ZoneOffset.UTC)).toSeconds());
-        if (skewSeconds > properties.webhookToleranceSeconds()) {
+        long tolerance = properties.webhookToleranceSeconds();
+        if (skewSeconds > tolerance) {
+            LOG.warn("Webhook timestamp skew detected: received={}, server={}, skew={}s, tolerance={}s",
+                    timestamp, OffsetDateTime.now(ZoneOffset.UTC), skewSeconds, tolerance);
             throw new ApiException(
                     HttpStatus.UNAUTHORIZED,
                     "WHATSAPP_WEB_TIMESTAMP_EXPIRED",
@@ -438,6 +490,7 @@ public class WhatsAppWebWebhookService {
         if (!MessageDigest.isEqual(
                 expectedSignature.getBytes(StandardCharsets.UTF_8),
                 signatureHeader.getBytes(StandardCharsets.UTF_8))) {
+            LOG.warn("Webhook HMAC validation failed: expected={}, received={}", expectedSignature, signatureHeader);
             throw new ApiException(
                     HttpStatus.UNAUTHORIZED,
                     "WHATSAPP_WEB_SIGNATURE_INVALID",
@@ -520,6 +573,14 @@ public class WhatsAppWebWebhookService {
 
     private String normalizePhone(String rawPhone) {
         return rawPhone == null ? "" : rawPhone.trim().replace(" ", "");
+    }
+
+    private String resolveTestPhone(String normalizedPhone) {
+        if (properties.testPhoneMap() != null && !properties.testPhoneMap().isEmpty()) {
+            return properties.testPhoneMap().getOrDefault(normalizedPhone, normalizedPhone);
+        }
+        // Default fallback for backward compatibility
+        return "224145803620505".equals(normalizedPhone) ? "56950954580" : normalizedPhone;
     }
 
     private String deriveDisplayName(String normalizedPhone) {

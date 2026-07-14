@@ -301,13 +301,6 @@ export function AppointmentDetailPage() {
         </Card>
       ) : null}
 
-      {paymentUrl ? (
-        <Card className="border-indigo-200 bg-indigo-50">
-          <p className="text-sm font-semibold text-indigo-950">Enlace de pago generado</p>
-          <p className="mt-2 break-all text-sm text-indigo-800">{paymentUrl}</p>
-        </Card>
-      ) : null}
-
       {bookingQuery.isPending ? (
         <LoadingState message="Cargando el detalle de la cita seleccionada." variant="detail" />
       ) : bookingQuery.isError || !bookingQuery.data ? (
@@ -386,116 +379,6 @@ export function AppointmentDetailPage() {
                 </Button>
               ) : null}
             </div>
-          </Card>
-
-            <Card className="space-y-4">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <h3 className="text-xl font-semibold text-[var(--color-text)]">Pagos de reserva</h3>
-                <p className="mt-1 text-sm text-slate-600">
-                  Abono requerido: {bookingQuery.data.requiresDeposit ? `$${Number(bookingQuery.data.depositAmount ?? 0).toLocaleString('es-CL')}` : 'No requerido'}
-                </p>
-              </div>
-              <StatusBadge
-                label={formatEstadoPago(bookingQuery.data.paymentStatus)}
-                tone={getEstadoTone(bookingQuery.data.paymentStatus)}
-              />
-            </div>
-
-            <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_160px_150px]">
-              <Input
-                label="Referencia"
-                onChange={(event) => setManualReference(event.target.value)}
-                placeholder="Transferencia, comprobante o folio"
-                value={manualReference}
-              />
-              <Input
-                label="Monto"
-                min="1"
-                onChange={(event) => setManualAmount(event.target.value)}
-                placeholder={String(bookingQuery.data.depositAmount ?? '')}
-                type="number"
-                value={manualAmount}
-              />
-              <div className="flex items-end">
-                <Button
-                  disabled={!isOnline || manualPaymentMutation.isPending}
-                  fullWidth
-                  onClick={() => manualPaymentMutation.mutate()}
-                  variant="secondary"
-                >
-                  Registrar pago
-                </Button>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-end gap-3">
-              <div className="flex-1 sm:flex-none">
-                <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500" htmlFor="payment-purpose">
-                  Proposito
-                </label>
-                <select
-                  className="mt-1 block w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-900 shadow-sm focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-300"
-                  disabled={!isOnline || paymentLinkMutation.isPending}
-                  id="payment-purpose"
-                  onChange={(e) => setPaymentPurpose(e.target.value as 'DEPOSIT' | 'FULL' | 'MANUAL')}
-                  value={paymentPurpose}
-                >
-                  <option value="DEPOSIT">Abono</option>
-                  <option value="FULL">Pago completo</option>
-                  <option value="MANUAL">Manual</option>
-                </select>
-              </div>
-              {paymentPurpose === 'FULL' && (
-                <div className="flex-1 sm:flex-none">
-                  <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500" htmlFor="full-amount">
-                    Monto total
-                  </label>
-                  <Input
-                    id="full-amount"
-                    label=""
-                    min="1"
-                    onChange={(event) => setFullAmount(event.target.value)}
-                    placeholder="Monto total del servicio"
-                    type="number"
-                    value={fullAmount}
-                    disabled={!isOnline || paymentLinkMutation.isPending}
-                  />
-                </div>
-              )}
-              <Button
-                disabled={!isOnline || (!bookingQuery.data.requiresDeposit && paymentPurpose === 'DEPOSIT') || (paymentPurpose === 'FULL' && !fullAmount) || paymentLinkMutation.isPending}
-                onClick={() => paymentLinkMutation.mutate()}
-                variant="secondary"
-              >
-                Generar link de pago
-              </Button>
-            </div>
-
-            <TraceSection
-              empty="No hay pagos registrados para esta reserva."
-              items={(bookingQuery.data.payments ?? []).map((payment) => ({
-                id: payment.id,
-                title: `${payment.provider} · ${formatEstadoPago(payment.status)} · ${payment.currency} ${Number(payment.amount).toLocaleString('es-CL')}`,
-                detail: `${payment.manual ? 'Manual' : 'Proveedor'} · ${formatDateTime(payment.createdAt)}${payment.providerPaymentId ? ` · Ref: ${payment.providerPaymentId}` : ''}${payment.checkoutUrl ? ` · ${payment.checkoutUrl}` : ''}`,
-                action: payment.status === 'APPROVED'
-                  ? {
-                      label: 'Reembolsar',
-                      onClick: () => refundPaymentMutation.mutate(payment.id),
-                      disabled: refundPaymentMutation.isPending,
-                    }
-                  : payment.checkoutUrl
-                  ? {
-                      label: 'Copiar URL',
-                      onClick: () => {
-                        navigator.clipboard.writeText(payment.checkoutUrl!)
-                        showToast({ title: 'URL copiada', description: 'Enlace de pago copiado al portapapeles.', tone: 'success' })
-                      },
-                    }
-                  : undefined,
-              }))}
-              title="Movimientos"
-            />
           </Card>
 
           <Card className="space-y-4">

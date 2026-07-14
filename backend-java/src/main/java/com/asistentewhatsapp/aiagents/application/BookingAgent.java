@@ -123,7 +123,7 @@ public class BookingAgent extends AbstractAgentHandler {
         }
 
         TransactionalAgendaBookingService.BookingLinkResult linkResult = transactionalAgendaBookingService.generateBookingLink(
-                request.businessId(), request.customerPhone());
+                request.businessId(), request.customerPhone(), request.conversationId(), request.customerId());
         String response = WhatsAppMessageFormatter.bookingLink(linkResult.url(), linkResult.isKnownCustomer());
         AiTraceLogger.info("BOOKING_LINK_GENERATED", traceId, request.conversationId(), null, "BookingAgent",
                 "isKnownCustomer=" + linkResult.isKnownCustomer()

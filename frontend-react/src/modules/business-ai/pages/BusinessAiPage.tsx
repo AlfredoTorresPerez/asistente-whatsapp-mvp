@@ -1,5 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ConfirmDialog } from '../../../components/overlay/ConfirmDialog'
 import { Modal } from '../../../components/overlay/Modal'
 import { Button } from '../../../components/ui/Button'
@@ -11,7 +11,7 @@ import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { Textarea } from '../../../components/ui/Textarea'
 import { formatEstadoRegistro, getRegistroTone, isRegistroActivo } from '../../../lib/statusFormatters'
 import { useToast } from '../../../lib/toast'
-import { BUSINESS_AI_AUDIT_PAGE_SIZE, DEFAULT_BUSINESS_HOURS, getAuditTotalPages, isBusinessHourRangeValid, paginateAuditLogs, sortAuditLogsDescending } from '../lib/businessAiHelpers'
+import { BUSINESS_AI_AUDIT_PAGE_SIZE, getAuditTotalPages, isBusinessHourRangeValid, paginateAuditLogs, sortAuditLogsDescending } from '../lib/businessAiHelpers'
 import type { BusinessHoursDay } from '../lib/businessAiHelpers'
 import { formatRuleType } from '../../rules/lib/ruleTypeLabels'
 import {
@@ -33,11 +33,15 @@ import {
   getConversationsRequest,
   sendConversationMessageRequest,
 } from '../../../services/api/conversationsApi'
+import { getBusinessHoursRequest, saveBusinessHoursRequest } from '../../../services/api/completeAgendaApi'
+import { getBusinessLocationsRequest } from '../../../services/api/businessLocationsApi'
 import type {
   AestheticBusinessRuleResponse,
   AestheticIntentLogResponse,
   AestheticProductResponse,
   AestheticServiceResponse,
+  BusinessHoursResponse,
+  BusinessLocationResponse,
   ConversationSummaryResponse,
   IntentAnalysisResponse,
   UpsertAestheticBusinessRuleRequest,
@@ -595,9 +599,20 @@ export function BusinessAiPage() {
   const [rowToToggle, setRowToToggle] = useState<{ row: KnowledgeRow; active: boolean } | null>(null)
   const [allowedTopics, setAllowedTopics] = useState(() => Object.fromEntries(allowedTopicDefaults.map((topic) => [topic, true])) as Record<string, boolean>)
   const [blockedTopics, setBlockedTopics] = useState(() => Object.fromEntries(blockedTopicDefaults.map((topic) => [topic, true])) as Record<string, boolean>)
-  const [businessHours, setBusinessHours] = useState<BusinessHoursDay[]>(DEFAULT_BUSINESS_HOURS)
+  const emptyHours: BusinessHoursDay[] = [
+    { day: 'Lunes', startTime: '09:00', endTime: '18:00' },
+    { day: 'Martes', startTime: '09:00', endTime: '18:00' },
+    { day: 'Miércoles', startTime: '09:00', endTime: '18:00' },
+    { day: 'Jueves', startTime: '09:00', endTime: '18:00' },
+    { day: 'Viernes', startTime: '09:00', endTime: '18:00' },
+    { day: 'Sábado', startTime: '09:00', endTime: '13:00' },
+    { day: 'Domingo', startTime: '', endTime: '' },
+  ]
+  const DAY_MAP: Record<string, number> = { Lunes: 1, Martes: 2, 'Miércoles': 3, Jueves: 4, Viernes: 5, Sábado: 6, Domingo: 7 }
+  const [businessHours, setBusinessHours] = useState<BusinessHoursDay[]>(emptyHours)
   const [businessHoursError, setBusinessHoursError] = useState<string | null>(null)
   const [businessHoursSaved, setBusinessHoursSaved] = useState(false)
+  const [hoursLocationId, setHoursLocationId] = useState('')
   const [config, setConfig] = useState<AssistantConfigState>({
     active: true,
     allowBooking: true,
@@ -661,6 +676,57 @@ export function BusinessAiPage() {
   const logs = useMemo(() => logsQuery.data?.items ?? [], [logsQuery.data?.items])
   const serviceCategories = useMemo(() => serviceCategoriesQuery.data?.items ?? [], [serviceCategoriesQuery.data?.items])
   const productCategories = useMemo(() => productCategoriesQuery.data?.items ?? [], [productCategoriesQuery.data?.items])
+  const locationsQuery = useQuery({
+    queryKey: ['business-locations', 'ai-page'],
+    queryFn: () => getBusinessLocationsRequest({ activeOnly: true }),
+  })
+
+  const locations = useMemo(() => locationsQuery.data ?? [], [locationsQuery.data])
+  const firstLocationId = locations.length > 0 ? locations[0].id : ''
+
+  const businessHoursQuery = useQuery({
+    queryKey: ['agenda-business-hours', hoursLocationId || firstLocationId],
+    queryFn: () => getBusinessHoursRequest(hoursLocationId || firstLocationId),
+    enabled: !!(hoursLocationId || firstLocationId),
+  })
+
+  const saveHoursMutation = useMutation({
+    mutationFn: async () => {
+      const locationId = hoursLocationId || firstLocationId
+      if (!locationId) throw new Error('No hay sucursales disponibles.')
+      return saveBusinessHoursRequest({
+        locationId,
+        hours: businessHours.filter((h) => h.startTime && h.endTime).map((h) => ({
+          dayOfWeek: DAY_MAP[h.day] ?? 1,
+          startTime: h.startTime,
+          endTime: h.endTime,
+        })),
+      })
+    },
+    onSuccess: () => {
+      setBusinessHoursSaved(true)
+      showToast({ title: 'Horario guardado', description: 'El horario de atención se actualizó correctamente.', tone: 'success' })
+    },
+    onError: (error) => {
+      showToast({ title: 'No se pudo guardar el horario', description: error instanceof Error ? error.message : 'Intenta nuevamente.', tone: 'error' })
+    },
+  })
+
+  useEffect(() => {
+    if (businessHoursQuery.data) {
+      const serverHours = businessHoursQuery.data as BusinessHoursResponse[]
+      if (serverHours.length > 0) {
+        const days: BusinessHoursDay[] = emptyHours.map((day) => {
+          const dow = DAY_MAP[day.day]
+          const match = serverHours.find((h) => h.dayOfWeek === dow)
+          return match ? { ...day, startTime: match.startTime.slice(0, 5), endTime: match.endTime.slice(0, 5) } : day
+        })
+        setBusinessHours(days)
+        setBusinessHoursSaved(true)
+      }
+    }
+  }, [businessHoursQuery.data])
+
   const conversations = useMemo(() => conversationsQuery.data?.items ?? [], [conversationsQuery.data?.items])
 
   const operationalPromptRule = rules.find((rule) => rule.code === 'PROMPT_OPERATIVO_IA_NEGOCIO')
@@ -1098,12 +1164,7 @@ export function BusinessAiPage() {
     }
 
     setBusinessHoursError(null)
-    setBusinessHoursSaved(true)
-    showToast({
-      description: 'El horario quedó guardado localmente. Queda preparada la integración cuando exista punto de acceso de persistencia.',
-      title: 'Horario actualizado',
-      tone: 'success',
-    })
+    saveHoursMutation.mutate()
   }
 
   return (
@@ -1150,11 +1211,15 @@ export function BusinessAiPage() {
           <BusinessHoursCard
             error={businessHoursError}
             hours={businessHours}
+            loading={businessHoursQuery.isPending}
+            locations={locations}
+            selectedLocationId={hoursLocationId}
             saved={businessHoursSaved}
             onChange={(nextHours) => {
               setBusinessHours(nextHours)
               setBusinessHoursSaved(false)
             }}
+            onLocationChange={setHoursLocationId}
             onSave={saveBusinessHours}
           />
         </div>
@@ -1424,13 +1489,21 @@ function AssistantConfigCard({
 function BusinessHoursCard({
   error,
   hours,
+  loading,
+  locations,
+  selectedLocationId,
   onChange,
+  onLocationChange,
   onSave,
   saved,
 }: {
   error: string | null
   hours: BusinessHoursDay[]
+  loading: boolean
+  locations: BusinessLocationResponse[]
+  selectedLocationId: string
   onChange: (hours: BusinessHoursDay[]) => void
+  onLocationChange: (id: string) => void
   onSave: () => void
   saved: boolean
 }) {
@@ -1443,9 +1516,22 @@ function BusinessHoursCard({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-lg font-semibold text-slate-950">Horario de atención</p>
-          <p className="mt-1 text-sm leading-6 text-slate-600">Configura hora de inicio y término para cada día.</p>
+          <p className="mt-1 text-sm leading-6 text-slate-600">Configura hora de inicio y término para cada día según la sucursal.</p>
         </div>
         <StatusBadge label={saved ? 'Guardado' : 'Editable'} tone={saved ? 'success' : 'info'} />
+      </div>
+
+      <div className="mt-4">
+        <label className="block text-sm font-semibold text-slate-700 mb-1">Sucursal</label>
+        <select
+          className="h-11 w-full rounded-[14px] border border-[var(--color-border)] bg-white px-4 text-sm text-slate-700 outline-none focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+          onChange={(event) => onLocationChange(event.target.value)}
+          value={selectedLocationId}
+        >
+          {locations.map((loc) => (
+            <option key={loc.id} value={loc.id}>{loc.name}</option>
+          ))}
+        </select>
       </div>
 
       {error ? (
@@ -1454,39 +1540,43 @@ function BusinessHoursCard({
         </div>
       ) : null}
 
-      <div className="mt-4 grid gap-2">
-        <div className="hidden grid-cols-[1fr_150px_150px] gap-3 px-3 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 sm:grid">
-          <span>Día</span>
-          <span>Hora Inicio</span>
-          <span>Hora Término</span>
-        </div>
-        {hours.map((day, index) => (
-          <div className="grid gap-2 rounded-[18px] border border-[var(--color-border)] bg-white p-3 sm:grid-cols-[1fr_150px_150px] sm:items-center" key={day.day}>
-            <p className="text-sm font-semibold text-slate-950">{day.day}</p>
-            <label className="block">
-              <span className="mb-1 block text-xs font-semibold text-slate-500 sm:hidden">Hora Inicio</span>
-              <input
-                className="h-10 w-full rounded-[14px] border border-[var(--color-border)] px-3 text-sm outline-none focus:border-[var(--color-primary)]"
-                onChange={(event) => updateDay(index, 'startTime', event.target.value)}
-                type="time"
-                value={day.startTime}
-              />
-            </label>
-            <label className="block">
-              <span className="mb-1 block text-xs font-semibold text-slate-500 sm:hidden">Hora Término</span>
-              <input
-                className="h-10 w-full rounded-[14px] border border-[var(--color-border)] px-3 text-sm outline-none focus:border-[var(--color-primary)]"
-                onChange={(event) => updateDay(index, 'endTime', event.target.value)}
-                type="time"
-                value={day.endTime}
-              />
-            </label>
+      {loading ? (
+        <p className="mt-4 text-sm text-slate-500">Cargando horarios...</p>
+      ) : (
+        <div className="mt-4 grid gap-2">
+          <div className="hidden grid-cols-[1fr_150px_150px] gap-3 px-3 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 sm:grid">
+            <span>Día</span>
+            <span>Hora Inicio</span>
+            <span>Hora Término</span>
           </div>
-        ))}
-      </div>
+          {hours.map((day, index) => (
+            <div className="grid gap-2 rounded-[18px] border border-[var(--color-border)] bg-white p-3 sm:grid-cols-[1fr_150px_150px] sm:items-center" key={day.day}>
+              <p className="text-sm font-semibold text-slate-950">{day.day}</p>
+              <label className="block">
+                <span className="mb-1 block text-xs font-semibold text-slate-500 sm:hidden">Hora Inicio</span>
+                <input
+                  className="h-10 w-full rounded-[14px] border border-[var(--color-border)] px-3 text-sm outline-none focus:border-[var(--color-primary)]"
+                  onChange={(event) => updateDay(index, 'startTime', event.target.value)}
+                  type="time"
+                  value={day.startTime}
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-xs font-semibold text-slate-500 sm:hidden">Hora Término</span>
+                <input
+                  className="h-10 w-full rounded-[14px] border border-[var(--color-border)] px-3 text-sm outline-none focus:border-[var(--color-primary)]"
+                  onChange={(event) => updateDay(index, 'endTime', event.target.value)}
+                  type="time"
+                  value={day.endTime}
+                />
+              </label>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--color-border)] pt-4">
-        <p className="text-sm leading-6 text-slate-600">La persistencia real queda preparada para integrarse cuando exista punto de acceso en servidor.</p>
+        <p className="text-sm leading-6 text-slate-600">Estos horarios se usan en agenda completa, disponibilidad y reservas.</p>
         <Button onClick={onSave}>Guardar horario</Button>
       </div>
     </Card>

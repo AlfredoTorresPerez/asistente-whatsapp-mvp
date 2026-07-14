@@ -9,7 +9,10 @@ import com.asistentewhatsapp.agenda.api.AgendaCancelRequest;
 import com.asistentewhatsapp.agenda.api.AgendaFilterOptionsResponse;
 import com.asistentewhatsapp.agenda.api.AgendaRescheduleRequest;
 import com.asistentewhatsapp.agenda.api.AgendaSlotResponse;
+import com.asistentewhatsapp.agenda.api.BusinessHoursResponse;
 import com.asistentewhatsapp.agenda.api.CreateTemporaryAgendaBookingRequest;
+import com.asistentewhatsapp.agenda.api.SaveBusinessHoursRequest;
+import com.asistentewhatsapp.agenda.api.SaveProfessionalHoursRequest;
 import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository;
 import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository.LocationRecord;
 import org.slf4j.Logger;
@@ -259,6 +262,41 @@ public class CompleteDigitalAgendaService {
         BookingDetailResponse currentBooking = bookingJdbcRepository.findBookingDetail(businessId, bookingId);
         BookingStateMachine.assertTransition(currentBooking.status(), BookingStateMachine.CANCELLED_BY_CUSTOMER, "cancelarse");
         repository.cancelBookingByCustomer(businessId, bookingId, reason, "WHATSAPP");
+    }
+
+    @Transactional
+    public List<BusinessHoursResponse> saveBusinessHours(AuthenticatedUser user, SaveBusinessHoursRequest request) {
+        LocationRecord location = repository.findLocation(user.businessId(), request.locationId());
+        List<CompleteAgendaJdbcRepository.BusinessHoursRecord> records = request.hours().stream()
+                .map(h -> new CompleteAgendaJdbcRepository.BusinessHoursRecord(h.dayOfWeek(), h.startTime(), h.endTime()))
+                .toList();
+        repository.replaceBusinessHours(user.businessId(), location.id(), records);
+        List<CompleteAgendaJdbcRepository.BusinessHoursRecord> saved = repository.findAllBusinessHours(user.businessId(), location.id());
+        return saved.stream()
+                .map(r -> new BusinessHoursResponse(r.dayOfWeek(), r.startTime(), r.endTime()))
+                .toList();
+    }
+
+    @Transactional
+    public List<BusinessHoursResponse> saveProfessionalHours(AuthenticatedUser user, SaveProfessionalHoursRequest request) {
+        repository.findLocation(user.businessId(), request.locationId());
+        List<CompleteAgendaJdbcRepository.BusinessHoursRecord> records = request.hours().stream()
+                .map(h -> new CompleteAgendaJdbcRepository.BusinessHoursRecord(h.dayOfWeek(), h.startTime(), h.endTime()))
+                .toList();
+        repository.replaceProfessionalHours(user.businessId(), request.locationId(), request.professionalId(), records);
+        return List.of();
+    }
+
+    @Transactional(readOnly = true)
+    public List<BusinessHoursResponse> businessHours(AuthenticatedUser user, UUID locationId) {
+        if (locationId == null) {
+            UUID resolvedLocationId = repository.findUserDefaultLocation(user.businessId(), user.userId());
+            locationId = resolvedLocationId != null ? resolvedLocationId : repository.findFirstLocation(user.businessId());
+        }
+        List<CompleteAgendaJdbcRepository.BusinessHoursRecord> records = repository.findAllBusinessHours(user.businessId(), locationId);
+        return records.stream()
+                .map(r -> new BusinessHoursResponse(r.dayOfWeek(), r.startTime(), r.endTime()))
+                .toList();
     }
 
     @Transactional

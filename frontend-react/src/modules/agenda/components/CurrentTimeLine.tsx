@@ -1,14 +1,21 @@
 import { useEffect, useState } from 'react'
-import dayjs from 'dayjs'
-import { agendaTimeZone, baseHourHeight, scheduleEndHour, scheduleStartHour } from './agendaUtils'
+import { agendaTimeZone, baseHourHeight } from './agendaUtils'
 
 type CurrentTimeLineProps = {
   visibleDayKeys: string[]
   hourLayout: Record<number, { top: number; height: number; maxItems: number }>
   timeColumnWidth: number
+  scheduleStartHour: number
+  scheduleEndHour: number
 }
 
-export function CurrentTimeLine({ visibleDayKeys, hourLayout, timeColumnWidth }: CurrentTimeLineProps) {
+export function CurrentTimeLine({
+  visibleDayKeys,
+  hourLayout,
+  timeColumnWidth,
+  scheduleStartHour,
+  scheduleEndHour,
+}: CurrentTimeLineProps) {
   const [now, setNow] = useState(() => new Date())
 
   useEffect(() => {
@@ -61,14 +68,15 @@ export function CurrentTimeLine({ visibleDayKeys, hourLayout, timeColumnWidth }:
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute right-0 z-30"
-      style={{ left: timeColumnWidth, top: 0 }}
+      className="pointer-events-none absolute z-30"
+      style={{ left: 0, right: 0, top: 0 }}
     >
       <div
-        className="absolute left-0 right-0 border-t-2 border-dashed border-rose-400/80"
-        style={{ top }}
+        className="border-t-2 border-dashed border-rose-400/80"
+        style={{ position: 'absolute', top, left: `${timeColumnWidth + 4}px`, right: 0 }}
       >
-        <span className="absolute -left-20 -top-3 rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-bold text-rose-600 shadow-sm">
+        <span className="absolute -top-3 rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-bold text-rose-600 shadow-sm"
+          style={{ left: '4px' }}>
           Ahora {label}
         </span>
       </div>

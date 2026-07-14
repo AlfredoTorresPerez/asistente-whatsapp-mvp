@@ -11,6 +11,7 @@ import com.asistentewhatsapp.channels.application.ChannelDispatchService;
 import com.asistentewhatsapp.channels.infrastructure.whatsappweb.WhatsAppWebChannelJdbcRepository;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 class AiReplyOutboxProcessorTest {
 
@@ -21,16 +22,20 @@ class AiReplyOutboxProcessorTest {
         AestheticCenterService aestheticCenterService = mock(AestheticCenterService.class);
         AgentCoordinatorService agentCoordinatorService = mock(AgentCoordinatorService.class);
         ChannelDispatchService channelDispatchService = mock(ChannelDispatchService.class);
+        AiAgentProperties properties = new AiAgentProperties();
+        JdbcTemplate jdbcTemplate = mock(JdbcTemplate.class);
         AiReplyOutboxProcessor processor = new AiReplyOutboxProcessor(
                 outboxRepository,
                 channelRepository,
                 aestheticCenterService,
                 agentCoordinatorService,
                 channelDispatchService,
+                properties,
+                jdbcTemplate,
                 10,
-                120000,
-                30000,
-                900000);
+                120000L,
+                30000L,
+                900000L);
         when(outboxRepository.claimDueJobs(10, 120000)).thenReturn(List.of());
 
         processor.processDueJobs();

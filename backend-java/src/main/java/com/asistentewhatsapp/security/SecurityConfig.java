@@ -54,6 +54,20 @@ public class SecurityConfig {
 
     @Bean
     @Order(1)
+    SecurityFilterChain publicCustomerBookingsSecurityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .securityMatcher(new AntPathRequestMatcher("/api/v1/public/customer-bookings/**"))
+                .csrf(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
+                .cors(Customizer.withDefaults())
+                .build();
+    }
+
+    @Bean
+    @Order(2)
     SecurityFilterChain publicSecurityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .securityMatcher(SecurityPublicPaths.PUBLIC_ENDPOINTS)
@@ -67,7 +81,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Order(2)
+    @Order(3)
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)

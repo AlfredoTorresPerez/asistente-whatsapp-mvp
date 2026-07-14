@@ -4,12 +4,12 @@ import com.asistentewhatsapp.security.domain.AuthenticatedUser;
 import com.asistentewhatsapp.shared.exception.ApiException;
 import org.springframework.http.HttpStatus;
 
-final class AdminAccessGuard {
+public final class AdminAccessGuard {
 
     private AdminAccessGuard() {
     }
 
-    static void requireOwnerOrAdmin(AuthenticatedUser authenticatedUser) {
+    public static void requireOwnerOrAdmin(AuthenticatedUser authenticatedUser) {
         if (authenticatedUser == null || authenticatedUser.roles().stream().noneMatch(AdminAccessGuard::isAllowedRole)) {
             throw new ApiException(
                     HttpStatus.FORBIDDEN,
@@ -18,7 +18,7 @@ final class AdminAccessGuard {
         }
     }
 
-    static void requireOwnerAdminOrSupervisor(AuthenticatedUser authenticatedUser) {
+    public static void requireOwnerAdminOrSupervisor(AuthenticatedUser authenticatedUser) {
         if (authenticatedUser == null || authenticatedUser.roles().stream().noneMatch(AdminAccessGuard::isReadAllowedRole)) {
             throw new ApiException(
                     HttpStatus.FORBIDDEN,

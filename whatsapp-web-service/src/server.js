@@ -15,7 +15,7 @@ const sessionId = process.env.WHATSAPP_WEB_SESSION_ID ?? "demo-sales";
 const backendWebhookUrl = process.env.WHATSAPP_WEB_BACKEND_WEBHOOK_URL ?? "http://backend-java:8080/api/v1/integrations/whatsapp-web/webhook";
 const webhookSecret = process.env.WHATSAPP_WEB_WEBHOOK_SECRET ?? process.env.APP_WHATSAPP_WEB_WEBHOOK_SECRET ?? "dev-whatsapp-web-webhook-secret";
 const realWhatsAppWebEnabled = String(process.env.WHATSAPP_WEB_REAL_ENABLED ?? "true").toLowerCase() === "true";
-const autoConnectEnabled = String(process.env.WHATSAPP_WEB_AUTO_CONNECT ?? "false").toLowerCase() === "true";
+const autoConnectEnabled = String(process.env.WHATSAPP_WEB_AUTO_CONNECT ?? "true").toLowerCase() === "true";
 const companyPhoneNumber = normalizeOptionalPhone(
   process.env.WHATSAPP_WEB_COMPANY_PHONE_NUMBER
     ?? process.env.WHATSAPP_WEB_DEFAULT_PHONE_NUMBER
@@ -29,17 +29,53 @@ const defaultPhoneNumber = companyPhoneNumber;
 const sessionDataPath = process.env.WHATSAPP_WEB_SESSION_DATA_PATH ?? "/app/.wwebjs_auth";
 const cachePath = process.env.WHATSAPP_WEB_CACHE_PATH ?? "/app/.wwebjs_cache";
 const chromeExecutablePath = process.env.WHATSAPP_WEB_CHROME_EXECUTABLE ?? process.env.PUPPETEER_EXECUTABLE_PATH ?? undefined;
-const visualMode = String(process.env.WHATSAPP_WEB_VISUAL_MODE ?? "true").toLowerCase() === "true";
+const visualMode = String(process.env.WHATSAPP_WEB_VISUAL_MODE ?? "false").toLowerCase() === "true";
 const headlessMode = String(process.env.WHATSAPP_WEB_HEADLESS ?? (visualMode ? "false" : "true")).toLowerCase() === "true";
 const browserViewerUrl = process.env.WHATSAPP_WEB_BROWSER_VIEWER_URL ?? "http://localhost:6080/vnc.html?autoconnect=true&resize=scale";
 const cleanProfileLocksOnStart = String(process.env.WHATSAPP_WEB_CLEAN_PROFILE_LOCKS_ON_START ?? "true").toLowerCase() === "true";
 const killOrphanChromiumOnStart = String(process.env.WHATSAPP_WEB_KILL_ORPHAN_CHROMIUM_ON_START ?? "true").toLowerCase() === "true";
 const webVersionCacheMode = String(process.env.WHATSAPP_WEB_WEB_VERSION_CACHE ?? "none").toLowerCase();
-const chromiumInitRetries = Math.max(1, Number(process.env.WHATSAPP_WEB_INIT_RETRIES ?? 3));
-const chromiumInitRetryDelayMs = Math.max(500, Number(process.env.WHATSAPP_WEB_INIT_RETRY_DELAY_MS ?? 5000));
+const chromiumInitRetries = Math.max(1, Number(process.env.WHATSAPP_WEB_INIT_RETRIES ?? 5));
+const chromiumInitRetryDelayMs = Math.max(500, Number(process.env.WHATSAPP_WEB_INIT_RETRY_DELAY_MS ?? 10000));
 const puppeteerProtocolTimeoutMs = Math.max(30000, Number(process.env.WHATSAPP_WEB_PUPPETEER_PROTOCOL_TIMEOUT_MS ?? 180000));
 const puppeteerTimeoutMs = Math.max(30000, Number(process.env.WHATSAPP_WEB_PUPPETEER_TIMEOUT_MS ?? 180000));
 const chromeExtraArgs = parseList(process.env.WHATSAPP_WEB_CHROME_EXTRA_ARGS ?? "");
+const runtimeRecoveryDelayMs = Math.max(1000, Number(process.env.WHATSAPP_WEB_RUNTIME_RECOVERY_DELAY_MS ?? 5000));
+
+const LOG_LEVEL = process.env.LOG_LEVEL ?? "info";
+const LOG_JSON = String(process.env.LOG_JSON ?? "true").toLowerCase() === "true";
+
+function generateCorrelationId() {
+  return crypto.randomUUID();
+}
+
+function log(level, message, meta = {}) {
+  if (shouldLog(level)) {
+    const entry = {
+      timestamp: new Date().toISOString(),
+      level,
+      service: "whatsapp-web-service",
+      correlationId: meta.correlationId ?? "-",
+      message,
+      ...meta,
+    };
+    if (LOG_JSON) {
+      console.log(JSON.stringify(entry));
+    } else {
+      console.log(`[${entry.timestamp}] [${level}] [${entry.correlationId}] ${message}`, meta);
+    }
+  }
+}
+
+function shouldLog(level) {
+  const levels = { debug: 0, info: 1, warn: 2, error: 3 };
+  return levels[level] >= levels[LOG_LEVEL];
+}
+
+function logDebug(message, meta) { log("debug", message, meta); }
+function logInfo(message, meta) { log("info", message, meta); }
+function logWarn(message, meta) { log("warn", message, meta); }
+function logError(message, meta) { log("error", message, meta); }
 
 
 const state = {
@@ -63,7 +99,6 @@ let manualDisconnect = false;
 const adapterSentMessageIds = new Map();
 const adapterSentMessageRetentionMs = Math.max(30000, Number(process.env.WHATSAPP_WEB_ADAPTER_SENT_ID_RETENTION_MS ?? 300000));
 const outboundExternalEmitDelayMs = Math.max(0, Number(process.env.WHATSAPP_WEB_OUTBOUND_EXTERNAL_EMIT_DELAY_MS ?? 1500));
-const runtimeRecoveryDelayMs = Math.max(1000, Number(process.env.WHATSAPP_WEB_RUNTIME_RECOVERY_DELAY_MS ?? 5000));
 let runtimeRecoveryTimer = null;
 
 process.on("unhandledRejection", (reason) => {
@@ -97,6 +132,15 @@ function touch(eventStatus = null) {
   if (eventStatus) {
     state.connectionStatus = eventStatus;
   }
+}
+
+function isClientHealthy() {
+  if (!clientInstance) return false;
+  if (!state.runtimeReady) return false;
+  if (state.connectionStatus !== "CONNECTED") return false;
+  const info = clientInstance.info;
+  if (!info || !info.wid) return false;
+  return true;
 }
 
 function errorMessage(error) {
@@ -1106,8 +1150,10 @@ app.get("/", (_request, response) => {
 });
 
 app.get("/health", (_request, response) => {
-  response.json({
-    status: "UP",
+  const healthy = realWhatsAppWebEnabled ? isClientHealthy() : true;
+  const statusCode = healthy ? 200 : 503;
+  response.status(statusCode).json({
+    status: healthy ? "UP" : "DOWN",
     service: "whatsapp-webjs-service",
     compatibilityServiceName: "whatsapp-web-service",
     mode: state.adapterMode,
@@ -1115,6 +1161,8 @@ app.get("/health", (_request, response) => {
     browserViewerUrl: state.browserViewerUrl,
     connectionStatus: state.connectionStatus,
     runtimeReady: state.runtimeReady,
+    clientHealthy: healthy,
+    lastError: state.lastError,
     timestamp: new Date().toISOString(),
   });
 });
@@ -1233,12 +1281,31 @@ if (autoConnectEnabled) {
   startClientInBackground();
 }
 
-app.listen(port, "0.0.0.0", () => {
-  console.log(`whatsapp-webjs-service ${state.adapterMode} listening on 0.0.0.0:${port}`);
-  console.log(`[health] GET http://0.0.0.0:${port}/health responded with UP`);
-  console.log(`[config] visualMode=${visualMode} headlessMode=${headlessMode} autoConnect=${autoConnectEnabled} realEnabled=${realWhatsAppWebEnabled}`);
+const server = app.listen(port, "0.0.0.0", () => {
+  logInfo(`whatsapp-webjs-service ${state.adapterMode} listening on 0.0.0.0:${port}`);
+  logInfo(`[health] GET http://0.0.0.0:${port}/health`);
+  logInfo(`[config] visualMode=${visualMode} headlessMode=${headlessMode} autoConnect=${autoConnectEnabled} realEnabled=${realWhatsAppWebEnabled}`);
   if (state.browserViewerUrl) {
-    console.log(`[visual] browser viewer at ${state.browserViewerUrl}`);
+    logInfo(`[visual] browser viewer at ${state.browserViewerUrl}`);
   }
-  console.log(`[paths] sessionData=${sessionDataPath} cache=${cachePath} chrome=${chromeExecutablePath}`);
+  logInfo(`[paths] sessionData=${sessionDataPath} cache=${cachePath} chrome=${chromeExecutablePath}`);
 });
+
+async function gracefulShutdown(signal) {
+  logInfo(`Received ${signal}, starting graceful shutdown`);
+  manualDisconnect = true;
+  if (runtimeRecoveryTimer) {
+    clearTimeout(runtimeRecoveryTimer);
+    runtimeRecoveryTimer = null;
+  }
+  server.close(() => {
+    logInfo("HTTP server closed");
+  });
+  const pendingClient = clientInstance ?? (clientPromise ? await clientPromise.catch(() => null) : null);
+  await destroyClientSafely(pendingClient);
+  logInfo("WhatsApp client destroyed");
+  process.exit(0);
+}
+
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));

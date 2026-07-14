@@ -158,7 +158,8 @@ class ConversationServiceDispatchConsistencyTest {
                 "Admin",
                 "ana@example.com",
                 "America/Santiago",
-                List.of("ADMIN"));
+                List.of("ADMIN"),
+                List.of());
     }
 
     private ConversationJdbcRepository.ConversationContextRecord context(UUID conversationId) {

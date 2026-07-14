@@ -3,6 +3,7 @@ package com.asistentewhatsapp.bookings.infrastructure;
 import com.asistentewhatsapp.shared.exception.ResourceNotFoundException;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

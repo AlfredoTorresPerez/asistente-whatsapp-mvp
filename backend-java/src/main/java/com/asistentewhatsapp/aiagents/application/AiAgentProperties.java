@@ -31,6 +31,16 @@ public class AiAgentProperties {
 
     private double defaultConfidence = 0.78;
 
+    private long outboxWorkerIntervalMs = 5000;
+
+    private long outboxBatchSize = 10;
+
+    private long outboxProcessingTimeoutMs = 120000;
+
+    private long outboxRetryBaseDelayMs = 30000;
+
+    private long outboxRetryMaxDelayMs = 900000;
+
     public boolean enabled() {
         return enabled;
     }
@@ -69,5 +79,45 @@ public class AiAgentProperties {
 
     public void setDefaultConfidence(double defaultConfidence) {
         this.defaultConfidence = defaultConfidence;
+    }
+
+    public long getOutboxWorkerIntervalMs() {
+        return outboxWorkerIntervalMs;
+    }
+
+    public void setOutboxWorkerIntervalMs(long outboxWorkerIntervalMs) {
+        this.outboxWorkerIntervalMs = outboxWorkerIntervalMs;
+    }
+
+    public long getOutboxBatchSize() {
+        return outboxBatchSize;
+    }
+
+    public void setOutboxBatchSize(long outboxBatchSize) {
+        this.outboxBatchSize = outboxBatchSize;
+    }
+
+    public long getOutboxProcessingTimeoutMs() {
+        return outboxProcessingTimeoutMs;
+    }
+
+    public void setOutboxProcessingTimeoutMs(long outboxProcessingTimeoutMs) {
+        this.outboxProcessingTimeoutMs = outboxProcessingTimeoutMs;
+    }
+
+    public long getOutboxRetryBaseDelayMs() {
+        return outboxRetryBaseDelayMs;
+    }
+
+    public void setOutboxRetryBaseDelayMs(long outboxRetryBaseDelayMs) {
+        this.outboxRetryBaseDelayMs = outboxRetryBaseDelayMs;
+    }
+
+    public long getOutboxRetryMaxDelayMs() {
+        return outboxRetryMaxDelayMs;
+    }
+
+    public void setOutboxRetryMaxDelayMs(long outboxRetryMaxDelayMs) {
+        this.outboxRetryMaxDelayMs = outboxRetryMaxDelayMs;
     }
 }

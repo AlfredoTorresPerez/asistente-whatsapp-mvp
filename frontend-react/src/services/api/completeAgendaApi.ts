@@ -9,7 +9,10 @@ import type {
   AgendaFilterOptionsResponse,
   AgendaRescheduleRequest,
   BookingDetailResponse,
+  BusinessHoursResponse,
   CreateTemporaryAgendaBookingRequest,
+  SaveBusinessHoursRequest,
+  SaveProfessionalHoursRequest,
 } from './types'
 
 function toSearchParams(filters: Record<string, string | undefined | null>) {
@@ -28,6 +31,11 @@ export function getAgendaAvailabilityRequest(payload: AgendaAvailabilityRequest)
     method: 'POST',
     body: JSON.stringify(payload),
   })
+}
+
+export function getBusinessHoursRequest(locationId?: string) {
+  const params = locationId ? `?locationId=${locationId}` : ''
+  return apiFetch<BusinessHoursResponse[]>(`/agenda/business-hours${params}`)
 }
 
 export function createTemporaryAgendaBookingRequest(payload: CreateTemporaryAgendaBookingRequest) {
@@ -71,6 +79,20 @@ export function cancelAgendaBookingRequest(bookingId: string, payload: AgendaCan
 export function createAgendaBlockRequest(payload: AgendaBlockRequest) {
   return apiFetch<AgendaBlockResponse>('/agenda/blocks', {
     method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
+export function saveBusinessHoursRequest(payload: SaveBusinessHoursRequest) {
+  return apiFetch<BusinessHoursResponse[]>('/agenda/business-hours', {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  })
+}
+
+export function saveProfessionalHoursRequest(payload: SaveProfessionalHoursRequest) {
+  return apiFetch<BusinessHoursResponse[]>('/agenda/professional-hours', {
+    method: 'PUT',
     body: JSON.stringify(payload),
   })
 }

@@ -3,6 +3,7 @@ package com.asistentewhatsapp.bookings.infrastructure;
 import com.asistentewhatsapp.shared.exception.ResourceNotFoundException;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -68,6 +69,9 @@ public class BookingActionLinkJdbcRepository {
             String createdByChannel) {
         UUID id = UUID.randomUUID();
         jdbcTemplate.update(
+                "update booking_reschedule_link set status = 'EXPIRED', expires_at = now() where business_id = :businessId and booking_id = :bookingId",
+                Map.of("businessId", businessId, "bookingId", bookingId));
+        jdbcTemplate.update(
                 """
                         insert into booking_reschedule_link (
                             id, business_id, booking_id, token_hash, reschedule_url, proposed_starts_at,
@@ -99,6 +103,9 @@ public class BookingActionLinkJdbcRepository {
     public UUID insertCancellationLink(UUID businessId, UUID bookingId, String tokenHash, String publicUrl,
             OffsetDateTime expiresAt, String reason, UUID actorUserId, String createdByChannel) {
         UUID id = UUID.randomUUID();
+        jdbcTemplate.update(
+                "update booking_cancellation_link set status = 'EXPIRED', expires_at = now() where business_id = :businessId and booking_id = :bookingId",
+                Map.of("businessId", businessId, "bookingId", bookingId));
         jdbcTemplate.update(
                 """
                         insert into booking_cancellation_link (

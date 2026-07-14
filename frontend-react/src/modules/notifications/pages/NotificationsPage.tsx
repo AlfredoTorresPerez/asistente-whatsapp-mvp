@@ -39,6 +39,23 @@ const defaultFilters: NotificationsFiltersValues = {
   type: '',
 }
 
+const NOTIFICATION_TYPE_LABELS: Record<string, string> = {
+  NEW_MESSAGE: 'Nuevo mensaje',
+}
+
+const NOTIFICATION_STATUS_LABELS: Record<string, string> = {
+  UNREAD: 'No leída',
+  READ: 'Leída',
+}
+
+function formatNotificationType(type: string) {
+  return NOTIFICATION_TYPE_LABELS[type] ?? type
+}
+
+function formatNotificationStatus(status: string) {
+  return NOTIFICATION_STATUS_LABELS[status] ?? status
+}
+
 function getStatusTone(status: string) {
   switch (status) {
     case 'UNREAD':
@@ -352,11 +369,11 @@ export function NotificationsPage() {
                         </button>
                       </td>
                       <td className="border-b border-[var(--color-border)] px-5 py-4">
-                        <StatusBadge label={notification.type} tone="info" />
+                        <StatusBadge label={formatNotificationType(notification.type)} tone="info" />
                       </td>
                       <td className="border-b border-[var(--color-border)] px-5 py-4">
                         <StatusBadge
-                          label={notification.status}
+                          label={formatNotificationStatus(notification.status)}
                           tone={getStatusTone(notification.status)}
                         />
                       </td>

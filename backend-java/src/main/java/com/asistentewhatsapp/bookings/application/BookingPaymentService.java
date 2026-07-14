@@ -284,7 +284,7 @@ public class BookingPaymentService {
                 result.payment().status(),
                 result.bookingStatus(),
                 result.duplicate(),
-                "APPROVED".equals(resolvedStatus));
+                BookingStateMachine.CONFIRMED.equals(result.bookingStatus()));
     }
 
     private IntegratePaymentResult integratePayment(

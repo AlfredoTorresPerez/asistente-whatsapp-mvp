@@ -12,6 +12,7 @@ import com.asistentewhatsapp.bookings.api.CreateBookingRequest;
 import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository;
 import com.asistentewhatsapp.bookings.infrastructure.BookingJdbcRepository;
 import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository;
+import com.asistentewhatsapp.bookings.application.AvailabilityService;
 import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository;
 import com.asistentewhatsapp.security.domain.AuthenticatedUser;
 import com.asistentewhatsapp.shared.exception.ApiException;
@@ -28,7 +29,7 @@ class BookingServiceTest {
     private static final UUID BUSINESS_ID = UUID.randomUUID();
     private static final AuthenticatedUser USER = new AuthenticatedUser(
             UUID.randomUUID(), BUSINESS_ID, "Negocio", "Admin",
-            "Test", "admin@test.com", "America/Santiago", List.of("ADMIN"));
+            "Test", "admin@test.com", "America/Santiago", List.of("ADMIN"), List.of());
 
     private BookingJdbcRepository bookingJdbcRepository;
     private BusinessLocationJdbcRepository businessLocationJdbcRepository;
@@ -47,7 +48,8 @@ class BookingServiceTest {
 
         bookingService = new BookingService(
                 bookingJdbcRepository, businessLocationJdbcRepository,
-                bookingConfirmationJdbcRepository, agendaRepository);
+                bookingConfirmationJdbcRepository, agendaRepository,
+                mock(AvailabilityService.class));
     }
 
     @Test

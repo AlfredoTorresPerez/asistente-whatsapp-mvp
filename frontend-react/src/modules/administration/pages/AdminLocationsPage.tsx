@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ApiClientError } from '../../../services/api/httpClient'
 import { ErrorState } from '../../../components/feedback/ErrorState'
@@ -16,7 +16,8 @@ import {
   getBusinessLocationsRequest,
   updateBusinessLocationRequest,
 } from '../../../services/api/businessLocationsApi'
-import type { BusinessLocationResponse, UpsertBusinessLocationRequest } from '../../../services/api/types'
+import { getBusinessHoursRequest, saveBusinessHoursRequest } from '../../../services/api/completeAgendaApi'
+import type { BusinessHoursResponse, BusinessLocationResponse, UpsertBusinessLocationRequest } from '../../../services/api/types'
 
 type FormState = {
   id: string | null
@@ -33,6 +34,27 @@ type FormState = {
 type FormErrors = Partial<Record<keyof FormState, string>> & {
   general?: string
 }
+
+const DAY_LABELS: Record<number, string> = {
+  1: 'Lunes',
+  2: 'Martes',
+  3: 'Miércoles',
+  4: 'Jueves',
+  5: 'Viernes',
+  6: 'Sábado',
+  7: 'Domingo',
+}
+
+const emptyHourEntry = { dayOfWeek: 1, startTime: '09:00', endTime: '18:00' }
+const defaultHours: { dayOfWeek: number; startTime: string; endTime: string }[] = [
+  { dayOfWeek: 1, startTime: '09:00', endTime: '18:00' },
+  { dayOfWeek: 2, startTime: '09:00', endTime: '18:00' },
+  { dayOfWeek: 3, startTime: '09:00', endTime: '18:00' },
+  { dayOfWeek: 4, startTime: '09:00', endTime: '18:00' },
+  { dayOfWeek: 5, startTime: '09:00', endTime: '18:00' },
+  { dayOfWeek: 6, startTime: '09:00', endTime: '13:00' },
+  { dayOfWeek: 7, startTime: '', endTime: '' },
+]
 
 const emptyForm: FormState = {
   id: null,
@@ -54,6 +76,8 @@ export function AdminLocationsPage() {
   const [formErrors, setFormErrors] = useState<FormErrors>({})
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ALL')
+  const [businessHours, setBusinessHours] = useState<{ dayOfWeek: number; startTime: string; endTime: string }[]>(defaultHours)
+  const [businessHoursSaved, setBusinessHoursSaved] = useState(false)
 
   const locationsQuery = useQuery({
     queryKey: ['business-locations', 'admin'],
@@ -160,6 +184,48 @@ export function AdminLocationsPage() {
       })
     },
   })
+
+  const businessHoursQuery = useQuery({
+    queryKey: ['agenda-business-hours', form.id],
+    queryFn: () => getBusinessHoursRequest(form.id!),
+    enabled: !!form.id,
+  })
+
+  const saveHoursMutation = useMutation({
+    mutationFn: async () => {
+      if (!form.id) throw new Error('Selecciona una sucursal primero.')
+      const activeHours = businessHours.filter((h) => h.startTime && h.endTime)
+      return saveBusinessHoursRequest({ locationId: form.id, hours: activeHours })
+    },
+    onSuccess: () => {
+      showToast({ title: 'Horarios guardados', description: 'Los horarios de atención se actualizaron correctamente.', tone: 'success' })
+      setBusinessHoursSaved(true)
+    },
+    onError: (error) => {
+      showToast({ title: 'No se pudieron guardar los horarios', description: error instanceof Error ? error.message : 'Intenta nuevamente.', tone: 'error' })
+    },
+  })
+
+  useEffect(() => {
+    if (businessHoursQuery.data) {
+      const serverHours = businessHoursQuery.data.map((h: BusinessHoursResponse) => ({
+        dayOfWeek: h.dayOfWeek,
+        startTime: h.startTime.slice(0, 5),
+        endTime: h.endTime.slice(0, 5),
+      }))
+      if (serverHours.length > 0) {
+        setBusinessHours(serverHours)
+        setBusinessHoursSaved(true)
+      }
+    }
+  }, [businessHoursQuery.data])
+
+  useEffect(() => {
+    if (!form.id) {
+      setBusinessHours(defaultHours)
+      setBusinessHoursSaved(false)
+    }
+  }, [form.id])
 
   const updateField = (field: keyof FormState, value: string) => {
     setForm((current) => {
@@ -444,6 +510,83 @@ export function AdminLocationsPage() {
               </div>
             </form>
           </Card>
+
+          {form.id ? (
+            <Card className="space-y-5">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Horarios de atención</p>
+                <h2 className="mt-2 text-xl font-semibold text-slate-950">
+                  Horarios de {form.name}
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Configura el horario de atención para cada día de la semana. Estos horarios se usan en agenda, disponibilidad y reservas.
+                </p>
+              </div>
+
+              {businessHoursQuery.isPending ? (
+                <p className="text-sm text-slate-500">Cargando horarios...</p>
+              ) : null}
+
+              <div className="grid gap-2">
+                <div className="hidden grid-cols-[1fr_150px_150px_48px] gap-3 px-3 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 sm:grid">
+                  <span>Día</span>
+                  <span>Hora Inicio</span>
+                  <span>Hora Término</span>
+                  <span></span>
+                </div>
+                {businessHours.map((entry, index) => (
+                  <div className="grid gap-2 rounded-[18px] border border-[var(--color-border)] bg-white p-3 sm:grid-cols-[1fr_150px_150px_48px] sm:items-center" key={entry.dayOfWeek}>
+                    <p className="text-sm font-semibold text-slate-950">{DAY_LABELS[entry.dayOfWeek]}</p>
+                    <label className="block">
+                      <span className="mb-1 block text-xs font-semibold text-slate-500 sm:hidden">Hora Inicio</span>
+                      <input
+                        className="h-10 w-full rounded-[14px] border border-[var(--color-border)] px-3 text-sm outline-none focus:border-[var(--color-primary)]"
+                        onChange={(event) => {
+                          setBusinessHours((prev) => prev.map((h, i) => i === index ? { ...h, startTime: event.target.value } : h))
+                          setBusinessHoursSaved(false)
+                        }}
+                        type="time"
+                        value={entry.startTime}
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="mb-1 block text-xs font-semibold text-slate-500 sm:hidden">Hora Término</span>
+                      <input
+                        className="h-10 w-full rounded-[14px] border border-[var(--color-border)] px-3 text-sm outline-none focus:border-[var(--color-primary)]"
+                        onChange={(event) => {
+                          setBusinessHours((prev) => prev.map((h, i) => i === index ? { ...h, endTime: event.target.value } : h))
+                          setBusinessHoursSaved(false)
+                        }}
+                        type="time"
+                        value={entry.endTime}
+                      />
+                    </label>
+                    <div className="flex items-center justify-end">
+                      {entry.startTime && entry.endTime ? (
+                        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50 text-xs text-emerald-600" title="Activo">
+                          ✓
+                        </span>
+                      ) : (
+                        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-xs text-slate-400" title="Sin atención">
+                          —
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--color-border)] pt-4">
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <StatusBadge label={businessHoursSaved ? 'Guardado' : 'Sin guardar'} tone={businessHoursSaved ? 'success' : 'info'} />
+                  <span>Estos horarios se reflejan en agenda completa, disponibilidad y reservas.</span>
+                </div>
+                <Button loading={saveHoursMutation.isPending} onClick={() => saveHoursMutation.mutate()}>
+                  Guardar horarios
+                </Button>
+              </div>
+            </Card>
+          ) : null}
         </>
       ) : null}
     </section>

@@ -104,7 +104,7 @@ class AiExcelMatrixOrchestratorCoverageTest {
 
         AgentRoutingResult first = harness.preview("Quiero agendar manana a las 16:00 horas", conversationId).orElseThrow();
         assertThat(first.agentType()).isEqualTo(AgentType.BOOKING);
-        assertThat(first.missingData()).contains("motivo_o_servicio");
+        assertThat(first.missingData()).isEmpty();
 
         AgentRoutingResult second = harness.preview("depilacion bozo", conversationId).orElseThrow();
         assertThat(second.agentType()).isEqualTo(AgentType.BOOKING);
@@ -324,7 +324,7 @@ class AiExcelMatrixOrchestratorCoverageTest {
             this.registry = new AgentRegistry(List.of(
                     new ReceptionAgent(),
                     new SalesAgent(knowledge),
-                    new BookingAgent(knowledge, locationRepository, transactional),
+                    new BookingAgent(knowledge, transactional),
                     new PaymentsAgent(knowledge),
                     new SupportAgent(locationRepository),
                     new KnowledgeAgent(),
@@ -426,6 +426,13 @@ class AiExcelMatrixOrchestratorCoverageTest {
                                 "https://matrix-test.trycloudflare.com/reservas/confirmar/TOKEN-DE-PRUEBA",
                                 720));
                     });
+            Mockito.when(service.generateBookingLink(
+                            Mockito.any(),
+                            Mockito.any(),
+                            Mockito.any(),
+                            Mockito.any()))
+                    .thenReturn(new TransactionalAgendaBookingService.BookingLinkResult(
+                            "https://matrix-test.trycloudflare.com/reservas/confirmar/TOKEN-DE-PRUEBA", true));
             return service;
         }
 

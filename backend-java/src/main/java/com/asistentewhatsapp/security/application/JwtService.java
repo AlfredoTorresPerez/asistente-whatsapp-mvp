@@ -37,6 +37,7 @@ public class JwtService {
                 .claim("email", authenticatedUser.email())
                 .claim("timezone", authenticatedUser.timezone())
                 .claim("roles", authenticatedUser.roles())
+                .claim("permissions", authenticatedUser.permissions())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiresAt))
                 .signWith(secretKey)
@@ -50,6 +51,7 @@ public class JwtService {
                 .parseSignedClaims(token)
                 .getPayload();
         List<String> roles = claims.get("roles", List.class);
+        List<String> permissions = claims.get("permissions", List.class);
         return new AuthenticatedUser(
                 UUID.fromString(claims.getSubject()),
                 UUID.fromString(claims.get("businessId", String.class)),
@@ -58,7 +60,8 @@ public class JwtService {
                 claims.get("lastName", String.class),
                 claims.get("email", String.class),
                 claims.get("timezone", String.class),
-                roles == null ? List.of() : roles);
+                roles == null ? List.of() : roles,
+                permissions == null ? List.of() : permissions);
     }
 
     public long getAccessTokenExpiresInSeconds() {

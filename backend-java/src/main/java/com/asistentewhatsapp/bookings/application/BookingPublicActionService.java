@@ -245,6 +245,7 @@ public class BookingPublicActionService {
     public AgendaAvailabilityResponse getRescheduleAvailability(String rawToken, UUID bookingId,
             UUID serviceId, UUID locationId, LocalDate date) {
         RescheduleLinkRecord link = resolveActiveRescheduleLink(rawToken);
+        validateBookingIdMatchesLink(link, bookingId);
         CustomerBookingItemResponse booking = activeBookingForToken(link, bookingId);
         if (BookingStateMachine.isClosed(booking.status())) {
             throw new ApiException(HttpStatus.CONFLICT, "BOOKING_ALREADY_CLOSED",
@@ -256,6 +257,7 @@ public class BookingPublicActionService {
     @Transactional
     public CustomerBookingItemResponse rescheduleBooking(String rawToken, UUID bookingId, PublicBookingRescheduleRequest request) {
         RescheduleLinkRecord link = resolveActiveRescheduleLink(rawToken);
+        validateBookingIdMatchesLink(link, bookingId);
 
         CustomerBookingItemResponse booking = activeBookingForToken(link, bookingId);
 
@@ -485,6 +487,13 @@ public class BookingPublicActionService {
                     "El enlace de reprogramacion ya fue usado o invalidado.", Map.of("status", link.linkStatus()));
         }
         return link;
+    }
+
+    private void validateBookingIdMatchesLink(RescheduleLinkRecord link, UUID bookingId) {
+        if (!link.bookingId().equals(bookingId)) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "BOOKING_ID_MISMATCH",
+                    "El ID de la reserva no coincide con el enlace de reprogramacion.", Map.of("bookingId", "No autorizado"));
+        }
     }
 
     private CustomerBookingItemResponse activeBookingForToken(RescheduleLinkRecord link, UUID bookingId) {

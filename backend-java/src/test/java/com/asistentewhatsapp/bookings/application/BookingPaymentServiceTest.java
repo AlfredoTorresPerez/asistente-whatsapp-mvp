@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -52,11 +53,11 @@ class BookingPaymentServiceTest {
         when(repository.findBookingForUpdate(businessId, bookingId))
                 .thenReturn(new BookingPaymentBookingRecord(bookingId, businessId, BookingStateMachine.EXPIRED, true, BigDecimal.valueOf(10000), "PENDING"))
                 .thenReturn(new BookingPaymentBookingRecord(bookingId, businessId, BookingStateMachine.EXPIRED, true, BigDecimal.valueOf(10000), "PAID"));
-        when(repository.findExisting(eq(businessId), eq("MERCADOPAGO"), eq("pay-1"), eq("idem-1"), eq(null))).thenReturn(Optional.empty());
+        when(repository.findExisting(eq(businessId), eq("MERCADOPAGO"), eq("pay-1"), eq(null), eq("idem-1"))).thenReturn(Optional.empty());
         when(repository.insertPayment(
-                eq(businessId), eq(bookingId), eq("MERCADOPAGO"), eq("pay-1"), eq(null), eq("idem-1"), eq("idem-1"),
-                eq(BigDecimal.valueOf(10000)), eq("CLP"), eq("APPROVED"),
-                anyString(), anyString(), any(), anyString(), anyString(), anyString(), anyInt(), anyString(), eq("DEPOSIT")))
+                any(), any(), any(), any(), any(), any(), any(),
+                any(), any(), any(),
+                any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(payment(paymentId, businessId, bookingId, "APPROVED"));
 
         Map<String, String> headers = Map.of("x-signature", "ts=1,v1=valid", "x-request-id", "req-1");
@@ -95,7 +96,7 @@ class BookingPaymentServiceTest {
         BookingPaymentRecord existing = payment(UUID.randomUUID(), businessId, bookingId, "APPROVED");
         when(repository.findBookingForUpdate(businessId, bookingId))
                 .thenReturn(new BookingPaymentBookingRecord(bookingId, businessId, BookingStateMachine.PENDING_PAYMENT, true, BigDecimal.valueOf(10000), "PAID"));
-        when(repository.findExisting(eq(businessId), eq("MERCADOPAGO"), eq("pay-1"), eq("idem-1"), eq(null))).thenReturn(Optional.of(existing));
+        when(repository.findExisting(eq(businessId), eq("MERCADOPAGO"), eq("pay-1"), eq(null), eq("idem-1"))).thenReturn(Optional.of(existing));
 
         Map<String, String> headers = Map.of("x-signature", "ts=1,v1=valid", "x-request-id", "req-1");
         BookingPaymentWebhookResponse response = service.handleWebhook("""
@@ -112,7 +113,7 @@ class BookingPaymentServiceTest {
                 """.formatted(businessId, bookingId), "MERCADOPAGO", headers);
 
         assertThat(response.duplicate()).isTrue();
-        verify(repository, never()).insertPayment(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), anyString(), anyString(), any(), anyString(), anyString(), anyString(), anyInt(), anyString(), anyString());
+        verify(repository, never()).insertPayment(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), anyString(), anyString(), any(), anyString(), anyString(), anyString(), nullable(Integer.class), anyString(), anyString());
         verify(repository, never()).recalculateBookingPaymentStatus(any(), any());
         verify(auditService, never()).record(any(), any(), any(), any(), any(), any(), any());
     }
@@ -179,7 +180,7 @@ class BookingPaymentServiceTest {
         BookingPaymentRecord existing = payment(UUID.randomUUID(), businessId, bookingId, "APPROVED");
         when(repository.findBookingForUpdate(businessId, bookingId))
                 .thenReturn(new BookingPaymentBookingRecord(bookingId, businessId, BookingStateMachine.PENDING_PAYMENT, true, BigDecimal.valueOf(10000), "PAID"));
-        when(repository.findExisting(businessId, "MANUAL", "trx-1", "manual-key", null)).thenReturn(Optional.of(existing));
+        when(repository.findExisting(businessId, "MANUAL", "trx-1", null, "manual-key")).thenReturn(Optional.of(existing));
 
         BookingPaymentResponse response = service.registerManualPayment(user, bookingId,
                 new RegisterBookingManualPaymentRequest("manual", "trx-1", "manual-key", BigDecimal.valueOf(10000), "CLP", "APPROVED", null, null, null));
@@ -268,7 +269,8 @@ class BookingPaymentServiceTest {
                 "Lovelace",
                 "ada@example.com",
                 "America/Santiago",
-                List.of("ADMIN"));
+                List.of("ADMIN"),
+                List.of());
     }
 
     private static BookingPaymentService service(

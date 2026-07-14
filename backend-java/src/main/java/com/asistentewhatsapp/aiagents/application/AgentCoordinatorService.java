@@ -66,12 +66,16 @@ public class AgentCoordinatorService {
                         + " confidence=" + intent.confidence()
                         + " urgency=" + intent.urgency()
                         + " reason=" + intent.handoffReason());
+        AiTraceLogger.debug("INTENT_DETECTED_DEBUG", traceId, request.conversationId(), null, "AgentCoordinatorService",
+                "fullIntent=" + intent.toString());
         Map<String, String> entities = mergeEntities(previousContext, entityExtractionService.extract(request));
         enrichTurnContext(entities, request);
         entities.put("trace_id", traceId);
         resolveNumericBookingOption(previousContext, request.messageBody(), entities, traceId, request.conversationId());
         AiTraceLogger.info("ENTITIES_MERGED", traceId, request.conversationId(), null, "AgentCoordinatorService",
                 "entities=" + AiTraceLogger.summarizeMap(entities));
+        AiTraceLogger.debug("ENTITIES_DEBUG", traceId, request.conversationId(), null, "AgentCoordinatorService",
+                "extractedEntities=" + AiTraceLogger.summarizeMap(entityExtractionService.extract(request)));
         IntentDetectionResult resolvedIntent = resolveContextAwareIntent(intent, previousContext, entities);
         if (resolvedIntent != intent) {
             AiTraceLogger.info("INTENT_CONTEXT_RESOLVED", traceId, request.conversationId(), null, "AgentCoordinatorService",
@@ -129,12 +133,16 @@ public class AgentCoordinatorService {
                         + " confidence=" + intent.confidence()
                         + " urgency=" + intent.urgency()
                         + " reason=" + intent.handoffReason());
+        AiTraceLogger.debug("INTENT_DETECTED_DEBUG", traceId, request.conversationId(), null, "AgentCoordinatorService",
+                "fullIntent=" + intent.toString());
         Map<String, String> entities = mergeEntities(previousContext, entityExtractionService.extract(request));
         enrichTurnContext(entities, request);
         entities.put("trace_id", traceId);
         resolveNumericBookingOption(previousContext, request.messageBody(), entities, traceId, request.conversationId());
         AiTraceLogger.info("ENTITIES_MERGED", traceId, request.conversationId(), null, "AgentCoordinatorService",
                 "entities=" + AiTraceLogger.summarizeMap(entities));
+        AiTraceLogger.debug("ENTITIES_DEBUG", traceId, request.conversationId(), null, "AgentCoordinatorService",
+                "extractedEntities=" + AiTraceLogger.summarizeMap(entityExtractionService.extract(request)));
         IntentDetectionResult resolvedIntent = resolveContextAwareIntent(intent, previousContext, entities);
         AgentHandler handler = agentRegistry.resolve(resolvedIntent);
         AiTraceLogger.info("AGENT_SELECTED", traceId, request.conversationId(), null, "AgentCoordinatorService",

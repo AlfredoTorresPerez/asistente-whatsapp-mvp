@@ -101,7 +101,7 @@ class CompleteAgendaJdbcRepositoryTest {
         assertThat(sql.getAllValues())
                 .anySatisfy(statement -> assertThat(statement)
                         .contains("update booking")
-                        .contains("status = 'CANCELADA'")
+                        .contains("status = :targetStatus")
                         .contains("version = version + 1")
                         .contains("status in (:mutableStatuses)"));
     }

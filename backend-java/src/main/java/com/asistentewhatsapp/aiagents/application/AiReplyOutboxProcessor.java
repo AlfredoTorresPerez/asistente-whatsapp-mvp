@@ -9,6 +9,7 @@ import com.asistentewhatsapp.channels.domain.MessageChannelType;
 import com.asistentewhatsapp.channels.infrastructure.whatsappweb.WhatsAppWebChannelJdbcRepository;
 import com.asistentewhatsapp.shared.observability.LogSanitizer;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +34,7 @@ public class AiReplyOutboxProcessor {
     private final long processingTimeoutMs;
     private final long baseRetryDelayMs;
     private final long maxRetryDelayMs;
+    private final JdbcTemplate jdbcTemplate;
 
     public AiReplyOutboxProcessor(
             AiReplyOutboxJdbcRepository outboxRepository,
@@ -40,6 +43,7 @@ public class AiReplyOutboxProcessor {
             AgentCoordinatorService agentCoordinatorService,
             ChannelDispatchService channelDispatchService,
             AiAgentProperties properties,
+            JdbcTemplate jdbcTemplate,
             @Value("${app.ai.agents.outbox-batch-size:10}") int batchSize,
             @Value("${app.ai.agents.outbox-processing-timeout-ms:120000}") long processingTimeoutMs,
             @Value("${app.ai.agents.outbox-retry-base-delay-ms:30000}") long baseRetryDelayMs,
@@ -50,6 +54,7 @@ public class AiReplyOutboxProcessor {
         this.agentCoordinatorService = agentCoordinatorService;
         this.channelDispatchService = channelDispatchService;
         this.properties = properties;
+        this.jdbcTemplate = jdbcTemplate;
         this.batchSize = batchSize;
         this.processingTimeoutMs = processingTimeoutMs;
         this.baseRetryDelayMs = baseRetryDelayMs;
@@ -59,40 +64,79 @@ public class AiReplyOutboxProcessor {
     @Scheduled(fixedDelayString = "${app.ai.agents.outbox-worker-interval-ms:5000}")
     public void processDueJobs() {
         String correlationId = AiTraceLogger.newTraceId("JOB-AI-OUTBOX");
+        Instant pollStart = Instant.now();
         try (MDC.MDCCloseable ignored = MDC.putCloseable("correlationId", correlationId)) {
             List<AiReplyOutboxJdbcRepository.AiReplyOutboxJob> jobs = outboxRepository.claimDueJobs(batchSize, processingTimeoutMs);
             if (jobs.isEmpty()) {
                 AiTraceLogger.debug("AI_OUTBOX_WORKER_IDLE", correlationId, null, null, "AiReplyOutboxProcessor",
-                        "claimedJobs=0 batchSize=" + batchSize);
+                        "claimedJobs=0 batchSize=" + batchSize + " intervalMs=" + properties.getOutboxWorkerIntervalMs());
                 return;
             }
+            long claimedCount = jobs.size();
             AiTraceLogger.info("AI_OUTBOX_WORKER_CLAIMED", correlationId, null, null, "AiReplyOutboxProcessor",
-                    "claimedJobs=" + jobs.size() + " batchSize=" + batchSize);
-            jobs.forEach(this::processJobSafely);
+                    "claimedJobs=" + claimedCount + " batchSize=" + batchSize);
+            
+            int processed = 0;
+            int failed = 0;
+            for (AiReplyOutboxJdbcRepository.AiReplyOutboxJob job : jobs) {
+                try {
+                    boolean completed = processJob(job);
+                    if (completed) {
+                        outboxRepository.markProcessed(job.id(), OffsetDateTime.now(ZoneOffset.UTC));
+                        processed++;
+                    } else {
+                        failed++;
+                    }
+                } catch (RuntimeException exception) {
+                    failed++;
+                    OffsetDateTime nextAttemptAt = OffsetDateTime.now(ZoneOffset.UTC).plus(retryDelay(job.attempts()));
+                    outboxRepository.markFailedOrRetry(
+                            job.id(),
+                            job.attempts(),
+                            job.maxAttempts(),
+                            exception.getClass().getSimpleName(),
+                            exception.getMessage(),
+                            nextAttemptAt);
+                    AiTraceLogger.error("AI_OUTBOX_JOB_FAILED", job.traceId(), job.conversationId(), job.inboundMessageId(), "AiReplyOutboxProcessor",
+                            "attempt=" + job.attempts()
+                                    + " maxAttempts=" + job.maxAttempts()
+                                    + " nextAttemptAt=" + nextAttemptAt
+                                    + " errorType=" + exception.getClass().getSimpleName(),
+                            exception);
+                }
+            }
+            long pollDurationMs = Duration.between(pollStart, Instant.now()).toMillis();
+            AiTraceLogger.info("AI_OUTBOX_WORKER_COMPLETED", correlationId, null, null, "AiReplyOutboxProcessor",
+                    "claimed=" + claimedCount + " processed=" + processed + " failed=" + failed + " durationMs=" + pollDurationMs);
         }
     }
 
-    private void processJobSafely(AiReplyOutboxJdbcRepository.AiReplyOutboxJob job) {
-        try {
-            boolean completed = processJob(job);
-            if (completed) {
-                outboxRepository.markProcessed(job.id(), OffsetDateTime.now(ZoneOffset.UTC));
-            }
-        } catch (RuntimeException exception) {
-            OffsetDateTime nextAttemptAt = OffsetDateTime.now(ZoneOffset.UTC).plus(retryDelay(job.attempts()));
-            outboxRepository.markFailedOrRetry(
-                    job.id(),
-                    job.attempts(),
-                    job.maxAttempts(),
-                    exception.getClass().getSimpleName(),
-                    exception.getMessage(),
-                    nextAttemptAt);
-            AiTraceLogger.error("AI_OUTBOX_JOB_FAILED", job.traceId(), job.conversationId(), job.inboundMessageId(), "AiReplyOutboxProcessor",
-                    "attempt=" + job.attempts()
-                            + " maxAttempts=" + job.maxAttempts()
-                            + " nextAttemptAt=" + nextAttemptAt
-                            + " errorType=" + exception.getClass().getSimpleName(),
-                    exception);
+    public AiOutboxStats getStats() {
+        String sql = """
+                select
+                    count(*) filter (where status = 'PENDING') as pending,
+                    count(*) filter (where status = 'PROCESSING') as processing,
+                    count(*) filter (where status = 'FAILED') as failed,
+                    min(created_at) filter (where status = 'PENDING') as oldest_pending
+                from ai_reply_outbox
+                where status in ('PENDING', 'PROCESSING', 'FAILED')
+                """;
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new AiOutboxStats(
+                rs.getLong("pending"),
+                rs.getLong("processing"),
+                rs.getLong("failed"),
+                rs.getObject("oldest_pending", OffsetDateTime.class)
+        )).stream().findFirst().orElse(new AiOutboxStats(0, 0, 0, null));
+    }
+
+    public record AiOutboxStats(
+            long pending,
+            long processing,
+            long failed,
+            OffsetDateTime oldestPendingCreatedAt) {
+        public long oldestAgeSeconds() {
+            if (oldestPendingCreatedAt == null) return 0;
+            return Duration.between(oldestPendingCreatedAt, OffsetDateTime.now(ZoneOffset.UTC)).getSeconds();
         }
     }
 

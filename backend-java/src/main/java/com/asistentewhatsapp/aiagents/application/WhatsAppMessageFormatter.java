@@ -148,6 +148,21 @@ public final class WhatsAppMessageFormatter {
         return sb.toString();
     }
 
+    public static String multipleCancellationCandidatesSingleLink(List<? extends CandidateBase> candidates, String url, int expirationMinutes) {
+        var sb = new StringBuilder("🛑 *Tienes varias reservas activas - Cancelación*\n\n");
+        sb.append("Selecciona la reserva que deseas cancelar:\n\n");
+        for (int i = 0; i < candidates.size(); i++) {
+            var c = candidates.get(i);
+            sb.append("*" + (i + 1) + ". " + safe(c.service(), "—") + "*\n");
+            sb.append("   " + safe(c.date(), "—") + " a las " + safe(c.time(), "—") + " en " + safe(c.location(), "—") + "\n\n");
+        }
+        sb.append("👉 *Toca o copia este enlace para gestionar tus reservas:*\n\n");
+        sb.append(safe(url, "") + "\n\n");
+        sb.append("_Si WhatsApp no lo abre al tocarlo, copia el enlace y pégalo en el navegador._\n\n");
+        sb.append("⏳ *Importante:* este enlace vence en *" + formatDuration(expirationMinutes) + "*.");
+        return sb.toString();
+    }
+
     public static String multipleRescheduleCandidates(List<RescheduleCandidate> candidates) {
         var sb = new StringBuilder("🔄 *Tienes varias reservas activas - Reprogramación*\n\n");
         sb.append("Selecciona la reserva que deseas reprogramar:\n\n");
@@ -161,8 +176,30 @@ public final class WhatsAppMessageFormatter {
         return sb.toString();
     }
 
-    public record CancellationCandidate(String service, String date, String time, String location, String url) {}
-    public record RescheduleCandidate(String service, String date, String time, String location, String url) {}
+    public static String multipleRescheduleCandidatesSingleLink(List<? extends CandidateBase> candidates, String url, int expirationMinutes) {
+        var sb = new StringBuilder("🔄 *Tienes varias reservas activas - Reprogramación*\n\n");
+        sb.append("Selecciona la reserva que deseas reprogramar:\n\n");
+        for (int i = 0; i < candidates.size(); i++) {
+            var c = candidates.get(i);
+            sb.append("*" + (i + 1) + ". " + safe(c.service(), "—") + "*\n");
+            sb.append("   " + safe(c.date(), "—") + " a las " + safe(c.time(), "—") + " en " + safe(c.location(), "—") + "\n\n");
+        }
+        sb.append("👉 *Toca o copia este enlace para gestionar tus reservas:*\n\n");
+        sb.append(safe(url, "") + "\n\n");
+        sb.append("_Si WhatsApp no lo abre al tocarlo, copia el enlace y pégalo en el navegador._\n\n");
+        sb.append("⏳ *Importante:* este enlace vence en *" + formatDuration(expirationMinutes) + "*.");
+        return sb.toString();
+    }
+
+    public interface CandidateBase {
+        String service();
+        String date();
+        String time();
+        String location();
+    }
+
+    public record CancellationCandidate(String service, String date, String time, String location, String url) implements CandidateBase {}
+    public record RescheduleCandidate(String service, String date, String time, String location, String url) implements CandidateBase {}
 
     public static String bookingCancelledSuccess(String service, String date, String time, String location) {
         return "✅ *Reserva cancelada*\n\n"

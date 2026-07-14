@@ -36,6 +36,7 @@ function getErrorMessage(error: unknown, fallback: string) {
 }
 
 const STEP_LABELS = ['Categoria', 'Servicio', 'Sucursal', 'Fecha y hora', 'Tus datos', 'Resumen']
+const CHILEAN_MOBILE_PHONE_PATTERN = /^569\d{7,8}$/
 
 const CATEGORY_COLORS = [
   'bg-teal-100 text-teal-700',
@@ -84,7 +85,10 @@ export function CreatePublicBookingPage() {
     if (customerInfoQuery.data) {
       const info = customerInfoQuery.data
       if (info.customerName) setCustomerName(info.customerName)
-      if (info.customerPhone) setCustomerPhone(info.customerPhone)
+      if (info.customerPhone) {
+        const phone = info.customerPhone.trim().replace(/^\+/, '')
+        setCustomerPhone(CHILEAN_MOBILE_PHONE_PATTERN.test(phone) ? phone : '')
+      }
       if (info.customerEmail) setCustomerEmail(info.customerEmail)
     }
   }, [customerInfoQuery.data])
@@ -177,7 +181,7 @@ export function CreatePublicBookingPage() {
         return Boolean(selectedDateIso) && Boolean(selectedSlot) && !dateError
       case 4: {
         const phone = customerPhone.trim().replace(/^\+/, '')
-        return customerName.trim().length >= 2 && /^569\d{7,8}$/.test(phone)
+        return customerName.trim().length >= 2 && CHILEAN_MOBILE_PHONE_PATTERN.test(phone)
       }
       case 5:
         return !createBookingMutation.isPending
@@ -471,7 +475,11 @@ export function CreatePublicBookingPage() {
                       input.addEventListener('change', handler, { once: true })
                       input.addEventListener('blur', () => input.remove(), { once: true })
                       document.body.appendChild(input)
-                      input.showPicker()
+                      if (typeof input.showPicker === 'function') {
+                        input.showPicker()
+                      } else {
+                        input.click()
+                      }
                     }}
                   >
                     <svg className="mr-2 h-5 w-5 text-slate-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -580,7 +588,7 @@ export function CreatePublicBookingPage() {
                   }}
                   onBlur={() => {
                     const phone = customerPhone.trim().replace(/^\+/, '')
-                    if (customerPhone.trim() && !/^569\d{7,8}$/.test(phone)) {
+                    if (customerPhone.trim() && !CHILEAN_MOBILE_PHONE_PATTERN.test(phone)) {
                       setPhoneError('Formato invalido. Debe ser 569XXXXXXXX (ej: 56912345678)')
                     }
                   }}

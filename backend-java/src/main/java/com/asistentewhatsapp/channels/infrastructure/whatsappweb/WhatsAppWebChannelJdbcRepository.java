@@ -30,7 +30,7 @@ public class WhatsAppWebChannelJdbcRepository {
     public Optional<ChannelAccountRecord> findChannelAccountByBusinessId(UUID businessId) {
         List<ChannelAccountRecord> items = jdbcTemplate.query(
                 """
-                        select id, business_id, session_key, status, phone_number, last_qr_code, last_event_at
+                        select id, business_id, session_key, status, phone_number, last_qr_code, last_qr_at, last_event_at
                         from channel_account
                         where business_id = ?
                           and channel_type = 'WHATSAPP'
@@ -45,7 +45,7 @@ public class WhatsAppWebChannelJdbcRepository {
     public Optional<ChannelAccountRecord> findChannelAccountBySessionKey(String sessionKey) {
         List<ChannelAccountRecord> items = jdbcTemplate.query(
                 """
-                        select id, business_id, session_key, status, phone_number, last_qr_code, last_event_at
+                        select id, business_id, session_key, status, phone_number, last_qr_code, last_qr_at, last_event_at
                         from channel_account
                         where session_key = ?
                         limit 1
@@ -58,7 +58,7 @@ public class WhatsAppWebChannelJdbcRepository {
     public Optional<ChannelAccountRecord> findFirstChannelAccount() {
         List<ChannelAccountRecord> items = jdbcTemplate.query(
                 """
-                        select id, business_id, session_key, status, phone_number, last_qr_code, last_event_at
+                        select id, business_id, session_key, status, phone_number, last_qr_code, last_qr_at, last_event_at
                         from channel_account
                         where channel_type = 'WHATSAPP'
                         order by created_at asc
@@ -68,18 +68,66 @@ public class WhatsAppWebChannelJdbcRepository {
         return items.stream().findFirst();
     }
 
+    public Optional<ChannelAccountRecord> findChannelAccountByPhoneNumber(String phoneNumber) {
+        List<ChannelAccountRecord> items = jdbcTemplate.query(
+                """
+                        select id, business_id, session_key, status, phone_number, last_qr_code, last_qr_at, last_event_at
+                        from channel_account
+                        where channel_type = 'WHATSAPP'
+                          and phone_number = ?
+                        order by created_at desc
+                        limit 1
+                        """,
+                new ChannelAccountRowMapper(),
+                phoneNumber);
+        return items.stream().findFirst();
+    }
+
+    public UUID upsertChannelAccount(
+            UUID businessId,
+            String sessionKey,
+            String phoneNumber,
+            String status) {
+        return jdbcTemplate.queryForObject(
+                """
+                        insert into channel_account (
+                            id,
+                            business_id,
+                            session_key,
+                            channel_type,
+                            provider_name,
+                            status,
+                            phone_number,
+                            created_at,
+                            updated_at
+                        ) values (?, ?, ?, 'WHATSAPP', 'WHATSAPP_WEB', ?, now(), now())
+                        on conflict (business_id, phone_number) do update set
+                            session_key = excluded.session_key,
+                            status = excluded.status,
+                            updated_at = now()
+                        returning id
+                        """,
+                UUID.class,
+                UUID.randomUUID(),
+                businessId,
+                sessionKey,
+                status);
+    }
+
     public void updateChannelAccount(
             UUID channelAccountId,
             String status,
             String phoneNumber,
             String qrCode,
             OffsetDateTime lastEventAt) {
+        boolean hasQrCode = qrCode != null && !qrCode.isBlank();
         jdbcTemplate.update(
                 """
                         update channel_account
                         set status = ?,
                             phone_number = ?,
                             last_qr_code = ?,
+                            last_qr_at = case when ? then cast(? as timestamptz) else last_qr_at end,
                             last_event_at = ?,
                             connected_at = case when ? = 'CONNECTED' then coalesce(connected_at, cast(? as timestamptz)) else connected_at end,
                             disconnected_at = case when ? = 'DISCONNECTED' then cast(? as timestamptz) else disconnected_at end,
@@ -89,6 +137,8 @@ public class WhatsAppWebChannelJdbcRepository {
                 status,
                 phoneNumber,
                 qrCode,
+                hasQrCode,
+                lastEventAt,
                 lastEventAt,
                 status,
                 lastEventAt,
@@ -673,6 +723,7 @@ public class WhatsAppWebChannelJdbcRepository {
             String status,
             String phoneNumber,
             String lastQrCode,
+            OffsetDateTime lastQrAt,
             OffsetDateTime lastEventAt) {
     }
 
@@ -702,6 +753,7 @@ public class WhatsAppWebChannelJdbcRepository {
                     resultSet.getString("status"),
                     resultSet.getString("phone_number"),
                     resultSet.getString("last_qr_code"),
+                    resultSet.getObject("last_qr_at", OffsetDateTime.class),
                     resultSet.getObject("last_event_at", OffsetDateTime.class));
         }
     }

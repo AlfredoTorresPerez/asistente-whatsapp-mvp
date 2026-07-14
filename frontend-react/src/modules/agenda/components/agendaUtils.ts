@@ -1,9 +1,7 @@
 import dayjs from 'dayjs'
-import type { AgendaCalendarItemResponse } from '../../../services/api/types'
+import type { AgendaCalendarItemResponse, BusinessHoursResponse } from '../../../services/api/types'
 
 export const agendaTimeZone = 'America/Santiago'
-export const scheduleStartHour = 9
-export const scheduleEndHour = 21
 export const baseHourHeight = 96
 export const eventCardEstimatedHeight = 80
 export const eventGap = 8
@@ -11,6 +9,16 @@ export const rowVerticalPadding = 12
 export const calendarDays = 7
 export const weekDayLabels = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab']
 export const scheduleHoursStep = 1
+
+const dayOfWeekMap: Record<number, { label: string; shortLabel: string }> = {
+  1: { label: 'Lunes', shortLabel: 'Lun' },
+  2: { label: 'Martes', shortLabel: 'Mar' },
+  3: { label: 'Miércoles', shortLabel: 'Mie' },
+  4: { label: 'Jueves', shortLabel: 'Jue' },
+  5: { label: 'Viernes', shortLabel: 'Vie' },
+  6: { label: 'Sábado', shortLabel: 'Sab' },
+  7: { label: 'Domingo', shortLabel: 'Dom' },
+}
 
 export type EventLayout = {
   item: AgendaCalendarItemResponse
@@ -23,6 +31,14 @@ export type EventLayout = {
 export type AgendaHourLayout = {
   byHour: Record<number, { top: number; height: number; maxItems: number }>
   totalHeight: number
+}
+
+export type DayAvailability = {
+  dayOfWeek: number
+  dateKey: string
+  hasBusinessHours: boolean
+  startHour: number
+  endHour: number
 }
 
 export function getAgendaDateKey(value: string) {
@@ -89,7 +105,66 @@ export function getItemStartHour(item: AgendaCalendarItemResponse) {
   return getLocalHourMinute(item).hour
 }
 
-export function getScheduleHours() {
+export function buildDayAvailability(businessHours: BusinessHoursResponse[], visibleDays: dayjs.Dayjs[]): DayAvailability[] {
+  const hoursByDay: Record<number, { startTime: number; endTime: number }> = {}
+  for (const bh of businessHours) {
+    const startHour = Number(bh.startTime.slice(0, 2))
+    const endHour = Number(bh.endTime.slice(0, 2))
+    const existing = hoursByDay[bh.dayOfWeek]
+    if (!existing) {
+      hoursByDay[bh.dayOfWeek] = { startTime: startHour, endTime: endHour }
+    } else {
+      hoursByDay[bh.dayOfWeek] = {
+        startTime: Math.min(existing.startTime, startHour),
+        endTime: Math.max(existing.endTime, endHour),
+      }
+    }
+  }
+
+return visibleDays.map((day) => {
+    const jsDay = day.day()
+    const sqlDay = jsDay === 0 ? 7 : jsDay
+
+    const bh = hoursByDay[sqlDay]
+    return {
+      dayOfWeek: sqlDay,
+      dateKey: day.format('YYYY-MM-DD'),
+      hasBusinessHours: Boolean(bh),
+      startHour: bh?.startTime ?? 0,
+      endHour: bh?.endTime ?? 0,
+    }
+  })
+}
+
+export function computeScheduleRange(
+  dayAvailability: DayAvailability[],
+  items: AgendaCalendarItemResponse[],
+): { scheduleStartHour: number; scheduleEndHour: number } {
+  let minStart = 24
+  let maxEnd = 0
+  for (const da of dayAvailability) {
+    if (da.hasBusinessHours) {
+      minStart = Math.min(minStart, da.startHour)
+      maxEnd = Math.max(maxEnd, da.endHour)
+    }
+  }
+  for (const item of items) {
+    const { hour: startHour, minute: startMinute } = getLocalHourMinute(item)
+    if (startHour < minStart) {
+      minStart = startHour
+    }
+    const endHour = Math.ceil((startHour * 60 + startMinute + item.durationMinutes) / 60)
+    if (endHour > maxEnd) {
+      maxEnd = endHour
+    }
+  }
+  return {
+    scheduleStartHour: minStart < 24 ? minStart : 9,
+    scheduleEndHour: maxEnd > 0 ? maxEnd : 21,
+  }
+}
+
+export function getScheduleHours(scheduleStartHour: number, scheduleEndHour: number) {
   return Array.from({ length: scheduleEndHour - scheduleStartHour + 1 }, (_, index) => scheduleStartHour + index)
 }
 
@@ -192,9 +267,22 @@ export function layoutEventsInCell(events: AgendaCalendarItemResponse[], rowHeig
   return result
 }
 
-export function buildAgendaHourLayout(items: AgendaCalendarItemResponse[], visibleDays: dayjs.Dayjs[]): AgendaHourLayout {
+export function buildAgendaHourLayout(
+  items: AgendaCalendarItemResponse[],
+  visibleDays: dayjs.Dayjs[],
+  dayAvailability: DayAvailability[],
+  scheduleStartHour: number,
+  scheduleEndHour: number,
+): AgendaHourLayout {
   const visibleDayKeys = new Set(visibleDays.map((day) => day.format('YYYY-MM-DD')))
   const itemsByDayHour = new Map<string, number>()
+
+  const hasBusinessDay = new Set<string>()
+  for (const da of dayAvailability) {
+    if (da.hasBusinessHours) {
+      hasBusinessDay.add(da.dateKey)
+    }
+  }
 
   items.forEach((item) => {
     const dateKey = item.dateLocal ?? getAgendaDateKey(item.startsAt)
@@ -211,7 +299,7 @@ export function buildAgendaHourLayout(items: AgendaCalendarItemResponse[], visib
   const byHour: AgendaHourLayout['byHour'] = {}
   let accumulatedTop = 0
 
-  getScheduleHours().forEach((hour) => {
+  getScheduleHours(scheduleStartHour, scheduleEndHour).forEach((hour) => {
     const maxItems = Math.max(
       0,
       ...visibleDays.map((day) => itemsByDayHour.get(`${day.format('YYYY-MM-DD')}-${hour}`) ?? 0),
@@ -224,7 +312,12 @@ export function buildAgendaHourLayout(items: AgendaCalendarItemResponse[], visib
   return { byHour, totalHeight: accumulatedTop }
 }
 
-export function getCurrentTimeIndicator(visibleDays: dayjs.Dayjs[], hourLayout: AgendaHourLayout) {
+export function getCurrentTimeIndicator(
+  visibleDays: dayjs.Dayjs[],
+  hourLayout: AgendaHourLayout,
+  scheduleStartHour: number,
+  scheduleEndHour: number,
+) {
   const now = new Date()
   const currentDateKey = getAgendaDateKey(now.toISOString())
   const isVisible = visibleDays.some((day) => day.format('YYYY-MM-DD') === currentDateKey)

@@ -3,6 +3,8 @@ package com.asistentewhatsapp.bookings.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -18,6 +20,7 @@ import com.asistentewhatsapp.bookings.infrastructure.BookingActionLinkJdbcReposi
 import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository;
 import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository;
 import com.asistentewhatsapp.agenda.api.AgendaCalendarItemResponse;
+import com.asistentewhatsapp.aesthetic.api.AestheticServiceResponse;
 import com.asistentewhatsapp.aesthetic.infrastructure.AestheticCenterJdbcRepository;
 import com.asistentewhatsapp.calendar.application.CalendarSyncService;
 import com.asistentewhatsapp.channels.application.ChannelDispatchService;
@@ -44,6 +47,8 @@ class BookingPublicActionServiceTest {
     @BeforeEach
     void setUp() {
         fixture = new Fixture();
+        when(fixture.aestheticRepository.findServices(any(), anyInt(), anyInt(), any(), any(), any()))
+                .thenReturn(new com.asistentewhatsapp.shared.api.PagedResponse<>(java.util.List.of(), 0, 1000, 0, 0));
     }
 
     @Test
@@ -59,7 +64,7 @@ class BookingPublicActionServiceTest {
         assertThat(response.bookingId()).isEqualTo(bookingId);
         assertThat(response.bookingStatus()).isEqualTo("PENDIENTE_CONFIRMACION");
         assertThat(response.linkStatus()).isEqualTo("ACTIVE");
-        assertThat(response.maskedCustomerPhone()).contains("5580");
+        assertThat(response.maskedCustomerPhone()).isEqualTo("****4580");
         assertThat(response.serviceName()).isEqualTo("Limpieza facial");
         assertThat(response.customerName()).isEqualTo("Maria Perez");
         assertThat(response.cancellationReason()).isNull();
@@ -86,13 +91,35 @@ class BookingPublicActionServiceTest {
     }
 
     @Test
+    void previewRescheduleReturnsBookingDetailsWithPhone56950954580() {
+        UUID businessId = UUID.randomUUID();
+        UUID bookingId = UUID.randomUUID();
+        RescheduleLinkRecord link = rescheduleLink(businessId, bookingId, "ACTIVE", "CONFIRMADA");
+        when(fixture.tokenHashService.sha256("resched-token")).thenReturn("resched-hash");
+        when(fixture.repository.findRescheduleByTokenHash("resched-hash", false)).thenReturn(link);
+        when(fixture.agendaRepository.findActiveBookingsByPhone(eq(businessId), eq("56950954580")))
+                .thenReturn(List.of());
+
+        PublicBookingRescheduleResponse response = fixture.service.previewReschedule("resched-token");
+
+        assertThat(response.bookingId()).isEqualTo(bookingId);
+        assertThat(response.linkStatus()).isEqualTo("ACTIVE");
+        assertThat(response.maskedCustomerPhone()).isEqualTo("****4580");
+        assertThat(response.customerName()).isEqualTo("Maria Perez");
+        assertThat(response.bookings()).isEmpty();
+    }
+
+    @Test
     void confirmCancellationWithReasonChangesStatus() {
         UUID businessId = UUID.randomUUID();
         UUID bookingId = UUID.randomUUID();
         CancellationLinkRecord link = cancellationLink(businessId, bookingId, "ACTIVE", "CONFIRMADA", null);
+        CancellationLinkRecord cancelledLink = cancellationLink(businessId, bookingId, "USED", "CANCELADA", CANCEL_REASON);
         ActionBookingRecord booking = actionBooking(businessId, bookingId, "CONFIRMADA");
-        when(fixture.tokenHashService.sha256("valid-token")).thenReturn("hash");
-        when(fixture.repository.findCancellationByTokenHash("hash", true)).thenReturn(link);
+        when(fixture.tokenHashService.sha256(any())).thenReturn("hash");
+        when(fixture.repository.findCancellationByTokenHash(any(), anyBoolean()))
+                .thenReturn(link)
+                .thenReturn(cancelledLink);
         when(fixture.repository.findBookingForUpdate(businessId, bookingId)).thenReturn(booking);
 
         PublicBookingCancellationResponse response = fixture.service.confirmCancellation("valid-token",
@@ -120,32 +147,16 @@ class BookingPublicActionServiceTest {
     }
 
     @Test
-    void previewRescheduleReturnsBookingDetailsWithPhone56950954580() {
-        UUID businessId = UUID.randomUUID();
-        UUID bookingId = UUID.randomUUID();
-        RescheduleLinkRecord link = rescheduleLink(businessId, bookingId, "ACTIVE", "CONFIRMADA");
-        when(fixture.tokenHashService.sha256("resched-token")).thenReturn("resched-hash");
-        when(fixture.repository.findRescheduleByTokenHash("resched-hash", false)).thenReturn(link);
-        when(fixture.agendaRepository.findActiveBookingsByPhone(eq(businessId), eq("56950954580")))
-                .thenReturn(List.of());
-
-        PublicBookingRescheduleResponse response = fixture.service.previewReschedule("resched-token");
-
-        assertThat(response.bookingId()).isEqualTo(bookingId);
-        assertThat(response.linkStatus()).isEqualTo("ACTIVE");
-        assertThat(response.maskedCustomerPhone()).isEqualTo("****5580");
-        assertThat(response.customerName()).isEqualTo("Maria Perez");
-        assertThat(response.bookings()).isEmpty();
-    }
-
-    @Test
     void rejectCancellationWithBlankReasonOnConfirmedBooking() {
         UUID businessId = UUID.randomUUID();
         UUID bookingId = UUID.randomUUID();
         CancellationLinkRecord link = cancellationLink(businessId, bookingId, "ACTIVE", "CONFIRMADA", null);
+        CancellationLinkRecord cancelledLink = cancellationLink(businessId, bookingId, "USED", "CANCELADA", "Cancelacion confirmada por enlace publico.");
         ActionBookingRecord booking = actionBooking(businessId, bookingId, "CONFIRMADA");
-        when(fixture.tokenHashService.sha256("token-no-reason")).thenReturn("hash-no-reason");
-        when(fixture.repository.findCancellationByTokenHash("hash-no-reason", true)).thenReturn(link);
+        when(fixture.tokenHashService.sha256(any())).thenReturn("hash-no-reason");
+        when(fixture.repository.findCancellationByTokenHash(any(), anyBoolean()))
+                .thenReturn(link)
+                .thenReturn(cancelledLink);
         when(fixture.repository.findBookingForUpdate(businessId, bookingId)).thenReturn(booking);
 
         fixture.service.confirmCancellation("token-no-reason", new PublicBookingCancellationRequest(""));
@@ -158,7 +169,13 @@ class BookingPublicActionServiceTest {
     void previewExpiredCancellationLinkReturnsExpiredStatus() {
         UUID businessId = UUID.randomUUID();
         UUID bookingId = UUID.randomUUID();
-        CancellationLinkRecord expiredLink = cancellationLink(businessId, bookingId, "ACTIVE", "CONFIRMADA", null);
+        CancellationLinkRecord expiredLink = new CancellationLinkRecord(
+                UUID.randomUUID(), businessId, bookingId, "ACTIVE", "http://localhost/cancel/token",
+                OffsetDateTime.now(ZoneOffset.UTC).minusHours(1), null, null,
+                "Limpieza facial", "CONFIRMADA",
+                OffsetDateTime.now(ZoneOffset.UTC).plusDays(2), OffsetDateTime.now(ZoneOffset.UTC).plusDays(2).plusHours(1),
+                "Sucursal Centro", "Limpieza facial", "Profesional Test", "Sala 1",
+                "Maria Perez", PHONE, "maria@test.com");
         CancellationLinkRecord refreshedExpired = new CancellationLinkRecord(
                 expiredLink.linkId(), businessId, bookingId, "EXPIRED", expiredLink.publicUrl(),
                 OffsetDateTime.now(ZoneOffset.UTC).minusHours(1), null, null,

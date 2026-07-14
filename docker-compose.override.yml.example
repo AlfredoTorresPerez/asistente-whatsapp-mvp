@@ -1,0 +1,40 @@
+# =============================================================================
+# docker-compose.override.yml.example
+# =============================================================================
+# Copia a docker-compose.override.yml (en .gitignore) para sobreescribir
+# configuracion local sin modificar docker-compose.local.yml.
+#
+# Uso:
+#   docker compose -f docker-compose.local.yml up -d
+#   (Docker Compose mergea automaticamente docker-compose.override.yml si existe)
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # JDWP debug port para backend-java
+  # ---------------------------------------------------------------------------
+  backend-java:
+    environment:
+      JAVA_TOOL_OPTIONS: "-Duser.timezone=America/Santiago -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+    ports:
+      - "5005:5005"
+
+  # ---------------------------------------------------------------------------
+  # Frontend en modo produccion (nginx build en vez de Vite dev server)
+  # ---------------------------------------------------------------------------
+  # frontend-react:
+  #   build:
+  #     target: production
+
+  # ---------------------------------------------------------------------------
+  # Volumenes con ownership uid/gid fijo (Linux)
+  # En Linux, el usuario node dentro del contenedor whatsapp-web-service tiene
+  # uid=1000. Si los bind mounts se crean como root, los permisos fallan.
+  # Solucion: crear los directorios con uid=1000 en el host:
+  #   mkdir -p .docker/volumes/whatsapp-session .docker/volumes/whatsapp-cache
+  #   sudo chown -R 1000:1000 .docker/volumes/whatsapp-session .docker/volumes/whatsapp-cache
+  # ---------------------------------------------------------------------------
+  # whatsapp-web-service:
+  #   volumes:
+  #     - whatsapp-webjs-session-data:/app/.wwebjs_auth
+  #     - whatsapp-webjs-cache-data:/app/.wwebjs_cache

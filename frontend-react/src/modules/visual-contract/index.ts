@@ -15,5 +15,5 @@ export {
   OrderDetailPage,
   OrderPaymentPage,
   OrdersPage,
-  ReportsPage,
+
 } from './pages/VisualContractPages'

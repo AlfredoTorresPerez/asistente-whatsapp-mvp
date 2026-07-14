@@ -17,6 +17,7 @@ export type ShellUser = {
   businessName: string
   timezone: string
   phone: string | null
+  permissions: string[]
 }
 
 export type StoredShellSession = {
@@ -54,6 +55,7 @@ export function toShellUserFromAuthResponse(user: AuthUserResponse): ShellUser {
     businessName: user.businessName,
     timezone: user.timezone,
     phone: null,
+    permissions: user.permissions ?? [],
   }
 }
 
@@ -71,6 +73,7 @@ export function mergeShellUserProfile(
     timezone: profile.timezone,
     role: profile.role,
     businessName: profile.businessName,
+    permissions: user.permissions, // keep existing permissions
   }
 }
 

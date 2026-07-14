@@ -353,7 +353,9 @@ public class CustomerBookingService {
     private String generateRawToken() {
         byte[] bytes = new byte[32];
         SECURE_RANDOM.nextBytes(bytes);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes)
+                .replace('-', 'A')
+                .replace('_', 'Z');
     }
 
     private String normalizeToken(String token) {

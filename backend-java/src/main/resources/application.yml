@@ -79,6 +79,9 @@ app:
       webhook-secret: ${APP_WHATSAPP_WEB_WEBHOOK_SECRET:dev-whatsapp-web-webhook-secret}
       webhook-tolerance-seconds: ${APP_WHATSAPP_WEB_WEBHOOK_TOLERANCE_SECONDS:300}
       demo-fallback-enabled: ${APP_WHATSAPP_WEB_DEMO_FALLBACK_ENABLED:false}
+      test-phone-map: {}
+      log-raw-payload: ${APP_LOGGING_INCLUDE_MESSAGE_BODY:false}
+      qr-timeout-seconds: ${APP_WHATSAPP_WEB_QR_TIMEOUT_SECONDS:120}
     whatsapp-cloud-api:
       enabled: ${APP_WHATSAPP_CLOUD_API_ENABLED:false}
       base-url: ${APP_WHATSAPP_CLOUD_API_BASE_URL:https://graph.facebook.com}

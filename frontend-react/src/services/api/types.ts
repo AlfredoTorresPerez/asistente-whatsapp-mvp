@@ -7,6 +7,7 @@ export type AuthUserResponse = {
   businessId: string
   businessName: string
   timezone: string
+  permissions: string[]
 }
 
 export type LoginResponse = {
@@ -110,6 +111,81 @@ export type DashboardSummaryResponse = {
   orderSeries: DashboardSeriesPointResponse[]
   todayAppointments: DashboardAppointmentResponse[]
   recentActivity: DashboardActivityResponse[]
+}
+
+export type ReportsKpiItem = {
+  label: string
+  currentValue: number
+  previousValue: number
+  variationPercent: number | null
+  help: string
+}
+
+export type ReportsChannelResponse = {
+  channel: string
+  count: number
+  percentage: number
+}
+
+export type ReportsConversationPerformancePoint = {
+  date: string
+  received: number
+  aiAnswered: number
+  humanAnswered: number
+  unanswered: number
+}
+
+export type ReportsAppointmentPerformancePoint = {
+  date: string
+  solicitada: number
+  confirmada: number
+  completada: number
+  cancelada: number
+  ausencia: number
+}
+
+export type ReportsAppointmentDistributionPoint = {
+  status: string
+  label: string
+  count: number
+  percentage: number
+}
+
+export type ReportsFunnelStageResponse = {
+  name: string
+  count: number
+  conversionFromPrevious: number | null
+  conversionFromFirst: number | null
+}
+
+export type ReportsProspectRowResponse = {
+  id: string
+  name: string
+  phone: string
+  lastContact: string
+  stage: string
+  responsible: string | null
+  nextAppointment: string | null
+  location: string | null
+  serviceInterest: string | null
+  attentionStatus: string
+}
+
+export type ReportsProspectsResponse = {
+  items: ReportsProspectRowResponse[]
+  total: number
+  page: number
+  size: number
+}
+
+export type ReportsSummaryResponse = {
+  kpis: ReportsKpiItem[]
+  channelDistribution: ReportsChannelResponse[]
+  conversationPerformance: ReportsConversationPerformancePoint[]
+  appointmentDistribution: ReportsAppointmentDistributionPoint[]
+  appointmentPerformance: ReportsAppointmentPerformancePoint[]
+  conversionFunnel: ReportsFunnelStageResponse[]
+  prospects: ReportsProspectsResponse
 }
 
 export type NotificationResponse = {
@@ -246,6 +322,13 @@ export type WhatsAppWebStatusResponse = {
   adapterMode: string
   warningMessage: string
   recentEvents: WhatsAppWebRecentEventResponse[]
+}
+
+export type WhatsAppWebQrResponse = {
+  qrCode: string | null
+  sessionStatus: string
+  expiresAt: string | null
+  lastQrAt: string | null
 }
 
 export type WhatsAppWebActionResponse = {
@@ -1513,6 +1596,17 @@ export type BusinessHoursResponse = {
   dayOfWeek: number
   startTime: string
   endTime: string
+}
+
+export type SaveBusinessHoursRequest = {
+  locationId: string
+  hours: { dayOfWeek: number; startTime: string; endTime: string }[]
+}
+
+export type SaveProfessionalHoursRequest = {
+  locationId: string
+  professionalId: string
+  hours: { dayOfWeek: number; startTime: string; endTime: string }[]
 }
 
 export type AgendaFilterOptionsResponse = {

@@ -390,7 +390,7 @@ public class BookingService {
 
     private UUID resolveResponsibleUserId(AuthenticatedUser authenticatedUser, UUID responsibleUserId) {
         if (responsibleUserId == null) {
-            return authenticatedUser.userId();
+            return null;
         }
         return bookingJdbcRepository.findUserId(authenticatedUser.businessId(), responsibleUserId)
                 .orElseThrow(() -> validationError("assignedUserId", "El responsable indicado no existe."));

@@ -19,6 +19,7 @@ import com.asistentewhatsapp.bookings.api.PublicBookingConfirmationRescheduleReq
 import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository;
 import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository.ConfirmationBookingRecord;
 import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository.ConfirmationLinkRecord;
+import com.asistentewhatsapp.bookings.domain.SincronizadorReservaMotorReglas;
 import com.asistentewhatsapp.calendar.application.CalendarSyncService;
 import com.asistentewhatsapp.channels.application.ChannelDispatchRequest;
 import com.asistentewhatsapp.channels.application.ChannelDispatchResponse;
@@ -78,6 +79,7 @@ public class BookingConfirmationService {
     private final CalendarSyncService calendarSyncService;
     private final BookingConfirmationNotificationsService notificationsService;
     private final TransactionTemplate transactionTemplate;
+    private final SincronizadorReservaMotorReglas sincronizadorReservaMotorReglas;
 
     public BookingConfirmationService(
             BookingConfirmationJdbcRepository repository,
@@ -91,6 +93,7 @@ public class BookingConfirmationService {
             BookingPaymentService bookingPaymentService,
             CalendarSyncService calendarSyncService,
             BookingConfirmationNotificationsService notificationsService,
+            SincronizadorReservaMotorReglas sincronizadorReservaMotorReglas,
             PlatformTransactionManager transactionManager) {
         this.repository = repository;
         this.properties = properties;
@@ -103,6 +106,7 @@ public class BookingConfirmationService {
         this.bookingPaymentService = bookingPaymentService;
         this.calendarSyncService = calendarSyncService;
         this.notificationsService = notificationsService;
+        this.sincronizadorReservaMotorReglas = sincronizadorReservaMotorReglas;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
         this.transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
     }
@@ -190,6 +194,21 @@ public class BookingConfirmationService {
                 repository.updateBookingStatus(locked.businessId(), locked.bookingId(), STATUS_CONFIRMED);
                 completeAgendaJdbcRepository.insertStatusHistory(locked.businessId(), locked.bookingId(), locked.bookingStatus(), STATUS_CONFIRMED,
                         "Reserva confirmada desde enlace publico.", null, "PUBLIC_LINK");
+                sincronizadorReservaMotorReglas.sincronizarReserva(
+                        locked.businessId(),
+                        locked.bookingId(),
+                        locked.customerPhone(),
+                        locked.customerName(),
+                        locked.serviceName(),
+                        locked.locationName(),
+                        locked.professionalName(),
+                        locked.startsAt(),
+                        locked.durationMinutes(),
+                        STATUS_CONFIRMED,
+                        locked.conversationId(),
+                        "PUBLIC_LINK",
+                        "reservar",
+                        "confirm-link-" + locked.linkId());
             }
         });
         safelyRun(() -> notificationsService.scheduleReminders(link.businessId(), link.bookingId(), link.startsAt()),

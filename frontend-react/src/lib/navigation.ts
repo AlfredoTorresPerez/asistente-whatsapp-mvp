@@ -39,14 +39,9 @@ export const PRIMARY_NAV_ITEMS: NavigationItem[] = [
     description: 'Citas pendientes y reprogramaciones.',
   },
   {
-    label: 'Pedidos',
-    path: '/orders',
-    description: 'Pedidos, cobros y saldo pendiente.',
-  },
-  {
     label: 'Catalogo',
     path: '/catalog',
-    description: 'Productos y servicios para pedidos y conversaciones.',
+    description: 'Productos y servicios del catalogo comercial.',
   },
   {
     label: 'Reglas',
@@ -135,11 +130,6 @@ const ROUTE_METADATA: RouteMeta[] = [
     description: 'Formulario contextual para vincular un prospecto al hilo actual.',
   },
   {
-    matcher: /^\/conversations\/[^/]+\/orders\/new$/,
-    title: 'Crear pedido desde conversacion',
-    description: 'Formulario contextual para crear un pedido desde el hilo actual.',
-  },
-  {
     matcher: /^\/conversations\/[^/]+\/appointments\/new$/,
     title: 'Crear cita desde conversacion',
     description: 'Formulario contextual para agendar una cita desde el hilo actual.',
@@ -177,7 +167,7 @@ const ROUTE_METADATA: RouteMeta[] = [
   {
     matcher: /^\/prospects\/[^/]+$/,
     title: 'Detalle de prospecto',
-    description: 'Ficha del prospecto con historial, agenda y pedidos relacionados.',
+    description: 'Ficha del prospecto con historial, agenda y acciones relacionadas.',
   },
   {
     path: '/prospects',
@@ -218,26 +208,6 @@ const ROUTE_METADATA: RouteMeta[] = [
     matcher: /^\/prospects\/[^/]+\/appointments\/new$/,
     title: 'Crear cita desde prospecto',
     description: 'Formulario contextual para agendar una cita desde la ficha del prospecto.',
-  },
-  {
-    path: '/orders/new',
-    title: 'Crear pedido',
-    description: 'Formulario base con items, totales y contexto comercial.',
-  },
-  {
-    matcher: /^\/orders\/[^/]+\/payments\/new$/,
-    title: 'Registrar pago',
-    description: 'Formulario corto para registrar abonos y actualizar saldo.',
-  },
-  {
-    matcher: /^\/orders\/[^/]+$/,
-    title: 'Detalle de pedido',
-    description: 'Resumen, items, pagos y saldo pendiente del pedido seleccionado.',
-  },
-  {
-    path: '/orders',
-    title: 'Pedidos',
-    description: 'Listado paginado con filtros por estado, cobro y fechas.',
   },
   {
     path: '/catalog/products/new',
@@ -282,7 +252,7 @@ const ROUTE_METADATA: RouteMeta[] = [
   {
     path: '/reports',
     title: 'Reportes basicos',
-    description: 'KPIs, graficos y filtros por rango para el seguimiento comercial.',
+    description: 'Indicadores de conversaciones, prospectos, citas y rendimiento del centro estetico.',
   },
   {
     path: '/configuration',

@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository;
+import com.asistentewhatsapp.bookings.domain.SincronizadorReservaMotorReglas;
 import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository;
 import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository.ConfirmationLinkRecord;
 import com.asistentewhatsapp.calendar.application.CalendarSyncService;
@@ -125,7 +126,8 @@ class BookingConfirmationServiceTest {
                 "cliente@example.com",
                 requiresDeposit,
                 BigDecimal.valueOf(10000),
-                paymentStatus);
+                paymentStatus,
+                null);
     }
 
     private static final class Fixture {
@@ -140,6 +142,7 @@ class BookingConfirmationServiceTest {
         private final BookingPaymentService bookingPaymentService = mock(BookingPaymentService.class);
         private final CalendarSyncService calendarSyncService = mock(CalendarSyncService.class);
         private final BookingConfirmationNotificationsService notificationsService = mock(BookingConfirmationNotificationsService.class);
+        private final SincronizadorReservaMotorReglas sincronizadorReservaMotorReglas = mock(SincronizadorReservaMotorReglas.class);
         private final PlatformTransactionManager transactionManager = mock(PlatformTransactionManager.class);
         private final BookingConfirmationService service = new BookingConfirmationService(
                 repository,
@@ -153,6 +156,7 @@ class BookingConfirmationServiceTest {
                 bookingPaymentService,
                 calendarSyncService,
                 notificationsService,
+                sincronizadorReservaMotorReglas,
                 transactionManager);
     }
 }

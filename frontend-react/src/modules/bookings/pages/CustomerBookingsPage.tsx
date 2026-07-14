@@ -45,8 +45,11 @@ function statusTone(status: string) {
   return 'bg-slate-100 text-slate-800'
 }
 
-export function CustomerBookingsPage() {
+type PageMode = 'all' | 'cancel' | 'reschedule'
+
+export function CustomerBookingsPage({ mode }: { mode?: PageMode }) {
   const { token } = useParams()
+  const effectiveMode = mode ?? 'all'
   const [cancellingId, setCancellingId] = useState<string | null>(null)
   const [cancelReason, setCancelReason] = useState('')
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null)
@@ -136,10 +139,15 @@ export function CustomerBookingsPage() {
       <section className="mx-auto max-w-4xl space-y-6">
         <div className="text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-teal-700">Asistente WhatsApp Centro Estetico</p>
-          <h1 className="mt-3 text-3xl font-semibold text-slate-950">Mis reservas activas</h1>
+          <h1 className="mt-3 text-3xl font-semibold text-slate-950">
+            {effectiveMode === 'cancel' ? 'Cancelacion de reserva' : effectiveMode === 'reschedule' ? 'Reprogramar reserva' : 'Mis reservas activas'}
+          </h1>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            Aqui se muestran las reservas futuras asociadas a tu numero de celular. Puedes cancelar una reserva o abrirla para
-            reprogramar su fecha, hora, sucursal o servicio.
+            {effectiveMode === 'cancel'
+              ? 'Selecciona la reserva que deseas cancelar.'
+              : effectiveMode === 'reschedule'
+                ? 'Selecciona la reserva que deseas reprogramar.'
+                : 'Aqui se muestran las reservas futuras asociadas a tu numero de celular. Puedes cancelar una reserva o abrirla para reprogramar su fecha, hora, sucursal o servicio.'}
           </p>
         </div>
 
@@ -184,6 +192,7 @@ export function CustomerBookingsPage() {
                   cancelMutation={cancelMutation}
                   cancelReason={cancelReason}
                   setCancelReason={setCancelReason}
+                  mode={effectiveMode}
                 />
               ))}
             </div>
@@ -369,6 +378,7 @@ function BookingCard({
   cancelMutation,
   cancelReason,
   setCancelReason,
+  mode,
 }: {
   booking: CustomerBookingItemResponse
   isSelected: boolean
@@ -378,8 +388,11 @@ function BookingCard({
   cancelMutation: UseMutationResult<{ status: string; bookingId: string }, Error, string, unknown>
   cancelReason: string
   setCancelReason: (value: string) => void
+  mode: PageMode
 }) {
   const isCancelling = cancellingId === booking.bookingId
+  const showReschedule = mode === 'all' || mode === 'reschedule'
+  const showCancel = mode === 'all' || mode === 'cancel'
 
   return (
     <Card className={isSelected ? 'border-teal-300 bg-teal-50/60' : ''}>
@@ -397,15 +410,16 @@ function BookingCard({
             </span>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button onClick={onSelect} variant={isSelected ? 'secondary' : 'secondary'}>
-              {isSelected ? 'Editando' : 'Reprogramar'}
-            </Button>
-            <Button
-              variant="danger"
-              onClick={onCancel}
-            >
-              {isCancelling ? 'Cerrar cancelacion' : 'Cancelar reserva'}
-            </Button>
+            {showReschedule ? (
+              <Button onClick={onSelect} variant={isSelected ? 'secondary' : 'secondary'}>
+                {isSelected ? 'Editando' : 'Reprogramar'}
+              </Button>
+            ) : null}
+            {showCancel ? (
+              <Button variant="danger" onClick={onCancel}>
+                {isCancelling ? 'Cerrar cancelacion' : 'Cancelar reserva'}
+              </Button>
+            ) : null}
           </div>
         </div>
 

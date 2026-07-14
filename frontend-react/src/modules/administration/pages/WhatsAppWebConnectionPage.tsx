@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { z } from 'zod'
@@ -21,6 +21,7 @@ import { useOnlineStatus } from '../../../lib/useOnlineStatus'
 import {
   connectWhatsAppWebRequest,
   disconnectWhatsAppWebRequest,
+  getWhatsAppWebQrRequest,
   getWhatsAppWebStatusRequest,
   refreshWhatsAppWebQrRequest,
   sendWhatsAppWebTestMessageRequest,
@@ -30,6 +31,7 @@ import type {
   AestheticIntentLogResponse,
   IntentAnalysisResponse,
   IntentEntitiesResponse,
+  WhatsAppWebQrResponse,
   WhatsAppWebStatusResponse,
 } from '../../../services/api/types'
 
@@ -246,6 +248,32 @@ function toIntentLabel(intent: string) {
     .join(' ')
 }
 
+const QR_STORAGE_KEY = 'whatsapp-web-last-qr'
+
+function loadStoredQr(): WhatsAppWebQrResponse | null {
+  try {
+    const raw = localStorage.getItem(QR_STORAGE_KEY)
+    if (!raw) return null
+    return JSON.parse(raw) as WhatsAppWebQrResponse
+  } catch {
+    return null
+  }
+}
+
+function storeQr(qr: WhatsAppWebQrResponse) {
+  try {
+    localStorage.setItem(QR_STORAGE_KEY, JSON.stringify(qr))
+  } catch {
+  }
+}
+
+function clearStoredQr() {
+  try {
+    localStorage.removeItem(QR_STORAGE_KEY)
+  } catch {
+  }
+}
+
 export function WhatsAppWebConnectionPage() {
   const isOnline = useOnlineStatus()
   const { showToast } = useToast()
@@ -253,6 +281,10 @@ export function WhatsAppWebConnectionPage() {
   const [isQrModalOpen, setIsQrModalOpen] = useState(false)
   const [isDisconnectDialogOpen, setIsDisconnectDialogOpen] = useState(false)
   const [isQrLoading, setIsQrLoading] = useState(false)
+  const [qrExpiresIn, setQrExpiresIn] = useState<number | null>(null)
+  const [previousStatus, setPreviousStatus] = useState<string | null>(null)
+  const qrRefreshTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const countdownTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const {
     register,
     handleSubmit,
@@ -269,10 +301,18 @@ export function WhatsAppWebConnectionPage() {
 
   const watchedTestMessage = useWatch({ control, name: 'body' })
 
+  const isQrPending = (status: string | undefined) => status === 'QR_PENDING'
+
   const whatsAppWebStatusQuery = useQuery({
     queryKey: ['administration', 'whatsapp-web', 'status'],
     queryFn: getWhatsAppWebStatusRequest,
     refetchInterval: isOnline ? 20_000 : false,
+  })
+
+  const whatsAppWebQrQuery = useQuery({
+    queryKey: ['administration', 'whatsapp-web', 'qr'],
+    queryFn: getWhatsAppWebQrRequest,
+    refetchInterval: isOnline && isQrPending(whatsAppWebStatusQuery.data?.sessionStatus) ? 5_000 : false,
   })
 
   const intentLogsQuery = useQuery({
@@ -284,6 +324,7 @@ export function WhatsAppWebConnectionPage() {
   const invalidateStatus = async () => {
     await queryClient.invalidateQueries({ queryKey: ['administration', 'summary'] })
     await queryClient.invalidateQueries({ queryKey: ['administration', 'whatsapp-web', 'status'] })
+    await queryClient.invalidateQueries({ queryKey: ['administration', 'whatsapp-web', 'qr'] })
     await queryClient.invalidateQueries({ queryKey: ['esthetic', 'intent', 'latest-log'] })
   }
 
@@ -382,6 +423,7 @@ export function WhatsAppWebConnectionPage() {
     mutationFn: disconnectWhatsAppWebRequest,
     onSuccess: async () => {
       await invalidateStatus()
+      clearStoredQr()
       showToast({
         title: 'Canal desconectado',
         description: 'La sesion experimental WhatsApp Web quedo cerrada correctamente.',
@@ -437,6 +479,7 @@ export function WhatsAppWebConnectionPage() {
   })
 
   const status = whatsAppWebStatusQuery.data
+  const qrData = whatsAppWebQrQuery.data
   const isSyncing =
     connectMutation.isPending ||
     refreshQrMutation.isPending ||
@@ -458,6 +501,69 @@ export function WhatsAppWebConnectionPage() {
     await intentPreviewMutation.mutateAsync(values.body.trim())
   })
 
+  const handleManualRefreshQr = useCallback(() => {
+    void refreshQrMutation.mutateAsync()
+  }, [refreshQrMutation])
+
+  const handleConnect = useCallback(() => {
+    void connectMutation.mutateAsync()
+  }, [connectMutation])
+
+  useEffect(() => {
+    if (whatsAppWebQrQuery.data) {
+      storeQr(whatsAppWebQrQuery.data)
+    }
+  }, [whatsAppWebQrQuery.data])
+
+  useEffect(() => {
+    if (previousStatus !== 'CONNECTED' && status?.sessionStatus === 'CONNECTED') {
+      showToast({
+        title: 'QR escaneado, conectando...',
+        description: 'El telefono se vinculo correctamente al adaptador WhatsApp Web.',
+        tone: 'success',
+      })
+    }
+    setPreviousStatus(status?.sessionStatus ?? null)
+  }, [status?.sessionStatus, previousStatus, showToast])
+
+  useEffect(() => {
+    if (countdownTimerRef.current) {
+      clearInterval(countdownTimerRef.current)
+      countdownTimerRef.current = null
+    }
+
+    if (!qrData?.expiresAt || !qrData.qrCode) {
+      setQrExpiresIn(null)
+      return
+    }
+
+    const updateCountdown = () => {
+      const expiresAt = dayjs(qrData.expiresAt)
+      const now = dayjs()
+      const diff = expiresAt.diff(now, 'seconds')
+      if (diff <= 0) {
+        setQrExpiresIn(0)
+        void queryClient.invalidateQueries({ queryKey: ['administration', 'whatsapp-web', 'qr'] })
+        return
+      }
+      setQrExpiresIn(diff)
+    }
+
+    updateCountdown()
+    countdownTimerRef.current = setInterval(updateCountdown, 1000)
+
+    return () => {
+      if (countdownTimerRef.current) {
+        clearInterval(countdownTimerRef.current)
+        countdownTimerRef.current = null
+      }
+    }
+  }, [qrData?.expiresAt, qrData?.qrCode, queryClient])
+
+  const displayQrCode = qrData?.qrCode ?? status?.qrCode ?? loadStoredQr()?.qrCode ?? null
+  const displayQrExpiresIn = qrExpiresIn
+  const isQrExpired = displayQrExpiresIn !== null && displayQrExpiresIn <= 10
+
   return (
     <section className="space-y-6">
       <PageHeader
@@ -466,13 +572,9 @@ export function WhatsAppWebConnectionPage() {
             <Button
               disabled={!isOnline || isSyncing}
               loading={connectMutation.isPending}
-              onClick={() =>
-                void (status?.sessionStatus === 'QR_PENDING'
-                  ? refreshQrMutation.mutateAsync()
-                  : connectMutation.mutateAsync())
-              }
+              onClick={handleConnect}
             >
-              Reconectar
+              {status?.sessionStatus === 'QR_PENDING' ? 'Conectar' : 'Iniciar conexion'}
             </Button>
             <Button
               disabled={!isOnline || isSyncing}
@@ -480,6 +582,14 @@ export function WhatsAppWebConnectionPage() {
               variant="secondary"
             >
               Ver QR
+            </Button>
+            <Button
+              disabled={!isOnline || isSyncing}
+              loading={refreshQrMutation.isPending}
+              onClick={handleManualRefreshQr}
+              variant="secondary"
+            >
+              Refrescar QR
             </Button>
             <Button
               disabled={!isOnline || isSyncing}
@@ -569,21 +679,17 @@ export function WhatsAppWebConnectionPage() {
                 <Button
                   disabled={!isOnline || isSyncing}
                   loading={connectMutation.isPending}
-                  onClick={() =>
-                    void (status.sessionStatus === 'QR_PENDING'
-                      ? refreshQrMutation.mutateAsync()
-                      : connectMutation.mutateAsync())
-                  }
+                  onClick={handleConnect}
                 >
-                  Reconectar
+                  {status.sessionStatus === 'QR_PENDING' ? 'Conectar' : 'Iniciar conexion'}
                 </Button>
                 <Button
                   disabled={!isOnline || isSyncing}
                   loading={refreshQrMutation.isPending}
-                  onClick={() => void refreshQrMutation.mutateAsync()}
+                  onClick={handleManualRefreshQr}
                   variant="secondary"
                 >
-                  Actualizar QR
+                  Refrescar QR
                 </Button>
                 <Button
                   disabled={!isOnline || isSyncing}
@@ -702,6 +808,10 @@ export function WhatsAppWebConnectionPage() {
         onClose={() => {
           setIsQrModalOpen(false)
           setIsQrLoading(false)
+          if (qrRefreshTimerRef.current) {
+            clearInterval(qrRefreshTimerRef.current)
+            qrRefreshTimerRef.current = null
+          }
         }}
         open={isQrModalOpen}
       >
@@ -715,7 +825,17 @@ export function WhatsAppWebConnectionPage() {
                 QR de conexion WhatsApp Web
               </h2>
             </div>
-            <StatusBadge label="Experimental" tone="warning" />
+            <div className="flex items-center gap-2">
+              {status?.sessionStatus === 'CONNECTED' ? (
+                <StatusBadge label="Escaneado ✓" tone="success" />
+              ) : displayQrExpiresIn !== null ? (
+                <StatusBadge
+                  label={`Expira en ${displayQrExpiresIn}s`}
+                  tone={isQrExpired ? 'danger' : 'warning'}
+                />
+              ) : null}
+              <StatusBadge label="Experimental" tone="warning" />
+            </div>
           </div>
 
           {isQrLoading ? (
@@ -723,22 +843,48 @@ export function WhatsAppWebConnectionPage() {
               message="Solicitando el QR vigente desde el adaptador WhatsApp Web."
               variant="card"
             />
-          ) : status?.qrCode ? (
+          ) : displayQrCode && status?.sessionStatus !== 'CONNECTED' ? (
             <div className="rounded-[24px] border border-[var(--color-border)] bg-slate-50 px-5 py-5">
-              <p className="text-sm font-semibold text-slate-900">QR vigente</p>
-              {status.qrCode.startsWith('data:image') ? (
+              <p className="text-sm font-semibold text-slate-900">
+                Escanea el QR con WhatsApp
+                {displayQrExpiresIn !== null && displayQrExpiresIn <= 30 ? (
+                  <span className="ml-2 text-red-600">
+                    ({displayQrExpiresIn}s restantes)
+                  </span>
+                ) : null}
+              </p>
+              {displayQrCode.startsWith('data:image') ? (
                 <div className="mt-3 flex justify-center rounded-[18px] bg-white px-4 py-4">
                   <img
                     alt="QR WhatsApp Web"
                     className="h-auto w-full max-w-[320px] rounded-[12px]"
-                    src={status.qrCode}
+                    src={displayQrCode}
                   />
                 </div>
               ) : (
                 <p className="mt-3 break-all rounded-[18px] bg-white px-4 py-4 font-mono text-sm text-slate-700">
-                  {status.qrCode}
+                  {displayQrCode}
                 </p>
               )}
+              {isQrExpired ? (
+                <div className="mt-3 flex justify-center">
+                  <Button
+                    disabled={!isOnline || isSyncing}
+                    loading={refreshQrMutation.isPending}
+                    onClick={handleManualRefreshQr}
+                    size="sm"
+                  >
+                    Refrescar QR
+                  </Button>
+                </div>
+              ) : null}
+            </div>
+          ) : status?.sessionStatus === 'CONNECTED' ? (
+            <div className="rounded-[24px] border border-green-200 bg-green-50 px-5 py-5 text-center">
+              <p className="text-lg font-semibold text-green-800">Telefono conectado ✓</p>
+              <p className="mt-2 text-sm text-green-700">
+                El adaptador WhatsApp Web esta vinculado y listo para usar.
+              </p>
             </div>
           ) : (
             <EmptyState
@@ -747,9 +893,18 @@ export function WhatsAppWebConnectionPage() {
               variant="card"
             />
           )}
-          <p className="text-sm leading-6 text-slate-600">
-            Este MVP muestra un token representativo del QR porque el adaptador sigue en modo experimental desacoplado.
-          </p>
+
+          <div className="flex justify-center gap-3">
+            <Button
+              disabled={!isOnline || isSyncing || status?.sessionStatus === 'CONNECTED'}
+              loading={refreshQrMutation.isPending}
+              onClick={handleManualRefreshQr}
+              variant="secondary"
+              size="sm"
+            >
+              Refrescar QR
+            </Button>
+          </div>
         </div>
       </Modal>
 

@@ -1,4 +1,4 @@
-FROM node:22-bookworm-slim
+FROM node:20-slim
 
 WORKDIR /app
 
@@ -17,15 +17,15 @@ RUN for attempt in 1 2 3; do \
     && apt-get install -y --no-install-recommends \
       ca-certificates \
       chromium \
+      dumb-init \
       fluxbox \
       fonts-liberation \
-      git \
-      tzdata \
       novnc \
-      procps \
+      tzdata \
       websockify \
       x11vnc \
       xvfb \
+      procps \
     && rm -rf /var/lib/apt/lists/*
 
 COPY package.json ./
@@ -44,9 +44,16 @@ RUN corepack enable \
     done
 
 COPY src ./src
+COPY docker-entrypoint.sh ./docker-entrypoint.sh
 COPY start-visual.sh ./start-visual.sh
-RUN chmod +x ./start-visual.sh && mkdir -p /app/.wwebjs_auth /app/.wwebjs_cache /tmp/whatsapp-web-profile
+RUN chmod +x ./docker-entrypoint.sh \
+    && chmod +x ./start-visual.sh \
+    && mkdir -p /app/.wwebjs_auth /app/.wwebjs_cache /tmp/whatsapp-web-profile \
+    && chown -R node:node /app/.wwebjs_auth /app/.wwebjs_cache /tmp/whatsapp-web-profile
+
+USER node
 
 EXPOSE 3001 6080
 
-CMD ["./start-visual.sh"]
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["./docker-entrypoint.sh", "./start-visual.sh"]

@@ -1631,7 +1631,7 @@ public class CompleteAgendaJdbcRepository {
             logOutput("findProfessionalMaxDailyBookings", null);
             return null;
         }
-        Integer result = jdbcTemplate.queryForObject(
+        Integer result = jdbcTemplate.query(
                 """
                         select max_daily_bookings
                         from aesthetic_professional
@@ -1642,7 +1642,7 @@ public class CompleteAgendaJdbcRepository {
                 new MapSqlParameterSource()
                         .addValue("businessId", businessId)
                         .addValue("professionalId", professionalId),
-                Integer.class);
+                (rs) -> rs.next() ? rs.getObject("max_daily_bookings", Integer.class) : null);
         logOutput("findProfessionalMaxDailyBookings", result);
         return result;
     }
@@ -1842,6 +1842,111 @@ public class CompleteAgendaJdbcRepository {
         int result = bizResults.isEmpty() ? 60 : bizResults.get(0);
         logOutput("findMinAdvanceNoticeMinutes", result);
         return result;
+    }
+
+    public UUID findUserDefaultLocation(UUID businessId, UUID userId) {
+        List<UUID> items = jdbcTemplate.query(
+                """
+                        select location_id from business_user
+                        where business_id = :businessId and user_id = :userId and active = true
+                        limit 1
+                        """,
+                new MapSqlParameterSource().addValue("businessId", businessId).addValue("userId", userId),
+                (rs, rowNum) -> rs.getObject("location_id", UUID.class));
+        return items.isEmpty() ? null : items.getFirst();
+    }
+
+    public UUID findFirstLocation(UUID businessId) {
+        List<UUID> items = jdbcTemplate.query(
+                """
+                        select id from business_location
+                        where business_id = :businessId and active = true
+                        order by name limit 1
+                        """,
+                new MapSqlParameterSource().addValue("businessId", businessId),
+                (rs, rowNum) -> rs.getObject("id", UUID.class));
+        return items.isEmpty() ? null : items.getFirst();
+    }
+
+    public List<BusinessHoursRecord> findAllBusinessHours(UUID businessId, UUID locationId) {
+        logInput("findAllBusinessHours", businessId, locationId);
+        List<BusinessHoursRecord> result = jdbcTemplate.query(
+                """
+                        select day_of_week, start_time, end_time
+                        from agenda_business_hours
+                        where business_id = :businessId
+                          and location_id = :locationId
+                          and active = true
+                        order by day_of_week, start_time
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("businessId", businessId)
+                        .addValue("locationId", locationId),
+                (rs, rowNum) -> new BusinessHoursRecord(
+                        rs.getInt("day_of_week"),
+                        rs.getObject("start_time", LocalTime.class),
+                        rs.getObject("end_time", LocalTime.class)));
+        logOutput("findAllBusinessHours", result);
+        return result;
+    }
+
+    public record BusinessHoursRecord(int dayOfWeek, LocalTime startTime, LocalTime endTime) {}
+
+    public void replaceBusinessHours(UUID businessId, UUID locationId, List<BusinessHoursRecord> hours) {
+        logInput("replaceBusinessHours", businessId, locationId, hours.size());
+        jdbcTemplate.update(
+                "delete from agenda_business_hours where business_id = :businessId and location_id = :locationId",
+                new MapSqlParameterSource()
+                        .addValue("businessId", businessId)
+                        .addValue("locationId", locationId));
+        if (!hours.isEmpty()) {
+            MapSqlParameterSource[] batch = hours.stream().map(h -> new MapSqlParameterSource()
+                    .addValue("id", UUID.randomUUID())
+                    .addValue("businessId", businessId)
+                    .addValue("locationId", locationId)
+                    .addValue("dayOfWeek", h.dayOfWeek())
+                    .addValue("startTime", h.startTime())
+                    .addValue("endTime", h.endTime())
+            ).toArray(MapSqlParameterSource[]::new);
+            jdbcTemplate.batchUpdate(
+                    """
+                            insert into agenda_business_hours (id, business_id, location_id, day_of_week, start_time, end_time, active)
+                            values (:id, :businessId, :locationId, :dayOfWeek, :startTime, :endTime, true)
+                            """,
+                    batch);
+        }
+        logOutput("replaceBusinessHours", "done");
+    }
+
+    public void replaceProfessionalHours(UUID businessId, UUID locationId, UUID professionalId, List<BusinessHoursRecord> hours) {
+        logInput("replaceProfessionalHours", businessId, locationId, professionalId, hours.size());
+        jdbcTemplate.update(
+                """ 
+                        delete from agenda_professional_hours
+                        where business_id = :businessId and location_id = :locationId and professional_id = :professionalId
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("businessId", businessId)
+                        .addValue("locationId", locationId)
+                        .addValue("professionalId", professionalId));
+        if (!hours.isEmpty()) {
+            MapSqlParameterSource[] batch = hours.stream().map(h -> new MapSqlParameterSource()
+                    .addValue("id", UUID.randomUUID())
+                    .addValue("businessId", businessId)
+                    .addValue("locationId", locationId)
+                    .addValue("professionalId", professionalId)
+                    .addValue("dayOfWeek", h.dayOfWeek())
+                    .addValue("startTime", h.startTime())
+                    .addValue("endTime", h.endTime())
+            ).toArray(MapSqlParameterSource[]::new);
+            jdbcTemplate.batchUpdate(
+                    """
+                            insert into agenda_professional_hours (id, business_id, location_id, professional_id, day_of_week, start_time, end_time, active)
+                            values (:id, :businessId, :locationId, :professionalId, :dayOfWeek, :startTime, :endTime, true)
+                            """,
+                    batch);
+        }
+        logOutput("replaceProfessionalHours", "done");
     }
 
     public record DueReminderRecord(UUID id, UUID businessId, UUID bookingId, String reminderType, String channelType,

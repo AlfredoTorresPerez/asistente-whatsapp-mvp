@@ -13,7 +13,8 @@ public class SecurityUserMapper {
     public AuthenticatedUser toAuthenticatedUser(
             UserAccountEntity userAccount,
             String businessName,
-            List<String> roles) {
+            List<String> roles,
+            List<String> permissions) {
         return new AuthenticatedUser(
                 userAccount.getId(),
                 userAccount.getBusinessId(),
@@ -22,7 +23,8 @@ public class SecurityUserMapper {
                 userAccount.getLastName(),
                 userAccount.getEmail(),
                 userAccount.getTimezone(),
-                roles);
+                roles,
+                permissions);
     }
 
     public AuthUserResponse toAuthUserResponse(AuthenticatedUser authenticatedUser) {
@@ -34,7 +36,8 @@ public class SecurityUserMapper {
                 authenticatedUser.primaryRole(),
                 authenticatedUser.businessId(),
                 authenticatedUser.businessName(),
-                authenticatedUser.timezone());
+                authenticatedUser.timezone(),
+                authenticatedUser.permissions());
     }
 
     public UserProfileResponse toUserProfileResponse(

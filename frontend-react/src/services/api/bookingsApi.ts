@@ -1,4 +1,8 @@
 import { ApiClientError, apiFetch } from './httpClient'
+
+function enc(v: string): string {
+  return v.replace(/-/g, '%2D').replace(/_/g, '%5F')
+}
 import type {
   AgendaAvailabilityRequest,
   AgendaAvailabilityResponse,
@@ -350,13 +354,13 @@ export function createPublicLandingBookingRequest(payload: CreatePublicBookingRe
 }
 
 export function getCustomerBookingsRequest(token: string) {
-  return apiFetch<CustomerBookingItemResponse[]>(`/public/customer-bookings/${token}`, {
+  return apiFetch<CustomerBookingItemResponse[]>(`/public/customer-bookings/${enc(token)}`, {
     auth: false,
   })
 }
 
 export function cancelCustomerBookingRequest(token: string, bookingId: string, reason?: string) {
-  return apiFetch<{ status: string; bookingId: string }>(`/public/customer-bookings/${token}/${bookingId}/cancel`, {
+  return apiFetch<{ status: string; bookingId: string }>(`/public/customer-bookings/${enc(token)}/${bookingId}/cancel`, {
     method: 'POST',
     auth: false,
     body: JSON.stringify({ reason }),
@@ -364,7 +368,7 @@ export function cancelCustomerBookingRequest(token: string, bookingId: string, r
 }
 
 export function getCustomerBookingReschedulePreviewRequest(token: string, bookingId: string) {
-  return apiFetch<CustomerBookingReschedulePreviewResponse>(`/public/customer-bookings/${token}/${bookingId}/reschedule`, {
+  return apiFetch<CustomerBookingReschedulePreviewResponse>(`/public/customer-bookings/${enc(token)}/${bookingId}/reschedule`, {
     auth: false,
   })
 }
@@ -377,7 +381,7 @@ export function getCustomerBookingRescheduleAvailabilityRequest(
   date: string,
 ) {
   const searchParams = new URLSearchParams({ serviceId, locationId, date })
-  return apiFetch<AgendaAvailabilityResponse>(`/public/customer-bookings/${token}/${bookingId}/reschedule/availability?${searchParams.toString()}`, {
+  return apiFetch<AgendaAvailabilityResponse>(`/public/customer-bookings/${enc(token)}/${bookingId}/reschedule/availability?${searchParams.toString()}`, {
     auth: false,
   })
 }
@@ -387,7 +391,7 @@ export function rescheduleCustomerBookingRequest(
   bookingId: string,
   payload: CustomerBookingRescheduleRequest,
 ) {
-  return apiFetch<CustomerBookingItemResponse>(`/public/customer-bookings/${token}/${bookingId}/reschedule`, {
+  return apiFetch<CustomerBookingItemResponse>(`/public/customer-bookings/${enc(token)}/${bookingId}/reschedule`, {
     method: 'POST',
     auth: false,
     body: JSON.stringify(payload),

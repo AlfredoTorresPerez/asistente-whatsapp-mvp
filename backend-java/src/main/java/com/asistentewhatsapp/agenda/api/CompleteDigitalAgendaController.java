@@ -5,6 +5,7 @@ import com.asistentewhatsapp.bookings.api.BookingDetailResponse;
 import com.asistentewhatsapp.security.domain.AuthenticatedUser;
 import jakarta.validation.Valid;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,6 +46,27 @@ public class CompleteDigitalAgendaController {
         return completeDigitalAgendaService.createTemporaryBooking(authenticatedUser, request);
     }
 
+
+    @GetMapping("/business-hours")
+    public List<BusinessHoursResponse> businessHours(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @RequestParam(required = false) UUID locationId) {
+        return completeDigitalAgendaService.businessHours(authenticatedUser, locationId);
+    }
+
+    @PutMapping(value = "/business-hours", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public List<BusinessHoursResponse> saveBusinessHours(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @Valid @RequestBody SaveBusinessHoursRequest request) {
+        return completeDigitalAgendaService.saveBusinessHours(authenticatedUser, request);
+    }
+
+    @PutMapping(value = "/professional-hours", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public List<BusinessHoursResponse> saveProfessionalHours(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @Valid @RequestBody SaveProfessionalHoursRequest request) {
+        return completeDigitalAgendaService.saveProfessionalHours(authenticatedUser, request);
+    }
 
     @GetMapping("/filter-options")
     public AgendaFilterOptionsResponse filterOptions(

@@ -1,5 +1,6 @@
 package com.asistentewhatsapp.security.api;
 
+import java.util.List;
 import java.util.UUID;
 
 public record AuthUserResponse(
@@ -10,6 +11,7 @@ public record AuthUserResponse(
         String role,
         UUID businessId,
         String businessName,
-        String timezone) {
+        String timezone,
+        List<String> permissions) {
 }
 

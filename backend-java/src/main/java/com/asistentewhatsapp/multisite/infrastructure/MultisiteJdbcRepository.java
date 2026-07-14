@@ -213,21 +213,21 @@ public class MultisiteJdbcRepository {
         return jdbcTemplate.query(
                 """
                         select
-                            pls.id,
-                            pls.professional_id,
+                            aph.id,
+                            aph.professional_id,
                             ap.full_name as professional_name,
-                            pls.location_id,
+                            aph.location_id,
                             bl.name as location_name,
-                            pls.day_of_week,
-                            pls.start_time,
-                            pls.end_time,
-                            pls.active
-                        from professional_location_schedule pls
-                        join aesthetic_professional ap on ap.id = pls.professional_id and ap.business_id = pls.business_id
-                        join business_location bl on bl.id = pls.location_id and bl.business_id = pls.business_id
-                        where pls.business_id = :businessId
-                          and (cast(:locationId as uuid) is null or pls.location_id = :locationId)
-                        order by bl.name asc, ap.full_name asc, pls.day_of_week asc, pls.start_time asc
+                            aph.day_of_week,
+                            aph.start_time,
+                            aph.end_time,
+                            aph.active
+                        from agenda_professional_hours aph
+                        join aesthetic_professional ap on ap.id = aph.professional_id and ap.business_id = aph.business_id
+                        join business_location bl on bl.id = aph.location_id and bl.business_id = aph.business_id
+                        where aph.business_id = :businessId
+                          and (cast(:locationId as uuid) is null or aph.location_id = :locationId)
+                        order by bl.name asc, ap.full_name asc, aph.day_of_week asc, aph.start_time asc
                         """,
                 new MapSqlParameterSource().addValue("businessId", businessId).addValue("locationId", locationId),
                 (rs, rowNum) -> new ProfessionalScheduleResponse(
@@ -259,7 +259,7 @@ public class MultisiteJdbcRepository {
                         .addValue("locationId", request.locationId()));
         jdbcTemplate.update(
                 """
-                        insert into professional_location_schedule (
+                        insert into agenda_professional_hours (
                             id, business_id, professional_id, location_id, day_of_week, start_time, end_time, active
                         ) values (
                             :id, :businessId, :professionalId, :locationId, :dayOfWeek, :startTime, :endTime, :active

@@ -26,6 +26,11 @@ public class WhatsAppWebController {
         return whatsAppWebAdministrationService.getStatus(authenticatedUser);
     }
 
+    @GetMapping({"/api/v1/whatsapp-web/qr", "/api/channels/whatsapp-web/qr"})
+    public WhatsAppWebQrResponse qr(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        return whatsAppWebAdministrationService.getQr(authenticatedUser);
+    }
+
     @PostMapping({"/api/v1/whatsapp-web/connect", "/api/channels/whatsapp-web/connect"})
     public WhatsAppWebActionResponse connect(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
         return whatsAppWebAdministrationService.connect(authenticatedUser);

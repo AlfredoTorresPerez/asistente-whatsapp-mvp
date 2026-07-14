@@ -471,51 +471,6 @@ export function AutomationRuleRunPage() {
   )
 }
 
-export function ReportsPage() {
-  return (
-    <ModuleLayout
-      actions={[{ label: 'Exportar', to: '/reports', variant: 'secondary' }, { label: 'Programar envio', to: '/reports' }]}
-      aside={
-        <PanelCard title="Filtros avanzados">
-          <FieldGrid fields={['Rango', 'Canal', 'Responsable', 'Estado']} />
-        </PanelCard>
-      }
-      description="Indicadores, filtros avanzados, exportaciones y seguimiento del estado comercial."
-      eyebrow="Reportes"
-      metrics={[
-        { label: 'Conversaciones', value: '1.250', delta: '+12%', tone: 'success' },
-        { label: 'Prospectos', value: '320', delta: '+9%', tone: 'success' },
-        { label: 'Pedidos', value: '86', delta: '+5%', tone: 'info' },
-        { label: 'Respuesta', value: '92%', delta: 'OK', tone: 'success' },
-      ]}
-      title="Reportes basicos"
-    >
-      <Card className="space-y-6">
-        <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
-          <div className="rounded-[24px] border border-[var(--color-border)] bg-white p-5">
-            <p className="text-sm font-semibold text-[var(--color-text)]">Conversaciones por canal</p>
-            <div className="mx-auto mt-5 flex h-40 w-40 items-center justify-center rounded-full border-[22px] border-blue-500 bg-emerald-100 text-center text-2xl font-semibold text-[var(--color-text)]">
-              1.250
-            </div>
-          </div>
-          <div className="rounded-[24px] border border-[var(--color-border)] bg-white p-5">
-            <p className="text-sm font-semibold text-[var(--color-text)]">Rendimiento de conversaciones</p>
-            <div className="mt-8 flex h-40 items-end gap-3">
-              {[62, 78, 70, 92, 86, 100, 82].map((height, index) => (
-                <div className="flex flex-1 flex-col items-center gap-2" key={`${height}-${index}`}>
-                  <div className="w-full rounded-t-xl bg-blue-500/80" style={{ height: `${height}%` }} />
-                  <span className="text-xs text-[var(--color-text-secondary)]">D{index + 1}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-        <VisualTable caption="Detalle exportable" columns={['Indicador', 'Estado', 'Valor']} rows={orderRows} />
-      </Card>
-    </ModuleLayout>
-  )
-}
-
 const userRows: DataTableShellRow[] = [
   { id: 'u1', cells: ['Ana Admin', <StatusBadge key="u1" label="OWNER" tone="info" />, <StatusBadge key="u1s" label="Activo" tone="success" />], href: '/admin/users/demo-user/edit' },
   { id: 'u2', cells: ['Carla Mendez', <StatusBadge key="u2" label="AGENT" tone="neutral" />, <StatusBadge key="u2s" label="Activo" tone="success" />], href: '/admin/users/demo-user/edit' },

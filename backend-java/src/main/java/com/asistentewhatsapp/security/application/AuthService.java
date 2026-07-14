@@ -19,6 +19,7 @@ import com.asistentewhatsapp.security.infrastructure.BusinessRepository;
 import com.asistentewhatsapp.security.infrastructure.PasswordResetTokenRepository;
 import com.asistentewhatsapp.security.infrastructure.SecurityPolicyRepository;
 import com.asistentewhatsapp.security.infrastructure.UserAccountRepository;
+import com.asistentewhatsapp.security.infrastructure.UserPermissionJdbcRepository;
 import com.asistentewhatsapp.security.infrastructure.UserRoleJdbcRepository;
 import com.asistentewhatsapp.shared.api.StatusResponse;
 import com.asistentewhatsapp.shared.email.TransactionalEmailService;
@@ -34,7 +35,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Base64;
-import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -60,6 +60,7 @@ public class AuthService {
     private final SecurityPolicyRepository securityPolicyRepository;
     private final BusinessRepository businessRepository;
     private final UserRoleJdbcRepository userRoleJdbcRepository;
+    private final UserPermissionJdbcRepository userPermissionJdbcRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final AuditLogJdbcRepository auditLogJdbcRepository;
     private final PasswordEncoder passwordEncoder;
@@ -75,6 +76,7 @@ public class AuthService {
             SecurityPolicyRepository securityPolicyRepository,
             BusinessRepository businessRepository,
             UserRoleJdbcRepository userRoleJdbcRepository,
+            UserPermissionJdbcRepository userPermissionJdbcRepository,
             PasswordResetTokenRepository passwordResetTokenRepository,
             AuditLogJdbcRepository auditLogJdbcRepository,
             PasswordEncoder passwordEncoder,
@@ -88,6 +90,7 @@ public class AuthService {
         this.securityPolicyRepository = securityPolicyRepository;
         this.businessRepository = businessRepository;
         this.userRoleJdbcRepository = userRoleJdbcRepository;
+        this.userPermissionJdbcRepository = userPermissionJdbcRepository;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.auditLogJdbcRepository = auditLogJdbcRepository;
         this.passwordEncoder = passwordEncoder;
@@ -348,10 +351,11 @@ public class AuthService {
 
     private AuthenticatedUser buildAuthenticatedUser(UserAccountEntity userAccount) {
         List<String> roles = userRoleJdbcRepository.findRoleCodesByUserId(userAccount.getId());
+        List<String> permissions = userPermissionJdbcRepository.findPermissionCodesByUserId(userAccount.getId());
         String businessName = businessRepository.findById(userAccount.getBusinessId())
                 .map(BusinessEntity::getBusinessName)
                 .orElse("Centro Estetico Bella");
-        return securityUserMapper.toAuthenticatedUser(userAccount, businessName, roles);
+        return securityUserMapper.toAuthenticatedUser(userAccount, businessName, roles, permissions);
     }
 
     private UserAccountEntity loadScopedUser(AuthenticatedUser authenticatedUser) {
@@ -418,10 +422,18 @@ public class AuthService {
         try {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
             byte[] digest = messageDigest.digest(token.getBytes(StandardCharsets.UTF_8));
-            return HexFormat.of().formatHex(digest);
+            return bytesToHex(digest);
         } catch (NoSuchAlgorithmException exception) {
             throw new IllegalStateException("No se pudo generar el hash del token.", exception);
         }
+    }
+
+    private String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder(bytes.length * 2);
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
     }
 
     public String maskEmail(String email) {

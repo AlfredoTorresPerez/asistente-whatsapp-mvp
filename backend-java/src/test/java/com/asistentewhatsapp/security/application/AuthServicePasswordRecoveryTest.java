@@ -11,6 +11,7 @@ import com.asistentewhatsapp.security.infrastructure.BusinessRepository;
 import com.asistentewhatsapp.security.infrastructure.PasswordResetTokenRepository;
 import com.asistentewhatsapp.security.infrastructure.SecurityPolicyRepository;
 import com.asistentewhatsapp.security.infrastructure.UserAccountRepository;
+import com.asistentewhatsapp.security.infrastructure.UserPermissionJdbcRepository;
 import com.asistentewhatsapp.security.infrastructure.UserRoleJdbcRepository;
 import com.asistentewhatsapp.shared.email.TransactionalEmailService;
 import com.asistentewhatsapp.shared.email.TransactionalEmailService.DeliveryStatus;
@@ -40,6 +41,7 @@ class AuthServicePasswordRecoveryTest {
     private final SecurityPolicyRepository securityPolicyRepository = mock(SecurityPolicyRepository.class);
     private final BusinessRepository businessRepository = mock(BusinessRepository.class);
     private final UserRoleJdbcRepository userRoleJdbcRepository = mock(UserRoleJdbcRepository.class);
+    private final UserPermissionJdbcRepository userPermissionJdbcRepository = mock(UserPermissionJdbcRepository.class);
     private final PasswordResetTokenRepository passwordResetTokenRepository = mock(PasswordResetTokenRepository.class);
     private final AuditLogJdbcRepository auditLogJdbcRepository = mock(AuditLogJdbcRepository.class);
     private final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
@@ -61,6 +63,7 @@ class AuthServicePasswordRecoveryTest {
                 securityPolicyRepository,
                 businessRepository,
                 userRoleJdbcRepository,
+                userPermissionJdbcRepository,
                 passwordResetTokenRepository,
                 auditLogJdbcRepository,
                 passwordEncoder,

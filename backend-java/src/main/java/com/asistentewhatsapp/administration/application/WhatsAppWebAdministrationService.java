@@ -1,6 +1,7 @@
 package com.asistentewhatsapp.administration.application;
 
 import com.asistentewhatsapp.administration.api.WhatsAppWebActionResponse;
+import com.asistentewhatsapp.administration.api.WhatsAppWebQrResponse;
 import com.asistentewhatsapp.administration.api.WhatsAppWebStatusResponse;
 import com.asistentewhatsapp.administration.api.WhatsAppWebTestMessageRequest;
 import com.asistentewhatsapp.administration.api.WhatsAppWebTestMessageResponse;
@@ -64,6 +65,20 @@ public class WhatsAppWebAdministrationService {
                     WARNING_MESSAGE,
                     repository.findRecentEvents(authenticatedUser.businessId(), 6));
         }
+    }
+
+    @Transactional(readOnly = true)
+    public WhatsAppWebQrResponse getQr(AuthenticatedUser authenticatedUser) {
+        AdminAccessGuard.requireOwnerAdminOrSupervisor(authenticatedUser);
+        WhatsAppWebChannelJdbcRepository.ChannelAccountRecord channelAccount = loadChannelAccount(authenticatedUser.businessId());
+        String qrCode = channelAccount.lastQrCode();
+        String status = channelAccount.status();
+        OffsetDateTime lastQrAt = channelAccount.lastQrAt();
+        OffsetDateTime expiresAt = null;
+        if (qrCode != null && !qrCode.isBlank() && lastQrAt != null) {
+            expiresAt = lastQrAt.plusSeconds(properties.qrTimeoutSeconds());
+        }
+        return new WhatsAppWebQrResponse(qrCode, status, expiresAt, lastQrAt);
     }
 
     @Transactional

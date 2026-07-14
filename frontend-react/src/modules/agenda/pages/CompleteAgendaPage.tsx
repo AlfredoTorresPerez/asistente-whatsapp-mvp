@@ -17,6 +17,7 @@ import {
   getAgendaAvailabilityRequest,
   getAgendaCalendarRequest,
   getAgendaFilterOptionsRequest,
+  getBusinessHoursRequest,
 } from '../../../services/api/completeAgendaApi'
 import { getBusinessLocationsRequest } from '../../../services/api/businessLocationsApi'
 import { createBookingConfirmationLinkRequest, getBookingDetailRequest } from '../../../services/api/bookingsApi'
@@ -162,6 +163,12 @@ export function CompleteAgendaPage() {
   const locationsQuery = useQuery({
     queryKey: ['business-locations', 'agenda-completa'],
     queryFn: () => getBusinessLocationsRequest({ activeOnly: true }),
+  })
+
+  const businessHoursQuery = useQuery({
+    queryKey: ['agenda-business-hours', locationId || 'all'],
+    queryFn: () => getBusinessHoursRequest(locationId || undefined),
+    enabled: Boolean(locationsQuery.data?.length),
   })
 
   const filterOptionsQuery = useQuery({
@@ -459,6 +466,7 @@ export function CompleteAgendaPage() {
             onDateChange={setDate}
           />
           <WeeklyCalendarView
+            businessHours={businessHoursQuery.data ?? []}
             calendarItems={calendarItems}
             selectedBookingId={selectedBookingId}
             visibleDays={visibleDays}

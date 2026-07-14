@@ -30,7 +30,7 @@ class AiAgentCoherenceTest {
     private final AgentRegistry registry = new AgentRegistry(List.of(
             new ReceptionAgent(),
             new SalesAgent(knowledgeService),
-            new BookingAgent(knowledgeService, locationRepository, transactionalAgendaBookingService),
+            new BookingAgent(knowledgeService, transactionalAgendaBookingService),
             new PaymentsAgent(knowledgeService),
             new SupportAgent(locationRepository),
             new KnowledgeAgent(),
@@ -71,12 +71,18 @@ class AiAgentCoherenceTest {
                         Mockito.any(),
                         Mockito.any()))
                 .thenReturn(Optional.empty());
+        Mockito.when(service.generateBookingLink(
+                        Mockito.any(),
+                        Mockito.any(),
+                        Mockito.any(),
+                        Mockito.any()))
+                .thenReturn(new TransactionalAgendaBookingService.BookingLinkResult("http://localhost/reservar", false));
         return service;
     }
 
     @Test
     void bookingAgentDoesNotAskServiceAgainWhenServiceDateAndTimeAreKnown() {
-        BookingAgent agent = new BookingAgent(knowledgeService, locationRepository, transactionalAgendaBookingService);
+        BookingAgent agent = new BookingAgent(knowledgeService, transactionalAgendaBookingService);
         Map<String, String> entities = new LinkedHashMap<>();
         entities.put("servicio_o_producto", "Depilacion bozo");
         entities.put("fecha_relativa", "mañana");
@@ -89,9 +95,8 @@ class AiAgentCoherenceTest {
                 java.util.List.of());
 
         assertThat(result.missingData()).isEmpty();
-        assertNormalizedContains(result.responseToCustomer(), "Depilacion bozo", "mañana", "14:00");
+        assertThat(result.responseToCustomer()).contains("/reservar");
         assertThat(result.responseToCustomer()).doesNotContain("qué servicio", "servicio específico", "a las a las");
-        assertThat(result.responseToCustomer()).contains("validar disponibilidad real");
     }
 
     @Test
@@ -102,7 +107,7 @@ class AiAgentCoherenceTest {
         assertRoute("Cuanto cuesta depilacion bozo", AgentIntent.PRICE_REQUEST, AgentType.SALES,
                 "$8.990", "15 minutos");
         assertRoute("Quiero agendar depilación bozo mañana a las 14 horas", AgentIntent.COMMERCIAL_AND_BOOKING, AgentType.BOOKING,
-                "depilacion bozo", "mañana", "14:00", "validar disponibilidad real");
+                "reserva", "en linea");
         assertRoute("Quiero hablar con una persona", AgentIntent.HUMAN_REQUEST, AgentType.HUMAN_HANDOFF,
                 "derivar", "persona del equipo");
         assertRoute("Estoy molesta, nadie responde", AgentIntent.COMPLAINT, AgentType.HUMAN_HANDOFF,
@@ -112,11 +117,11 @@ class AiAgentCoherenceTest {
     @Test
     void bookingAgentAsksOnlyForMissingData() {
         assertRoute("Quiero agendar depilación bozo", AgentIntent.COMMERCIAL_AND_BOOKING, AgentType.BOOKING,
-                "para que dia");
+                "reserva", "en linea");
         assertRoute("Quiero agendar mañana", AgentIntent.BOOKING_REQUEST, AgentType.BOOKING,
-                "servicio especifico");
+                "reserva", "en linea");
         assertRoute("Quiero agendar a las 14 horas", AgentIntent.BOOKING_REQUEST, AgentType.BOOKING,
-                "servicio especifico");
+                "reserva", "en linea");
     }
 
     @Test
@@ -127,9 +132,8 @@ class AiAgentCoherenceTest {
         assertThat(result.extractedData()).containsEntry("servicio_o_producto", "Limpieza facial profunda");
         assertThat(result.extractedData()).containsEntry("fecha_relativa", "viernes");
         assertThat(result.missingData()).doesNotContain("motivo_o_servicio", "fecha_deseada");
-        assertThat(result.missingData()).contains("horario_preferido");
-        assertNormalizedContains(result.responseToCustomer(), "limpieza facial", "viernes", "horario");
-        assertThat(normalize(result.responseToCustomer())).doesNotContain("servicio especifico");
+        assertThat(result.missingData()).isEmpty();
+        assertThat(result.responseToCustomer()).contains("/reservar");
     }
 
     @Test
@@ -147,7 +151,7 @@ class AiAgentCoherenceTest {
     void availabilityQuestionDoesNotConfirmCalendarSlot() {
         AgentRoutingResult result = route("Tienen disponibilidad mañana a las 14 para depilacion bozo?");
 
-        assertNormalizedContains(result.responseToCustomer(), "validar disponibilidad real", "quieres que revise esa hora");
+        assertThat(result.responseToCustomer()).contains("/reservar");
         assertThat(normalize(result.responseToCustomer())).doesNotContain("confirmada", "confirmado");
     }
 
@@ -198,15 +202,14 @@ class AiAgentCoherenceTest {
         AgentCoordinatorService coordinator = new AgentCoordinatorService(enabledProperties(), detector, extractor, registry, repository);
 
         AgentRoutingResult first = coordinator.route(request("Quiero agendar depilacion bozo")).orElseThrow();
-        assertThat(first.missingData()).contains("fecha_deseada");
+        assertThat(first.missingData()).isEmpty();
 
         AgentRoutingResult second = coordinator.route(request("mañana")).orElseThrow();
-        assertThat(second.missingData()).contains("horario_preferido");
-        assertThat(second.missingData()).doesNotContain("motivo_o_servicio", "fecha_deseada");
+        assertThat(second.missingData()).isEmpty();
 
         AgentRoutingResult third = coordinator.route(request("a las 14 horas")).orElseThrow();
         assertThat(third.missingData()).isEmpty();
-        assertNormalizedContains(third.responseToCustomer(), "depilacion bozo", "mañana", "14:00");
+        assertThat(third.responseToCustomer()).contains("/reservar");
     }
 
     private AgentConversationRequest request(String body) {

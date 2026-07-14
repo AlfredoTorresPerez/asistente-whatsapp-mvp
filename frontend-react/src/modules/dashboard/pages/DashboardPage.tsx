@@ -69,8 +69,6 @@ function resolveActivityRoute(activity: DashboardActivityResponse) {
       return `/prospects/${activity.entityId}`
     case 'BOOKING':
       return `/appointments/${activity.entityId}`
-    case 'ORDER':
-      return `/orders/${activity.entityId}`
     case 'PRODUCT':
     case 'CATALOG_PRODUCT':
       return `/catalog/products/${activity.entityId}/edit`
@@ -92,7 +90,6 @@ function resolveActivityRoute(activity: DashboardActivityResponse) {
 function isDashboardEmpty(
   openConversations: number,
   newProspects: number,
-  openOrders: number,
   pendingAppointments: number,
   appointmentsCount: number,
   activityCount: number,
@@ -100,7 +97,6 @@ function isDashboardEmpty(
   return (
     openConversations === 0 &&
     newProspects === 0 &&
-    openOrders === 0 &&
     pendingAppointments === 0 &&
     appointmentsCount === 0 &&
     activityCount === 0
@@ -144,12 +140,6 @@ export function DashboardPage() {
               tone: 'success' as const,
             },
             {
-              label: 'Pedidos abiertos',
-              value: String(data.kpis.openOrders),
-              note: 'Pedidos activos con seguimiento en curso.',
-              tone: 'warning' as const,
-            },
-            {
               label: 'Citas pendientes',
               value: String(data.kpis.pendingAppointments),
               note: 'Citas pendientes o reprogramadas en el rango.',
@@ -177,9 +167,6 @@ export function DashboardPage() {
             </Link>
             <Link className={buttonClassName({ variant: 'secondary' })} to="/appointments">
               Ver agenda
-            </Link>
-            <Link className={buttonClassName({ variant: 'secondary' })} to="/orders">
-              Ver pedidos
             </Link>
           </>
         }
@@ -251,7 +238,6 @@ export function DashboardPage() {
       isDashboardEmpty(
         data.kpis.openConversations,
         data.kpis.newProspects,
-        data.kpis.openOrders,
         data.kpis.pendingAppointments,
         data.todayAppointments.length,
         data.recentActivity.length,
@@ -284,11 +270,6 @@ export function DashboardPage() {
               description="Conversaciones creadas por dia en el rango seleccionado."
               series={data.conversationSeries}
               title="Actividad de conversaciones"
-            />
-            <SeriesCard
-              description="Pedidos registrados por dia durante el periodo activo."
-              series={data.orderSeries}
-              title="Actividad de pedidos"
             />
             <Card>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
@@ -385,10 +366,6 @@ export function DashboardPage() {
                 <SummaryLine
                   label="Prospectos en movimiento"
                   value={data.kpis.newProspects}
-                />
-                <SummaryLine
-                  label="Pedidos por cobrar o confirmar"
-                  value={data.kpis.openOrders}
                 />
                 <SummaryLine
                   label="Citas pendientes"

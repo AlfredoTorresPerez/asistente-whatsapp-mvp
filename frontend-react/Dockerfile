@@ -1,3 +1,27 @@
+# syntax=docker/dockerfile:1.7
+# =============================================================================
+# DEV STAGE  - Vite dev server con HMR (usado por docker-compose.local.yml)
+# =============================================================================
+FROM node:24-alpine AS dev
+
+WORKDIR /app
+
+ENV NODE_OPTIONS=--dns-result-order=ipv4first
+ARG VITE_API_BASE_URL=/api/v1
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN corepack enable && corepack prepare pnpm@10.18.3 --activate && pnpm install --frozen-lockfile
+
+COPY . .
+
+EXPOSE 5173
+
+CMD ["pnpm", "dev", "--host", "0.0.0.0"]
+
+# =============================================================================
+# BUILD STAGE - Compilacion para produccion
+# =============================================================================
 FROM node:24-alpine AS build
 
 WORKDIR /app
@@ -7,14 +31,16 @@ ARG VITE_API_BASE_URL=/api/v1
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-
 RUN corepack enable && corepack prepare pnpm@10.18.3 --activate && pnpm install --frozen-lockfile
 
 COPY . .
 
 RUN pnpm build
 
-FROM nginx:1.27-alpine
+# =============================================================================
+# PRODUCTION STAGE - nginx sirviendo el bundle estatico
+# =============================================================================
+FROM nginx:1.27-alpine AS production
 
 RUN apk add --no-cache tzdata
 
