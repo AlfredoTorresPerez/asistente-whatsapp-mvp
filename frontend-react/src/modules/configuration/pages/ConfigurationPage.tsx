@@ -20,6 +20,8 @@ import type {
   WhatsAppConfigurationResponse,
   WhatsAppConfigurationSessionHistoryResponse,
 } from '../../../services/api/types'
+import { CalendarSection } from '../components/CalendarSection'
+import { usePermissions } from '../../../hooks/usePermissions'
 
 type BadgeTone = 'success' | 'warning' | 'danger' | 'neutral' | 'info'
 type PreferenceKey = keyof WhatsAppConfigurationPreferencesResponse
@@ -150,6 +152,7 @@ function toHistoryToneLabel(tone: string) {
 export function ConfigurationPage() {
   const { showToast } = useToast()
   const queryClient = useQueryClient()
+  const { hasPermission } = usePermissions()
   const configurationQuery = useQuery({
     queryKey: configurationQueryKey,
     queryFn: getWhatsAppConfigurationRequest,
@@ -328,6 +331,10 @@ export function ConfigurationPage() {
             </div>
           </div>
         </div>
+      ) : null}
+
+      {hasPermission('CALENDAR_CONFIG_VIEW') ? (
+        <CalendarSection />
       ) : null}
     </section>
   )

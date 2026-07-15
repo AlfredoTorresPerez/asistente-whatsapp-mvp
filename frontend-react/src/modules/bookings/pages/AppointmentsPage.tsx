@@ -42,6 +42,24 @@ function formatDateTime(value: string) {
   return dayjs(value).format('DD MMM YYYY HH:mm')
 }
 
+function syncStatusTone(status: string): string {
+  switch (status) {
+    case 'SYNCED': return 'bg-emerald-500'
+    case 'PENDING': return 'bg-amber-400'
+    case 'FAILED': return 'bg-red-500'
+    default: return 'bg-slate-300'
+  }
+}
+
+function syncStatusTitle(status: string): string {
+  switch (status) {
+    case 'SYNCED': return 'Sincronizado con Google Calendar'
+    case 'PENDING': return 'Pendiente de sincronizar'
+    case 'FAILED': return 'Error de sincronización'
+    default: return 'Sin sincronizar'
+  }
+}
+
 function buildCalendarDays(visibleMonth: dayjs.Dayjs) {
   const firstDay = visibleMonth.startOf('month').startOf('week')
   return Array.from({ length: 42 }, (_, index) => firstDay.add(index, 'day'))
@@ -355,7 +373,10 @@ export function AppointmentsPage() {
                               className={['rounded-lg px-2 py-1 text-[11px] shadow-sm', ss.bg, ss.text].join(' ')}
                               style={{ borderLeft: `2px solid ${ss.hex}` }}
                             >
-                              <p className="truncate font-semibold">{booking.subject}</p>
+                              <div className="flex items-center gap-1.5">
+                                <span className={['inline-block h-1.5 w-1.5 rounded-full', syncStatusTone(booking.calendarSyncStatus)].join(' ')} title={syncStatusTitle(booking.calendarSyncStatus)} />
+                                <p className="truncate font-semibold">{booking.subject}</p>
+                              </div>
                               <p className="truncate opacity-80">{dayjs(booking.startsAt).format('HH:mm')}</p>
                             </div>
                           )
@@ -400,16 +421,21 @@ export function AppointmentsPage() {
                 {selectedDayBookings.map((booking) => {
                   const agendaItem = bookingToAgendaItem(booking)
                   return (
-                    <Link
-                      key={booking.id}
-                      className="block transition hover:-translate-y-0.5"
-                      to={`/appointments/${booking.id}`}
-                    >
-                      <AgendaEventCard
-                        item={agendaItem}
-                        showStatus
+                    <div key={booking.id} className="relative">
+                      <Link
+                        className="block transition hover:-translate-y-0.5"
+                        to={`/appointments/${booking.id}`}
+                      >
+                        <AgendaEventCard
+                          item={agendaItem}
+                          showStatus
+                        />
+                      </Link>
+                      <span
+                        className={['absolute right-2 top-2 inline-block h-2 w-2 rounded-full ring-1 ring-white', syncStatusTone(booking.calendarSyncStatus)].join(' ')}
+                        title={syncStatusTitle(booking.calendarSyncStatus)}
                       />
-                    </Link>
+                    </div>
                   )
                 })}
               </div>

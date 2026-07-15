@@ -39,7 +39,11 @@ values
     ('40000000-0000-0000-0000-000000000018', 'WHATSAPP_CONFIG_MANAGE', 'Gestionar configuración WhatsApp', 'WHATSAPP', 'Permite conectar, desconectar y configurar WhatsApp.'),
     
     -- Reportes
-    ('40000000-0000-0000-0000-000000000019', 'REPORTS_VIEW', 'Ver reportes', 'REPORTS', 'Permite consultar reportes y métricas.')
+    ('40000000-0000-0000-0000-000000000019', 'REPORTS_VIEW', 'Ver reportes', 'REPORTS', 'Permite consultar reportes y métricas.'),
+
+    -- Calendario
+    ('40000000-0000-0000-0000-000000000020', 'CALENDAR_CONFIG_VIEW', 'Ver configuraci\u00f3n de calendario', 'CALENDAR', 'Permite ver el estado y configuraci\u00f3n de la integraci\u00f3n de calendario.'),
+    ('40000000-0000-0000-0000-000000000021', 'CALENDAR_CONFIG_MANAGE', 'Gestionar configuraci\u00f3n de calendario', 'CALENDAR', 'Permite conectar, desconectar y configurar el calendario.')
 on conflict (code) do nothing;
 
 -- Asignación de permisos a roles
@@ -77,7 +81,9 @@ join permission p on p.code in (
     'LOCATIONS_MANAGE',
     'USERS_VIEW',
     'WHATSAPP_CONFIG_VIEW',
-    'REPORTS_VIEW'
+    'REPORTS_VIEW',
+    'CALENDAR_CONFIG_VIEW',
+    'CALENDAR_CONFIG_MANAGE'
 )
 where r.code = 'ADMIN'
 on conflict (role_id, permission_id) do nothing;
@@ -102,7 +108,8 @@ join permission p on p.code in (
     'CATALOG_VIEW',
     'LOCATIONS_VIEW',
     'USERS_VIEW',
-    'REPORTS_VIEW'
+    'REPORTS_VIEW',
+    'CALENDAR_CONFIG_VIEW'
 )
 where r.code = 'SUPERVISOR'
 on conflict (role_id, permission_id) do nothing;

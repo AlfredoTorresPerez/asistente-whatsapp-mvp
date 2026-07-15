@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +28,7 @@ public class ResponseTemplateController {
         this.responseTemplateService = responseTemplateService;
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CONVERSATIONS_VIEW')")
     @GetMapping("/api/v1/templates")
     public List<ResponseTemplateResponse> list(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -34,6 +36,7 @@ public class ResponseTemplateController {
         return responseTemplateService.list(authenticatedUser, active);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'TEMPLATE_MANAGE')")
     @PostMapping(value = "/api/v1/templates", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseTemplateResponse create(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -41,6 +44,7 @@ public class ResponseTemplateController {
         return responseTemplateService.create(authenticatedUser, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'TEMPLATE_MANAGE')")
     @PutMapping(value = "/api/v1/templates/{templateId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseTemplateResponse update(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -49,6 +53,7 @@ public class ResponseTemplateController {
         return responseTemplateService.update(authenticatedUser, templateId, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'TEMPLATE_MANAGE')")
     @PatchMapping(value = "/api/v1/templates/{templateId}/status", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseTemplateResponse updateStatus(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,

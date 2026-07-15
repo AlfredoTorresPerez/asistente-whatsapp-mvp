@@ -302,7 +302,6 @@ export function CompleteAgendaPage() {
         generateConfirmationLink: true,
         sendWhatsApp: true,
       }
-      console.log('[diagnostico] createTemporaryAgendaBookingRequest payload:', payload)
       return createTemporaryAgendaBookingRequest(payload)
     },
     onSuccess: (booking) => {
@@ -315,7 +314,6 @@ export function CompleteAgendaPage() {
     },
     onError: (error) => {
       const apiError = error as ApiClientError
-      console.log('[diagnostico] createMutation error:', { code: apiError.code, status: apiError.status, message: apiError.message, fieldErrors: apiError.fieldErrors })
       if (apiError?.fieldErrors && Object.keys(apiError.fieldErrors).length > 0) {
         const firstFieldError = Object.values(apiError.fieldErrors)[0]
         showToast({

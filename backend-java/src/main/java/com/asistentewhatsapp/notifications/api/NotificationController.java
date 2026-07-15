@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
@@ -24,6 +25,7 @@ public class NotificationController {
         this.notificationService = notificationService;
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'NOTIFICATIONS_VIEW')")
     @GetMapping("/api/v1/notifications")
     public PagedResponse<NotificationResponse> list(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -35,6 +37,7 @@ public class NotificationController {
         return notificationService.list(authenticatedUser, page, size, search, status, type);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'NOTIFICATIONS_VIEW')")
     @PatchMapping("/api/v1/notifications/{notificationId}/read")
     public NotificationReadResponse markAsRead(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -42,6 +45,7 @@ public class NotificationController {
         return notificationService.markAsRead(authenticatedUser, notificationId);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'NOTIFICATIONS_VIEW')")
     @PatchMapping("/api/v1/notifications/read-all")
     public NotificationsReadAllResponse markAllAsRead(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {

@@ -156,10 +156,6 @@ export function CreatePublicBookingPage() {
         customerPhone: customerPhone.trim().replace(/^\+/, ''),
         customerEmail: customerEmail.trim() || undefined,
       }
-      console.log('[DEBUG] selectedSlot:', selectedSlot)
-      console.log('[DEBUG] startsAt value:', selectedSlot!.startsAt)
-      console.log('[DEBUG] payload JSON:', JSON.stringify(payload))
-      console.log('[DEBUG] startsAt type:', typeof selectedSlot!.startsAt)
       return createPublicLandingBookingRequest(payload)
     },
     onSuccess: () => {

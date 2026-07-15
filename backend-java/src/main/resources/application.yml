@@ -35,6 +35,7 @@ spring:
 
 server:
   port: ${SERVER_PORT:8080}
+  forward-headers-strategy: framework
   error:
     include-message: never
     include-stacktrace: never
@@ -46,7 +47,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,prometheus
   endpoint:
     health:
       probes:
@@ -60,6 +61,8 @@ springdoc:
 
 app:
   environment: ${APP_ENVIRONMENT:local}
+  rate-limiting:
+    enabled: ${APP_RATE_LIMITING_ENABLED:true}
   logging:
     include-message-body: ${APP_LOGGING_INCLUDE_MESSAGE_BODY:false}
   security:
@@ -160,6 +163,11 @@ app:
       log-result: ${APP_METHOD_TRACING_LOG_RESULT:false}
       max-payload-length: ${APP_METHOD_TRACING_MAX_PAYLOAD_LENGTH:600}
       slow-execution-threshold-ms: ${APP_METHOD_TRACING_SLOW_THRESHOLD_MS:1500}
+
+sentry:
+  dsn: ${SENTRY_DSN:}
+  traces-sample-rate: 0.1
+  enable-tracing: ${SENTRY_ENABLED:false}
 
 logging:
   pattern:

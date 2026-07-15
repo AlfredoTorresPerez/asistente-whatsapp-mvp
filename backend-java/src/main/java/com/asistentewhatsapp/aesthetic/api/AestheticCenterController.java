@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -26,6 +27,7 @@ public class AestheticCenterController {
         this.aestheticCenterService = aestheticCenterService;
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CATALOG_VIEW')")
     @GetMapping({"/api/esthetic/service-categories", "/api/v1/esthetic/service-categories"})
     public PagedResponse<AestheticCategoryResponse> listServiceCategories(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -35,6 +37,7 @@ public class AestheticCenterController {
         return aestheticCenterService.listServiceCategories(authenticatedUser, page, size, active);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CATALOG_VIEW')")
     @GetMapping({"/api/esthetic/product-categories", "/api/v1/esthetic/product-categories"})
     public PagedResponse<AestheticCategoryResponse> listProductCategories(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -44,6 +47,7 @@ public class AestheticCenterController {
         return aestheticCenterService.listProductCategories(authenticatedUser, page, size, active);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CATALOG_VIEW')")
     @GetMapping({"/api/esthetic/services", "/api/v1/esthetic/services"})
     public PagedResponse<AestheticServiceResponse> listServices(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -55,6 +59,7 @@ public class AestheticCenterController {
         return aestheticCenterService.listServices(authenticatedUser, page, size, search, categoryCode, active);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CATALOG_VIEW')")
     @GetMapping({"/api/esthetic/services/{serviceId}", "/api/v1/esthetic/services/{serviceId}"})
     public AestheticServiceResponse getService(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -64,6 +69,7 @@ public class AestheticCenterController {
 
 
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CATALOG_MANAGE')")
     @PostMapping(
             value = {"/api/esthetic/services", "/api/v1/esthetic/services"},
             consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -73,6 +79,7 @@ public class AestheticCenterController {
         return aestheticCenterService.createService(authenticatedUser, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CATALOG_MANAGE')")
     @PutMapping(
             value = {"/api/esthetic/services/{serviceId}", "/api/v1/esthetic/services/{serviceId}"},
             consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -83,6 +90,7 @@ public class AestheticCenterController {
         return aestheticCenterService.updateService(authenticatedUser, serviceId, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CATALOG_VIEW')")
     @GetMapping({"/api/esthetic/products", "/api/v1/esthetic/products"})
     public PagedResponse<AestheticProductResponse> listProducts(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -95,6 +103,7 @@ public class AestheticCenterController {
         return aestheticCenterService.listProducts(authenticatedUser, page, size, search, categoryCode, active, lowStockOnly);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CATALOG_VIEW')")
     @GetMapping({"/api/esthetic/products/{productId}", "/api/v1/esthetic/products/{productId}"})
     public AestheticProductResponse getProduct(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -104,6 +113,7 @@ public class AestheticCenterController {
 
 
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CATALOG_MANAGE')")
     @PostMapping(
             value = {"/api/esthetic/products", "/api/v1/esthetic/products"},
             consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -113,6 +123,7 @@ public class AestheticCenterController {
         return aestheticCenterService.createProduct(authenticatedUser, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CATALOG_MANAGE')")
     @PutMapping(
             value = {"/api/esthetic/products/{productId}", "/api/v1/esthetic/products/{productId}"},
             consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -123,6 +134,7 @@ public class AestheticCenterController {
         return aestheticCenterService.updateProduct(authenticatedUser, productId, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'AUTOMATION_MANAGE')")
     @GetMapping({"/api/esthetic/rules", "/api/v1/esthetic/rules"})
     public PagedResponse<AestheticBusinessRuleResponse> listRules(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -135,6 +147,7 @@ public class AestheticCenterController {
 
 
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'AUTOMATION_MANAGE')")
     @GetMapping({"/api/esthetic/rules/{ruleId}", "/api/v1/esthetic/rules/{ruleId}"})
     public AestheticBusinessRuleResponse getRule(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -142,6 +155,7 @@ public class AestheticCenterController {
         return aestheticCenterService.getRule(authenticatedUser, ruleId);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'AUTOMATION_MANAGE')")
     @PostMapping(
             value = {"/api/esthetic/rules", "/api/v1/esthetic/rules"},
             consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -151,6 +165,7 @@ public class AestheticCenterController {
         return aestheticCenterService.createRule(authenticatedUser, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'AUTOMATION_MANAGE')")
     @PutMapping(
             value = {"/api/esthetic/rules/{ruleId}", "/api/v1/esthetic/rules/{ruleId}"},
             consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -161,6 +176,7 @@ public class AestheticCenterController {
         return aestheticCenterService.updateRule(authenticatedUser, ruleId, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'AUTOMATION_MANAGE')")
     @PostMapping(
             value = {"/api/esthetic/intent/analyze", "/api/v1/esthetic/intent/analyze"},
             consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -170,6 +186,7 @@ public class AestheticCenterController {
         return aestheticCenterService.analyzeIntent(authenticatedUser, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'AUTOMATION_MANAGE')")
     @GetMapping({"/api/esthetic/intent/logs", "/api/v1/esthetic/intent/logs"})
     public PagedResponse<AestheticIntentLogResponse> listIntentLogs(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,

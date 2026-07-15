@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -32,6 +33,7 @@ public class BookingController {
         this.bookingPaymentService = bookingPaymentService;
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'AGENDA_VIEW')")
     @GetMapping({"/api/bookings", "/api/v1/bookings", "/api/v1/appointments"})
     public PagedResponse<BookingSummaryResponse> list(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -58,6 +60,7 @@ public class BookingController {
                 resolvedResponsibleUserId);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_CREATE')")
     @PostMapping(
             value = {"/api/bookings", "/api/v1/bookings", "/api/v1/appointments"},
             consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -67,6 +70,7 @@ public class BookingController {
         return bookingService.create(authenticatedUser, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'AGENDA_VIEW')")
     @GetMapping({"/api/bookings/{bookingId}", "/api/v1/bookings/{bookingId}", "/api/v1/appointments/{bookingId}"})
     public BookingDetailResponse detail(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -74,6 +78,7 @@ public class BookingController {
         return bookingService.getDetail(authenticatedUser, bookingId);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_UPDATE')")
     @PutMapping(
             value = {"/api/bookings/{bookingId}", "/api/v1/bookings/{bookingId}", "/api/v1/appointments/{bookingId}"},
             consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -84,6 +89,7 @@ public class BookingController {
         return bookingService.update(authenticatedUser, bookingId, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_RESCHEDULE')")
     @PatchMapping(
             value = {
                 "/api/bookings/{bookingId}/reschedule",
@@ -98,6 +104,7 @@ public class BookingController {
         return bookingService.reschedule(authenticatedUser, bookingId, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_CANCEL')")
     @PatchMapping(
             value = {
                 "/api/bookings/{bookingId}/cancel",
@@ -112,6 +119,7 @@ public class BookingController {
         return bookingService.cancel(authenticatedUser, bookingId, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_UPDATE')")
     @GetMapping({"/api/bookings/{bookingId}/payments", "/api/v1/bookings/{bookingId}/payments", "/api/v1/appointments/{bookingId}/payments"})
     public List<BookingPaymentResponse> payments(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -119,6 +127,7 @@ public class BookingController {
         return bookingPaymentService.listPayments(authenticatedUser, bookingId);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_UPDATE')")
     @PostMapping(
             value = {
                 "/api/bookings/{bookingId}/payment-link",
@@ -133,6 +142,7 @@ public class BookingController {
         return bookingPaymentService.createCheckoutLink(authenticatedUser, bookingId, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_UPDATE')")
     @PostMapping(
             value = {
                 "/api/bookings/{bookingId}/payments/manual",
@@ -147,6 +157,7 @@ public class BookingController {
         return bookingPaymentService.registerManualPayment(authenticatedUser, bookingId, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_CANCEL')")
     @PatchMapping(
             value = {
                 "/api/bookings/{bookingId}/payments/{paymentId}/refund",

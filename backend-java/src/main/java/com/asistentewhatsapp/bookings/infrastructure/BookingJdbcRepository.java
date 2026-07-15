@@ -75,7 +75,8 @@ public class BookingJdbcRepository {
                             case
                                 when ua.id is null then null
                                 else concat(ua.first_name, ' ', ua.last_name)
-                            end as assigned_user_name
+                            end as assigned_user_name,
+                            coalesce(bcs.sync_status, 'NONE') as calendar_sync_status
                         """
                         + queryParts.fromAndWhere()
                         + """
@@ -623,9 +624,11 @@ public class BookingJdbcRepository {
                             location = :location,
                             notes = :notes,
                             completed_at = :completedAt,
+                            version = version + 1,
                             updated_at = current_timestamp
                         where business_id = :businessId
                           and id = :bookingId
+                          and status in (:activeStatuses)
                         """,
                 bookingParameters(businessId, bookingId)
                         .addValue("assignedUserId", assignedUserId)
@@ -637,7 +640,8 @@ public class BookingJdbcRepository {
                         .addValue("locationId", locationId)
                         .addValue("location", location)
                         .addValue("notes", notes)
-                        .addValue("completedAt", completedAt));
+                        .addValue("completedAt", completedAt)
+                        .addValue("activeStatuses", ACTIVE_BOOKING_STATUSES));
         if (updated == 0) {
             throw new ResourceNotFoundException("No se encontro la cita solicitada.");
         }
@@ -721,6 +725,9 @@ public class BookingJdbcRepository {
                         left join business_location bl
                           on bl.id = b.location_id
                          and bl.business_id = b.business_id
+                        left join booking_calendar_sync bcs
+                          on bcs.booking_id = b.id
+                         and bcs.business_id = b.business_id
                         where b.business_id = :businessId
                           and b.starts_at < :to
                           and coalesce(b.ends_at, b.starts_at + (b.duration_minutes || ' minutes')::interval) > :from
@@ -785,7 +792,8 @@ public class BookingJdbcRepository {
                 resultSet.getString("assigned_user_name"),
                 resultSet.getBoolean("requires_deposit"),
                 resultSet.getBigDecimal("deposit_amount"),
-                resultSet.getString("payment_status"));
+                resultSet.getString("payment_status"),
+                resultSet.getString("calendar_sync_status"));
     }
 
     private RowMapper<BookingDetailResponse> bookingDetailRowMapper() {

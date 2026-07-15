@@ -1,6 +1,7 @@
 package com.asistentewhatsapp.shared.exception;
 
 import com.asistentewhatsapp.shared.api.ApiErrorResponse;
+import com.asistentewhatsapp.shared.infrastructure.SlackNotifier;
 import com.asistentewhatsapp.shared.observability.CorrelationIdFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
@@ -10,6 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @Autowired(required = false)
+    private SlackNotifier slackNotifier;
+
+    public GlobalExceptionHandler() {
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleValidationException(
@@ -161,6 +169,9 @@ public class GlobalExceptionHandler {
             Exception exception,
             HttpServletRequest request) {
         LOGGER.error("Excepcion no manejada: ", exception);
+        if (slackNotifier != null) slackNotifier.notifyError(
+                "500 en " + request.getMethod() + " " + request.getRequestURI(),
+                exception.toString());
         return buildResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "INTERNAL_ERROR",

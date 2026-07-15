@@ -14,6 +14,7 @@ import com.asistentewhatsapp.bookings.infrastructure.BookingJdbcRepository;
 import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository;
 import com.asistentewhatsapp.bookings.application.AvailabilityService;
 import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository;
+import com.asistentewhatsapp.security.application.AuditService;
 import com.asistentewhatsapp.security.domain.AuthenticatedUser;
 import com.asistentewhatsapp.shared.exception.ApiException;
 import java.math.BigDecimal;
@@ -49,7 +50,8 @@ class BookingServiceTest {
         bookingService = new BookingService(
                 bookingJdbcRepository, businessLocationJdbcRepository,
                 bookingConfirmationJdbcRepository, agendaRepository,
-                mock(AvailabilityService.class));
+                mock(AvailabilityService.class),
+                mock(AuditService.class));
     }
 
     @Test

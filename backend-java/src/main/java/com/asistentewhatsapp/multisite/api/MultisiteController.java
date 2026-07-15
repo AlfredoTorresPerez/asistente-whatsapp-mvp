@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -26,66 +27,76 @@ public class MultisiteController {
         this.multisiteService = multisiteService;
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_VIEW')")
     @GetMapping("/summary")
-    public List<MultisiteLocationSummaryResponse> summary(@AuthenticationPrincipal AuthenticatedUser user) {
-        return multisiteService.locationSummary(user);
+    public List<MultisiteLocationSummaryResponse> summary(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        return multisiteService.locationSummary(authenticatedUser);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_VIEW')")
     @GetMapping("/catalog-availability")
     public List<MultisiteCatalogAvailabilityResponse> catalogAvailability(
-            @AuthenticationPrincipal AuthenticatedUser user,
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
             @RequestParam(required = false) UUID locationId) {
-        return multisiteService.catalogAvailability(user, locationId);
+        return multisiteService.catalogAvailability(authenticatedUser, locationId);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_VIEW')")
     @PutMapping(value = "/catalog-availability", consumes = MediaType.APPLICATION_JSON_VALUE)
     public List<MultisiteCatalogAvailabilityResponse> upsertCatalogAvailability(
-            @AuthenticationPrincipal AuthenticatedUser user,
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
             @Valid @RequestBody UpsertCatalogAvailabilityRequest request) {
-        return multisiteService.upsertCatalogAvailability(user, request);
+        return multisiteService.upsertCatalogAvailability(authenticatedUser, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_VIEW')")
     @GetMapping("/professionals")
-    public List<MultisiteProfessionalResponse> professionals(@AuthenticationPrincipal AuthenticatedUser user) {
-        return multisiteService.professionals(user);
+    public List<MultisiteProfessionalResponse> professionals(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        return multisiteService.professionals(authenticatedUser);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_VIEW')")
     @GetMapping("/professional-schedules")
     public List<ProfessionalScheduleResponse> schedules(
-            @AuthenticationPrincipal AuthenticatedUser user,
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
             @RequestParam(required = false) UUID locationId) {
-        return multisiteService.schedules(user, locationId);
+        return multisiteService.schedules(authenticatedUser, locationId);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_VIEW')")
     @PostMapping(value = "/professional-schedules", consumes = MediaType.APPLICATION_JSON_VALUE)
     public List<ProfessionalScheduleResponse> upsertSchedule(
-            @AuthenticationPrincipal AuthenticatedUser user,
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
             @Valid @RequestBody UpsertProfessionalScheduleRequest request) {
-        return multisiteService.upsertSchedule(user, request);
+        return multisiteService.upsertSchedule(authenticatedUser, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_VIEW')")
     @GetMapping("/user-access")
-    public List<UserLocationAccessResponse> userAccess(@AuthenticationPrincipal AuthenticatedUser user) {
-        return multisiteService.userAccess(user);
+    public List<UserLocationAccessResponse> userAccess(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        return multisiteService.userAccess(authenticatedUser);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_VIEW')")
     @PutMapping(value = "/user-access", consumes = MediaType.APPLICATION_JSON_VALUE)
     public List<UserLocationAccessResponse> upsertUserAccess(
-            @AuthenticationPrincipal AuthenticatedUser user,
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
             @Valid @RequestBody UpsertUserLocationAccessRequest request) {
-        return multisiteService.upsertUserAccess(user, request);
+        return multisiteService.upsertUserAccess(authenticatedUser, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_VIEW')")
     @GetMapping("/channels")
-    public List<MultisiteChannelResponse> channels(@AuthenticationPrincipal AuthenticatedUser user) {
-        return multisiteService.channels(user);
+    public List<MultisiteChannelResponse> channels(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        return multisiteService.channels(authenticatedUser);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_VIEW')")
     @PutMapping(value = "/channels/{channelId}/location", consumes = MediaType.APPLICATION_JSON_VALUE)
     public List<MultisiteChannelResponse> updateChannelLocation(
-            @AuthenticationPrincipal AuthenticatedUser user,
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
             @PathVariable UUID channelId,
             @RequestBody UpdateChannelLocationRequest request) {
-        return multisiteService.updateChannelLocation(user, channelId, request);
+        return multisiteService.updateChannelLocation(authenticatedUser, channelId, request);
     }
 }

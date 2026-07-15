@@ -567,6 +567,7 @@ export type BookingSummaryResponse = {
   requiresDeposit: boolean
   depositAmount: number
   paymentStatus: string
+  calendarSyncStatus: string
 }
 
 export type BookingDetailResponse = {
@@ -1690,4 +1691,39 @@ export type CustomerBookingRescheduleRequest = {
   date: string
   startsAt: string
   reason?: string
+}
+
+// Calendar Integration
+export type CalendarAccountResponse = {
+  id: string
+  provider: string
+  emailMasked: string | null
+  calendarId: string | null
+  calendarSummary: string | null
+  active: boolean
+  connectedAt: string | null
+  lastSyncAt: string | null
+  requiresReconnect: boolean
+  revokedAt: string | null
+  authorizationStatus: string
+}
+
+export type CalendarListEntry = {
+  id: string
+  summary: string
+  primary: boolean
+  accessRole: string
+}
+
+export type BookingSyncStatusResponse = {
+  id: string
+  bookingId: string
+  provider: string
+  externalEventId: string | null
+  syncStatus: string
+  syncAction: string
+  errorMessage: string | null
+  retryCount: number
+  lastSyncAttemptAt: string | null
+  lastSuccessfulSyncAt: string | null
 }

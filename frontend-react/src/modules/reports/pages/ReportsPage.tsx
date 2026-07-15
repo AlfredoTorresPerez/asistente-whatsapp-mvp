@@ -452,8 +452,7 @@ export function ReportsPage() {
                       nameKey="label"
                       cx="50%"
                       cy="50%"
-                      outerRadius={100}
-                      label={({ name, value }) => `${name}: ${value}`}
+                      outerRadius={80}
                     >
                       {data.appointmentDistribution.map(entry => (
                         <Cell key={entry.status} fill={PIE_COLORS[entry.status] ?? '#94a3b8'} />
@@ -469,6 +468,16 @@ export function ReportsPage() {
                         </div>
                       )
                     }} />
+                    <Legend
+                      verticalAlign="bottom"
+                      align="center"
+                      iconType="circle"
+                      iconSize={10}
+                      formatter={(value: string) => {
+                        const entry = data.appointmentDistribution.find(e => e.label === value)
+                        return `${value} (${entry?.count ?? 0})`
+                      }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               )}

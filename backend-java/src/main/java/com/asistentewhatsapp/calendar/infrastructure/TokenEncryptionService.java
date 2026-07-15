@@ -20,25 +20,41 @@ public class TokenEncryptionService {
     private static final int GCM_TAG_LENGTH = 128;
 
     private final SecretKey secretKey;
+    private final boolean ephemeral;
 
-    public TokenEncryptionService(@Value("${app.calendar.encryption-secret:}") String encryptionSecret) {
-        byte[] keyBytes;
+    public TokenEncryptionService(
+            @Value("${app.calendar.encryption-secret:}") String encryptionSecret,
+            @Value("${app.environment:local}") String environment) {
+        boolean isDevelopment = "local".equals(environment) || "test".equals(environment);
+
         if (encryptionSecret == null || encryptionSecret.isBlank()) {
-            keyBytes = new byte[32];
+            if (!isDevelopment) {
+                throw new IllegalStateException(
+                        "APP_CALENDAR_ENCRYPTION_SECRET is not configured. " +
+                        "A 32-byte Base64-encoded key is required in production.");
+            }
+            byte[] keyBytes = new byte[32];
             new SecureRandom().nextBytes(keyBytes);
+            this.secretKey = new SecretKeySpec(keyBytes, "AES");
+            this.ephemeral = true;
             LOGGER.warn("CALENDAR_ENCRYPTION_SECRET_NOT_CONFIGURED using ephemeral key. Tokens will not survive restart.");
         } else {
-            byte[] raw = encryptionSecret.getBytes(java.nio.charset.StandardCharsets.UTF_8);
-            if (raw.length < 32) {
-                byte[] padded = new byte[32];
-                System.arraycopy(raw, 0, padded, 0, Math.min(raw.length, 32));
-                keyBytes = padded;
-            } else {
-                keyBytes = new byte[32];
-                System.arraycopy(raw, 0, keyBytes, 0, 32);
+            byte[] keyBytes;
+            try {
+                keyBytes = Base64.getDecoder().decode(encryptionSecret.trim());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalStateException(
+                        "APP_CALENDAR_ENCRYPTION_SECRET is not valid Base64. " +
+                        "Provide a Base64-encoded 32-byte key.", e);
             }
+            if (keyBytes.length != 32) {
+                throw new IllegalStateException(
+                        "APP_CALENDAR_ENCRYPTION_SECRET decoded length is " + keyBytes.length +
+                        ", expected 32 bytes. Provide a Base64-encoded 32-byte key.");
+            }
+            this.secretKey = new SecretKeySpec(keyBytes, "AES");
+            this.ephemeral = false;
         }
-        this.secretKey = new SecretKeySpec(keyBytes, "AES");
     }
 
     public String encrypt(String plainText) {
@@ -72,5 +88,9 @@ public class TokenEncryptionService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to decrypt token", e);
         }
+    }
+
+    public boolean isEphemeral() {
+        return ephemeral;
     }
 }

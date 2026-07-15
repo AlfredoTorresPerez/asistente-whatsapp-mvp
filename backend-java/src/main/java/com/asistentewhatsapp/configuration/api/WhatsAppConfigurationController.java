@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -22,11 +23,13 @@ public class WhatsAppConfigurationController {
         this.whatsAppConfigurationService = whatsAppConfigurationService;
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_VIEW')")
     @GetMapping
     public WhatsAppConfigurationResponse getConfiguration(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
         return whatsAppConfigurationService.getConfiguration(authenticatedUser);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
     @PatchMapping(path = "/preferences")
     public WhatsAppConfigurationResponse updatePreferences(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -34,16 +37,19 @@ public class WhatsAppConfigurationController {
         return whatsAppConfigurationService.updatePreferences(authenticatedUser, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
     @PostMapping(path = "/connect")
     public WhatsAppConfigurationResponse connect(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
         return whatsAppConfigurationService.connect(authenticatedUser);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
     @PostMapping(path = "/refresh-qr")
     public WhatsAppConfigurationResponse refreshQr(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
         return whatsAppConfigurationService.refreshQr(authenticatedUser);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
     @PostMapping(path = "/disconnect")
     public WhatsAppConfigurationResponse disconnect(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
         return whatsAppConfigurationService.disconnect(authenticatedUser);

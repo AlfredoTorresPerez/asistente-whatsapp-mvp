@@ -2,6 +2,8 @@ services:
   postgres:
     image: postgres:16-alpine
     container_name: asistente-whatsapp-postgres-prod
+    mem_limit: 1g
+    cpus: 1.0
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-asistente_whatsapp}
       POSTGRES_USER: ${POSTGRES_USER:-assistant}
@@ -22,6 +24,8 @@ services:
       dockerfile: Dockerfile
       network: host
     container_name: asistente-whatsapp-backend-prod
+    mem_limit: 2g
+    cpus: 2.0
     depends_on:
       postgres:
         condition: service_healthy
@@ -90,6 +94,8 @@ services:
       args:
         VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api/v1}
     container_name: asistente-whatsapp-frontend-prod
+    mem_limit: 512m
+    cpus: 0.5
     depends_on:
       backend-java:
         condition: service_healthy
@@ -107,5 +113,26 @@ services:
       timeout: 5s
       retries: 10
 
+  caddy:
+    image: caddy:2-alpine
+    container_name: asistente-whatsapp-caddy-prod
+    restart: unless-stopped
+    mem_limit: 256m
+    cpus: 0.3
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:-demo.example.com}
+    volumes:
+      - ./caddy/Caddyfile.prod:/etc/caddy/Caddyfile:ro
+      - caddy-prod-data:/data
+    depends_on:
+      backend-java:
+        condition: service_healthy
+      frontend-react:
+        condition: service_healthy
+
 volumes:
   postgres-prod-data:
+  caddy-prod-data:

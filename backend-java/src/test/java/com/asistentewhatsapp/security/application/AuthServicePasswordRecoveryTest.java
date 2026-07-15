@@ -13,6 +13,8 @@ import com.asistentewhatsapp.security.infrastructure.SecurityPolicyRepository;
 import com.asistentewhatsapp.security.infrastructure.UserAccountRepository;
 import com.asistentewhatsapp.security.infrastructure.UserPermissionJdbcRepository;
 import com.asistentewhatsapp.security.infrastructure.UserRoleJdbcRepository;
+import com.asistentewhatsapp.security.infrastructure.UserSessionJdbcRepository;
+import com.asistentewhatsapp.security.application.RefreshTokenService;
 import com.asistentewhatsapp.shared.email.TransactionalEmailService;
 import com.asistentewhatsapp.shared.email.TransactionalEmailService.DeliveryStatus;
 import java.time.OffsetDateTime;
@@ -50,6 +52,8 @@ class AuthServicePasswordRecoveryTest {
     private final SecurityUserMapper securityUserMapper = new SecurityUserMapper();
     private final JwtProperties jwtProperties = new JwtProperties();
     private final TransactionalEmailService transactionalEmailService = mock(TransactionalEmailService.class);
+    private final UserSessionJdbcRepository userSessionJdbcRepository = mock(UserSessionJdbcRepository.class);
+    private final RefreshTokenService refreshTokenService = mock(RefreshTokenService.class);
 
     @Test
     void forgotPasswordStoresHashAndDoesNotAuditRawToken() {
@@ -66,11 +70,13 @@ class AuthServicePasswordRecoveryTest {
                 userPermissionJdbcRepository,
                 passwordResetTokenRepository,
                 auditLogJdbcRepository,
+                userSessionJdbcRepository,
                 passwordEncoder,
                 jwtService,
                 passwordPolicyService,
                 securityUserMapper,
                 jwtProperties,
+                refreshTokenService,
                 transactionalEmailService,
                 "http://localhost:5173");
 

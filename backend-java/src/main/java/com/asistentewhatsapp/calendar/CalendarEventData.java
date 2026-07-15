@@ -1,6 +1,7 @@
 package com.asistentewhatsapp.calendar;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 public record CalendarEventData(
     String summary,
@@ -10,5 +11,14 @@ public record CalendarEventData(
     OffsetDateTime endAt,
     String timezone,
     String attendeeEmail,
-    String attendeeName) {
+    String attendeeName,
+    UUID businessId,
+    UUID bookingId,
+    String googleEventId) {
+
+    public CalendarEventData {
+        if (startAt != null && endAt != null && endAt.isBefore(startAt)) {
+            throw new IllegalArgumentException("endAt must be after startAt");
+        }
+    }
 }

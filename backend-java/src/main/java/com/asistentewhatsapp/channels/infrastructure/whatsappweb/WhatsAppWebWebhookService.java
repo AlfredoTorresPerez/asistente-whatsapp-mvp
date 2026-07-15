@@ -255,6 +255,14 @@ public class WhatsAppWebWebhookService {
                         null,
                         null));
 
+        if (externalMessageId != null && !externalMessageId.isBlank()
+                && repository.findMessageIdByExternalMessageId(channelAccount.businessId(), externalMessageId).isPresent()) {
+            AiTraceLogger.info("DUPLICATE_MESSAGE_SKIPPED", traceId, conversation.id(), null, "WhatsAppWebWebhookService",
+                    "externalMessageId=" + LogSanitizer.maskExternalId(externalMessageId)
+                            + " phoneMasked=" + AiTraceLogger.maskPhone(normalizedPhone));
+            return;
+        }
+
         UUID inboundMessageId = repository.insertInboundMessage(
                 channelAccount.businessId(),
                 conversation.id(),

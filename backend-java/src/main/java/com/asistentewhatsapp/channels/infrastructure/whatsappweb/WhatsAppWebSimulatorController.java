@@ -11,6 +11,7 @@ import java.time.ZoneOffset;
 import java.util.UUID;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
+@ConditionalOnProperty(name = "app.whatsapp-web.simulator-enabled", havingValue = "true", matchIfMissing = true)
 @RequestMapping(value = "/api/v1/test", produces = MediaType.APPLICATION_JSON_VALUE)
 public class WhatsAppWebSimulatorController {
 

@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import java.util.UUID;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +28,7 @@ public class LeadController {
         this.leadService = leadService;
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LEAD_MANAGE')")
     @GetMapping({"/api/v1/leads", "/api/v1/prospects"})
     public PagedResponse<LeadSummaryResponse> list(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -56,6 +58,7 @@ public class LeadController {
                 resolvedResponsibleUserId);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LEAD_MANAGE')")
     @PostMapping(
             value = {"/api/v1/leads", "/api/v1/prospects"},
             consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -65,6 +68,7 @@ public class LeadController {
         return leadService.create(authenticatedUser, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LEAD_MANAGE')")
     @GetMapping({"/api/v1/leads/{leadId}", "/api/v1/prospects/{leadId}"})
     public LeadDetailResponse detail(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -72,6 +76,7 @@ public class LeadController {
         return leadService.getDetail(authenticatedUser, leadId);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LEAD_MANAGE')")
     @PutMapping(
             value = {"/api/v1/leads/{leadId}", "/api/v1/prospects/{leadId}"},
             consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -82,6 +87,7 @@ public class LeadController {
         return leadService.update(authenticatedUser, leadId, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LEAD_MANAGE')")
     @PostMapping(
             value = {"/api/v1/leads/{leadId}/notes", "/api/v1/prospects/{leadId}/notes"},
             consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -92,6 +98,7 @@ public class LeadController {
         return leadService.addNote(authenticatedUser, leadId, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LEAD_MANAGE')")
     @PatchMapping(
             value = {"/api/v1/leads/{leadId}/stage", "/api/v1/prospects/{leadId}/stage"},
             consumes = MediaType.APPLICATION_JSON_VALUE)

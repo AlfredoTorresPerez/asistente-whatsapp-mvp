@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -23,6 +24,7 @@ public class BookingConfirmationController {
         this.bookingConfirmationService = bookingConfirmationService;
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_UPDATE')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public BookingConfirmationLinkResponse create(

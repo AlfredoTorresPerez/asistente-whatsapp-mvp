@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -24,6 +25,7 @@ public class BookingPublicActionLinkController {
         this.bookingPublicActionService = bookingPublicActionService;
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_RESCHEDULE')")
     @PostMapping(
             value = "/api/v1/bookings/{bookingId}/reschedule-link",
             consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -35,6 +37,7 @@ public class BookingPublicActionLinkController {
         return bookingPublicActionService.createRescheduleLink(authenticatedUser, bookingId, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_CANCEL')")
     @PostMapping(
             value = "/api/v1/bookings/{bookingId}/cancellation-link",
             consumes = MediaType.APPLICATION_JSON_VALUE)

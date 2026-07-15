@@ -24,8 +24,10 @@ import {
   refundBookingPaymentRequest,
   registerBookingManualPaymentRequest,
 } from '../../../services/api/bookingsApi'
-import type { CreateBookingPaymentLinkRequest } from '../../../services/api/types'
+import type { BookingSyncStatusResponse, CreateBookingPaymentLinkRequest } from '../../../services/api/types'
 import { getBookingStatusLabel, getBookingStatusTone } from '../bookingOptions'
+import { usePermissions } from '../../../hooks/usePermissions'
+import { getBookingSyncStatusRequest, retryBookingSyncRequest } from '../../../services/api/calendarApi'
 
 function formatDateTime(value: string | null) {
   return value ? dayjs(value).format('DD MMM YYYY HH:mm') : 'Sin registro'
@@ -232,6 +234,39 @@ export function AppointmentDetailPage() {
     },
   })
 
+  const { hasPermission } = usePermissions()
+
+  const calendarSyncQuery = useQuery({
+    queryKey: ['bookings', appointmentId, 'calendar-sync'],
+    queryFn: () => getBookingSyncStatusRequest(appointmentId ?? ''),
+    enabled: Boolean(appointmentId),
+    refetchInterval: isOnline ? 30_000 : false,
+  })
+
+  const retrySyncMutation = useMutation({
+    mutationFn: async () => {
+      if (!appointmentId) {
+        throw new Error('No hay cita seleccionada.')
+      }
+      return retryBookingSyncRequest(appointmentId)
+    },
+    onSuccess: async () => {
+      await calendarSyncQuery.refetch()
+      showToast({
+        title: 'Sincronizacion reintentada',
+        description: 'Se solicito un nuevo intento de sincronizacion con Google Calendar.',
+        tone: 'success',
+      })
+    },
+    onError: () => {
+      showToast({
+        title: 'No se pudo reintentar',
+        description: 'Verifica que la integracion con Google Calendar este activa.',
+        tone: 'error',
+      })
+    },
+  })
+
   return (
     <section className="space-y-6">
       <PageHeader
@@ -420,6 +455,12 @@ export function AppointmentDetailPage() {
               title="Historial"
             />
           </Card>
+
+          <CalendarSyncCard
+            calendarSyncQuery={calendarSyncQuery}
+            onRetry={() => retrySyncMutation.mutate()}
+            retryLoading={retrySyncMutation.isPending}
+          />
           </div>
 
           <Card className="space-y-5">
@@ -480,6 +521,111 @@ function InfoCard({ label, value }: { label: string; value: string }) {
     <Card className="space-y-2 bg-slate-50">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</p>
       <p className="text-sm font-medium text-[var(--color-text)]">{value}</p>
+    </Card>
+  )
+}
+
+function CalendarSyncCard({
+  calendarSyncQuery,
+  onRetry,
+  retryLoading,
+}: {
+  calendarSyncQuery: {
+    data: BookingSyncStatusResponse[] | undefined
+    isPending: boolean
+    isError: boolean
+  }
+  onRetry: () => void
+  retryLoading: boolean
+}) {
+  const { hasPermission } = usePermissions()
+  const syncRecords = calendarSyncQuery.data ?? []
+
+  function syncStatusLabel(status: string) {
+    switch (status) {
+      case 'SYNCED':
+        return 'Sincronizado'
+      case 'PENDING':
+        return 'Pendiente'
+      case 'FAILED':
+        return 'Fallido'
+      case 'CANCELLED':
+        return 'Cancelado'
+      default:
+        return status
+    }
+  }
+
+  function syncStatusTone(status: string): 'success' | 'warning' | 'danger' | 'neutral' | 'info' {
+    switch (status) {
+      case 'SYNCED':
+        return 'success'
+      case 'PENDING':
+        return 'warning'
+      case 'FAILED':
+        return 'danger'
+      case 'CANCELLED':
+        return 'neutral'
+      default:
+        return 'neutral'
+    }
+  }
+
+  return (
+    <Card className="space-y-4">
+      <h3 className="text-xl font-semibold text-[var(--color-text)]">Sincronización Google Calendar</h3>
+      {calendarSyncQuery.isPending ? (
+        <p className="text-sm text-slate-500">Cargando estado de sincronización...</p>
+      ) : calendarSyncQuery.isError ? (
+        <p className="text-sm text-red-600">Error al cargar el estado de sincronización.</p>
+      ) : syncRecords.length === 0 ? (
+        <p className="text-sm text-slate-500">No hay registros de sincronización para esta reserva.</p>
+      ) : (
+        <div className="space-y-3">
+          {syncRecords.slice(0, 5).map((record) => (
+            <div
+              className="rounded-xl border border-[var(--color-border)] bg-slate-50 px-4 py-3"
+              key={record.id}
+            >
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div className="space-y-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <StatusBadge label={syncStatusLabel(record.syncStatus)} tone={syncStatusTone(record.syncStatus)} />
+                    <span className="text-xs text-slate-500">{record.provider}</span>
+                  </div>
+                  {record.externalEventId ? (
+                    <p className="text-xs text-slate-500">
+                      ID externo: {record.externalEventId.length > 30
+                        ? `${record.externalEventId.substring(0, 30)}...`
+                        : record.externalEventId}
+                    </p>
+                  ) : null}
+                  {record.lastSyncAttemptAt ? (
+                    <p className="text-xs text-slate-500">
+                      Último intento: {formatDateTime(record.lastSyncAttemptAt)}
+                    </p>
+                  ) : null}
+                  {record.syncStatus === 'FAILED' && record.errorMessage ? (
+                    <p className="text-xs text-red-600">{record.errorMessage}</p>
+                  ) : null}
+                </div>
+              </div>
+              {record.syncStatus === 'FAILED' && hasPermission('CALENDAR_CONFIG_MANAGE') ? (
+                <div className="mt-3">
+                  <Button
+                    loading={retryLoading}
+                    onClick={onRetry}
+                    size="sm"
+                    variant="secondary"
+                  >
+                    Reintentar sincronización
+                  </Button>
+                </div>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      )}
     </Card>
   )
 }

@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import java.util.UUID;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,12 +26,14 @@ public class ConversationController {
         this.conversationService = conversationService;
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CONVERSATIONS_VIEW')")
     @GetMapping("/api/v1/conversations/metrics")
     public ConversationMetricsResponse metrics(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
         return conversationService.getMetrics(authenticatedUser);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CONVERSATIONS_VIEW')")
     @GetMapping("/api/v1/conversations")
     public PagedResponse<ConversationSummaryResponse> list(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -42,6 +45,7 @@ public class ConversationController {
         return conversationService.list(authenticatedUser, page, size, search, status, ownerUserId);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CONVERSATIONS_VIEW')")
     @GetMapping("/api/v1/conversations/{conversationId}")
     public ConversationDetailResponse detail(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -49,6 +53,7 @@ public class ConversationController {
         return conversationService.getDetail(authenticatedUser, conversationId);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CONVERSATIONS_REPLY')")
     @PostMapping(value = "/api/v1/conversations", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ConversationDetailResponse create(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -56,6 +61,7 @@ public class ConversationController {
         return conversationService.create(authenticatedUser, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CONVERSATIONS_REPLY')")
     @PostMapping(value = "/api/v1/conversations/{conversationId}/messages", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ConversationMessageResponse sendMessage(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -64,6 +70,7 @@ public class ConversationController {
         return conversationService.sendMessage(authenticatedUser, conversationId, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CONVERSATIONS_ASSIGN')")
     @PostMapping(value = "/api/v1/conversations/{conversationId}/assign", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ConversationDetailResponse assign(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -72,6 +79,7 @@ public class ConversationController {
         return conversationService.assign(authenticatedUser, conversationId, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CONVERSATIONS_VIEW')")
     @PostMapping("/api/v1/conversations/{conversationId}/mark-read")
     public ConversationDetailResponse markRead(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -79,6 +87,7 @@ public class ConversationController {
         return conversationService.markRead(authenticatedUser, conversationId);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CONVERSATIONS_REPLY')")
     @PostMapping("/api/v1/conversations/{conversationId}/preview-ai")
     public ConversationAiReplyResponse previewAiReply(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -86,6 +95,7 @@ public class ConversationController {
         return conversationService.previewAiReply(authenticatedUser, conversationId);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CONVERSATIONS_REPLY')")
     @PostMapping("/api/v1/conversations/{conversationId}/close")
     public ConversationDetailResponse close(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -93,6 +103,7 @@ public class ConversationController {
         return conversationService.close(authenticatedUser, conversationId);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CONVERSATIONS_REPLY')")
     @PostMapping("/api/v1/conversations/{conversationId}/reopen")
     public ConversationDetailResponse reopen(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,

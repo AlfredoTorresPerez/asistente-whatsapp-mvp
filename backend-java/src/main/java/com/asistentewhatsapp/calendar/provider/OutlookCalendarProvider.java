@@ -1,6 +1,7 @@
 package com.asistentewhatsapp.calendar.provider;
 
 import com.asistentewhatsapp.calendar.CalendarEventData;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,11 @@ public class OutlookCalendarProvider implements CalendarProvider {
     @Override
     public String getProviderName() {
         return PROVIDER_NAME;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 
     @Override
@@ -45,19 +51,43 @@ public class OutlookCalendarProvider implements CalendarProvider {
     }
 
     @Override
-    public String createEvent(CalendarEventData eventData, String accessToken) {
+    public RevokeResult revokeToken(String accessToken) {
+        LOGGER.info("OUTLOOK_CALENDAR_STUB revokeToken");
+        return new RevokeResult(true, null);
+    }
+
+    @Override
+    public UserInfoResult getUserInfo(String accessToken) {
+        LOGGER.info("OUTLOOK_CALENDAR_STUB getUserInfo");
+        return new UserInfoResult("outlook-user-id", "outlook@demo.cl", true, "Outlook User");
+    }
+
+    @Override
+    public List<CalendarListEntry> listCalendars(String accessToken) {
+        LOGGER.info("OUTLOOK_CALENDAR_STUB listCalendars");
+        return List.of(new CalendarListEntry("primary", "Calendar", true, "owner"));
+    }
+
+    @Override
+    public String createEvent(String calendarId, CalendarEventData eventData, String accessToken) {
         LOGGER.info("OUTLOOK_CALENDAR_STUB createEvent summary={}", eventData.summary());
         return "outlook_event_" + System.currentTimeMillis();
     }
 
     @Override
-    public void updateEvent(String externalEventId, CalendarEventData eventData, String accessToken) {
+    public void updateEvent(String calendarId, String externalEventId, CalendarEventData eventData, String accessToken) {
         LOGGER.info("OUTLOOK_CALENDAR_STUB updateEvent eventId={}", externalEventId);
     }
 
     @Override
-    public void deleteEvent(String externalEventId, String accessToken) {
+    public void deleteEvent(String calendarId, String externalEventId, String accessToken) {
         LOGGER.info("OUTLOOK_CALENDAR_STUB deleteEvent eventId={}", externalEventId);
+    }
+
+    @Override
+    public CalendarEventData getEvent(String calendarId, String externalEventId, String accessToken) {
+        LOGGER.info("OUTLOOK_CALENDAR_STUB getEvent eventId={}", externalEventId);
+        return null;
     }
 
     private String mask(String value) {

@@ -80,7 +80,6 @@ export function NewAppointmentPage() {
         notes: values.notes || undefined,
         assignedUserId: user?.id,
       }
-      console.log('[diagnostico] createBookingRequest payload:', payload)
       return createBookingRequest(payload)
     },
     onSuccess: (booking) => {
@@ -93,7 +92,6 @@ export function NewAppointmentPage() {
     },
     onError: (error) => {
       const apiError = error as ApiClientError
-      console.log('[diagnostico] createBookingRequest error:', { code: apiError.code, status: apiError.status, message: apiError.message, fieldErrors: apiError.fieldErrors })
       if (apiError?.fieldErrors && Object.keys(apiError.fieldErrors).length > 0) {
         const firstFieldError = Object.values(apiError.fieldErrors)[0]
         showToast({

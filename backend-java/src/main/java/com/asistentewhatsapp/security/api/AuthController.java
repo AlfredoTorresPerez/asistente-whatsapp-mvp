@@ -5,12 +5,14 @@ import com.asistentewhatsapp.security.domain.AuthenticatedUser;
 import com.asistentewhatsapp.shared.api.StatusResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -39,8 +41,20 @@ public class AuthController {
     }
 
     @PostMapping({"/api/v1/auth/logout", "/api/auth/logout"})
-    public StatusResponse logout(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        return authService.logout(authenticatedUser);
+    public StatusResponse logout(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @RequestHeader(value = "X-Refresh-Token", required = false) String refreshToken) {
+        return authService.logout(authenticatedUser, refreshToken);
+    }
+
+    @PostMapping({"/api/v1/auth/refresh", "/api/auth/refresh"})
+    public LoginResponse refresh(
+            @Valid @RequestBody RefreshTokenRequest request,
+            HttpServletRequest httpServletRequest) {
+        return authService.refresh(
+            request.refreshToken(),
+            httpServletRequest.getHeader("User-Agent"),
+            httpServletRequest.getRemoteAddr());
     }
 
     @PostMapping({"/api/v1/auth/forgot-password", "/api/auth/forgot-password"})

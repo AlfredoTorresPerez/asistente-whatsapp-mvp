@@ -154,7 +154,7 @@ describe('NotificationsPage', () => {
       expect(screen.queryByRole('button', { name: 'Marcar leida' })).not.toBeInTheDocument()
     })
 
-    expect(screen.getByText('READ')).toBeInTheDocument()
+    expect(screen.getByText('Leída')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Notificaciones \(0\)/i })).toBeInTheDocument()
   })
 })

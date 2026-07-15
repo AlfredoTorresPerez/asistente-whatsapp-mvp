@@ -9,6 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -21,6 +22,7 @@ public class DashboardController {
         this.dashboardService = dashboardService;
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'DASHBOARD_VIEW')")
     @GetMapping("/api/v1/dashboard/summary")
     public DashboardSummaryResponse summary(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,

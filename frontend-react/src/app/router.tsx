@@ -115,7 +115,7 @@ export const appRoutes: RouteObject[] = [
       { path: 'automation-rules/:ruleId/test', element: <RequirePermission permission="AUTOMATION_MANAGE"><AutomationRuleRunPage /></RequirePermission> },
       { path: 'business-ai', element: <RequirePermission permission="REPORTS_VIEW"><BusinessAiPage /></RequirePermission> },
       { path: 'reports', element: <RequirePermission permission="REPORTS_VIEW"><ReportsPage /></RequirePermission> },
-      { path: 'configuration', element: <RequirePermission permission="WHATSAPP_CONFIG_VIEW"><ConfigurationPage /></RequirePermission> },
+      { path: 'configuration', element: <RequireAnyPermission permissions={['WHATSAPP_CONFIG_VIEW', 'CALENDAR_CONFIG_VIEW']}><ConfigurationPage /></RequireAnyPermission> },
       { path: 'admin', element: <RequirePermission permission="ADMIN_MANAGE"><AdministrationPage /></RequirePermission> },
       { path: 'admin/company', element: <RequirePermission permission="LOCATIONS_MANAGE"><CompanySettingsPage /></RequirePermission> },
       { path: 'admin/locations', element: <RequirePermission permission="LOCATIONS_MANAGE"><AdminLocationsPage /></RequirePermission> },
@@ -144,6 +144,23 @@ function RequirePermission({
   const { user } = useShellSession()
 
   if (!user || !user.permissions?.includes(permission)) {
+    return <Navigate replace to="/dashboard" />
+  }
+
+  return children
+}
+
+// Componente para verificar que el usuario tenga al menos uno de los permisos
+function RequireAnyPermission({
+  permissions,
+  children,
+}: {
+  permissions: string[]
+  children: ReactNode
+}) {
+  const { user } = useShellSession()
+
+  if (!user || !permissions.some((p) => user.permissions?.includes(p))) {
     return <Navigate replace to="/dashboard" />
   }
 

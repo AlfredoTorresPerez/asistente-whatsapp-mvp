@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import java.util.UUID;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +28,7 @@ public class CatalogController {
         this.catalogService = catalogService;
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CATALOG_VIEW')")
     @GetMapping({"/api/catalog/products", "/api/v1/catalog/products"})
     public PagedResponse<CatalogProductResponse> listProducts(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -38,6 +40,7 @@ public class CatalogController {
         return catalogService.listProducts(authenticatedUser, page, size, search, categoryCode, active);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CATALOG_MANAGE')")
     @PostMapping(
             value = {"/api/catalog/products", "/api/v1/catalog/products"},
             consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -47,6 +50,7 @@ public class CatalogController {
         return catalogService.createProduct(authenticatedUser, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CATALOG_VIEW')")
     @GetMapping({"/api/catalog/products/{id}", "/api/v1/catalog/products/{id}"})
     public CatalogProductResponse getProduct(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -54,6 +58,7 @@ public class CatalogController {
         return catalogService.getProduct(authenticatedUser, id);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CATALOG_MANAGE')")
     @PutMapping(
             value = {"/api/catalog/products/{id}", "/api/v1/catalog/products/{id}"},
             consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -64,6 +69,7 @@ public class CatalogController {
         return catalogService.updateProduct(authenticatedUser, id, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CATALOG_MANAGE')")
     @PatchMapping(
             value = {"/api/catalog/products/{id}/status", "/api/v1/catalog/products/{id}/status"},
             consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -74,6 +80,7 @@ public class CatalogController {
         return catalogService.updateProductStatus(authenticatedUser, id, request.active());
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CATALOG_VIEW')")
     @GetMapping({"/api/catalog/categories", "/api/v1/catalog/categories"})
     public PagedResponse<CatalogCategoryResponse> listCategories(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -83,6 +90,7 @@ public class CatalogController {
         return catalogService.listCategories(authenticatedUser, page, size, active);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CATALOG_MANAGE')")
     @PostMapping(
             value = {"/api/catalog/categories", "/api/v1/catalog/categories"},
             consumes = MediaType.APPLICATION_JSON_VALUE)

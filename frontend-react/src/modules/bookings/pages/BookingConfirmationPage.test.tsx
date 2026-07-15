@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
@@ -12,6 +13,13 @@ function jsonResponse(payload: unknown, status = 200) {
   })
 }
 
+function futureDate(daysAhead: number, hours = 15): string {
+  const d = new Date()
+  d.setDate(d.getDate() + daysAhead)
+  d.setHours(hours, 0, 0, 0)
+  return d.toISOString().replace('Z', '-04:00')
+}
+
 function confirmationResponse(overrides: Record<string, unknown> = {}) {
   return {
     bookingId: '22222222-2222-2222-2222-222222222222',
@@ -21,7 +29,7 @@ function confirmationResponse(overrides: Record<string, unknown> = {}) {
     serviceName: 'Limpieza facial profunda',
     professionalName: 'Ana Profesional',
     roomName: 'Sala Estetica 1',
-    startsAt: '2026-07-15T15:00:00-04:00',
+    startsAt: futureDate(3),
     durationMinutes: 60,
     locationId: '33333333-3333-3333-3333-333333333333',
     location: 'Sucursal Providencia',
@@ -31,7 +39,7 @@ function confirmationResponse(overrides: Record<string, unknown> = {}) {
     requiresDeposit: false,
     depositAmount: 0,
     paymentStatus: 'NOT_REQUIRED',
-    expiresAt: '2026-07-10T15:00:00-04:00',
+    expiresAt: futureDate(2),
     confirmedAt: null,
     ...overrides,
   }
@@ -83,7 +91,7 @@ describe('BookingConfirmationPage', () => {
     expect(await screen.findByText('Maria Perez (****4580)')).toBeInTheDocument()
     expect(screen.getByText('Limpieza facial profunda')).toBeInTheDocument()
     expect(screen.getByText('Sucursal Providencia')).toBeInTheDocument()
-    expect(screen.getByText('15/07/2026 15:00')).toBeInTheDocument()
+    expect(screen.getByText(dayjs(futureDate(3)).format('DD/MM/YYYY HH:mm'))).toBeInTheDocument()
   })
 
   it('shows confirm button when booking is pending confirmation', async () => {

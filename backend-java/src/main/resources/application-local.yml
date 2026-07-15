@@ -1,0 +1,40 @@
+app:
+  environment: local
+  rate-limiting:
+    enabled: ${APP_RATE_LIMITING_ENABLED:true}
+  logging:
+    include-message-body: ${APP_LOGGING_INCLUDE_MESSAGE_BODY:true}
+  channels:
+    whatsapp-web:
+      enabled: ${APP_WHATSAPP_WEB_ENABLED:false}
+      simulator-enabled: ${APP_WHATSAPP_WEB_SIMULATOR_ENABLED:true}
+      demo-fallback-enabled: ${APP_WHATSAPP_WEB_DEMO_FALLBACK_ENABLED:true}
+  test:
+    enabled: true
+  ai:
+    agents:
+      auto-reply-enabled: ${APP_AI_AGENTS_AUTO_REPLY_ENABLED:false}
+  email:
+    enabled: ${APP_EMAIL_ENABLED:false}
+    simulation-enabled: ${APP_EMAIL_SIMULATION_ENABLED:true}
+  calendar:
+    google:
+      enabled: ${APP_CALENDAR_GOOGLE_ENABLED:false}
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+sentry:
+  enabled: false
+  dsn: ""
+
+logging:
+  level:
+    com.asistentewhatsapp: ${APP_LOG_LEVEL:DEBUG}
+
+spring:
+  flyway:
+    locations: classpath:db/migration

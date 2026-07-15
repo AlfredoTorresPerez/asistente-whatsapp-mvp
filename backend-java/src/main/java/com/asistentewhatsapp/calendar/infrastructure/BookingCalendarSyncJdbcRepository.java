@@ -25,6 +25,15 @@ public class BookingCalendarSyncJdbcRepository {
                 recordRowMapper());
     }
 
+    public List<BookingCalendarSyncRecord> findByBookingAndBusiness(UUID bookingId, UUID businessId) {
+        return jdbcTemplate.query(
+                "select * from booking_calendar_sync where booking_id = :bookingId and business_id = :businessId order by provider",
+                new MapSqlParameterSource()
+                        .addValue("bookingId", bookingId)
+                        .addValue("businessId", businessId),
+                recordRowMapper());
+    }
+
     public List<BookingCalendarSyncRecord> findByBookingAndProvider(UUID bookingId, String provider) {
         return jdbcTemplate.query(
                 "select * from booking_calendar_sync where booking_id = :bookingId and provider = :provider",
@@ -32,6 +41,16 @@ public class BookingCalendarSyncJdbcRepository {
                         .addValue("bookingId", bookingId)
                         .addValue("provider", provider),
                 recordRowMapper());
+    }
+
+    public Optional<BookingCalendarSyncRecord> findByBookingAndProviderAndBusiness(UUID bookingId, String provider, UUID businessId) {
+        return jdbcTemplate.query(
+                "select * from booking_calendar_sync where booking_id = :bookingId and provider = :provider and business_id = :businessId",
+                new MapSqlParameterSource()
+                        .addValue("bookingId", bookingId)
+                        .addValue("provider", provider)
+                        .addValue("businessId", businessId),
+                recordRowMapper()).stream().findFirst();
     }
 
     public Optional<BookingCalendarSyncRecord> findByBookingAndProviderOptional(UUID bookingId, String provider) {
@@ -51,6 +70,39 @@ public class BookingCalendarSyncJdbcRepository {
                 new MapSqlParameterSource()
                         .addValue("maxRetries", maxRetries)
                         .addValue("before", before),
+                recordRowMapper());
+    }
+
+    public List<BookingCalendarSyncRecord> findByBusinessAndStatusAndRetries(UUID businessId, String status,
+            int maxRetries, OffsetDateTime before, int limit) {
+        return jdbcTemplate.query(
+                """
+                select * from booking_calendar_sync
+                where business_id = :businessId
+                  and sync_status = :status
+                  and retry_count < :maxRetries
+                  and (last_sync_attempt_at is null or last_sync_attempt_at < :before)
+                order by retry_count asc, last_sync_attempt_at asc nulls first
+                limit :limit
+                """,
+                new MapSqlParameterSource()
+                        .addValue("businessId", businessId)
+                        .addValue("status", status)
+                        .addValue("maxRetries", maxRetries)
+                        .addValue("before", before)
+                        .addValue("limit", limit),
+                recordRowMapper());
+    }
+
+    public List<BookingCalendarSyncRecord> findPendingSyncs(int limit) {
+        return jdbcTemplate.query(
+                """
+                select * from booking_calendar_sync
+                where sync_status = 'PENDING'
+                order by created_at asc
+                limit :limit
+                """,
+                new MapSqlParameterSource("limit", limit),
                 recordRowMapper());
     }
 

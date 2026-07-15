@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -31,6 +32,7 @@ public class CompleteDigitalAgendaController {
         this.completeDigitalAgendaService = completeDigitalAgendaService;
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'AGENDA_VIEW')")
     @PostMapping(value = "/availability", consumes = MediaType.APPLICATION_JSON_VALUE)
     public AgendaAvailabilityResponse availability(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -38,6 +40,7 @@ public class CompleteDigitalAgendaController {
         return completeDigitalAgendaService.availability(authenticatedUser, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_CREATE')")
     @PostMapping(value = "/temporary-bookings", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public BookingDetailResponse createTemporaryBooking(
@@ -47,6 +50,7 @@ public class CompleteDigitalAgendaController {
     }
 
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'AGENDA_VIEW')")
     @GetMapping("/business-hours")
     public List<BusinessHoursResponse> businessHours(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -54,6 +58,7 @@ public class CompleteDigitalAgendaController {
         return completeDigitalAgendaService.businessHours(authenticatedUser, locationId);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'AGENDA_VIEW')")
     @PutMapping(value = "/business-hours", consumes = MediaType.APPLICATION_JSON_VALUE)
     public List<BusinessHoursResponse> saveBusinessHours(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -61,6 +66,7 @@ public class CompleteDigitalAgendaController {
         return completeDigitalAgendaService.saveBusinessHours(authenticatedUser, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'AGENDA_VIEW')")
     @PutMapping(value = "/professional-hours", consumes = MediaType.APPLICATION_JSON_VALUE)
     public List<BusinessHoursResponse> saveProfessionalHours(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -68,6 +74,7 @@ public class CompleteDigitalAgendaController {
         return completeDigitalAgendaService.saveProfessionalHours(authenticatedUser, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'AGENDA_VIEW')")
     @GetMapping("/filter-options")
     public AgendaFilterOptionsResponse filterOptions(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -75,6 +82,7 @@ public class CompleteDigitalAgendaController {
         return completeDigitalAgendaService.filterOptions(authenticatedUser, locationId);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'AGENDA_VIEW')")
     @GetMapping("/calendar")
     public AgendaCalendarResponse calendar(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -88,6 +96,7 @@ public class CompleteDigitalAgendaController {
         return completeDigitalAgendaService.calendar(authenticatedUser, from, to, locationId, professionalId, roomId, serviceId, status);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_CREATE')")
     @PatchMapping(value = "/bookings/{bookingId}/reschedule", consumes = MediaType.APPLICATION_JSON_VALUE)
     public BookingDetailResponse reschedule(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -96,6 +105,7 @@ public class CompleteDigitalAgendaController {
         return completeDigitalAgendaService.reschedule(authenticatedUser, bookingId, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_CREATE')")
     @PatchMapping(value = "/bookings/{bookingId}/cancel", consumes = MediaType.APPLICATION_JSON_VALUE)
     public BookingDetailResponse cancel(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -104,6 +114,7 @@ public class CompleteDigitalAgendaController {
         return completeDigitalAgendaService.cancel(authenticatedUser, bookingId, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_CREATE')")
     @PostMapping(value = "/blocks", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public AgendaBlockResponse createBlock(

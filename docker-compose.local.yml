@@ -26,6 +26,8 @@ services:
     image: postgres:16-alpine
     container_name: asistente-postgres
     restart: unless-stopped
+    mem_limit: 512m
+    cpus: 0.5
     environment:
       TZ: ${TZ:-America/Santiago}
       PGTZ: ${TZ:-America/Santiago}
@@ -53,6 +55,8 @@ services:
       dockerfile: Dockerfile
     container_name: asistente-backend
     restart: unless-stopped
+    mem_limit: 1g
+    cpus: 1.0
     depends_on:
       postgres:
         condition: service_healthy
@@ -101,6 +105,7 @@ services:
       APP_BOOKING_PAYMENT_PROVIDER: ${APP_BOOKING_PAYMENT_PROVIDER:-SIMULATED}
 
       # Frontend URLs
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-demo}
       APP_FRONTEND_PUBLIC_BASE_URL: ${APP_FRONTEND_PUBLIC_BASE_URL:-http://localhost:5173}
       APP_BOOKING_RESCHEDULE_PUBLIC_BASE_URL: ${APP_BOOKING_RESCHEDULE_PUBLIC_BASE_URL:-http://localhost:5173/reservas/reprogramar}
       APP_BOOKING_CANCELLATION_PUBLIC_BASE_URL: ${APP_BOOKING_CANCELLATION_PUBLIC_BASE_URL:-http://localhost:5173/reservas/cancelar}
@@ -135,6 +140,8 @@ services:
       target: dev
     container_name: asistente-frontend
     restart: unless-stopped
+    mem_limit: 512m
+    cpus: 0.5
     depends_on:
       backend-java:
         condition: service_healthy
@@ -230,11 +237,80 @@ services:
     networks:
       - asistente-local
 
+  # ---------------------------------------------------------------------------
+  # PROMETHEUS (monitoreo - opcional: requiere --profile monitoring)
+  # ---------------------------------------------------------------------------
+  prometheus:
+    profiles:
+      - monitoring
+    image: prom/prometheus:latest
+    container_name: asistente-prometheus
+    restart: unless-stopped
+    mem_limit: 256m
+    cpus: 0.3
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - asistente-local
+
+  grafana:
+    profiles:
+      - monitoring
+    image: grafana/grafana:latest
+    container_name: asistente-grafana
+    restart: unless-stopped
+    mem_limit: 256m
+    cpus: 0.3
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+    volumes:
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - asistente-local
+    depends_on:
+      - prometheus
+
+  # ---------------------------------------------------------------------------
+  # CADDY (HTTPS local autosigned - opcional: requiere --profile https)
+  # ---------------------------------------------------------------------------
+  caddy:
+    profiles:
+      - https
+    image: caddy:2-alpine
+    container_name: asistente-caddy
+    restart: unless-stopped
+    mem_limit: 128m
+    cpus: 0.2
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile.local:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+    networks:
+      - asistente-local
+    depends_on:
+      backend-java:
+        condition: service_healthy
+      frontend-react:
+        condition: service_healthy
+
 # =============================================================================
 # VOLUMES
 # =============================================================================
 volumes:
   postgres-data:
+
+  prometheus-data:
+
+  grafana-data:
+
+  caddy-data:
 
   whatsapp-webjs-session-data:
     driver: local

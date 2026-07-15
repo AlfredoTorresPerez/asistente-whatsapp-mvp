@@ -14,6 +14,7 @@ import com.asistentewhatsapp.security.domain.PasswordResetTokenEntity;
 import com.asistentewhatsapp.security.domain.SecurityPolicyEntity;
 import com.asistentewhatsapp.security.domain.UserAccountEntity;
 import com.asistentewhatsapp.security.domain.UserAccountStatus;
+import com.asistentewhatsapp.security.domain.UserSessionEntity;
 import com.asistentewhatsapp.security.infrastructure.AuditLogJdbcRepository;
 import com.asistentewhatsapp.security.infrastructure.BusinessRepository;
 import com.asistentewhatsapp.security.infrastructure.PasswordResetTokenRepository;
@@ -21,6 +22,7 @@ import com.asistentewhatsapp.security.infrastructure.SecurityPolicyRepository;
 import com.asistentewhatsapp.security.infrastructure.UserAccountRepository;
 import com.asistentewhatsapp.security.infrastructure.UserPermissionJdbcRepository;
 import com.asistentewhatsapp.security.infrastructure.UserRoleJdbcRepository;
+import com.asistentewhatsapp.security.infrastructure.UserSessionJdbcRepository;
 import com.asistentewhatsapp.shared.api.StatusResponse;
 import com.asistentewhatsapp.shared.email.TransactionalEmailService;
 import com.asistentewhatsapp.shared.email.TransactionalEmailService.DeliveryStatus;
@@ -63,11 +65,13 @@ public class AuthService {
     private final UserPermissionJdbcRepository userPermissionJdbcRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final AuditLogJdbcRepository auditLogJdbcRepository;
+    private final UserSessionJdbcRepository userSessionJdbcRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final PasswordPolicyService passwordPolicyService;
     private final SecurityUserMapper securityUserMapper;
     private final JwtProperties jwtProperties;
+    private final RefreshTokenService refreshTokenService;
     private final TransactionalEmailService transactionalEmailService;
     private final String frontendPublicBaseUrl;
 
@@ -79,11 +83,13 @@ public class AuthService {
             UserPermissionJdbcRepository userPermissionJdbcRepository,
             PasswordResetTokenRepository passwordResetTokenRepository,
             AuditLogJdbcRepository auditLogJdbcRepository,
+            UserSessionJdbcRepository userSessionJdbcRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
             PasswordPolicyService passwordPolicyService,
             SecurityUserMapper securityUserMapper,
             JwtProperties jwtProperties,
+            RefreshTokenService refreshTokenService,
             TransactionalEmailService transactionalEmailService,
             @Value("${app.frontend.public-base-url:http://localhost:5173}") String frontendPublicBaseUrl) {
         this.userAccountRepository = userAccountRepository;
@@ -93,11 +99,13 @@ public class AuthService {
         this.userPermissionJdbcRepository = userPermissionJdbcRepository;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.auditLogJdbcRepository = auditLogJdbcRepository;
+        this.userSessionJdbcRepository = userSessionJdbcRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.passwordPolicyService = passwordPolicyService;
         this.securityUserMapper = securityUserMapper;
         this.jwtProperties = jwtProperties;
+        this.refreshTokenService = refreshTokenService;
         this.transactionalEmailService = transactionalEmailService;
         this.frontendPublicBaseUrl = frontendPublicBaseUrl;
     }
@@ -155,11 +163,16 @@ public class AuthService {
                 Map.of("email", userAccount.getEmail(), "ipAddress", clientIpAddress),
                 OffsetDateTime.now(ZoneOffset.UTC));
 
+        RefreshTokenService.RefreshTokenResult refreshResult = refreshTokenService.createSession(
+                authenticatedUser, null, clientIpAddress);
+
         AuthUserResponse authUserResponse = securityUserMapper.toAuthUserResponse(authenticatedUser);
         return new LoginResponse(
                 jwtService.createToken(authenticatedUser),
+                refreshResult.rawToken(),
                 "Bearer",
                 jwtService.getAccessTokenExpiresInSeconds(),
+                jwtProperties.getRefreshTokenExpiresInSeconds(),
                 authUserResponse);
     }
 
@@ -171,7 +184,14 @@ public class AuthService {
     }
 
     @Transactional
-    public StatusResponse logout(AuthenticatedUser authenticatedUser) {
+    public StatusResponse logout(AuthenticatedUser authenticatedUser, String refreshToken) {
+        if (refreshToken != null && !refreshToken.isBlank()) {
+            refreshTokenService.revokeSession(
+                authenticatedUser.businessId(), authenticatedUser.userId(), refreshToken);
+        } else {
+            refreshTokenService.revokeAllSessions(
+                authenticatedUser.businessId(), authenticatedUser.userId(), authenticatedUser.userId());
+        }
         auditLogJdbcRepository.insert(
                 authenticatedUser.businessId(),
                 authenticatedUser.userId(),
@@ -182,6 +202,49 @@ public class AuthService {
                 Map.of("email", authenticatedUser.email()),
                 OffsetDateTime.now(ZoneOffset.UTC));
         return new StatusResponse("LOGGED_OUT");
+    }
+
+    @Transactional
+    public LoginResponse refresh(String refreshToken, String deviceInfo, String clientIpAddress) {
+        refreshTokenService.validateSession(refreshToken);
+
+        String hash = refreshTokenService.sha256(refreshToken);
+        UserSessionEntity session = userSessionJdbcRepository.findByRefreshTokenHash(hash)
+            .orElseThrow(() -> new AuthenticationFailedException("Sesion invalida."));
+
+        if (!session.isActive(OffsetDateTime.now(ZoneOffset.UTC))) {
+            throw new AuthenticationFailedException("Sesion expirada o revocada.");
+        }
+
+        UserAccountEntity userAccount = userAccountRepository.findScopedById(
+                session.getBusinessId(), session.getUserId())
+            .orElseThrow(() -> new AuthenticationFailedException("Usuario no encontrado."));
+
+        if (userAccount.getStatus() != UserAccountStatus.ACTIVE) {
+            throw new AuthenticationFailedException("Cuenta inactiva o bloqueada.");
+        }
+
+        AuthenticatedUser authenticatedUser = buildAuthenticatedUser(userAccount);
+
+        var rotated = refreshTokenService.rotate(authenticatedUser, refreshToken, deviceInfo, clientIpAddress);
+
+        userSessionJdbcRepository.updateLastUsed(rotated.session().getId(), OffsetDateTime.now(ZoneOffset.UTC));
+
+        auditLogJdbcRepository.insert(
+                userAccount.getBusinessId(), userAccount.getId(),
+                "TOKEN_REFRESHED", "USER_ACCOUNT", userAccount.getId(),
+                "Token de acceso renovado.",
+                Map.of("ipAddress", clientIpAddress),
+                OffsetDateTime.now(ZoneOffset.UTC));
+
+        AuthUserResponse authUserResponse = securityUserMapper.toAuthUserResponse(authenticatedUser);
+        return new LoginResponse(
+                jwtService.createToken(authenticatedUser),
+                rotated.rawToken(),
+                "Bearer",
+                jwtService.getAccessTokenExpiresInSeconds(),
+                jwtProperties.getRefreshTokenExpiresInSeconds(),
+                authUserResponse);
     }
 
     @Transactional

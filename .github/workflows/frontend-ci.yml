@@ -1,0 +1,42 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [main, develop, 'feature/**', 'fix/**']
+    paths:
+      - 'frontend-react/**'
+      - '.github/workflows/frontend-ci.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'frontend-react/**'
+
+env:
+  PNPM_VERSION: 10.18.3
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend-react
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: frontend-react/pnpm-lock.yaml
+      - name: Install pnpm
+        run: corepack enable && corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Format check
+        run: pnpm format:check
+        continue-on-error: true
+      - name: Lint
+        run: pnpm lint
+      - name: Test
+        run: pnpm test -- --run
+      - name: Build
+        run: pnpm build

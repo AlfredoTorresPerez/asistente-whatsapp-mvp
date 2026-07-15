@@ -7,6 +7,7 @@ public class JwtProperties {
 
     private String secret;
     private long accessTokenExpiresInSeconds = 900;
+    private long refreshTokenExpiresInSeconds = 2592000;
     private long resetTokenExpiresInMinutes = 30;
 
     public String getSecret() {
@@ -23,6 +24,14 @@ public class JwtProperties {
 
     public void setAccessTokenExpiresInSeconds(long accessTokenExpiresInSeconds) {
         this.accessTokenExpiresInSeconds = accessTokenExpiresInSeconds;
+    }
+
+    public long getRefreshTokenExpiresInSeconds() {
+        return refreshTokenExpiresInSeconds;
+    }
+
+    public void setRefreshTokenExpiresInSeconds(long refreshTokenExpiresInSeconds) {
+        this.refreshTokenExpiresInSeconds = refreshTokenExpiresInSeconds;
     }
 
     public long getResetTokenExpiresInMinutes() {

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -27,6 +28,7 @@ public class BusinessLocationController {
         this.businessLocationService = businessLocationService;
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_VIEW')")
     @GetMapping({"/api/business-locations", "/api/v1/business-locations"})
     public List<BusinessLocationResponse> list(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -34,6 +36,7 @@ public class BusinessLocationController {
         return businessLocationService.list(authenticatedUser, activeOnly);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_VIEW')")
     @GetMapping({"/api/business-locations/{locationId}", "/api/v1/business-locations/{locationId}"})
     public BusinessLocationResponse detail(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -41,6 +44,7 @@ public class BusinessLocationController {
         return businessLocationService.getDetail(authenticatedUser, locationId);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_MANAGE')")
     @PostMapping(
             value = {"/api/business-locations", "/api/v1/business-locations"},
             consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -50,6 +54,7 @@ public class BusinessLocationController {
         return businessLocationService.create(authenticatedUser, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_MANAGE')")
     @PutMapping(
             value = {"/api/business-locations/{locationId}", "/api/v1/business-locations/{locationId}"},
             consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -60,6 +65,7 @@ public class BusinessLocationController {
         return businessLocationService.update(authenticatedUser, locationId, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_MANAGE')")
     @DeleteMapping({"/api/business-locations/{locationId}", "/api/v1/business-locations/{locationId}"})
     public BusinessLocationResponse deactivate(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,

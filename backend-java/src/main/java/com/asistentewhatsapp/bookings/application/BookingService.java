@@ -13,6 +13,8 @@ import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepo
 import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository;
 import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository;
 import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository.BusinessLocationRecord;
+import com.asistentewhatsapp.security.application.AuditMetadata;
+import com.asistentewhatsapp.security.application.AuditService;
 import com.asistentewhatsapp.security.domain.AuthenticatedUser;
 import com.asistentewhatsapp.shared.api.PagedResponse;
 import com.asistentewhatsapp.shared.exception.ApiException;
@@ -37,18 +39,21 @@ public class BookingService {
     private final BookingConfirmationJdbcRepository bookingConfirmationJdbcRepository;
     private final CompleteAgendaJdbcRepository agendaRepository;
     private final AvailabilityService availabilityService;
+    private final AuditService auditService;
 
     public BookingService(
             BookingJdbcRepository bookingJdbcRepository,
             BusinessLocationJdbcRepository businessLocationJdbcRepository,
             BookingConfirmationJdbcRepository bookingConfirmationJdbcRepository,
             CompleteAgendaJdbcRepository agendaRepository,
-            AvailabilityService availabilityService) {
+            AvailabilityService availabilityService,
+            AuditService auditService) {
         this.bookingJdbcRepository = bookingJdbcRepository;
         this.businessLocationJdbcRepository = businessLocationJdbcRepository;
         this.bookingConfirmationJdbcRepository = bookingConfirmationJdbcRepository;
         this.agendaRepository = agendaRepository;
         this.availabilityService = availabilityService;
+        this.auditService = auditService;
     }
 
     @Transactional(readOnly = true)
@@ -126,6 +131,18 @@ public class BookingService {
                 location.locationText(),
                 notes,
                 resolveCompletedAt(status, startsAt));
+        auditService.record(authenticatedUser.businessId(), authenticatedUser.userId(),
+                "BOOKING_CREATED", "BOOKING", bookingId,
+                "Reserva creada manualmente.",
+                AuditMetadata.of(
+                        "status", status,
+                        "customerId", customer.id(),
+                        "customerPhone", customer.phone(),
+                        "subject", subject,
+                        "startsAt", startsAt,
+                        "durationMinutes", durationMinutes,
+                        "locationId", location.locationId(),
+                        "assignedUserId", assignedUserId));
         return bookingJdbcRepository.findBookingDetail(authenticatedUser.businessId(), bookingId);
     }
 
@@ -182,6 +199,18 @@ public class BookingService {
                 location.locationText(),
                 normalizeOptionalText(request.notes(), "notes", 2000),
                 resolveCompletedAt(status, startsAt));
+        auditService.record(authenticatedUser.businessId(), authenticatedUser.userId(),
+                "BOOKING_CREATED_FROM_CONVERSATION", "BOOKING", bookingId,
+                "Reserva creada desde conversacion.",
+                AuditMetadata.of(
+                        "status", status,
+                        "conversationId", conversationId,
+                        "leadId", leadId,
+                        "subject", request.subject(),
+                        "startsAt", startsAt,
+                        "durationMinutes", durationMinutes,
+                        "locationId", location.locationId(),
+                        "assignedUserId", assignedUserId));
         return bookingJdbcRepository.findBookingDetail(authenticatedUser.businessId(), bookingId);
     }
 
@@ -235,6 +264,18 @@ public class BookingService {
                 location.locationText(),
                 normalizeOptionalText(request.notes(), "notes", 2000),
                 resolveCompletedAt(status, startsAt));
+        auditService.record(authenticatedUser.businessId(), authenticatedUser.userId(),
+                "BOOKING_CREATED_FROM_LEAD", "BOOKING", bookingId,
+                "Reserva creada desde prospecto.",
+                AuditMetadata.of(
+                        "status", status,
+                        "leadId", leadId,
+                        "customerId", lead.customerId(),
+                        "subject", request.subject(),
+                        "startsAt", startsAt,
+                        "durationMinutes", durationMinutes,
+                        "locationId", location.locationId(),
+                        "assignedUserId", assignedUserId));
         return bookingJdbcRepository.findBookingDetail(authenticatedUser.businessId(), bookingId);
     }
 
@@ -268,6 +309,16 @@ public class BookingService {
                 location.locationText(),
                 normalizeOptionalText(request.notes(), "notes", 2000),
                 resolveCompletedAt(status, startsAt));
+        auditService.record(authenticatedUser.businessId(), authenticatedUser.userId(),
+                "BOOKING_UPDATED", "BOOKING", bookingId,
+                "Reserva actualizada.",
+                AuditMetadata.of(
+                        "previousStatus", current.status(),
+                        "newStatus", status,
+                        "subject", request.subject(),
+                        "startsAt", startsAt,
+                        "durationMinutes", request.durationMinutes(),
+                        "locationId", location.locationId()));
         return bookingJdbcRepository.findBookingDetail(authenticatedUser.businessId(), bookingId);
     }
 
@@ -299,6 +350,16 @@ public class BookingService {
                         request.notes() != null ? request.notes() : current.notes(),
                         "notes",
                         2000));
+        auditService.record(authenticatedUser.businessId(), authenticatedUser.userId(),
+                "BOOKING_RESCHEDULED", "BOOKING", bookingId,
+                "Reserva reprogramada.",
+                AuditMetadata.of(
+                        "previousStatus", current.status(),
+                        "newStatus", BookingStateMachine.RESCHEDULED,
+                        "previousStartsAt", current.startsAt(),
+                        "newStartsAt", startsAt,
+                        "durationMinutes", durationMinutes,
+                        "locationId", location.locationId()));
         return bookingJdbcRepository.findBookingDetail(authenticatedUser.businessId(), bookingId);
     }
 
@@ -312,6 +373,13 @@ public class BookingService {
         String reason = normalizeRequiredValue(request.reason(), "reason", 2000);
         String notes = appendCancellationReason(current.notes(), reason);
         bookingJdbcRepository.cancelBooking(authenticatedUser.businessId(), bookingId, notes);
+        auditService.record(authenticatedUser.businessId(), authenticatedUser.userId(),
+                "BOOKING_CANCELLED", "BOOKING", bookingId,
+                "Reserva cancelada: " + reason,
+                AuditMetadata.of(
+                        "previousStatus", current.status(),
+                        "newStatus", BookingStateMachine.CANCELLED,
+                        "reason", reason));
         return bookingJdbcRepository.findBookingDetail(authenticatedUser.businessId(), bookingId);
     }
 

@@ -22,5 +22,6 @@ public record BookingSummaryResponse(
         String assignedUserName,
         boolean requiresDeposit,
         BigDecimal depositAmount,
-        String paymentStatus) {
+        String paymentStatus,
+        String calendarSyncStatus) {
 }

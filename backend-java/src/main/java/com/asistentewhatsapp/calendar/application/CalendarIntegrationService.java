@@ -1,10 +1,15 @@
 package com.asistentewhatsapp.calendar.application;
 
+import com.asistentewhatsapp.calendar.api.CalendarAccountResponse;
 import com.asistentewhatsapp.calendar.infrastructure.CalendarIntegrationJdbcRepository;
 import com.asistentewhatsapp.calendar.infrastructure.CalendarIntegrationJdbcRepository.CalendarIntegrationAccountRecord;
+import com.asistentewhatsapp.calendar.infrastructure.GoogleCalendarHttpClient;
 import com.asistentewhatsapp.calendar.infrastructure.TokenEncryptionService;
 import com.asistentewhatsapp.calendar.provider.CalendarProvider;
+import com.asistentewhatsapp.calendar.provider.CalendarProvider.CalendarListEntry;
 import com.asistentewhatsapp.calendar.provider.CalendarProvider.TokenExchangeResult;
+import com.asistentewhatsapp.calendar.provider.CalendarProvider.UserInfoResult;
+import com.asistentewhatsapp.security.application.AuditService;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +18,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,14 +29,26 @@ public class CalendarIntegrationService {
 
     private final CalendarIntegrationJdbcRepository repository;
     private final TokenEncryptionService tokenEncryption;
+    private final OAuthStateService oAuthStateService;
     private final Map<String, CalendarProvider> providers;
+    private final GoogleCalendarHttpClient httpClient;
+    private final AuditService auditService;
+    private final String frontendBaseUrl;
 
     public CalendarIntegrationService(
             CalendarIntegrationJdbcRepository repository,
             TokenEncryptionService tokenEncryption,
-            List<CalendarProvider> providerList) {
+            OAuthStateService oAuthStateService,
+            List<CalendarProvider> providerList,
+            GoogleCalendarHttpClient httpClient,
+            AuditService auditService,
+            @Value("${app.frontend.public-base-url:http://localhost:5173}") String frontendBaseUrl) {
         this.repository = repository;
         this.tokenEncryption = tokenEncryption;
+        this.oAuthStateService = oAuthStateService;
+        this.httpClient = httpClient;
+        this.auditService = auditService;
+        this.frontendBaseUrl = frontendBaseUrl;
         Map<String, CalendarProvider> map = new ConcurrentHashMap<>();
         for (CalendarProvider p : providerList) {
             map.put(p.getProviderName(), p);
@@ -38,38 +56,45 @@ public class CalendarIntegrationService {
         this.providers = map;
     }
 
-    public List<CalendarIntegrationAccountRecord> getAccounts(UUID businessId) {
-        return repository.findActiveByBusiness(businessId);
+    public List<CalendarAccountResponse> getStatus(UUID businessId) {
+        List<CalendarIntegrationAccountRecord> records = repository.findActiveByBusiness(businessId);
+        return records.stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    public Optional<CalendarIntegrationAccountRecord> getAccount(UUID accountId) {
-        return repository.findById(accountId);
-    }
-
-    public String getAuthUrl(UUID businessId, String providerName, String redirectUri) {
-        CalendarProvider provider = providers.get(providerName);
-        if (provider == null) {
-            throw new IllegalArgumentException("Unknown provider: " + providerName);
+    public String getAuthUrl(UUID businessId, String providerName) {
+        CalendarProvider provider = getProvider(providerName);
+        if (!provider.isEnabled()) {
+            throw new IllegalStateException("Calendar provider " + providerName + " is not enabled");
         }
-        String state = businessId.toString() + "|" + providerName + "|" + UUID.randomUUID();
+        String state = oAuthStateService.generateState(businessId, providerName);
+        String redirectUri = getRedirectUri(providerName);
         return provider.getAuthUrl(state, redirectUri);
     }
 
     @Transactional
-    public CalendarIntegrationAccountRecord handleOAuthCallback(String state, String code, String redirectUri) {
-        String[] parts = state.split("\\|");
-        if (parts.length < 2) {
-            throw new IllegalArgumentException("Invalid state parameter");
-        }
-        UUID businessId = UUID.fromString(parts[0]);
-        String providerName = parts[1];
+    public CalendarAccountResponse handleOAuthCallback(String state, String code) {
+        OAuthStateService.OAuthStateInfo stateInfo = oAuthStateService.consumeAndValidate(state, null, null);
 
-        CalendarProvider provider = providers.get(providerName);
-        if (provider == null) {
-            throw new IllegalArgumentException("Unknown provider: " + providerName);
+        if (stateInfo == null) {
+            throw new IllegalArgumentException("Invalid OAuth state");
         }
 
-        TokenExchangeResult tokenResult = provider.exchangeCode(code, redirectUri);
+        UUID businessId = stateInfo.businessId();
+        String providerName = stateInfo.provider();
+
+        CalendarProvider provider = getProvider(providerName);
+        if (!provider.isEnabled()) {
+            throw new IllegalStateException("Calendar provider " + providerName + " is not enabled");
+        }
+
+        String configuredRedirectUri = getRedirectUri(providerName);
+        TokenExchangeResult tokenResult = provider.exchangeCode(code, configuredRedirectUri);
+
+        UserInfoResult userInfo = provider.getUserInfo(tokenResult.accessToken());
+        String email = userInfo.email() != null ? userInfo.email() : tokenResult.email();
+
         String encryptedAccess = tokenEncryption.encrypt(tokenResult.accessToken());
         String encryptedRefresh = tokenEncryption.encrypt(tokenResult.refreshToken());
 
@@ -78,25 +103,132 @@ public class CalendarIntegrationService {
                 ? now.plusSeconds(tokenResult.expiresInSeconds())
                 : null;
 
-        CalendarIntegrationAccountRecord record = new CalendarIntegrationAccountRecord(
+        CalendarIntegrationAccountRecord accountRecord = new CalendarIntegrationAccountRecord(
                 UUID.randomUUID(), businessId, providerName,
-                tokenResult.calendarEmail() != null ? tokenResult.calendarEmail() : "unknown@email.com",
+                email,
                 encryptedAccess, encryptedRefresh, expiresAt,
-                tokenResult.calendarId(), null, true, now, now, now);
+                null, null, true, now, now, now,
+                null, null, false);
 
-        repository.save(record);
+        repository.save(accountRecord);
+
+        auditService.record(businessId, null, "CALENDAR_ACCOUNT_CONNECTED", "CALENDAR", accountRecord.id(),
+                "Cuenta de calendario conectada: " + providerName + " - " + CalendarAccountResponse.maskEmail(email));
+
         LOGGER.info("CALENDAR_ACCOUNT_CONNECTED businessId={} provider={} email={}",
-                businessId, providerName, record.email());
-        return record;
+                businessId, providerName, CalendarAccountResponse.maskEmail(email));
+
+        return toResponse(accountRecord);
     }
 
     @Transactional
-    public void disconnect(UUID accountId) {
-        Optional<CalendarIntegrationAccountRecord> opt = repository.findById(accountId);
-        if (opt.isEmpty()) {
-            throw new IllegalArgumentException("Account not found: " + accountId);
+    public void disconnect(UUID accountId, UUID businessId) {
+        CalendarIntegrationAccountRecord account = findAccountByIdAndBusiness(accountId, businessId);
+
+        String accessToken = null;
+        if (account.accessTokenEncrypted() != null) {
+            try {
+                accessToken = tokenEncryption.decrypt(account.accessTokenEncrypted());
+            } catch (Exception e) {
+                LOGGER.warn("CALENDAR_DECRYPT_FAILED accountId={}", accountId);
+            }
         }
-        repository.deactivate(accountId);
-        LOGGER.info("CALENDAR_ACCOUNT_DISCONNECTED accountId={} provider={}", accountId, opt.get().provider());
+
+        if (accessToken != null) {
+            try {
+                CalendarProvider provider = getProvider(account.provider());
+                provider.revokeToken(accessToken);
+            } catch (Exception e) {
+                LOGGER.warn("CALENDAR_REVOKE_FAILED accountId={} reason={}", accountId, e.getMessage());
+            }
+        }
+
+        repository.revokeAccount(accountId, businessId);
+
+        auditService.record(businessId, null, "CALENDAR_ACCOUNT_DISCONNECTED", "CALENDAR", accountId,
+                "Cuenta de calendario desvinculada: " + account.provider());
+
+        LOGGER.info("CALENDAR_ACCOUNT_DISCONNECTED accountId={} provider={}", accountId, account.provider());
+    }
+
+    @Transactional
+    public void selectCalendar(UUID accountId, UUID businessId, String calendarId, String calendarSummary) {
+        CalendarIntegrationAccountRecord account = findAccountByIdAndBusiness(accountId, businessId);
+
+        String accessToken = tokenEncryption.decrypt(account.accessTokenEncrypted());
+        CalendarProvider provider = getProvider(account.provider());
+
+        List<CalendarListEntry> available = provider.listCalendars(accessToken);
+        boolean found = false;
+        for (CalendarListEntry entry : available) {
+            if (entry.id().equals(calendarId)) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            throw new IllegalArgumentException("Calendar with id " + calendarId
+                    + " is not available or not writable for this account");
+        }
+
+        repository.updateCalendarId(accountId, businessId, calendarId, calendarSummary);
+
+        auditService.record(businessId, null, "CALENDAR_SELECTED", "CALENDAR", accountId,
+                "Calendario seleccionado: " + calendarSummary + " (" + calendarId + ")");
+
+        LOGGER.info("CALENDAR_SELECTED accountId={} calendarId={} summary={}", accountId, calendarId, calendarSummary);
+    }
+
+    public List<CalendarListEntry> listCalendars(UUID accountId, UUID businessId) {
+        CalendarIntegrationAccountRecord account = findAccountByIdAndBusiness(accountId, businessId);
+        String accessToken = tokenEncryption.decrypt(account.accessTokenEncrypted());
+        CalendarProvider provider = getProvider(account.provider());
+        return provider.listCalendars(accessToken);
+    }
+
+    public CalendarAccountResponse getAccountByIdAndBusiness(UUID accountId, UUID businessId) {
+        CalendarIntegrationAccountRecord account = findAccountByIdAndBusiness(accountId, businessId);
+        return toResponse(account);
+    }
+
+    public boolean isIntegrationActive(UUID businessId) {
+        return !repository.findActiveByBusiness(businessId).isEmpty();
+    }
+
+    public CalendarIntegrationAccountRecord findAccountByIdAndBusiness(UUID accountId, UUID businessId) {
+        return repository.findByIdAndBusiness(accountId, businessId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Calendar account not found: " + accountId));
+    }
+
+    private CalendarProvider getProvider(String providerName) {
+        CalendarProvider provider = providers.get(providerName);
+        if (provider == null) {
+            throw new IllegalArgumentException("Unknown calendar provider: " + providerName);
+        }
+        return provider;
+    }
+
+    private String getRedirectUri(String providerName) {
+        CalendarProvider provider = getProvider(providerName);
+        // The provider uses its own redirectUri as fallback
+        return null;
+    }
+
+    private CalendarAccountResponse toResponse(CalendarIntegrationAccountRecord record) {
+        String status = CalendarAccountResponse.determineAuthorizationStatus(
+                record.active(), record.requiresReconnect(), record.revokedAt());
+        return new CalendarAccountResponse(
+                record.id(),
+                record.provider(),
+                CalendarAccountResponse.maskEmail(record.email()),
+                record.calendarId(),
+                record.calendarSummary(),
+                record.active(),
+                record.connectedAt(),
+                record.lastSyncAt(),
+                record.requiresReconnect(),
+                record.revokedAt(),
+                status);
     }
 }

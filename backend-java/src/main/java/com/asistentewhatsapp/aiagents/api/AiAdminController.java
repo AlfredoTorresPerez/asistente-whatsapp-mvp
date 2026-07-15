@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import java.util.UUID;
 
 @RestController
@@ -28,12 +29,14 @@ public class AiAdminController {
         this.agentCoordinatorService = agentCoordinatorService;
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'ADMIN_MANAGE')")
     @GetMapping("/outbox/stats")
     public AiReplyOutboxProcessor.AiOutboxStats getOutboxStats(AuthenticatedUser authenticatedUser) {
         AdminAccessGuard.requireOwnerAdminOrSupervisor(authenticatedUser);
         return outboxProcessor.getStats();
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'ADMIN_MANAGE')")
     @PostMapping("/preview")
     public AiPreviewResponse preview(@RequestBody AiPreviewRequest request, AuthenticatedUser authenticatedUser) {
         AdminAccessGuard.requireOwnerAdminOrSupervisor(authenticatedUser);

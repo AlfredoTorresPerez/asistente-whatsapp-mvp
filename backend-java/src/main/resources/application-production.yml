@@ -1,0 +1,30 @@
+app:
+  rate-limiting:
+    enabled: ${APP_RATE_LIMITING_ENABLED:true}
+  test:
+    enabled: false
+  whatsapp-web:
+    simulator-enabled: false
+  email:
+    simulation-enabled: ${APP_EMAIL_SIMULATION_ENABLED:false}
+    from: ${APP_EMAIL_FROM:no-reply@midominio.cl}
+    from-name: ${APP_EMAIL_FROM_NAME:Centro Estetico}
+  booking-payment:
+    provider: ${APP_BOOKING_PAYMENT_PROVIDER:SIMULATED}
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+server:
+  error:
+    include-stacktrace: never
+    include-message: never
+
+spring:
+  jpa:
+    show-sql: false
+  flyway:
+    locations: classpath:db/migration

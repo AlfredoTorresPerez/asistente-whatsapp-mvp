@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -27,6 +28,7 @@ public class AdminUserController {
         this.adminUserService = adminUserService;
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'USERS_VIEW')")
     @GetMapping("/api/v1/admin/users")
     public PagedResponse<AdminUserResponse> listUsers(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -38,6 +40,7 @@ public class AdminUserController {
         return adminUserService.listUsers(authenticatedUser, page, size, search, role, status);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'USERS_VIEW')")
     @GetMapping("/api/v1/admin/users/{userId}")
     public AdminUserResponse getUser(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -45,6 +48,7 @@ public class AdminUserController {
         return adminUserService.getUser(authenticatedUser, userId);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'USERS_MANAGE')")
     @PostMapping(value = "/api/v1/admin/users", consumes = MediaType.APPLICATION_JSON_VALUE)
     public AdminUserResponse createUser(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -52,6 +56,7 @@ public class AdminUserController {
         return adminUserService.createUser(authenticatedUser, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'USERS_MANAGE')")
     @PatchMapping(value = "/api/v1/admin/users/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public AdminUserResponse updateUser(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -60,6 +65,7 @@ public class AdminUserController {
         return adminUserService.updateUser(authenticatedUser, userId, request);
     }
 
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'USERS_VIEW')")
     @GetMapping("/api/v1/admin/roles")
     public List<AdminRoleResponse> listRoles(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
         return adminUserService.listRoles(authenticatedUser);

@@ -1,0 +1,17 @@
+{
+    email admin@example.com
+}
+
+demo.example.com {
+    encode zstd gzip
+
+    @backend {
+        path /api/* /v3/* /swagger-ui/* /actuator/*
+    }
+    reverse_proxy @backend backend-java:8080
+
+    @frontend {
+        path /*
+    }
+    reverse_proxy @frontend frontend-react:8080
+}
