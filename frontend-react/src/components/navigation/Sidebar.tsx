@@ -11,7 +11,9 @@ type SidebarProps = {
 }
 
 export function Sidebar({ businessName, onClose, onLogout, open, role }: SidebarProps) {
-  const visibleNavigationItems = PRIMARY_NAV_ITEMS.filter((item) => canAccessNavigationItem(item, role))
+  const visibleNavigationItems = PRIMARY_NAV_ITEMS.filter((item) =>
+    canAccessNavigationItem(item, role),
+  )
 
   return (
     <>
@@ -137,7 +139,13 @@ function NavIcon({ path }: { path: string }) {
     case '/conversations':
       return (
         <svg {...iconProps}>
-          <path d="M5 7.5C5 6.12 6.12 5 7.5 5H16.5C17.88 5 19 6.12 19 7.5V13.5C19 14.88 17.88 16 16.5 16H11L7 19V16H7.5C6.12 16 5 14.88 5 13.5V7.5Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+          <path
+            d="M5 7.5C5 6.12 6.12 5 7.5 5H16.5C17.88 5 19 6.12 19 7.5V13.5C19 14.88 17.88 16 16.5 16H11L7 19V16H7.5C6.12 16 5 14.88 5 13.5V7.5Z"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.8"
+          />
         </svg>
       )
     case '/automation-rules':
@@ -153,8 +161,17 @@ function NavIcon({ path }: { path: string }) {
     case '/prospects':
       return (
         <svg {...iconProps}>
-          <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" stroke="currentColor" strokeWidth="1.8" />
-          <path d="M5 19C5 16.79 8.13 15 12 15C15.87 15 19 16.79 19 19" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
+          <path
+            d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          />
+          <path
+            d="M5 19C5 16.79 8.13 15 12 15C15.87 15 19 16.79 19 19"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeWidth="1.8"
+          />
         </svg>
       )
     case '/agenda':
@@ -177,7 +194,13 @@ function NavIcon({ path }: { path: string }) {
     case '/orders':
       return (
         <svg {...iconProps}>
-          <path d="M7 7H19L17.5 13H9L7 5H5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+          <path
+            d="M7 7H19L17.5 13H9L7 5H5"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.8"
+          />
           <circle cx="10" cy="18" fill="currentColor" r="1.2" />
           <circle cx="17" cy="18" fill="currentColor" r="1.2" />
         </svg>
@@ -185,7 +208,13 @@ function NavIcon({ path }: { path: string }) {
     case '/catalog':
       return (
         <svg {...iconProps}>
-          <path d="M7 5H17V19L12 16.5L7 19V5Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+          <path
+            d="M7 5H17V19L12 16.5L7 19V5Z"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.8"
+          />
         </svg>
       )
     case '/reports':
@@ -199,8 +228,20 @@ function NavIcon({ path }: { path: string }) {
     case '/admin/locations':
       return (
         <svg {...iconProps}>
-          <path d="M5 20V8.5L12 4L19 8.5V20" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
-          <path d="M9 20V13H15V20" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+          <path
+            d="M5 20V8.5L12 4L19 8.5V20"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.8"
+          />
+          <path
+            d="M9 20V13H15V20"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.8"
+          />
           <path d="M9 9.5H9.01" stroke="currentColor" strokeLinecap="round" strokeWidth="2.4" />
           <path d="M12 9.5H12.01" stroke="currentColor" strokeLinecap="round" strokeWidth="2.4" />
           <path d="M15 9.5H15.01" stroke="currentColor" strokeLinecap="round" strokeWidth="2.4" />
@@ -209,8 +250,18 @@ function NavIcon({ path }: { path: string }) {
     case '/configuration':
       return (
         <svg {...iconProps}>
-          <path d="M12 15.5A3.5 3.5 0 1 0 12 8.5A3.5 3.5 0 0 0 12 15.5Z" stroke="currentColor" strokeWidth="1.8" />
-          <path d="M19.4 15A1.7 1.7 0 0 0 19.7 16.9L19.8 17A2 2 0 0 1 17 19.8L16.9 19.7A1.7 1.7 0 0 0 15 19.4A1.7 1.7 0 0 0 14 21V21.2A2 2 0 0 1 10 21.2V21A1.7 1.7 0 0 0 9 19.4A1.7 1.7 0 0 0 7.1 19.7L7 19.8A2 2 0 0 1 4.2 17L4.3 16.9A1.7 1.7 0 0 0 4.6 15A1.7 1.7 0 0 0 3 14H2.8A2 2 0 0 1 2.8 10H3A1.7 1.7 0 0 0 4.6 9A1.7 1.7 0 0 0 4.3 7.1L4.2 7A2 2 0 0 1 7 4.2L7.1 4.3A1.7 1.7 0 0 0 9 4.6A1.7 1.7 0 0 0 10 3V2.8A2 2 0 0 1 14 2.8V3A1.7 1.7 0 0 0 15 4.6A1.7 1.7 0 0 0 16.9 4.3L17 4.2A2 2 0 0 1 19.8 7L19.7 7.1A1.7 1.7 0 0 0 19.4 9A1.7 1.7 0 0 0 21 10H21.2A2 2 0 0 1 21.2 14H21A1.7 1.7 0 0 0 19.4 15Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.6" />
+          <path
+            d="M12 15.5A3.5 3.5 0 1 0 12 8.5A3.5 3.5 0 0 0 12 15.5Z"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          />
+          <path
+            d="M19.4 15A1.7 1.7 0 0 0 19.7 16.9L19.8 17A2 2 0 0 1 17 19.8L16.9 19.7A1.7 1.7 0 0 0 15 19.4A1.7 1.7 0 0 0 14 21V21.2A2 2 0 0 1 10 21.2V21A1.7 1.7 0 0 0 9 19.4A1.7 1.7 0 0 0 7.1 19.7L7 19.8A2 2 0 0 1 4.2 17L4.3 16.9A1.7 1.7 0 0 0 4.6 15A1.7 1.7 0 0 0 3 14H2.8A2 2 0 0 1 2.8 10H3A1.7 1.7 0 0 0 4.6 9A1.7 1.7 0 0 0 4.3 7.1L4.2 7A2 2 0 0 1 7 4.2L7.1 4.3A1.7 1.7 0 0 0 9 4.6A1.7 1.7 0 0 0 10 3V2.8A2 2 0 0 1 14 2.8V3A1.7 1.7 0 0 0 15 4.6A1.7 1.7 0 0 0 16.9 4.3L17 4.2A2 2 0 0 1 19.8 7L19.7 7.1A1.7 1.7 0 0 0 19.4 9A1.7 1.7 0 0 0 21 10H21.2A2 2 0 0 1 21.2 14H21A1.7 1.7 0 0 0 19.4 15Z"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.6"
+          />
         </svg>
       )
     default:
@@ -226,9 +277,26 @@ function NavIcon({ path }: { path: string }) {
 
 function SupportIcon() {
   return (
-    <svg className="h-4 w-4 text-white/88" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M4 12A8 8 0 0 1 20 12V15A2 2 0 0 1 18 17H16V11H20" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
-      <path d="M4 11H8V17H6A2 2 0 0 1 4 15V11Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+    <svg
+      className="h-4 w-4 text-white/88"
+      fill="none"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M4 12A8 8 0 0 1 20 12V15A2 2 0 0 1 18 17H16V11H20"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M4 11H8V17H6A2 2 0 0 1 4 15V11Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
       <path d="M10 20H14" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
     </svg>
   )
@@ -236,10 +304,27 @@ function SupportIcon() {
 
 function LogoutIcon() {
   return (
-    <svg className="h-4 w-4 text-white/88" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M14 7L19 12L14 17" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+    <svg
+      className="h-4 w-4 text-white/88"
+      fill="none"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M14 7L19 12L14 17"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
       <path d="M19 12H10" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
-      <path d="M10 4H6C4.9 4 4 4.9 4 6V18C4 19.1 4.9 20 6 20H10" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+      <path
+        d="M10 4H6C4.9 4 4 4.9 4 6V18C4 19.1 4.9 20 6 20H10"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
     </svg>
   )
 }

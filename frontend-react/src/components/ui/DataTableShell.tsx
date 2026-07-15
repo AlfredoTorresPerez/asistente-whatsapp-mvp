@@ -14,7 +14,12 @@ type DataTableShellProps = {
   rows: DataTableShellRow[]
 }
 
-export function DataTableShell({ caption, columns, emptyMessage = 'No hay registros para mostrar.', rows }: DataTableShellProps) {
+export function DataTableShell({
+  caption,
+  columns,
+  emptyMessage = 'No hay registros para mostrar.',
+  rows,
+}: DataTableShellProps) {
   const navigate = useNavigate()
 
   const handleRowNavigation = (href?: string) => {
@@ -50,7 +55,10 @@ export function DataTableShell({ caption, columns, emptyMessage = 'No hay regist
           <tbody className="bg-white">
             {rows.length === 0 ? (
               <tr>
-                <td className="border-b border-[var(--color-border)] px-5 py-8 text-center text-sm text-slate-500" colSpan={columns.length}>
+                <td
+                  className="border-b border-[var(--color-border)] px-5 py-8 text-center text-sm text-slate-500"
+                  colSpan={columns.length}
+                >
                   {emptyMessage}
                 </td>
               </tr>

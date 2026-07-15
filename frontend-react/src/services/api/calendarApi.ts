@@ -19,7 +19,11 @@ export function getCalendarListRequest(accountId: string) {
   return apiFetch<CalendarListEntry[]>(`/calendar-integrations/${accountId}/calendars`)
 }
 
-export function selectCalendarRequest(accountId: string, calendarId: string, calendarSummary: string) {
+export function selectCalendarRequest(
+  accountId: string,
+  calendarId: string,
+  calendarSummary: string,
+) {
   return apiFetch<CalendarAccountResponse>(`/calendar-integrations/${accountId}/select-calendar`, {
     method: 'POST',
     body: JSON.stringify({ calendarId, calendarSummary }),

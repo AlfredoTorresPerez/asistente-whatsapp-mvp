@@ -7,11 +7,7 @@ type DashboardSummaryRequest = {
   ownerUserId?: string
 }
 
-export function getDashboardSummaryRequest({
-  from,
-  ownerUserId,
-  to,
-}: DashboardSummaryRequest) {
+export function getDashboardSummaryRequest({ from, ownerUserId, to }: DashboardSummaryRequest) {
   const searchParams = new URLSearchParams({
     from,
     to,

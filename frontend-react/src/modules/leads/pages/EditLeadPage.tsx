@@ -150,24 +150,12 @@ export function EditLeadPage() {
         <Card>
           <form className="space-y-5" onSubmit={onSubmit}>
             <div className="grid gap-5 md:grid-cols-2">
-              <Input
-                error={errors.firstName?.message}
-                label="Nombre"
-                {...register('firstName')}
-              />
-              <Input
-                error={errors.lastName?.message}
-                label="Apellido"
-                {...register('lastName')}
-              />
+              <Input error={errors.firstName?.message} label="Nombre" {...register('firstName')} />
+              <Input error={errors.lastName?.message} label="Apellido" {...register('lastName')} />
             </div>
 
             <div className="grid gap-5 md:grid-cols-2">
-              <Input
-                error={errors.phone?.message}
-                label="Telefono"
-                {...register('phone')}
-              />
+              <Input error={errors.phone?.message} label="Telefono" {...register('phone')} />
               <Input
                 error={errors.email?.message}
                 label="Correo"
@@ -200,7 +188,11 @@ export function EditLeadPage() {
               >
                 Cancelar
               </Button>
-              <Button disabled={!isOnline} loading={updateMutation.isPending || isSubmitting} type="submit">
+              <Button
+                disabled={!isOnline}
+                loading={updateMutation.isPending || isSubmitting}
+                type="submit"
+              >
                 Guardar cambios
               </Button>
             </div>

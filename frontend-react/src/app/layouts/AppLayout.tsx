@@ -39,9 +39,7 @@ export function AppLayout() {
     return (
       <div className="min-h-screen bg-[var(--color-background)] px-4 py-10">
         <div className="mx-auto max-w-xl rounded-[28px] border border-[var(--color-border)] bg-white p-8 shadow-[var(--shadow-card)]">
-          <LoadingState
-            message="Cargando datos del usuario autenticado."
-          />
+          <LoadingState message="Cargando datos del usuario autenticado." />
         </div>
       </div>
     )
@@ -59,45 +57,41 @@ export function AppLayout() {
           role={user.role}
         />
 
-        <main
-          className="flex h-full min-h-0 min-w-0 flex-col gap-4 overflow-hidden"
-        >
+        <main className="flex h-full min-h-0 min-w-0 flex-col gap-4 overflow-hidden">
           <div className="relative shrink-0">
-              {isUserMenuOpen ? (
-                <button
-                  aria-label="Cerrar menu de usuario"
-                  className="fixed inset-0 z-20 bg-transparent"
-                  onClick={() => setIsUserMenuOpen(false)}
-                  type="button"
-                />
-              ) : null}
-
-              <Topbar
-                currentDescription={currentRoute?.description ?? ''}
-                currentRoute={currentRoute?.title ?? 'Shell privado'}
-                isUserMenuOpen={isUserMenuOpen}
-                notificationCount={unreadNotificationsQuery.data?.totalItems ?? 0}
-                onOpenSidebar={() => setIsSidebarOpen(true)}
-                onToggleUserMenu={() => setIsUserMenuOpen((currentValue) => !currentValue)}
-                user={user}
+            {isUserMenuOpen ? (
+              <button
+                aria-label="Cerrar menu de usuario"
+                className="fixed inset-0 z-20 bg-transparent"
+                onClick={() => setIsUserMenuOpen(false)}
+                type="button"
               />
+            ) : null}
 
-              <UserMenu
-                onNavigate={() => setIsUserMenuOpen(false)}
-                onLogout={() => {
-                  setIsUserMenuOpen(false)
-                  setIsLogoutDialogOpen(true)
-                }}
-                open={isUserMenuOpen}
-                user={user}
-              />
-            </div>
+            <Topbar
+              currentDescription={currentRoute?.description ?? ''}
+              currentRoute={currentRoute?.title ?? 'Shell privado'}
+              isUserMenuOpen={isUserMenuOpen}
+              notificationCount={unreadNotificationsQuery.data?.totalItems ?? 0}
+              onOpenSidebar={() => setIsSidebarOpen(true)}
+              onToggleUserMenu={() => setIsUserMenuOpen((currentValue) => !currentValue)}
+              user={user}
+            />
 
-            <div
-              className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain pb-2 pr-1"
-            >
-              <Outlet />
-            </div>
+            <UserMenu
+              onNavigate={() => setIsUserMenuOpen(false)}
+              onLogout={() => {
+                setIsUserMenuOpen(false)
+                setIsLogoutDialogOpen(true)
+              }}
+              open={isUserMenuOpen}
+              user={user}
+            />
+          </div>
+
+          <div className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain pb-2 pr-1">
+            <Outlet />
+          </div>
         </main>
       </div>
 
@@ -112,18 +106,20 @@ export function AppLayout() {
           }
 
           setIsLoggingOut(true)
-          void signOut().then((remoteLogoutSucceeded) => {
-            if (!remoteLogoutSucceeded) {
-              showToast({
-                title: 'Sesion cerrada localmente',
-                description:
-                  'No alcanzamos a confirmar el logout remoto, pero la sesion local ya fue eliminada.',
-                tone: 'warning',
-              })
-            }
-          }).finally(() => {
-            setIsLoggingOut(false)
-          })
+          void signOut()
+            .then((remoteLogoutSucceeded) => {
+              if (!remoteLogoutSucceeded) {
+                showToast({
+                  title: 'Sesion cerrada localmente',
+                  description:
+                    'No alcanzamos a confirmar el logout remoto, pero la sesion local ya fue eliminada.',
+                  tone: 'warning',
+                })
+              }
+            })
+            .finally(() => {
+              setIsLoggingOut(false)
+            })
           setIsLogoutDialogOpen(false)
         }}
         open={isLogoutDialogOpen}

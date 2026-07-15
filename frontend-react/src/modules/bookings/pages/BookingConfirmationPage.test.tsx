@@ -103,7 +103,9 @@ describe('BookingConfirmationPage', () => {
   })
 
   it('shows "Reserva confirmada" and disables confirm when already confirmed', async () => {
-    vi.mocked(fetch).mockResolvedValue(jsonResponse(confirmationResponse({ bookingStatus: 'CONFIRMADA', linkStatus: 'CONFIRMED' })))
+    vi.mocked(fetch).mockResolvedValue(
+      jsonResponse(confirmationResponse({ bookingStatus: 'CONFIRMADA', linkStatus: 'CONFIRMED' })),
+    )
 
     renderAt('/reservas/confirmar/valid-token')
 
@@ -129,7 +131,9 @@ describe('BookingConfirmationPage', () => {
     await user.click(cancelBtn)
 
     expect(screen.getByRole('heading', { name: 'Cancelar reserva' })).toBeInTheDocument()
-    expect(screen.getByPlaceholderText('Ejemplo: No podre asistir a la hora reservada.')).toBeInTheDocument()
+    expect(
+      screen.getByPlaceholderText('Ejemplo: No podre asistir a la hora reservada.'),
+    ).toBeInTheDocument()
   })
 
   it('calls cancel API with reason and phone 56950954580 data', async () => {
@@ -145,7 +149,9 @@ describe('BookingConfirmationPage', () => {
     const textarea = screen.getByPlaceholderText('Ejemplo: No podre asistir a la hora reservada.')
     await user.type(textarea, 'No podre asistir a la hora reservada.')
 
-    fetchMock.mockResolvedValue(jsonResponse(confirmationResponse({ bookingStatus: 'CANCELADA', linkStatus: 'USED' })))
+    fetchMock.mockResolvedValue(
+      jsonResponse(confirmationResponse({ bookingStatus: 'CANCELADA', linkStatus: 'USED' })),
+    )
 
     const confirmCancelBtn = screen.getByRole('button', { name: 'Confirmar cancelacion' })
     await user.click(confirmCancelBtn)

@@ -27,7 +27,10 @@ export function createBusinessLocationRequest(payload: UpsertBusinessLocationReq
   })
 }
 
-export function updateBusinessLocationRequest(locationId: string, payload: UpsertBusinessLocationRequest) {
+export function updateBusinessLocationRequest(
+  locationId: string,
+  payload: UpsertBusinessLocationRequest,
+) {
   return apiFetch<BusinessLocationResponse>(`/business-locations/${locationId}`, {
     method: 'PUT',
     body: JSON.stringify(payload),

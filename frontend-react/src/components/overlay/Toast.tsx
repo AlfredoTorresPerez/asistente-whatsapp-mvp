@@ -20,13 +20,7 @@ const toneIcons: Record<ToastTone, string> = {
   warning: 'bg-amber-100 text-amber-700',
 }
 
-export function Toast({
-  description,
-  id,
-  onClose,
-  title,
-  tone = 'success',
-}: ToastProps) {
+export function Toast({ description, id, onClose, title, tone = 'success' }: ToastProps) {
   return (
     <div
       className={[
@@ -39,20 +33,52 @@ export function Toast({
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
-          <span className={['inline-flex h-10 w-10 items-center justify-center rounded-2xl', toneIcons[tone]].join(' ')}>
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <span
+            className={[
+              'inline-flex h-10 w-10 items-center justify-center rounded-2xl',
+              toneIcons[tone],
+            ].join(' ')}
+          >
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
               {tone === 'success' ? (
-                <path d="M5 12.5L9.5 17L19 7.5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+                <path
+                  d="M5 12.5L9.5 17L19 7.5"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                />
               ) : tone === 'error' ? (
                 <>
                   <path d="M12 8V12" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
-                  <path d="M12 16H12.01" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
-                  <path d="M10.29 3.86L1.82 18A2 2 0 0 0 3.53 21H20.47A2 2 0 0 0 22.18 18L13.71 3.86A2 2 0 0 0 10.29 3.86Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+                  <path
+                    d="M12 16H12.01"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeWidth="2"
+                  />
+                  <path
+                    d="M10.29 3.86L1.82 18A2 2 0 0 0 3.53 21H20.47A2 2 0 0 0 22.18 18L13.71 3.86A2 2 0 0 0 10.29 3.86Z"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                  />
                 </>
               ) : (
                 <>
                   <path d="M12 8V12" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
-                  <path d="M12 16H12.01" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+                  <path
+                    d="M12 16H12.01"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeWidth="2"
+                  />
                   <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
                 </>
               )}
@@ -60,7 +86,9 @@ export function Toast({
           </span>
           <div>
             <p className="text-sm font-semibold">{title}</p>
-            {description ? <p className="mt-1 text-sm leading-6 opacity-90">{description}</p> : null}
+            {description ? (
+              <p className="mt-1 text-sm leading-6 opacity-90">{description}</p>
+            ) : null}
           </div>
         </div>
 

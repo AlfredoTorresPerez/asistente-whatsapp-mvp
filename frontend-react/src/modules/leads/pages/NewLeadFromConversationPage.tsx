@@ -111,9 +111,10 @@ export function NewLeadFromConversationPage() {
     onError: (error) => {
       showToast({
         title: 'No se pudo crear el prospecto',
-        description: error instanceof ApiClientError
-          ? error.message
-          : 'La conversacion podria tener ya un prospecto asociado o faltar algun dato.',
+        description:
+          error instanceof ApiClientError
+            ? error.message
+            : 'La conversacion podria tener ya un prospecto asociado o faltar algun dato.',
         tone: 'error',
       })
     },
@@ -132,7 +133,9 @@ export function NewLeadFromConversationPage() {
       <PageHeader
         actions={
           <Button
-            onClick={() => navigate(conversationId ? `/conversations/${conversationId}` : '/conversations')}
+            onClick={() =>
+              navigate(conversationId ? `/conversations/${conversationId}` : '/conversations')
+            }
             variant="secondary"
           >
             Volver a la conversacion
@@ -181,11 +184,7 @@ export function NewLeadFromConversationPage() {
               </div>
 
               <div className="grid gap-5 md:grid-cols-2">
-                <Input
-                  error={errors.phone?.message}
-                  label="Telefono"
-                  {...register('phone')}
-                />
+                <Input error={errors.phone?.message} label="Telefono" {...register('phone')} />
                 <Input
                   error={errors.email?.message}
                   label="Correo"
@@ -219,7 +218,11 @@ export function NewLeadFromConversationPage() {
                 >
                   Cancelar
                 </Button>
-                <Button disabled={!isOnline} loading={createMutation.isPending || isSubmitting} type="submit">
+                <Button
+                  disabled={!isOnline}
+                  loading={createMutation.isPending || isSubmitting}
+                  type="submit"
+                >
                   Crear prospecto
                 </Button>
               </div>
@@ -237,7 +240,8 @@ export function NewLeadFromConversationPage() {
               <li>Telefono: {conversationQuery.data.customer.phone}</li>
               <li>Estado de la conversacion: {conversationQuery.data.status}</li>
               <li>
-                Ultimo mensaje: {conversationQuery.data.lastMessagePreview ?? 'Sin mensaje reciente'}
+                Ultimo mensaje:{' '}
+                {conversationQuery.data.lastMessagePreview ?? 'Sin mensaje reciente'}
               </li>
             </ul>
           </Card>

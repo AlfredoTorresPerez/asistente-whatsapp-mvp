@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { z } from 'zod'
@@ -19,7 +19,12 @@ import { useOnlineStatus } from '../../../lib/useOnlineStatus'
 import { getBookingsRequest } from '../../../services/api/bookingsApi'
 import type { BookingSummaryResponse } from '../../../services/api/types'
 import { AgendaEventCard } from '../../agenda/components/AgendaEventCard'
-import { agendaTimeZone, formatAgendaTime, getAgendaDateKey, getStatusStyle } from '../../agenda/components/agendaUtils'
+import {
+  agendaTimeZone,
+  formatAgendaTime,
+  getAgendaDateKey,
+  getStatusStyle,
+} from '../../agenda/components/agendaUtils'
 
 const fieldClassName =
   'w-full rounded-2xl border border-[var(--color-border)] bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100'
@@ -40,19 +45,27 @@ const defaultFilters: FiltersValues = {
 
 function syncStatusTone(status: string): string {
   switch (status) {
-    case 'SYNCED': return 'bg-emerald-500'
-    case 'PENDING': return 'bg-amber-400'
-    case 'FAILED': return 'bg-red-500'
-    default: return 'bg-slate-300'
+    case 'SYNCED':
+      return 'bg-emerald-500'
+    case 'PENDING':
+      return 'bg-amber-400'
+    case 'FAILED':
+      return 'bg-red-500'
+    default:
+      return 'bg-slate-300'
   }
 }
 
 function syncStatusTitle(status: string): string {
   switch (status) {
-    case 'SYNCED': return 'Sincronizado con Google Calendar'
-    case 'PENDING': return 'Pendiente de sincronizar'
-    case 'FAILED': return 'Error de sincronización'
-    default: return 'Sin sincronizar'
+    case 'SYNCED':
+      return 'Sincronizado con Google Calendar'
+    case 'PENDING':
+      return 'Pendiente de sincronizar'
+    case 'FAILED':
+      return 'Error de sincronización'
+    default:
+      return 'Sin sincronizar'
   }
 }
 
@@ -99,7 +112,7 @@ export function AppointmentsPage() {
   const { user } = useShellSession()
   const isOnline = useOnlineStatus()
   const [visibleMonth, setVisibleMonth] = useState(dayjs().startOf('month'))
-  const [selectedDate, setSelectedDate] = useState(dayjs().format('YYYY-MM-DD'))
+  const [userSelectedDate, setUserSelectedDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [appliedFilters, setAppliedFilters] = useState<FiltersValues>(defaultFilters)
   const {
     register,
@@ -143,27 +156,25 @@ export function AppointmentsPage() {
     return map
   }, [bookings])
 
-  const selectedDayBookings = groupedByDate.get(selectedDate) ?? []
-
-  useEffect(() => {
-    if (!dayjs(selectedDate).isSame(visibleMonth, 'month')) {
-      setSelectedDate(visibleMonth.startOf('month').format('YYYY-MM-DD'))
+  const selectedDate = useMemo(() => {
+    let candidate = userSelectedDate
+    if (!dayjs(candidate).isSame(visibleMonth, 'month')) {
+      candidate = visibleMonth.startOf('month').format('YYYY-MM-DD')
     }
-  }, [selectedDate, visibleMonth])
-
-  useEffect(() => {
     const monthStart = visibleMonth.startOf('month').format('YYYY-MM-DD')
-    const selectedDayHasBookings = (groupedByDate.get(selectedDate) ?? []).length > 0
-
-    if (firstBookingDate && selectedDate === monthStart && !selectedDayHasBookings) {
-      setSelectedDate(firstBookingDate)
+    const candidateHasBookings = (groupedByDate.get(candidate) ?? []).length > 0
+    if (firstBookingDate && candidate === monthStart && !candidateHasBookings) {
+      candidate = firstBookingDate
     }
-  }, [firstBookingDate, groupedByDate, selectedDate, visibleMonth])
+    return candidate
+  }, [userSelectedDate, visibleMonth, firstBookingDate, groupedByDate])
+
+  const selectedDayBookings = groupedByDate.get(selectedDate) ?? []
 
   const moveVisibleMonth = (months: number) => {
     const nextMonth = visibleMonth.add(months, 'month').startOf('month')
     setVisibleMonth(nextMonth)
-    setSelectedDate(nextMonth.format('YYYY-MM-DD'))
+    setUserSelectedDate(nextMonth.format('YYYY-MM-DD'))
   }
 
   const onSubmitFilters = handleSubmit(async (values) => {
@@ -197,7 +208,8 @@ export function AppointmentsPage() {
         <Card className="border-amber-200 bg-amber-50">
           <p className="text-sm font-semibold text-amber-900">Estado sin conexion</p>
           <p className="mt-2 text-sm leading-6 text-amber-800">
-            Puedes revisar la agenda cacheada, pero no crear ni sincronizar cambios hasta recuperar internet.
+            Puedes revisar la agenda cacheada, pero no crear ni sincronizar cambios hasta recuperar
+            internet.
           </p>
         </Card>
       ) : null}
@@ -288,18 +300,10 @@ export function AppointmentsPage() {
               </div>
 
               <div className="flex gap-2">
-                <Button
-                  onClick={() => moveVisibleMonth(-1)}
-                  size="sm"
-                  variant="secondary"
-                >
+                <Button onClick={() => moveVisibleMonth(-1)} size="sm" variant="secondary">
                   Mes anterior
                 </Button>
-                <Button
-                  onClick={() => moveVisibleMonth(1)}
-                  size="sm"
-                  variant="secondary"
-                >
+                <Button onClick={() => moveVisibleMonth(1)} size="sm" variant="secondary">
                   Mes siguiente
                 </Button>
               </div>
@@ -307,7 +311,8 @@ export function AppointmentsPage() {
 
             {bookings.length === 0 ? (
               <div className="rounded-3xl border border-dashed border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
-                La agenda del mes esta disponible aunque no existan citas. Selecciona un dia o crea una cita para ocupar un cupo.
+                La agenda del mes esta disponible aunque no existan citas. Selecciona un dia o crea
+                una cita para ocupar un cupo.
               </div>
             ) : null}
 
@@ -322,69 +327,81 @@ export function AppointmentsPage() {
               ))}
 
               {calendarDays.map((day) => {
-                  const key = day.format('YYYY-MM-DD')
-                  const items = groupedByDate.get(key) ?? []
-                  const active = selectedDate === key
-                  const isCurrentMonth = day.month() === visibleMonth.month()
-                  const isToday = day.isSame(dayjs(), 'day')
+                const key = day.format('YYYY-MM-DD')
+                const items = groupedByDate.get(key) ?? []
+                const active = selectedDate === key
+                const isCurrentMonth = day.month() === visibleMonth.month()
+                const isToday = day.isSame(dayjs(), 'day')
 
-                  return (
-                    <button
-                      key={key}
-                      className={[
-                        'min-h-[118px] rounded-[22px] border p-3 text-left transition',
-                        active
-                          ? 'border-blue-300 bg-blue-50'
-                          : 'border-[var(--color-border)] bg-white hover:border-blue-200 hover:bg-slate-50',
-                        isCurrentMonth ? '' : 'opacity-45',
-                        isToday && !active ? 'border-emerald-200 bg-emerald-50/40' : '',
-                      ]
-                        .join(' ')
-                        .trim()}
-                      onClick={() => setSelectedDate(key)}
-                      type="button"
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <span
-                          className={[
-                            'inline-flex h-7 w-7 items-center justify-center rounded-full text-sm font-semibold',
-                            isToday ? 'bg-emerald-500 text-white' : 'text-[var(--color-text)]',
-                          ].join(' ')}
-                        >
-                          {day.format('D')}
+                return (
+                  <button
+                    key={key}
+                    className={[
+                      'min-h-[118px] rounded-[22px] border p-3 text-left transition',
+                      active
+                        ? 'border-blue-300 bg-blue-50'
+                        : 'border-[var(--color-border)] bg-white hover:border-blue-200 hover:bg-slate-50',
+                      isCurrentMonth ? '' : 'opacity-45',
+                      isToday && !active ? 'border-emerald-200 bg-emerald-50/40' : '',
+                    ]
+                      .join(' ')
+                      .trim()}
+                    onClick={() => setUserSelectedDate(key)}
+                    type="button"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span
+                        className={[
+                          'inline-flex h-7 w-7 items-center justify-center rounded-full text-sm font-semibold',
+                          isToday ? 'bg-emerald-500 text-white' : 'text-[var(--color-text)]',
+                        ].join(' ')}
+                      >
+                        {day.format('D')}
+                      </span>
+                      {items.length > 0 ? (
+                        <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-800">
+                          {items.length}
                         </span>
-                        {items.length > 0 ? (
-                          <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-800">
-                            {items.length}
-                          </span>
-                        ) : null}
-                      </div>
+                      ) : null}
+                    </div>
 
-                      <div className="mt-2 space-y-1">
-                        {items.slice(0, 3).map((booking) => {
-                          const ss = getStatusStyle(booking.status)
-                          return (
-                            <div
-                              key={booking.id}
-                              className={['rounded-lg px-2 py-1 text-[11px] shadow-sm', ss.bg, ss.text].join(' ')}
-                              style={{ borderLeft: `2px solid ${ss.hex}` }}
-                            >
-                              <div className="flex items-center gap-1.5">
-                                <span className={['inline-block h-1.5 w-1.5 rounded-full', syncStatusTone(booking.calendarSyncStatus)].join(' ')} title={syncStatusTitle(booking.calendarSyncStatus)} />
-                                <p className="truncate font-semibold">{booking.subject}</p>
-                              </div>
-                              <p className="truncate opacity-80">{dayjs(booking.startsAt).format('HH:mm')}</p>
+                    <div className="mt-2 space-y-1">
+                      {items.slice(0, 3).map((booking) => {
+                        const ss = getStatusStyle(booking.status)
+                        return (
+                          <div
+                            key={booking.id}
+                            className={[
+                              'rounded-lg px-2 py-1 text-[11px] shadow-sm',
+                              ss.bg,
+                              ss.text,
+                            ].join(' ')}
+                            style={{ borderLeft: `2px solid ${ss.hex}` }}
+                          >
+                            <div className="flex items-center gap-1.5">
+                              <span
+                                className={[
+                                  'inline-block h-1.5 w-1.5 rounded-full',
+                                  syncStatusTone(booking.calendarSyncStatus),
+                                ].join(' ')}
+                                title={syncStatusTitle(booking.calendarSyncStatus)}
+                              />
+                              <p className="truncate font-semibold">{booking.subject}</p>
                             </div>
-                          )
-                        })}
-                        {items.length > 3 ? (
-                          <p className="text-xs font-semibold text-slate-500">
-                            +{items.length - 3} mas
-                          </p>
-                        ) : null}
-                      </div>
-                    </button>
-                  )
+                            <p className="truncate opacity-80">
+                              {dayjs(booking.startsAt).format('HH:mm')}
+                            </p>
+                          </div>
+                        )
+                      })}
+                      {items.length > 3 ? (
+                        <p className="text-xs font-semibold text-slate-500">
+                          +{items.length - 3} mas
+                        </p>
+                      ) : null}
+                    </div>
+                  </button>
+                )
               })}
             </div>
           </Card>
@@ -422,13 +439,13 @@ export function AppointmentsPage() {
                         className="block transition hover:-translate-y-0.5"
                         to={`/appointments/${booking.id}`}
                       >
-                        <AgendaEventCard
-                          item={agendaItem}
-                          showStatus
-                        />
+                        <AgendaEventCard item={agendaItem} showStatus />
                       </Link>
                       <span
-                        className={['absolute right-2 top-2 inline-block h-2 w-2 rounded-full ring-1 ring-white', syncStatusTone(booking.calendarSyncStatus)].join(' ')}
+                        className={[
+                          'absolute right-2 top-2 inline-block h-2 w-2 rounded-full ring-1 ring-white',
+                          syncStatusTone(booking.calendarSyncStatus),
+                        ].join(' ')}
                         title={syncStatusTitle(booking.calendarSyncStatus)}
                       />
                     </div>

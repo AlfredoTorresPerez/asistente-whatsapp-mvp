@@ -11,7 +11,11 @@ import { FilterBar } from '../../../components/ui/FilterBar'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { buttonClassName } from '../../../components/ui/buttonStyles'
-import { formatEstadoRegistro, getRegistroTone, isRegistroActivo } from '../../../lib/statusFormatters'
+import {
+  formatEstadoRegistro,
+  getRegistroTone,
+  isRegistroActivo,
+} from '../../../lib/statusFormatters'
 import { useOnlineStatus } from '../../../lib/useOnlineStatus'
 import {
   listAestheticServiceCategories,
@@ -117,7 +121,11 @@ export function CatalogPage() {
   const [searchInput, setSearchInput] = useState('')
   const [activeInput, setActiveInput] = useState<ActiveFilter>('')
   const [categoryInput, setCategoryInput] = useState('')
-  const [filters, setFilters] = useState({ search: '', active: '' as ActiveFilter, categoryCode: '' })
+  const [filters, setFilters] = useState({
+    search: '',
+    active: '' as ActiveFilter,
+    categoryCode: '',
+  })
   const [rowToToggle, setRowToToggle] = useState<{ row: CatalogRow; active: boolean } | null>(null)
   const [inlineError, setInlineError] = useState<string | null>(null)
 
@@ -169,7 +177,11 @@ export function CatalogPage() {
       return updateCatalogProductStatus(row.source.id, active)
     },
     onError: (error) => {
-      setInlineError(error instanceof Error ? error.message : 'No fue posible actualizar el estado del item del catálogo.')
+      setInlineError(
+        error instanceof Error
+          ? error.message
+          : 'No fue posible actualizar el estado del item del catálogo.',
+      )
     },
     onSuccess: async () => {
       setInlineError(null)
@@ -183,9 +195,10 @@ export function CatalogPage() {
   const products = useMemo(() => productsQuery.data?.items ?? [], [productsQuery.data?.items])
   const currentQuery = tab === 'services' ? servicesQuery : productsQuery
   const currentItems = tab === 'services' ? services.map(serviceToRow) : products.map(productToRow)
-  const categories = tab === 'services'
-    ? serviceCategoriesQuery.data?.items ?? []
-    : productCategoriesQuery.data?.items ?? []
+  const categories =
+    tab === 'services'
+      ? (serviceCategoriesQuery.data?.items ?? [])
+      : (productCategoriesQuery.data?.items ?? [])
 
   const metrics = useMemo(() => {
     const activeServices = services.filter((service) => service.active).length
@@ -235,17 +248,34 @@ export function CatalogPage() {
       />
 
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <MetricCard label="Servicios activos" value={String(metrics.activeServices)} tone="success" />
-        <MetricCard label="Productos activos" value={String(metrics.activeProducts)} tone="success" />
-        <MetricCard label="Categorías visibles" value={String(metrics.totalCategories)} tone="info" />
-        <MetricCard label="Stock bajo" value={String(metrics.lowStock)} tone={metrics.lowStock > 0 ? 'warning' : 'success'} />
+        <MetricCard
+          label="Servicios activos"
+          value={String(metrics.activeServices)}
+          tone="success"
+        />
+        <MetricCard
+          label="Productos activos"
+          value={String(metrics.activeProducts)}
+          tone="success"
+        />
+        <MetricCard
+          label="Categorías visibles"
+          value={String(metrics.totalCategories)}
+          tone="info"
+        />
+        <MetricCard
+          label="Stock bajo"
+          value={String(metrics.lowStock)}
+          tone={metrics.lowStock > 0 ? 'warning' : 'success'}
+        />
       </div>
 
       {!isOnline ? (
         <Card className="border-amber-200 bg-amber-50 p-4">
           <p className="text-sm font-semibold text-amber-900">Estado sin conexión</p>
           <p className="mt-1 text-sm leading-6 text-amber-800">
-            Puedes ver datos cacheados, pero la edición se sincronizará solo cuando vuelva la conexión.
+            Puedes ver datos cacheados, pero la edición se sincronizará solo cuando vuelva la
+            conexión.
           </p>
         </Card>
       ) : null}
@@ -274,8 +304,12 @@ export function CatalogPage() {
         <FilterBar
           actions={
             <>
-              <Button onClick={applyFilters} size="sm" type="button">Aplicar filtros</Button>
-              <Button onClick={clearFilters} size="sm" type="button" variant="secondary">Limpiar</Button>
+              <Button onClick={applyFilters} size="sm" type="button">
+                Aplicar filtros
+              </Button>
+              <Button onClick={clearFilters} size="sm" type="button" variant="secondary">
+                Limpiar
+              </Button>
             </>
           }
         >
@@ -291,16 +325,26 @@ export function CatalogPage() {
           </label>
           <label className="block">
             <span className="mb-1.5 block text-sm font-medium text-slate-700">Categoria</span>
-            <select className={fieldClassName} onChange={(event) => setCategoryInput(event.target.value)} value={categoryInput}>
+            <select
+              className={fieldClassName}
+              onChange={(event) => setCategoryInput(event.target.value)}
+              value={categoryInput}
+            >
               <option value="">Todas</option>
               {categories.map((category) => (
-                <option key={category.id} value={category.code}>{category.name}</option>
+                <option key={category.id} value={category.code}>
+                  {category.name}
+                </option>
               ))}
             </select>
           </label>
           <label className="block">
             <span className="mb-1.5 block text-sm font-medium text-slate-700">Estado</span>
-            <select className={fieldClassName} onChange={(event) => setActiveInput(event.target.value as ActiveFilter)} value={activeInput}>
+            <select
+              className={fieldClassName}
+              onChange={(event) => setActiveInput(event.target.value as ActiveFilter)}
+              value={activeInput}
+            >
               <option value="">Todos</option>
               <option value="true">Activos</option>
               <option value="false">Desactivados</option>
@@ -329,7 +373,10 @@ export function CatalogPage() {
         {currentQuery.data && currentItems.length === 0 ? (
           <EmptyState
             description="No hay elementos que coincidan con los filtros aplicados. Puedes crear uno nuevo desde las acciones superiores."
-            primaryAction={{ label: tab === 'services' ? 'Crear servicio' : 'Crear producto', to: tab === 'services' ? '/catalog/services/new' : '/catalog/products/new' }}
+            primaryAction={{
+              label: tab === 'services' ? 'Crear servicio' : 'Crear producto',
+              to: tab === 'services' ? '/catalog/services/new' : '/catalog/products/new',
+            }}
             title="Catálogo sin resultados"
           />
         ) : null}
@@ -356,23 +403,44 @@ export function CatalogPage() {
                   <article
                     className={[
                       'grid gap-3 rounded-[20px] border p-4 transition md:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,1fr)_110px_110px_auto] md:items-center',
-                      active ? 'border-[var(--color-border)] bg-white' : 'border-amber-200 bg-amber-50/70',
+                      active
+                        ? 'border-[var(--color-border)] bg-white'
+                        : 'border-amber-200 bg-amber-50/70',
                     ].join(' ')}
                     key={item.id}
                   >
                     <div className="min-w-0">
                       <p className="truncate font-semibold text-[var(--color-text)]">{item.name}</p>
-                      <p className="mt-1 truncate text-xs uppercase tracking-[0.16em] text-slate-500">{item.code}</p>
+                      <p className="mt-1 truncate text-xs uppercase tracking-[0.16em] text-slate-500">
+                        {item.code}
+                      </p>
                     </div>
                     <p className="truncate text-sm text-slate-700">{item.category}</p>
                     <p className="text-sm text-slate-700">{item.detail}</p>
-                    <StatusBadge label={formatEstadoRegistro(item.status)} tone={getRegistroTone(item.status)} />
-                    <p className="text-sm font-semibold text-slate-950">{formatMoney(item.price)}</p>
+                    <StatusBadge
+                      label={formatEstadoRegistro(item.status)}
+                      tone={getRegistroTone(item.status)}
+                    />
+                    <p className="text-sm font-semibold text-slate-950">
+                      {formatMoney(item.price)}
+                    </p>
                     <div className="flex flex-wrap justify-end gap-2">
                       {active ? (
-                        <Link className={buttonClassName({ size: 'sm', variant: 'secondary' })} title={`Editar ${item.name}`} to={item.href}>Editar</Link>
+                        <Link
+                          className={buttonClassName({ size: 'sm', variant: 'secondary' })}
+                          title={`Editar ${item.name}`}
+                          to={item.href}
+                        >
+                          Editar
+                        </Link>
                       ) : (
-                        <span aria-disabled="true" className={`${buttonClassName({ size: 'sm', variant: 'secondary' })} pointer-events-none opacity-60`} title="No se puede editar un registro desactivado.">Editar</span>
+                        <span
+                          aria-disabled="true"
+                          className={`${buttonClassName({ size: 'sm', variant: 'secondary' })} pointer-events-none opacity-60`}
+                          title="No se puede editar un registro desactivado."
+                        >
+                          Editar
+                        </span>
                       )}
                       <Button
                         disabled={statusMutation.isPending}
@@ -393,11 +461,31 @@ export function CatalogPage() {
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--color-border)] pt-4">
           <p className="text-sm text-slate-600">
-            Página {(currentQuery.data?.page ?? 0) + 1} de {Math.max(currentQuery.data?.totalPages ?? 1, 1)} · 10 registros por página
+            Página {(currentQuery.data?.page ?? 0) + 1} de{' '}
+            {Math.max(currentQuery.data?.totalPages ?? 1, 1)} · 10 registros por página
           </p>
           <div className="flex gap-2">
-            <Button disabled={page === 0 || currentQuery.isFetching} onClick={() => setPage((current) => Math.max(current - 1, 0))} size="sm" variant="secondary">Anterior</Button>
-            <Button disabled={!currentQuery.data || currentQuery.data.totalPages === 0 || page >= currentQuery.data.totalPages - 1 || currentQuery.isFetching} onClick={() => setPage((current) => current + 1)} size="sm" variant="secondary">Siguiente</Button>
+            <Button
+              disabled={page === 0 || currentQuery.isFetching}
+              onClick={() => setPage((current) => Math.max(current - 1, 0))}
+              size="sm"
+              variant="secondary"
+            >
+              Anterior
+            </Button>
+            <Button
+              disabled={
+                !currentQuery.data ||
+                currentQuery.data.totalPages === 0 ||
+                page >= currentQuery.data.totalPages - 1 ||
+                currentQuery.isFetching
+              }
+              onClick={() => setPage((current) => current + 1)}
+              size="sm"
+              variant="secondary"
+            >
+              Siguiente
+            </Button>
           </div>
         </div>
       </Card>
@@ -405,7 +493,11 @@ export function CatalogPage() {
       <ConfirmDialog
         confirmLabel={rowToToggle?.active ? 'Activar' : 'Desactivar'}
         confirmLoading={statusMutation.isPending}
-        description={rowToToggle ? `El ${rowToToggle.row.type.toLowerCase()} ${rowToToggle.row.name} quedara ${rowToToggle.active ? 'activo' : 'desactivado'}, pero no será eliminado físicamente.` : 'Confirma el cambio de estado del item.'}
+        description={
+          rowToToggle
+            ? `El ${rowToToggle.row.type.toLowerCase()} ${rowToToggle.row.name} quedara ${rowToToggle.active ? 'activo' : 'desactivado'}, pero no será eliminado físicamente.`
+            : 'Confirma el cambio de estado del item.'
+        }
         onCancel={() => setRowToToggle(null)}
         onConfirm={() => {
           if (rowToToggle) {
@@ -420,13 +512,25 @@ export function CatalogPage() {
   )
 }
 
-function MetricCard({ label, tone, value }: { label: string; tone: 'success' | 'warning' | 'info'; value: string }) {
+function MetricCard({
+  label,
+  tone,
+  value,
+}: {
+  label: string
+  tone: 'success' | 'warning' | 'info'
+  value: string
+}) {
   return (
     <Card className="p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">{label}</p>
-          <p className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[var(--color-text)]">{value}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">
+            {label}
+          </p>
+          <p className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[var(--color-text)]">
+            {value}
+          </p>
         </div>
         <StatusBadge label="BD" tone={tone} />
       </div>

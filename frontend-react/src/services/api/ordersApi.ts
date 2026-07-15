@@ -21,13 +21,15 @@ const toQueryString = (params: Record<string, string | number | boolean | null |
   return queryString ? `?${queryString}` : ''
 }
 
-export function listOrders(params: {
-  page?: number
-  size?: number
-  search?: string
-  status?: string
-  paymentStatus?: string
-} = {}) {
+export function listOrders(
+  params: {
+    page?: number
+    size?: number
+    search?: string
+    status?: string
+    paymentStatus?: string
+  } = {},
+) {
   return apiFetch<PagedResponse<OrderSummaryResponse>>(`/orders${toQueryString(params)}`)
 }
 

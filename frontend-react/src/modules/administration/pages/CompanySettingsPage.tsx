@@ -147,10 +147,7 @@ export function CompanySettingsPage() {
       />
 
       {companyQuery.isPending && !companyQuery.data ? (
-        <LoadingState
-          message="Cargando la configuracion actual de la empresa."
-          variant="page"
-        />
+        <LoadingState message="Cargando la configuracion actual de la empresa." variant="page" />
       ) : null}
 
       {companyQuery.isError && !companyQuery.data ? (
@@ -220,13 +217,15 @@ export function CompanySettingsPage() {
                   {companyQuery.data.businessName}
                 </p>
                 <p className="mt-2 text-sm leading-6 text-slate-700">
-                  El topbar y la sesion del usuario se sincronizan con este nombre comercial despues del guardado.
+                  El topbar y la sesion del usuario se sincronizan con este nombre comercial despues
+                  del guardado.
                 </p>
               </div>
               <div className="rounded-[24px] border border-[var(--color-border)] bg-slate-50 px-5 py-5">
                 <p className="text-sm font-semibold text-slate-900">Contexto operativo</p>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
-                  Esta configuracion es la fuente visible para administracion, topbar y partes del flujo comercial de Fase 1.
+                  Esta configuracion es la fuente visible para administracion, topbar y partes del
+                  flujo comercial de Fase 1.
                 </p>
               </div>
             </Card>
@@ -237,9 +236,7 @@ export function CompanySettingsPage() {
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
                 Contacto y soporte
               </p>
-              <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-                Canales principales
-              </h2>
+              <h2 className="mt-2 text-2xl font-semibold text-slate-950">Canales principales</h2>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">

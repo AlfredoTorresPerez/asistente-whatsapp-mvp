@@ -16,7 +16,10 @@ import {
   getAestheticRule,
   updateAestheticRule,
 } from '../../../services/api/aestheticApi'
-import type { AestheticBusinessRuleResponse, UpsertAestheticBusinessRuleRequest } from '../../../services/api/types'
+import type {
+  AestheticBusinessRuleResponse,
+  UpsertAestheticBusinessRuleRequest,
+} from '../../../services/api/types'
 
 type FormState = {
   active: boolean
@@ -127,7 +130,10 @@ export function AutomationRuleFormPage() {
         actions={
           <>
             {isEdit ? (
-              <Link className={buttonClassName({ variant: 'secondary' })} to={`/automation-rules/${ruleId}/test`}>
+              <Link
+                className={buttonClassName({ variant: 'secondary' })}
+                to={`/automation-rules/${ruleId}/test`}
+              >
                 Probar regla
               </Link>
             ) : null}
@@ -141,7 +147,9 @@ export function AutomationRuleFormPage() {
         title={title}
       />
 
-      {ruleQuery.isPending && isEdit ? <LoadingState message="Cargando regla seleccionada." variant="page" /> : null}
+      {ruleQuery.isPending && isEdit ? (
+        <LoadingState message="Cargando regla seleccionada." variant="page" />
+      ) : null}
       {ruleQuery.isError ? (
         <ErrorState
           description="No fue posible cargar la regla para editar."
@@ -150,7 +158,7 @@ export function AutomationRuleFormPage() {
         />
       ) : null}
 
-      {(!isEdit || ruleQuery.data) ? (
+      {!isEdit || ruleQuery.data ? (
         <Card className="space-y-6">
           <div className="flex flex-col gap-3 border-b border-[var(--color-border)] pb-5 lg:flex-row lg:items-start lg:justify-between">
             <div>
@@ -159,10 +167,14 @@ export function AutomationRuleFormPage() {
               </p>
               <h2 className="mt-2 text-xl font-semibold text-[var(--color-text)]">{title}</h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--color-text-secondary)]">
-                El motor inteligente usa estas reglas para filtrar respuestas, evitar datos inventados, derivar riesgos y mantener consistencia comercial.
+                El motor inteligente usa estas reglas para filtrar respuestas, evitar datos
+                inventados, derivar riesgos y mantener consistencia comercial.
               </p>
             </div>
-            <StatusBadge label={form.active ? 'Activo' : 'Desactivado'} tone={form.active ? 'success' : 'warning'} />
+            <StatusBadge
+              label={form.active ? 'Activo' : 'Desactivado'}
+              tone={form.active ? 'success' : 'warning'}
+            />
           </div>
 
           {formError ? (
@@ -179,33 +191,71 @@ export function AutomationRuleFormPage() {
             }}
           >
             <div className="grid gap-4 md:grid-cols-2">
-              <Input label="Nombre" onChange={(event) => setForm({ ...form, name: event.target.value })} value={form.name} />
-              <Input label="Codigo" hint="Si queda vacio se genera desde el nombre." onChange={(event) => setForm({ ...form, code: event.target.value })} value={form.code} />
+              <Input
+                label="Nombre"
+                onChange={(event) => setForm({ ...form, name: event.target.value })}
+                value={form.name}
+              />
+              <Input
+                label="Codigo"
+                hint="Si queda vacio se genera desde el nombre."
+                onChange={(event) => setForm({ ...form, code: event.target.value })}
+                value={form.code}
+              />
               <label className="block">
-                <span className="mb-2.5 block text-sm font-medium text-[#23385F]">Tipo de regla</span>
-                <select className={selectClassName} onChange={(event) => setForm({ ...form, ruleType: event.target.value })} value={form.ruleType}>
+                <span className="mb-2.5 block text-sm font-medium text-[#23385F]">
+                  Tipo de regla
+                </span>
+                <select
+                  className={selectClassName}
+                  onChange={(event) => setForm({ ...form, ruleType: event.target.value })}
+                  value={form.ruleType}
+                >
                   {ruleTypeOptions.map((option) => (
-                    <option key={option} value={option}>{formatRuleType(option)}</option>
+                    <option key={option} value={option}>
+                      {formatRuleType(option)}
+                    </option>
                   ))}
                 </select>
               </label>
-              <Input label="Prioridad" min="1" max="999" onChange={(event) => setForm({ ...form, priority: event.target.value })} type="number" value={form.priority} />
+              <Input
+                label="Prioridad"
+                min="1"
+                max="999"
+                onChange={(event) => setForm({ ...form, priority: event.target.value })}
+                type="number"
+                value={form.priority}
+              />
             </div>
 
-            <Textarea label="Descripcion funcional" onChange={(event) => setForm({ ...form, description: event.target.value })} value={form.description} />
             <Textarea
-              hint={'Formato JSON. Ejemplo: {"condiciones":["riesgo clínico"],"acciones":["derivar a humano"]}'}
+              label="Descripcion funcional"
+              onChange={(event) => setForm({ ...form, description: event.target.value })}
+              value={form.description}
+            />
+            <Textarea
+              hint={
+                'Formato JSON. Ejemplo: {"condiciones":["riesgo clínico"],"acciones":["derivar a humano"]}'
+              }
               label="Payload JSON de la regla"
               onChange={(event) => setForm({ ...form, rulePayload: event.target.value })}
               rows={10}
               value={form.rulePayload}
             />
 
-            <CheckboxField checked={form.active} label="Regla activa" onChange={(checked) => setForm({ ...form, active: checked })} />
+            <CheckboxField
+              checked={form.active}
+              label="Regla activa"
+              onChange={(checked) => setForm({ ...form, active: checked })}
+            />
 
             <div className="flex flex-wrap justify-end gap-3 border-t border-[var(--color-border)] pt-5">
-              <Link className={buttonClassName({ variant: 'secondary' })} to="/automation-rules">Cancelar</Link>
-              <Button loading={mutation.isPending} type="submit">Guardar regla</Button>
+              <Link className={buttonClassName({ variant: 'secondary' })} to="/automation-rules">
+                Cancelar
+              </Link>
+              <Button loading={mutation.isPending} type="submit">
+                Guardar regla
+              </Button>
             </div>
           </form>
         </Card>
@@ -214,10 +264,23 @@ export function AutomationRuleFormPage() {
   )
 }
 
-function CheckboxField({ checked, label, onChange }: { checked: boolean; label: string; onChange: (checked: boolean) => void }) {
+function CheckboxField({
+  checked,
+  label,
+  onChange,
+}: {
+  checked: boolean
+  label: string
+  onChange: (checked: boolean) => void
+}) {
   return (
     <label className="flex items-center gap-3 rounded-[18px] border border-[var(--color-border)] bg-white p-4 text-sm font-semibold text-[var(--color-text)]">
-      <input checked={checked} className="h-4 w-4" onChange={(event) => onChange(event.target.checked)} type="checkbox" />
+      <input
+        checked={checked}
+        className="h-4 w-4"
+        onChange={(event) => onChange(event.target.checked)}
+        type="checkbox"
+      />
       {label}
     </label>
   )

@@ -7,12 +7,7 @@ type PageHeaderProps = {
   actions?: ReactNode
 }
 
-export function PageHeader({
-  actions,
-  description,
-  eyebrow = 'Fase 1',
-  title,
-}: PageHeaderProps) {
+export function PageHeader({ actions, description, eyebrow = 'Fase 1', title }: PageHeaderProps) {
   return (
     <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
       <div className="max-w-3xl">

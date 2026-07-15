@@ -34,8 +34,7 @@ export function ForgotPasswordSentPage() {
     } catch (error) {
       showToast({
         title: 'No pudimos registrar la solicitud',
-        description:
-          error instanceof ApiClientError ? error.message : 'Reintenta en unos minutos.',
+        description: error instanceof ApiClientError ? error.message : 'Reintenta en unos minutos.',
         tone: 'error',
       })
     } finally {
@@ -71,8 +70,8 @@ export function ForgotPasswordSentPage() {
               Revisa tu correo si la cuenta existe
             </p>
             <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
-              Revisa bandeja de entrada y spam. En modo local el backend puede simular el
-              envio y dejar trazas seguras en logs.
+              Revisa bandeja de entrada y spam. En modo local el backend puede simular el envio y
+              dejar trazas seguras en logs.
             </p>
           </div>
         </div>

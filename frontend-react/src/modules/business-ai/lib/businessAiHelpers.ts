@@ -28,7 +28,11 @@ export function sortAuditLogsDescending<T extends AuditLike>(logs: T[]) {
   })
 }
 
-export function paginateAuditLogs<T>(logs: T[], page: number, pageSize = BUSINESS_AI_AUDIT_PAGE_SIZE) {
+export function paginateAuditLogs<T>(
+  logs: T[],
+  page: number,
+  pageSize = BUSINESS_AI_AUDIT_PAGE_SIZE,
+) {
   const safePage = Math.max(0, page)
   return logs.slice(safePage * pageSize, safePage * pageSize + pageSize)
 }

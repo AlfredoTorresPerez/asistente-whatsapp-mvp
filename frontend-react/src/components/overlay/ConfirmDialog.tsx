@@ -32,15 +32,28 @@ export function ConfirmDialog({
         <span
           className={[
             'mx-auto inline-flex h-16 w-16 items-center justify-center rounded-[22px]',
-            tone === 'danger' ? 'bg-red-50 text-red-500' : 'bg-[var(--color-primary-soft)] text-[var(--color-primary)]',
+            tone === 'danger'
+              ? 'bg-red-50 text-red-500'
+              : 'bg-[var(--color-primary-soft)] text-[var(--color-primary)]',
           ]
             .join(' ')
             .trim()}
         >
-          <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <svg
+            className="h-7 w-7"
+            fill="none"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <path d="M8 12H16" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
             <path d="M12 8V16" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
-            <path d="M19 6L12 3L5 6V12C5 16.6 8.2 20.86 12 22C15.8 20.86 19 16.6 19 12V6Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+            <path
+              d="M19 6L12 3L5 6V12C5 16.6 8.2 20.86 12 22C15.8 20.86 19 16.6 19 12V6Z"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+            />
           </svg>
         </span>
         <p className="mt-5 text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">

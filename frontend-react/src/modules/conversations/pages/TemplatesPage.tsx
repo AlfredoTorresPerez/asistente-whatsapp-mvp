@@ -44,9 +44,7 @@ export function TemplatesPage() {
     refetchInterval: isOnline ? 30_000 : false,
   })
 
-  const editingTemplate = templatesQuery.data?.find(
-    (template) => template.id === editingTemplateId,
-  )
+  const editingTemplate = templatesQuery.data?.find((template) => template.id === editingTemplateId)
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -142,7 +140,8 @@ export function TemplatesPage() {
         <Card className="border-amber-200 bg-amber-50">
           <p className="text-sm font-semibold text-amber-900">Sin conexion</p>
           <p className="mt-2 text-sm leading-6 text-amber-800">
-            Puedes revisar las plantillas ya cargadas, pero no se podran guardar cambios hasta recuperar internet.
+            Puedes revisar las plantillas ya cargadas, pero no se podran guardar cambios hasta
+            recuperar internet.
           </p>
         </Card>
       ) : null}
@@ -193,7 +192,9 @@ export function TemplatesPage() {
                   <tr key={template.id} className="align-top transition hover:bg-slate-50">
                     <td className="border-b border-[var(--color-border)] px-5 py-4">
                       <p className="text-sm font-semibold text-slate-950">{template.name}</p>
-                      <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">{template.body}</p>
+                      <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+                        {template.body}
+                      </p>
                     </td>
                     <td className="border-b border-[var(--color-border)] px-5 py-4">
                       <StatusBadge label={template.category} tone="info" />
@@ -237,7 +238,11 @@ export function TemplatesPage() {
         </Card>
       ) : null}
 
-      <Modal maxWidthClassName="max-w-[720px]" onClose={closeEditModal} open={Boolean(editingTemplate)}>
+      <Modal
+        maxWidthClassName="max-w-[720px]"
+        onClose={closeEditModal}
+        open={Boolean(editingTemplate)}
+      >
         <form className="space-y-5" onSubmit={onSubmit}>
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">

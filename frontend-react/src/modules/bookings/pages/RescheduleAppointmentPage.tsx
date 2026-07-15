@@ -131,7 +131,8 @@ export function RescheduleAppointmentPage() {
     onSuccess: () => {
       showToast({
         title: 'Enlace de reprogramacion enviado',
-        description: 'El cliente puede confirmar o rechazar la nueva fecha desde la pagina publica.',
+        description:
+          'El cliente puede confirmar o rechazar la nueva fecha desde la pagina publica.',
         tone: 'success',
       })
       navigate(appointmentId ? `/appointments/${appointmentId}` : '/appointments')
@@ -154,7 +155,9 @@ export function RescheduleAppointmentPage() {
       <PageHeader
         actions={
           <Button
-            onClick={() => navigate(appointmentId ? `/appointments/${appointmentId}` : '/appointments')}
+            onClick={() =>
+              navigate(appointmentId ? `/appointments/${appointmentId}` : '/appointments')
+            }
             variant="secondary"
           >
             Volver al detalle

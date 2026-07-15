@@ -10,7 +10,10 @@ import { Input } from '../../../components/ui/Input'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { useToast } from '../../../lib/toast'
-import { getSecurityPolicyRequest, updateSecurityPolicyRequest } from '../../../services/api/administrationApi'
+import {
+  getSecurityPolicyRequest,
+  updateSecurityPolicyRequest,
+} from '../../../services/api/administrationApi'
 import { ApiClientError } from '../../../services/api/httpClient'
 import type { SecurityPolicyRequest, SecurityPolicyResponse } from '../../../services/api/types'
 
@@ -34,7 +37,12 @@ export function AdminSecurityPage() {
   })
 
   if (policyQuery.isPending) {
-    return <LoadingState message="Cargando politicas de seguridad y auditoria reciente." variant="page" />
+    return (
+      <LoadingState
+        message="Cargando politicas de seguridad y auditoria reciente."
+        variant="page"
+      />
+    )
   }
 
   if (policyQuery.isError || !policyQuery.data) {
@@ -59,7 +67,9 @@ function SecurityPolicyForm({ policy }: { policy: SecurityPolicyResponse }) {
   const mutation = useMutation({
     mutationFn: () => updateSecurityPolicyRequest(form),
     onError: (error) => {
-      setFormError(error instanceof ApiClientError ? error.message : 'No fue posible guardar la seguridad.')
+      setFormError(
+        error instanceof ApiClientError ? error.message : 'No fue posible guardar la seguridad.',
+      )
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['administration', 'security'] })
@@ -92,8 +102,16 @@ function SecurityPolicyForm({ policy }: { policy: SecurityPolicyResponse }) {
 
       <div className="grid gap-4 md:grid-cols-3">
         <MetricCard label="Usuarios activos" tone="success" value={String(policy.activeUsers)} />
-        <MetricCard label="Bloqueados" tone={policy.lockedUsers > 0 ? 'warning' : 'success'} value={String(policy.lockedUsers)} />
-        <MetricCard label="Eventos 7 dias" tone="info" value={String(policy.auditEventsLast7Days)} />
+        <MetricCard
+          label="Bloqueados"
+          tone={policy.lockedUsers > 0 ? 'warning' : 'success'}
+          value={String(policy.lockedUsers)}
+        />
+        <MetricCard
+          label="Eventos 7 dias"
+          tone="info"
+          value={String(policy.auditEventsLast7Days)}
+        />
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
@@ -113,7 +131,9 @@ function SecurityPolicyForm({ policy }: { policy: SecurityPolicyResponse }) {
               label="Timeout de sesion (min)"
               max="1440"
               min="5"
-              onChange={(event) => setForm({ ...form, sessionTimeoutMinutes: Number(event.target.value) })}
+              onChange={(event) =>
+                setForm({ ...form, sessionTimeoutMinutes: Number(event.target.value) })
+              }
               type="number"
               value={form.sessionTimeoutMinutes}
             />
@@ -121,7 +141,9 @@ function SecurityPolicyForm({ policy }: { policy: SecurityPolicyResponse }) {
               label="Longitud minima"
               max="72"
               min="8"
-              onChange={(event) => setForm({ ...form, passwordMinLength: Number(event.target.value) })}
+              onChange={(event) =>
+                setForm({ ...form, passwordMinLength: Number(event.target.value) })
+              }
               type="number"
               value={form.passwordMinLength}
             />
@@ -129,7 +151,9 @@ function SecurityPolicyForm({ policy }: { policy: SecurityPolicyResponse }) {
               label="Maximo intentos fallidos"
               max="20"
               min="3"
-              onChange={(event) => setForm({ ...form, maxFailedLoginAttempts: Number(event.target.value) })}
+              onChange={(event) =>
+                setForm({ ...form, maxFailedLoginAttempts: Number(event.target.value) })
+              }
               type="number"
               value={form.maxFailedLoginAttempts}
             />
@@ -160,7 +184,9 @@ function SecurityPolicyForm({ policy }: { policy: SecurityPolicyResponse }) {
           ) : null}
 
           <div className="mt-6 flex flex-wrap gap-3">
-            <Button loading={mutation.isPending} onClick={submit}>Guardar seguridad</Button>
+            <Button loading={mutation.isPending} onClick={submit}>
+              Guardar seguridad
+            </Button>
             <Link to="/admin">
               <Button variant="secondary">Cancelar</Button>
             </Link>
@@ -175,11 +201,15 @@ function SecurityPolicyForm({ policy }: { policy: SecurityPolicyResponse }) {
             <SecurityLine label="Bloqueo" value={`${form.maxFailedLoginAttempts} intentos`} />
             <SecurityLine
               label="Reglas activas"
-              value={[
-                form.requireUppercase ? 'mayuscula' : null,
-                form.requireNumber ? 'numero' : null,
-                form.requireSymbol ? 'simbolo' : null,
-              ].filter(Boolean).join(', ') || 'basicas'}
+              value={
+                [
+                  form.requireUppercase ? 'mayuscula' : null,
+                  form.requireNumber ? 'numero' : null,
+                  form.requireSymbol ? 'simbolo' : null,
+                ]
+                  .filter(Boolean)
+                  .join(', ') || 'basicas'
+              }
             />
           </div>
         </Card>
@@ -188,7 +218,15 @@ function SecurityPolicyForm({ policy }: { policy: SecurityPolicyResponse }) {
   )
 }
 
-function MetricCard({ label, tone, value }: { label: string; tone: 'success' | 'warning' | 'info'; value: string }) {
+function MetricCard({
+  label,
+  tone,
+  value,
+}: {
+  label: string
+  tone: 'success' | 'warning' | 'info'
+  value: string
+}) {
   return (
     <Card>
       <div className="flex items-start justify-between gap-3">
@@ -211,7 +249,12 @@ function CheckboxCard({
 }) {
   return (
     <label className="flex cursor-pointer items-center gap-3 rounded-[18px] border border-[var(--color-border)] bg-white px-4 py-3 text-sm font-medium text-slate-700">
-      <input checked={checked} className="h-4 w-4 accent-[var(--color-primary)]" onChange={(event) => onChange(event.target.checked)} type="checkbox" />
+      <input
+        checked={checked}
+        className="h-4 w-4 accent-[var(--color-primary)]"
+        onChange={(event) => onChange(event.target.checked)}
+        type="checkbox"
+      />
       {label}
     </label>
   )

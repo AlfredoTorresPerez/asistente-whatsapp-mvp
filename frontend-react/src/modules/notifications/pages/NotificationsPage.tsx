@@ -364,12 +364,19 @@ export function NotificationsPage() {
                           onClick={() => void openNotification(notification)}
                           type="button"
                         >
-                          <p className="text-sm font-semibold text-slate-950">{notification.title}</p>
-                          <p className="mt-2 max-w-xl text-sm leading-6 text-slate-600">{notification.body}</p>
+                          <p className="text-sm font-semibold text-slate-950">
+                            {notification.title}
+                          </p>
+                          <p className="mt-2 max-w-xl text-sm leading-6 text-slate-600">
+                            {notification.body}
+                          </p>
                         </button>
                       </td>
                       <td className="border-b border-[var(--color-border)] px-5 py-4">
-                        <StatusBadge label={formatNotificationType(notification.type)} tone="info" />
+                        <StatusBadge
+                          label={formatNotificationType(notification.type)}
+                          tone="info"
+                        />
                       </td>
                       <td className="border-b border-[var(--color-border)] px-5 py-4">
                         <StatusBadge

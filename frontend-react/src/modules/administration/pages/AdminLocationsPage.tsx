@@ -16,8 +16,15 @@ import {
   getBusinessLocationsRequest,
   updateBusinessLocationRequest,
 } from '../../../services/api/businessLocationsApi'
-import { getBusinessHoursRequest, saveBusinessHoursRequest } from '../../../services/api/completeAgendaApi'
-import type { BusinessHoursResponse, BusinessLocationResponse, UpsertBusinessLocationRequest } from '../../../services/api/types'
+import {
+  getBusinessHoursRequest,
+  saveBusinessHoursRequest,
+} from '../../../services/api/completeAgendaApi'
+import type {
+  BusinessHoursResponse,
+  BusinessLocationResponse,
+  UpsertBusinessLocationRequest,
+} from '../../../services/api/types'
 
 type FormState = {
   id: string | null
@@ -75,7 +82,8 @@ export function AdminLocationsPage() {
   const [formErrors, setFormErrors] = useState<FormErrors>({})
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ALL')
-  const [businessHours, setBusinessHours] = useState<{ dayOfWeek: number; startTime: string; endTime: string }[]>(defaultHours)
+  const [businessHours, setBusinessHours] =
+    useState<{ dayOfWeek: number; startTime: string; endTime: string }[]>(defaultHours)
   const [businessHoursSaved, setBusinessHoursSaved] = useState(false)
 
   const locationsQuery = useQuery({
@@ -89,9 +97,10 @@ export function AdminLocationsPage() {
   const filteredLocations = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase()
     return locations.filter((location) => {
-      const matchesStatus = statusFilter === 'ALL'
-        || (statusFilter === 'ACTIVE' && location.active)
-        || (statusFilter === 'INACTIVE' && !location.active)
+      const matchesStatus =
+        statusFilter === 'ALL' ||
+        (statusFilter === 'ACTIVE' && location.active) ||
+        (statusFilter === 'INACTIVE' && !location.active)
       const haystack = [
         location.code,
         location.name,
@@ -141,15 +150,15 @@ export function AdminLocationsPage() {
         const nextErrors = toFormErrors(error.fieldErrors)
         setFormErrors({
           ...nextErrors,
-          general: Object.keys(nextErrors).length > 0
-            ? 'Corrige los campos marcados antes de guardar la sucursal.'
-            : error.message,
+          general:
+            Object.keys(nextErrors).length > 0
+              ? 'Corrige los campos marcados antes de guardar la sucursal.'
+              : error.message,
         })
         showToast({
           title: 'No se pudo guardar la sucursal',
-          description: Object.keys(nextErrors).length > 0
-            ? 'Hay campos con datos inválidos.'
-            : error.message,
+          description:
+            Object.keys(nextErrors).length > 0 ? 'Hay campos con datos inválidos.' : error.message,
           tone: 'error',
         })
         return
@@ -197,11 +206,19 @@ export function AdminLocationsPage() {
       return saveBusinessHoursRequest({ locationId: form.id, hours: activeHours })
     },
     onSuccess: () => {
-      showToast({ title: 'Horarios guardados', description: 'Los horarios de atención se actualizaron correctamente.', tone: 'success' })
+      showToast({
+        title: 'Horarios guardados',
+        description: 'Los horarios de atención se actualizaron correctamente.',
+        tone: 'success',
+      })
       setBusinessHoursSaved(true)
     },
     onError: (error) => {
-      showToast({ title: 'No se pudieron guardar los horarios', description: error instanceof Error ? error.message : 'Intenta nuevamente.', tone: 'error' })
+      showToast({
+        title: 'No se pudieron guardar los horarios',
+        description: error instanceof Error ? error.message : 'Intenta nuevamente.',
+        tone: 'error',
+      })
     },
   })
 
@@ -238,7 +255,11 @@ export function AdminLocationsPage() {
       return nextForm
     })
     setFormErrors((current) => {
-      const { [field]: _discardedFieldError, general: _discardedGeneralError, ...remainingErrors } = current
+      const {
+        [field]: _discardedFieldError,
+        general: _discardedGeneralError,
+        ...remainingErrors
+      } = current
       void _discardedFieldError
       void _discardedGeneralError
       return remainingErrors
@@ -266,7 +287,9 @@ export function AdminLocationsPage() {
     setForm(emptyForm)
     setFormErrors({})
     window.requestAnimationFrame(() => {
-      document.getElementById('location-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      document
+        .getElementById('location-form')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     })
   }
 
@@ -274,7 +297,9 @@ export function AdminLocationsPage() {
     setFormErrors({})
     setForm(toFormState(location))
     window.requestAnimationFrame(() => {
-      document.getElementById('location-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      document
+        .getElementById('location-form')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     })
   }
 
@@ -286,9 +311,7 @@ export function AdminLocationsPage() {
             <Button onClick={() => navigate('/admin')} variant="secondary">
               Volver a administracion
             </Button>
-            <Button onClick={startNewLocation}>
-              Nueva sucursal
-            </Button>
+            <Button onClick={startNewLocation}>Nueva sucursal</Button>
           </div>
         }
         description="Administra las sucursales del negocio para agenda, conversaciones, profesionales y configuración operativa."
@@ -311,10 +334,30 @@ export function AdminLocationsPage() {
       {!locationsQuery.isError ? (
         <>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <MetricCard label="Sedes activas" value={String(activeLocations.length)} helper={`De ${locations.length} sedes totales`} icon="🏢" />
-            <MetricCard label="Sedes inactivas" value={String(inactiveLocations.length)} helper="No disponibles para nuevas citas" icon="⏸" />
-            <MetricCard label="Zona horaria" value="America/Santiago" helper="Configuracion operativa base" icon="🕒" />
-            <MetricCard label="Uso operativo" value="Agenda" helper="Citas y conversaciones por sucursal" icon="📅" />
+            <MetricCard
+              label="Sedes activas"
+              value={String(activeLocations.length)}
+              helper={`De ${locations.length} sedes totales`}
+              icon="🏢"
+            />
+            <MetricCard
+              label="Sedes inactivas"
+              value={String(inactiveLocations.length)}
+              helper="No disponibles para nuevas citas"
+              icon="⏸"
+            />
+            <MetricCard
+              label="Zona horaria"
+              value="America/Santiago"
+              helper="Configuracion operativa base"
+              icon="🕒"
+            />
+            <MetricCard
+              label="Uso operativo"
+              value="Agenda"
+              helper="Citas y conversaciones por sucursal"
+              icon="📅"
+            />
           </div>
 
           <Card className="space-y-5">
@@ -335,7 +378,9 @@ export function AdminLocationsPage() {
                 />
                 <select
                   className="h-11 rounded-[14px] border border-[var(--color-border)] bg-white px-4 text-sm font-semibold text-slate-700 outline-none"
-                  onChange={(event) => setStatusFilter(event.target.value as 'ALL' | 'ACTIVE' | 'INACTIVE')}
+                  onChange={(event) =>
+                    setStatusFilter(event.target.value as 'ALL' | 'ACTIVE' | 'INACTIVE')
+                  }
                   value={statusFilter}
                 >
                   <option value="ALL">Estado: Todos</option>
@@ -363,7 +408,9 @@ export function AdminLocationsPage() {
                   className="grid gap-2 border-b border-[var(--color-border)] px-4 py-3 last:border-b-0 xl:grid-cols-[70px_minmax(120px,1.4fr)_minmax(110px,1fr)_minmax(80px,0.7fr)_minmax(95px,0.7fr)_minmax(95px,0.7fr)_minmax(95px,0.7fr)_80px_180px] xl:items-center"
                   key={location.id}
                 >
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">{location.code}</span>
+                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                    {location.code}
+                  </span>
                   <div>
                     <p className="truncate font-semibold text-slate-950">{location.name}</p>
                     {location.code.toLowerCase() === 'principal' ? (
@@ -372,14 +419,30 @@ export function AdminLocationsPage() {
                       </span>
                     ) : null}
                   </div>
-                  <p className="truncate text-sm text-slate-600">{location.address ?? 'Sin dirección'}</p>
-                  <p className="truncate text-sm text-slate-600">{location.commune ?? location.city ?? 'Sin comuna'}</p>
-                  <p className="truncate text-sm font-semibold text-blue-600">{location.phone ?? 'Sin teléfono'}</p>
-                  <p className="truncate text-sm text-slate-600">{location.whatsappNumber ?? 'Sin WhatsApp'}</p>
+                  <p className="truncate text-sm text-slate-600">
+                    {location.address ?? 'Sin dirección'}
+                  </p>
+                  <p className="truncate text-sm text-slate-600">
+                    {location.commune ?? location.city ?? 'Sin comuna'}
+                  </p>
+                  <p className="truncate text-sm font-semibold text-blue-600">
+                    {location.phone ?? 'Sin teléfono'}
+                  </p>
+                  <p className="truncate text-sm text-slate-600">
+                    {location.whatsappNumber ?? 'Sin WhatsApp'}
+                  </p>
                   <p className="truncate text-sm text-slate-600">{location.timezone}</p>
-                  <StatusBadge label={location.active ? 'Activa' : 'Inactiva'} tone={location.active ? 'success' : 'neutral'} />
+                  <StatusBadge
+                    label={location.active ? 'Activa' : 'Inactiva'}
+                    tone={location.active ? 'success' : 'neutral'}
+                  />
                   <div className="flex shrink-0 gap-1.5">
-                    <Button className="px-2.5 text-xs" onClick={() => editLocation(location)} size="sm" variant="secondary">
+                    <Button
+                      className="px-2.5 text-xs"
+                      onClick={() => editLocation(location)}
+                      size="sm"
+                      variant="secondary"
+                    >
                       Editar
                     </Button>
                     {location.active ? (
@@ -408,8 +471,12 @@ export function AdminLocationsPage() {
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600">
-              <span>Mostrando {filteredLocations.length} de {locations.length} sedes.</span>
-              <span className="font-semibold text-slate-700">Las citas deben considerar sucursal, profesional y horario.</span>
+              <span>
+                Mostrando {filteredLocations.length} de {locations.length} sedes.
+              </span>
+              <span className="font-semibold text-slate-700">
+                Las citas deben considerar sucursal, profesional y horario.
+              </span>
             </div>
           </Card>
 
@@ -422,7 +489,8 @@ export function AdminLocationsPage() {
                 Datos operativos de la sucursal
               </h2>
               <p className="mt-1 text-sm text-slate-500">
-                El código debe ser único dentro del negocio. Usa nombres claros porque se mostrarán en agenda y conversaciones.
+                El código debe ser único dentro del negocio. Usa nombres claros porque se mostrarán
+                en agenda y conversaciones.
               </p>
             </div>
 
@@ -513,12 +581,15 @@ export function AdminLocationsPage() {
           {form.id ? (
             <Card className="space-y-5">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Horarios de atención</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
+                  Horarios de atención
+                </p>
                 <h2 className="mt-2 text-xl font-semibold text-slate-950">
                   Horarios de {form.name}
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  Configura el horario de atención para cada día de la semana. Estos horarios se usan en agenda, disponibilidad y reservas.
+                  Configura el horario de atención para cada día de la semana. Estos horarios se
+                  usan en agenda, disponibilidad y reservas.
                 </p>
               </div>
 
@@ -534,14 +605,25 @@ export function AdminLocationsPage() {
                   <span></span>
                 </div>
                 {businessHours.map((entry, index) => (
-                  <div className="grid gap-2 rounded-[18px] border border-[var(--color-border)] bg-white p-3 sm:grid-cols-[1fr_150px_150px_48px] sm:items-center" key={entry.dayOfWeek}>
-                    <p className="text-sm font-semibold text-slate-950">{DAY_LABELS[entry.dayOfWeek]}</p>
+                  <div
+                    className="grid gap-2 rounded-[18px] border border-[var(--color-border)] bg-white p-3 sm:grid-cols-[1fr_150px_150px_48px] sm:items-center"
+                    key={entry.dayOfWeek}
+                  >
+                    <p className="text-sm font-semibold text-slate-950">
+                      {DAY_LABELS[entry.dayOfWeek]}
+                    </p>
                     <label className="block">
-                      <span className="mb-1 block text-xs font-semibold text-slate-500 sm:hidden">Hora Inicio</span>
+                      <span className="mb-1 block text-xs font-semibold text-slate-500 sm:hidden">
+                        Hora Inicio
+                      </span>
                       <input
                         className="h-10 w-full rounded-[14px] border border-[var(--color-border)] px-3 text-sm outline-none focus:border-[var(--color-primary)]"
                         onChange={(event) => {
-                          setBusinessHours((prev) => prev.map((h, i) => i === index ? { ...h, startTime: event.target.value } : h))
+                          setBusinessHours((prev) =>
+                            prev.map((h, i) =>
+                              i === index ? { ...h, startTime: event.target.value } : h,
+                            ),
+                          )
                           setBusinessHoursSaved(false)
                         }}
                         type="time"
@@ -549,11 +631,17 @@ export function AdminLocationsPage() {
                       />
                     </label>
                     <label className="block">
-                      <span className="mb-1 block text-xs font-semibold text-slate-500 sm:hidden">Hora Término</span>
+                      <span className="mb-1 block text-xs font-semibold text-slate-500 sm:hidden">
+                        Hora Término
+                      </span>
                       <input
                         className="h-10 w-full rounded-[14px] border border-[var(--color-border)] px-3 text-sm outline-none focus:border-[var(--color-primary)]"
                         onChange={(event) => {
-                          setBusinessHours((prev) => prev.map((h, i) => i === index ? { ...h, endTime: event.target.value } : h))
+                          setBusinessHours((prev) =>
+                            prev.map((h, i) =>
+                              i === index ? { ...h, endTime: event.target.value } : h,
+                            ),
+                          )
                           setBusinessHoursSaved(false)
                         }}
                         type="time"
@@ -562,11 +650,17 @@ export function AdminLocationsPage() {
                     </label>
                     <div className="flex items-center justify-end">
                       {entry.startTime && entry.endTime ? (
-                        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50 text-xs text-emerald-600" title="Activo">
+                        <span
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50 text-xs text-emerald-600"
+                          title="Activo"
+                        >
                           ✓
                         </span>
                       ) : (
-                        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-xs text-slate-400" title="Sin atención">
+                        <span
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-xs text-slate-400"
+                          title="Sin atención"
+                        >
                           —
                         </span>
                       )}
@@ -577,10 +671,18 @@ export function AdminLocationsPage() {
 
               <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--color-border)] pt-4">
                 <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <StatusBadge label={businessHoursSaved ? 'Guardado' : 'Sin guardar'} tone={businessHoursSaved ? 'success' : 'info'} />
-                  <span>Estos horarios se reflejan en agenda completa, disponibilidad y reservas.</span>
+                  <StatusBadge
+                    label={businessHoursSaved ? 'Guardado' : 'Sin guardar'}
+                    tone={businessHoursSaved ? 'success' : 'info'}
+                  />
+                  <span>
+                    Estos horarios se reflejan en agenda completa, disponibilidad y reservas.
+                  </span>
                 </div>
-                <Button loading={saveHoursMutation.isPending} onClick={() => saveHoursMutation.mutate()}>
+                <Button
+                  loading={saveHoursMutation.isPending}
+                  onClick={() => saveHoursMutation.mutate()}
+                >
                   Guardar horarios
                 </Button>
               </div>
@@ -592,7 +694,17 @@ export function AdminLocationsPage() {
   )
 }
 
-function MetricCard({ helper, icon, label, value }: { helper: string; icon: string; label: string; value: string }) {
+function MetricCard({
+  helper,
+  icon,
+  label,
+  value,
+}: {
+  helper: string
+  icon: string
+  label: string
+  value: string
+}) {
   return (
     <Card className="flex items-center gap-4">
       <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-2xl">
@@ -663,11 +775,29 @@ function validateLocationForm(form: FormState): FormErrors {
     errors.timezone = 'La zona horaria no puede superar 60 caracteres.'
   }
 
-  addMaxLengthError(errors, 'address', form.address, 255, 'La dirección no puede superar 255 caracteres.')
+  addMaxLengthError(
+    errors,
+    'address',
+    form.address,
+    255,
+    'La dirección no puede superar 255 caracteres.',
+  )
   addMaxLengthError(errors, 'city', form.city, 120, 'La ciudad no puede superar 120 caracteres.')
-  addMaxLengthError(errors, 'commune', form.commune, 120, 'La comuna no puede superar 120 caracteres.')
+  addMaxLengthError(
+    errors,
+    'commune',
+    form.commune,
+    120,
+    'La comuna no puede superar 120 caracteres.',
+  )
   addMaxLengthError(errors, 'phone', form.phone, 30, 'El teléfono no puede superar 30 caracteres.')
-  addMaxLengthError(errors, 'whatsappNumber', form.whatsappNumber, 30, 'El WhatsApp no puede superar 30 caracteres.')
+  addMaxLengthError(
+    errors,
+    'whatsappNumber',
+    form.whatsappNumber,
+    30,
+    'El WhatsApp no puede superar 30 caracteres.',
+  )
 
   return errors
 }

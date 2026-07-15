@@ -141,7 +141,9 @@ export function CatalogFormPage() {
   const queryClient = useQueryClient()
   const { productId, serviceId } = useParams()
   const isEdit = Boolean(productId || serviceId)
-  const initialType: CatalogItemType = location.pathname.includes('/services/') ? 'service' : 'product'
+  const initialType: CatalogItemType = location.pathname.includes('/services/')
+    ? 'service'
+    : 'product'
   const [itemType, setItemType] = useState<CatalogItemType>(initialType)
   const [form, setForm] = useState<FormState>(emptyForm)
   const [formError, setFormError] = useState<string | null>(null)
@@ -170,9 +172,17 @@ export function CatalogFormPage() {
   })
 
   const loadedEntity = serviceQuery.data
-    ? { form: fromService(serviceQuery.data), key: `service:${serviceQuery.data.id}`, type: 'service' as const }
+    ? {
+        form: fromService(serviceQuery.data),
+        key: `service:${serviceQuery.data.id}`,
+        type: 'service' as const,
+      }
     : productQuery.data
-      ? { form: fromProduct(productQuery.data), key: `product:${productQuery.data.id}`, type: 'product' as const }
+      ? {
+          form: fromProduct(productQuery.data),
+          key: `product:${productQuery.data.id}`,
+          type: 'product' as const,
+        }
       : null
 
   if (loadedEntity && loadedEntity.key !== loadedEntityKey) {
@@ -181,21 +191,25 @@ export function CatalogFormPage() {
     setForm(loadedEntity.form)
   }
 
-  const categories = useMemo(() => itemType === 'service'
-    ? serviceCategoriesQuery.data?.items ?? []
-    : productCategoriesQuery.data?.items ?? [], [
-      itemType,
-      productCategoriesQuery.data?.items,
-      serviceCategoriesQuery.data?.items,
-    ])
+  const categories = useMemo(
+    () =>
+      itemType === 'service'
+        ? (serviceCategoriesQuery.data?.items ?? [])
+        : (productCategoriesQuery.data?.items ?? []),
+    [itemType, productCategoriesQuery.data?.items, serviceCategoriesQuery.data?.items],
+  )
 
   if (!isEdit && !form.categoryCode && categories.length > 0) {
     setForm((current) => ({ ...current, categoryCode: categories[0].code }))
   }
 
   const pageTitle = isEdit
-    ? itemType === 'service' ? 'Editar servicio' : 'Editar producto'
-    : itemType === 'service' ? 'Crear servicio' : 'Crear producto'
+    ? itemType === 'service'
+      ? 'Editar servicio'
+      : 'Editar producto'
+    : itemType === 'service'
+      ? 'Crear servicio'
+      : 'Crear producto'
 
   const buildServiceRequest = (activeOverride = form.active): UpsertAestheticServiceRequest => ({
     active: activeOverride,
@@ -270,7 +284,9 @@ export function CatalogFormPage() {
       return updateAestheticService(serviceId, buildServiceRequest(false))
     },
     onError: (error) => {
-      setFormError(error instanceof Error ? error.message : 'No fue posible desactivar el servicio.')
+      setFormError(
+        error instanceof Error ? error.message : 'No fue posible desactivar el servicio.',
+      )
     },
     onSuccess: async () => {
       setForm((current) => ({ ...current, active: false }))
@@ -279,7 +295,8 @@ export function CatalogFormPage() {
     },
   })
 
-  const isLoading = serviceQuery.isPending && Boolean(serviceId) || productQuery.isPending && Boolean(productId)
+  const isLoading =
+    (serviceQuery.isPending && Boolean(serviceId)) || (productQuery.isPending && Boolean(productId))
   const hasLoadError = serviceQuery.isError || productQuery.isError
 
   const detailHint = useMemo(() => {
@@ -302,7 +319,9 @@ export function CatalogFormPage() {
         title={pageTitle}
       />
 
-      {isLoading ? <LoadingState message="Cargando informacion del item seleccionado." variant="page" /> : null}
+      {isLoading ? (
+        <LoadingState message="Cargando informacion del item seleccionado." variant="page" />
+      ) : null}
       {hasLoadError ? (
         <ErrorState
           description="No fue posible cargar el item para editar. Verifica que exista y que el backend este disponible."
@@ -322,9 +341,14 @@ export function CatalogFormPage() {
                 Item editable
               </p>
               <h2 className="mt-2 text-xl font-semibold text-[var(--color-text)]">{pageTitle}</h2>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--color-text-secondary)]">{detailHint}</p>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--color-text-secondary)]">
+                {detailHint}
+              </p>
             </div>
-            <StatusBadge label={form.active ? 'Activo' : 'Desactivado'} tone={form.active ? 'success' : 'warning'} />
+            <StatusBadge
+              label={form.active ? 'Activo' : 'Desactivado'}
+              tone={form.active ? 'success' : 'warning'}
+            />
           </div>
 
           {formError ? (
@@ -342,7 +366,9 @@ export function CatalogFormPage() {
           >
             {!isEdit ? (
               <label className="block">
-                <span className="mb-2.5 block text-sm font-medium text-[#23385F]">Tipo de item</span>
+                <span className="mb-2.5 block text-sm font-medium text-[#23385F]">
+                  Tipo de item
+                </span>
                 <select
                   className={selectClassName}
                   onChange={(event) => {
@@ -358,57 +384,186 @@ export function CatalogFormPage() {
             ) : null}
 
             <div className="grid gap-4 md:grid-cols-2">
-              <Input label="Nombre" onChange={(event) => setForm({ ...form, name: event.target.value })} value={form.name} />
-              <Input label="Codigo" hint="Si queda vacio se genera desde el nombre." onChange={(event) => setForm({ ...form, code: event.target.value })} value={form.code} />
+              <Input
+                label="Nombre"
+                onChange={(event) => setForm({ ...form, name: event.target.value })}
+                value={form.name}
+              />
+              <Input
+                label="Codigo"
+                hint="Si queda vacio se genera desde el nombre."
+                onChange={(event) => setForm({ ...form, code: event.target.value })}
+                value={form.code}
+              />
               <label className="block">
                 <span className="mb-2.5 block text-sm font-medium text-[#23385F]">Categoria</span>
-                <select className={selectClassName} onChange={(event) => setForm({ ...form, categoryCode: event.target.value })} value={form.categoryCode}>
+                <select
+                  className={selectClassName}
+                  onChange={(event) => setForm({ ...form, categoryCode: event.target.value })}
+                  value={form.categoryCode}
+                >
                   <option value="">Seleccionar categoria</option>
                   {categories.map((category) => (
-                    <option key={category.id} value={category.code}>{category.name}</option>
+                    <option key={category.id} value={category.code}>
+                      {category.name}
+                    </option>
                   ))}
                 </select>
               </label>
-              <Input label="Precio" min="0" onChange={(event) => setForm({ ...form, price: event.target.value })} step="1" type="number" value={form.price} />
+              <Input
+                label="Precio"
+                min="0"
+                onChange={(event) => setForm({ ...form, price: event.target.value })}
+                step="1"
+                type="number"
+                value={form.price}
+              />
             </div>
 
-            <Textarea label="Descripcion" onChange={(event) => setForm({ ...form, description: event.target.value })} value={form.description} />
+            <Textarea
+              label="Descripcion"
+              onChange={(event) => setForm({ ...form, description: event.target.value })}
+              value={form.description}
+            />
 
             {itemType === 'service' ? (
               <div className="space-y-5">
                 <div className="grid gap-4 md:grid-cols-2">
-                  <Input label="Duracion en minutos" min="10" onChange={(event) => setForm({ ...form, durationMinutes: event.target.value })} type="number" value={form.durationMinutes} />
-                  <Input label="Profesional requerido" onChange={(event) => setForm({ ...form, professionalRequired: event.target.value })} value={form.professionalRequired} />
+                  <Input
+                    label="Duracion en minutos"
+                    min="10"
+                    onChange={(event) => setForm({ ...form, durationMinutes: event.target.value })}
+                    type="number"
+                    value={form.durationMinutes}
+                  />
+                  <Input
+                    label="Profesional requerido"
+                    onChange={(event) =>
+                      setForm({ ...form, professionalRequired: event.target.value })
+                    }
+                    value={form.professionalRequired}
+                  />
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
-                  <Textarea label="Insumos asociados" onChange={(event) => setForm({ ...form, supplies: event.target.value })} value={form.supplies} />
-                  <Textarea label="Contraindicaciones" onChange={(event) => setForm({ ...form, contraindications: event.target.value })} value={form.contraindications} />
-                  <Textarea label="Reglas de disponibilidad" onChange={(event) => setForm({ ...form, availabilityRules: event.target.value })} value={form.availabilityRules} />
-                  <Textarea label="Reglas de reserva" onChange={(event) => setForm({ ...form, bookingRules: event.target.value })} value={form.bookingRules} />
-                  <Textarea label="Reglas de cancelacion" onChange={(event) => setForm({ ...form, cancellationRules: event.target.value })} value={form.cancellationRules} />
-                  <Textarea label="Cuidados posteriores" onChange={(event) => setForm({ ...form, aftercareRecommendations: event.target.value })} value={form.aftercareRecommendations} />
+                  <Textarea
+                    label="Insumos asociados"
+                    onChange={(event) => setForm({ ...form, supplies: event.target.value })}
+                    value={form.supplies}
+                  />
+                  <Textarea
+                    label="Contraindicaciones"
+                    onChange={(event) =>
+                      setForm({ ...form, contraindications: event.target.value })
+                    }
+                    value={form.contraindications}
+                  />
+                  <Textarea
+                    label="Reglas de disponibilidad"
+                    onChange={(event) =>
+                      setForm({ ...form, availabilityRules: event.target.value })
+                    }
+                    value={form.availabilityRules}
+                  />
+                  <Textarea
+                    label="Reglas de reserva"
+                    onChange={(event) => setForm({ ...form, bookingRules: event.target.value })}
+                    value={form.bookingRules}
+                  />
+                  <Textarea
+                    label="Reglas de cancelacion"
+                    onChange={(event) =>
+                      setForm({ ...form, cancellationRules: event.target.value })
+                    }
+                    value={form.cancellationRules}
+                  />
+                  <Textarea
+                    label="Cuidados posteriores"
+                    onChange={(event) =>
+                      setForm({ ...form, aftercareRecommendations: event.target.value })
+                    }
+                    value={form.aftercareRecommendations}
+                  />
                 </div>
                 <div className="grid gap-4 md:grid-cols-3">
-                  <CheckboxField checked={form.requiresPriorEvaluation} label="Requiere evaluacion previa" onChange={(checked) => setForm({ ...form, requiresPriorEvaluation: checked })} />
-                  <CheckboxField checked={form.requiresInformedConsent} label="Requiere consentimiento informado" onChange={(checked) => setForm({ ...form, requiresInformedConsent: checked })} />
-                  <CheckboxField checked={form.active} label="Servicio activo" onChange={(checked) => setForm({ ...form, active: checked })} />
+                  <CheckboxField
+                    checked={form.requiresPriorEvaluation}
+                    label="Requiere evaluacion previa"
+                    onChange={(checked) => setForm({ ...form, requiresPriorEvaluation: checked })}
+                  />
+                  <CheckboxField
+                    checked={form.requiresInformedConsent}
+                    label="Requiere consentimiento informado"
+                    onChange={(checked) => setForm({ ...form, requiresInformedConsent: checked })}
+                  />
+                  <CheckboxField
+                    checked={form.active}
+                    label="Servicio activo"
+                    onChange={(checked) => setForm({ ...form, active: checked })}
+                  />
                 </div>
               </div>
             ) : (
               <div className="space-y-5">
                 <div className="grid gap-4 md:grid-cols-2">
-                  <Input label="Stock" min="0" onChange={(event) => setForm({ ...form, stock: event.target.value })} type="number" value={form.stock} />
-                  <Input label="Stock minimo" min="0" onChange={(event) => setForm({ ...form, stockMinimum: event.target.value })} type="number" value={form.stockMinimum} />
-                  <Input label="Proveedor" onChange={(event) => setForm({ ...form, supplier: event.target.value })} value={form.supplier} />
-                  <Input label="Fecha de vencimiento" onChange={(event) => setForm({ ...form, expirationDate: event.target.value })} type="date" value={form.expirationDate} />
+                  <Input
+                    label="Stock"
+                    min="0"
+                    onChange={(event) => setForm({ ...form, stock: event.target.value })}
+                    type="number"
+                    value={form.stock}
+                  />
+                  <Input
+                    label="Stock minimo"
+                    min="0"
+                    onChange={(event) => setForm({ ...form, stockMinimum: event.target.value })}
+                    type="number"
+                    value={form.stockMinimum}
+                  />
+                  <Input
+                    label="Proveedor"
+                    onChange={(event) => setForm({ ...form, supplier: event.target.value })}
+                    value={form.supplier}
+                  />
+                  <Input
+                    label="Fecha de vencimiento"
+                    onChange={(event) => setForm({ ...form, expirationDate: event.target.value })}
+                    type="date"
+                    value={form.expirationDate}
+                  />
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
-                  <Textarea label="Servicios compatibles" onChange={(event) => setForm({ ...form, compatibleServices: event.target.value })} value={form.compatibleServices} />
-                  <Textarea label="Reglas de recomendacion" onChange={(event) => setForm({ ...form, recommendationRules: event.target.value })} value={form.recommendationRules} />
-                  <Textarea label="Reglas de venta cruzada" onChange={(event) => setForm({ ...form, crossSellRules: event.target.value })} value={form.crossSellRules} />
-                  <Textarea label="Restricciones de uso" onChange={(event) => setForm({ ...form, usageRestrictions: event.target.value })} value={form.usageRestrictions} />
+                  <Textarea
+                    label="Servicios compatibles"
+                    onChange={(event) =>
+                      setForm({ ...form, compatibleServices: event.target.value })
+                    }
+                    value={form.compatibleServices}
+                  />
+                  <Textarea
+                    label="Reglas de recomendacion"
+                    onChange={(event) =>
+                      setForm({ ...form, recommendationRules: event.target.value })
+                    }
+                    value={form.recommendationRules}
+                  />
+                  <Textarea
+                    label="Reglas de venta cruzada"
+                    onChange={(event) => setForm({ ...form, crossSellRules: event.target.value })}
+                    value={form.crossSellRules}
+                  />
+                  <Textarea
+                    label="Restricciones de uso"
+                    onChange={(event) =>
+                      setForm({ ...form, usageRestrictions: event.target.value })
+                    }
+                    value={form.usageRestrictions}
+                  />
                 </div>
-                <CheckboxField checked={form.active} label="Producto activo" onChange={(checked) => setForm({ ...form, active: checked })} />
+                <CheckboxField
+                  checked={form.active}
+                  label="Producto activo"
+                  onChange={(checked) => setForm({ ...form, active: checked })}
+                />
               </div>
             )}
 
@@ -426,8 +581,12 @@ export function CatalogFormPage() {
                 ) : null}
               </div>
               <div className="flex flex-wrap justify-end gap-3">
-                <Link className={buttonClassName({ variant: 'secondary' })} to="/catalog">Cancelar</Link>
-                <Button loading={mutation.isPending} type="submit">Guardar cambios</Button>
+                <Link className={buttonClassName({ variant: 'secondary' })} to="/catalog">
+                  Cancelar
+                </Link>
+                <Button loading={mutation.isPending} type="submit">
+                  Guardar cambios
+                </Button>
               </div>
             </div>
           </form>
@@ -437,10 +596,23 @@ export function CatalogFormPage() {
   )
 }
 
-function CheckboxField({ checked, label, onChange }: { checked: boolean; label: string; onChange: (checked: boolean) => void }) {
+function CheckboxField({
+  checked,
+  label,
+  onChange,
+}: {
+  checked: boolean
+  label: string
+  onChange: (checked: boolean) => void
+}) {
   return (
     <label className="flex items-center gap-3 rounded-[18px] border border-[var(--color-border)] bg-white p-4 text-sm font-semibold text-[var(--color-text)]">
-      <input checked={checked} className="h-4 w-4" onChange={(event) => onChange(event.target.checked)} type="checkbox" />
+      <input
+        checked={checked}
+        className="h-4 w-4"
+        onChange={(event) => onChange(event.target.checked)}
+        type="checkbox"
+      />
       {label}
     </label>
   )

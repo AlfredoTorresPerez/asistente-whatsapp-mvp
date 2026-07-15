@@ -22,11 +22,6 @@ insert into user_role (id, business_id, user_id, role_id)
 values ('50000000-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', '40000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000001')
 on conflict (user_id, role_id) do nothing;
 
--- Channel account
-insert into channel_account (id, business_id, channel_type, provider_name, session_key, status, phone_number, last_qr_code, last_event_at, disconnected_at, active)
-values ('69500000-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', 'WHATSAPP', 'WHATSAPP_WEB', 'demo-sales', 'QR_PENDING', null, 'demo-qr-placeholder', '2026-05-23T17:55:00Z', '2026-05-23T17:55:00Z', true)
-on conflict (business_id, channel_type) do nothing;
-
 -- Product categories
 insert into product_category (id, business_id, code, name, description, active)
 values ('60000000-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', 'FACIAL', 'Faciales', 'Servicios de limpieza e hidratacion facial.', true),
@@ -67,7 +62,7 @@ on conflict (id) do nothing;
 
 -- Leads
 insert into lead (id, business_id, customer_id, conversation_id, source_type, first_name, last_name, phone, normalized_phone, email, stage, notes, assigned_user_id, active)
-values ('66000000-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', '63000000-0000-0000-0000-000000000001', '64000000-0000-0000-0000-000000000001', 'CONVERSATION', 'Sofia', 'Rojas', '+56911112222', '+56911112222', 'sofia@demo.cl', 'QUALIFIED', 'Interesada en reservar una limpieza facial para la proxima semana.', '40000000-0000-0000-0000-000000000001', true),
+values ('66000000-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', '63000000-0000-0000-0000-000000000001', '64000000-0000-0000-0000-000000000001', 'CONVERSATION', 'Sofia', 'Rojas', '+56911112222', '+56911112222', 'sofia@demo.cl', 'INTERESTED', 'Interesada en reservar una limpieza facial para la proxima semana.', '40000000-0000-0000-0000-000000000001', true),
        ('66000000-0000-0000-0000-000000000002', '11111111-1111-1111-1111-111111111111', '63000000-0000-0000-0000-000000000002', null, 'MANUAL', 'Paula', 'Diaz', '+56933334444', '+56933334444', 'paula@demo.cl', 'NEW', 'Pidio informacion por depilacion laser.', '40000000-0000-0000-0000-000000000001', true)
 on conflict (id) do nothing;
 
@@ -77,14 +72,14 @@ values ('67000000-0000-0000-0000-000000000001', '11111111-1111-1111-1111-1111111
 on conflict (id) do nothing;
 
 -- Bookings
-insert into booking (id, business_id, customer_id, lead_id, conversation_id, assigned_user_id, subject, status, starts_at, duration_minutes, location, notes, completed_at)
-values ('68000000-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', '63000000-0000-0000-0000-000000000001', '66000000-0000-0000-0000-000000000001', '64000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000001', 'Evaluacion facial inicial', 'SCHEDULED', '2026-07-20T14:00:00Z', 45, 'Sucursal Providencia', 'Confirmar por WhatsApp una hora antes.', null),
-       ('68000000-0000-0000-0000-000000000002', '11111111-1111-1111-1111-111111111111', '63000000-0000-0000-0000-000000000002', '66000000-0000-0000-0000-000000000002', null, '40000000-0000-0000-0000-000000000001', 'Evaluacion depilacion laser', 'RESCHEDULED', '2026-07-22T17:00:00Z', 30, 'Sucursal Providencia', 'Cliente solicito mover la cita por trabajo.', null)
+insert into booking (id, business_id, customer_id, lead_id, conversation_id, assigned_user_id, subject, status, starts_at, ends_at, duration_minutes, location, notes, completed_at)
+values ('68000000-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', '63000000-0000-0000-0000-000000000001', '66000000-0000-0000-0000-000000000001', '64000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000001', 'Evaluacion facial inicial', 'CONFIRMADA', '2026-07-20T14:00:00Z', '2026-07-20T14:45:00Z', 45, 'Sucursal Providencia', 'Confirmar por WhatsApp una hora antes.', null),
+       ('68000000-0000-0000-0000-000000000002', '11111111-1111-1111-1111-111111111111', '63000000-0000-0000-0000-000000000002', '66000000-0000-0000-0000-000000000002', null, '40000000-0000-0000-0000-000000000001', 'Evaluacion depilacion laser', 'REPROGRAMADA', '2026-07-22T17:00:00Z', '2026-07-22T17:30:00Z', 30, 'Sucursal Providencia', 'Cliente solicito mover la cita por trabajo.', null)
 on conflict (id) do nothing;
 
 -- Order requests
 insert into order_request (id, business_id, customer_id, lead_id, conversation_id, created_by_user_id, status, payment_status, subtotal_amount, discount_amount, total_amount, paid_amount, balance_due, currency, due_date, notes)
-values ('69000000-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', '63000000-0000-0000-0000-000000000001', '66000000-0000-0000-0000-000000000001', '64000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000001', 'CONFIRMED', 'PARTIALLY_PAID', 59980.00, 5000.00, 54980.00, 20000.00, 34980.00, 'CLP', '2026-08-05', 'Pedido demo creado desde la conversacion de Sofia.')
+values ('69000000-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', '63000000-0000-0000-0000-000000000001', '66000000-0000-0000-0000-000000000001', '64000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000001', 'CONFIRMED', 'PARTIAL', 59980.00, 5000.00, 54980.00, 20000.00, 34980.00, 'CLP', '2026-08-05', 'Pedido demo creado desde la conversacion de Sofia.')
 on conflict (id) do nothing;
 
 -- Order items

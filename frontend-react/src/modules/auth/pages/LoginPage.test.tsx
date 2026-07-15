@@ -34,8 +34,6 @@ describe('LoginPage', () => {
     await user.click(screen.getByRole('button', { name: 'Ingresar' }))
 
     expect(await screen.findByText('Ingresa un correo valido.')).toBeInTheDocument()
-    expect(
-      screen.getByText('La contrasena debe tener al menos 8 caracteres.'),
-    ).toBeInTheDocument()
+    expect(screen.getByText('La contrasena debe tener al menos 8 caracteres.')).toBeInTheDocument()
   })
 })

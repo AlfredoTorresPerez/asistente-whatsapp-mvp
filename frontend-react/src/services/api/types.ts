@@ -353,7 +353,6 @@ export type WhatsAppWebTestMessageResponse = {
   acceptedAt: string
 }
 
-
 export type ConversationMetricsResponse = {
   activeConversations: number
   unattendedConversations: number
@@ -781,7 +780,6 @@ export type CreateBookingFromLeadRequest = {
   notes?: string
 }
 
-
 export type CreateBookingConfirmationLinkRequest = {
   expirationMinutes?: number
   sendWhatsApp?: boolean
@@ -847,7 +845,6 @@ export type PublicBookingConfirmationResponse = {
   expiresAt: string
   confirmedAt: string | null
 }
-
 
 export type PublicBookingCancellationFromConfirmationRequest = {
   reason: string
@@ -1583,7 +1580,6 @@ export type AgendaCalendarResponse = {
   to: string
   items: AgendaCalendarItemResponse[]
 }
-
 
 export type AgendaFilterOptionResponse = {
   id: string

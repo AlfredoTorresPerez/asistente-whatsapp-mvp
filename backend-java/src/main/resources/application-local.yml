@@ -36,5 +36,9 @@ logging:
     com.asistentewhatsapp: ${APP_LOG_LEVEL:DEBUG}
 
 spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/asistente}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:change-me-local}
   flyway:
-    locations: classpath:db/migration
+    locations: classpath:db/migration,classpath:db/seed

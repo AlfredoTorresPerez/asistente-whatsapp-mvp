@@ -31,7 +31,8 @@ export const PRIMARY_NAV_ITEMS: NavigationItem[] = [
   {
     label: 'Agenda completa',
     path: '/agenda',
-    description: 'Disponibilidad real, reservas temporales, cabinas, profesionales y confirmacion por WhatsApp.',
+    description:
+      'Disponibilidad real, reservas temporales, cabinas, profesionales y confirmacion por WhatsApp.',
   },
   {
     label: 'Citas',
@@ -177,7 +178,8 @@ const ROUTE_METADATA: RouteMeta[] = [
   {
     path: '/agenda',
     title: 'Agenda digital completa',
-    description: 'Disponibilidad por sucursal, profesional, cabina, reserva temporal y enlace de confirmacion.',
+    description:
+      'Disponibilidad por sucursal, profesional, cabina, reserva temporal y enlace de confirmacion.',
   },
   {
     path: '/appointments/new',
@@ -252,7 +254,8 @@ const ROUTE_METADATA: RouteMeta[] = [
   {
     path: '/reports',
     title: 'Reportes basicos',
-    description: 'Indicadores de conversaciones, prospectos, citas y rendimiento del centro estetico.',
+    description:
+      'Indicadores de conversaciones, prospectos, citas y rendimiento del centro estetico.',
   },
   {
     path: '/configuration',
@@ -272,7 +275,8 @@ const ROUTE_METADATA: RouteMeta[] = [
   {
     path: '/admin/multisite',
     title: 'Operacion multisede',
-    description: 'Control operativo de catalogo, stock, profesionales, permisos y canales por sede.',
+    description:
+      'Control operativo de catalogo, stock, profesionales, permisos y canales por sede.',
   },
   {
     path: '/admin/users/new',

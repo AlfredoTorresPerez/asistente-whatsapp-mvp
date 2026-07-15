@@ -12,7 +12,12 @@ export function clampConversationPage(page: number, totalPages: number) {
   return Math.min(Math.max(page, 0), Math.max(totalPages - 1, 0))
 }
 
-export function getConversationPageItems<T>(items: T[], page: number, pageSize = CONVERSATIONS_PAGE_SIZE) {
-  const start = clampConversationPage(page, getTotalConversationPages(items.length, pageSize)) * pageSize
+export function getConversationPageItems<T>(
+  items: T[],
+  page: number,
+  pageSize = CONVERSATIONS_PAGE_SIZE,
+) {
+  const start =
+    clampConversationPage(page, getTotalConversationPages(items.length, pageSize)) * pageSize
   return items.slice(start, start + pageSize)
 }

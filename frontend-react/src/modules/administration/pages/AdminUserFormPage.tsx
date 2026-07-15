@@ -17,7 +17,11 @@ import {
   updateAdminUserRequest,
 } from '../../../services/api/administrationApi'
 import { ApiClientError } from '../../../services/api/httpClient'
-import type { AdminRoleResponse, AdminUserRequest, AdminUserResponse } from '../../../services/api/types'
+import type {
+  AdminRoleResponse,
+  AdminUserRequest,
+  AdminUserResponse,
+} from '../../../services/api/types'
 
 type FormState = {
   email: string
@@ -122,16 +126,20 @@ function AdminUserForm({
   const [form, setForm] = useState<FormState>(() => toInitialForm(user))
   const [formError, setFormError] = useState<string | null>(null)
 
-  const roleOptions = roles.map((role) => ({ label: `${role.name} (${role.permissionCount})`, value: role.code }))
+  const roleOptions = roles.map((role) => ({
+    label: `${role.name} (${role.permissionCount})`,
+    value: role.code,
+  }))
 
   const mutation = useMutation({
-    mutationFn: () => (
+    mutationFn: () =>
       isEdit && userId
         ? updateAdminUserRequest(userId, toRequest(form, true))
-        : createAdminUserRequest(toRequest(form, false))
-    ),
+        : createAdminUserRequest(toRequest(form, false)),
     onError: (error) => {
-      setFormError(error instanceof ApiClientError ? error.message : 'No fue posible guardar el usuario.')
+      setFormError(
+        error instanceof ApiClientError ? error.message : 'No fue posible guardar el usuario.',
+      )
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['administration', 'users'] })
@@ -175,19 +183,55 @@ function AdminUserForm({
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-lg font-semibold text-slate-950">Datos del usuario</p>
-            <p className="mt-1 text-sm text-slate-600">Roles disponibles desde la matriz de permisos del backend.</p>
+            <p className="mt-1 text-sm text-slate-600">
+              Roles disponibles desde la matriz de permisos del backend.
+            </p>
           </div>
-          <StatusBadge label={form.status === 'ACTIVE' ? 'Activo' : form.status} tone={form.status === 'ACTIVE' ? 'success' : 'warning'} />
+          <StatusBadge
+            label={form.status === 'ACTIVE' ? 'Activo' : form.status}
+            tone={form.status === 'ACTIVE' ? 'success' : 'warning'}
+          />
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <Input label="Nombre" onChange={(event) => setForm({ ...form, firstName: event.target.value })} value={form.firstName} />
-          <Input label="Apellido" onChange={(event) => setForm({ ...form, lastName: event.target.value })} value={form.lastName} />
-          <Input label="Correo" onChange={(event) => setForm({ ...form, email: event.target.value })} type="email" value={form.email} />
-          <Input label="Telefono" onChange={(event) => setForm({ ...form, phone: event.target.value })} value={form.phone} />
-          <Select label="Rol" onChange={(event) => setForm({ ...form, role: event.target.value })} options={roleOptions} value={form.role} />
-          <Select label="Estado" onChange={(event) => setForm({ ...form, status: event.target.value })} options={statusOptions} value={form.status} />
-          <Input label="Zona horaria" onChange={(event) => setForm({ ...form, timezone: event.target.value })} value={form.timezone} />
+          <Input
+            label="Nombre"
+            onChange={(event) => setForm({ ...form, firstName: event.target.value })}
+            value={form.firstName}
+          />
+          <Input
+            label="Apellido"
+            onChange={(event) => setForm({ ...form, lastName: event.target.value })}
+            value={form.lastName}
+          />
+          <Input
+            label="Correo"
+            onChange={(event) => setForm({ ...form, email: event.target.value })}
+            type="email"
+            value={form.email}
+          />
+          <Input
+            label="Telefono"
+            onChange={(event) => setForm({ ...form, phone: event.target.value })}
+            value={form.phone}
+          />
+          <Select
+            label="Rol"
+            onChange={(event) => setForm({ ...form, role: event.target.value })}
+            options={roleOptions}
+            value={form.role}
+          />
+          <Select
+            label="Estado"
+            onChange={(event) => setForm({ ...form, status: event.target.value })}
+            options={statusOptions}
+            value={form.status}
+          />
+          <Input
+            label="Zona horaria"
+            onChange={(event) => setForm({ ...form, timezone: event.target.value })}
+            value={form.timezone}
+          />
           {!isEdit ? (
             <Input
               hint="Usa una contrasena temporal unica; no se define una por defecto."

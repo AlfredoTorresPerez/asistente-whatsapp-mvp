@@ -36,4 +36,3 @@ export const changePasswordSchema = z
 
 export type ProfileFormValues = z.infer<typeof profileSchema>
 export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>
-

@@ -89,7 +89,11 @@ describe('NotificationsPage', () => {
         })
       }
 
-      if (url.includes('/notifications?') && url.includes('status=UNREAD') && !url.includes('size=10')) {
+      if (
+        url.includes('/notifications?') &&
+        url.includes('status=UNREAD') &&
+        !url.includes('size=10')
+      ) {
         return jsonResponse({
           items: [],
           page: 0,

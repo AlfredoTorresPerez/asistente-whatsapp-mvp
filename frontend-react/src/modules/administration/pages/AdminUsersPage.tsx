@@ -12,7 +12,10 @@ import { Input } from '../../../components/ui/Input'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { Select } from '../../../components/ui/Select'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
-import { listAdminRolesRequest, listAdminUsersRequest } from '../../../services/api/administrationApi'
+import {
+  listAdminRolesRequest,
+  listAdminUsersRequest,
+} from '../../../services/api/administrationApi'
 
 const statusOptions = [
   { label: 'Todos', value: '' },
@@ -59,11 +62,21 @@ export function AdminUsersPage() {
     href: `/admin/users/${user.id}/edit`,
     cells: [
       <div key={`${user.id}-name`}>
-        <p className="font-semibold text-slate-950">{user.firstName} {user.lastName}</p>
+        <p className="font-semibold text-slate-950">
+          {user.firstName} {user.lastName}
+        </p>
         <p className="mt-1 text-xs text-slate-500">{user.email}</p>
       </div>,
-      <StatusBadge key={`${user.id}-role`} label={user.role} tone={user.role === 'OWNER' ? 'info' : 'neutral'} />,
-      <StatusBadge key={`${user.id}-status`} label={statusLabel(user.status)} tone={statusTone(user.status)} />,
+      <StatusBadge
+        key={`${user.id}-role`}
+        label={user.role}
+        tone={user.role === 'OWNER' ? 'info' : 'neutral'}
+      />,
+      <StatusBadge
+        key={`${user.id}-status`}
+        label={statusLabel(user.status)}
+        tone={statusTone(user.status)}
+      />,
       user.lastLoginAt ? dayjs(user.lastLoginAt).format('DD/MM/YYYY HH:mm') : 'Sin acceso reciente',
     ],
   }))
@@ -87,9 +100,24 @@ export function AdminUsersPage() {
       />
 
       <FilterBar>
-        <Input label="Buscar" onChange={(event) => setSearch(event.target.value)} placeholder="Nombre o correo" value={search} />
-        <Select label="Rol" onChange={(event) => setRole(event.target.value)} options={roleOptions} value={role} />
-        <Select label="Estado" onChange={(event) => setStatus(event.target.value)} options={statusOptions} value={status} />
+        <Input
+          label="Buscar"
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Nombre o correo"
+          value={search}
+        />
+        <Select
+          label="Rol"
+          onChange={(event) => setRole(event.target.value)}
+          options={roleOptions}
+          value={role}
+        />
+        <Select
+          label="Estado"
+          onChange={(event) => setStatus(event.target.value)}
+          options={statusOptions}
+          value={status}
+        />
       </FilterBar>
 
       {usersQuery.isPending ? (

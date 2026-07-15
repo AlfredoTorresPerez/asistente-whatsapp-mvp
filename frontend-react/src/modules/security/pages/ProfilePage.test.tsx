@@ -59,12 +59,12 @@ describe('ProfilePage', () => {
   it('shows error state when API fails', async () => {
     const { server } = await import('../../../test/mocks/server')
     const { http, HttpResponse } = await import('msw')
-    server.use(
-      http.get('*/api/v1/users/me', () => new HttpResponse(null, { status: 500 })),
-    )
+    server.use(http.get('*/api/v1/users/me', () => new HttpResponse(null, { status: 500 })))
 
     renderPage()
-    expect(await screen.findByText(/Perfil no disponible/, {}, { timeout: 3000 })).toBeInTheDocument()
+    expect(
+      await screen.findByText(/Perfil no disponible/, {}, { timeout: 3000 }),
+    ).toBeInTheDocument()
   })
 
   it('submits form and shows success toast', async () => {

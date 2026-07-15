@@ -157,7 +157,11 @@ export function NewLeadPage() {
               <Button onClick={() => navigate('/prospects')} variant="secondary">
                 Cancelar
               </Button>
-              <Button disabled={!isOnline} loading={createMutation.isPending || isSubmitting} type="submit">
+              <Button
+                disabled={!isOnline}
+                loading={createMutation.isPending || isSubmitting}
+                type="submit"
+              >
                 Crear prospecto
               </Button>
             </div>

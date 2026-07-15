@@ -1,10 +1,6 @@
 import type { PropsWithChildren } from 'react'
 import { useEffect, useState } from 'react'
-import {
-  loginRequest,
-  logoutRequest,
-  meRequest,
-} from '../services/api/authApi'
+import { loginRequest, logoutRequest, meRequest } from '../services/api/authApi'
 import {
   changePasswordRequest as changePasswordApiRequest,
   getCurrentProfileRequest,

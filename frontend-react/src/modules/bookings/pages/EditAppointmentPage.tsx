@@ -125,7 +125,9 @@ export function EditAppointmentPage() {
       <PageHeader
         actions={
           <Button
-            onClick={() => navigate(appointmentId ? `/appointments/${appointmentId}` : '/appointments')}
+            onClick={() =>
+              navigate(appointmentId ? `/appointments/${appointmentId}` : '/appointments')
+            }
             variant="secondary"
           >
             Volver al detalle
@@ -197,7 +199,11 @@ export function EditAppointmentPage() {
               >
                 Cancelar
               </Button>
-              <Button disabled={!isOnline} loading={updateMutation.isPending || isSubmitting} type="submit">
+              <Button
+                disabled={!isOnline}
+                loading={updateMutation.isPending || isSubmitting}
+                type="submit"
+              >
                 Guardar cambios
               </Button>
             </div>

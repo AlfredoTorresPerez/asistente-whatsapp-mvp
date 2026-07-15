@@ -56,8 +56,8 @@ export function ForgotPasswordPage() {
             Recuperar contrasena
           </h2>
           <p className="mt-3 text-sm leading-6 text-[var(--color-text-secondary)]">
-            Si el correo esta registrado, enviaremos instrucciones para que el usuario pueda
-            volver a entrar sin perder acceso al negocio.
+            Si el correo esta registrado, enviaremos instrucciones para que el usuario pueda volver
+            a entrar sin perder acceso al negocio.
           </p>
         </div>
         <StatusBadge label="Seguro" tone="success" />
@@ -71,8 +71,8 @@ export function ForgotPasswordPage() {
           <div>
             <p className="text-sm font-semibold text-[var(--color-text)]">Proceso guiado</p>
             <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
-              El backend responde de forma generica para proteger la cuenta y registra el
-              resultado sin exponer detalles sensibles.
+              El backend responde de forma generica para proteger la cuenta y registra el resultado
+              sin exponer detalles sensibles.
             </p>
           </div>
         </div>

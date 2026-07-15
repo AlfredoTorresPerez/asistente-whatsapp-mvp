@@ -51,7 +51,9 @@ const CATEGORY_COLORS = [
 function CategoryIcon({ name, index }: { name: string; index: number }) {
   const colorClass = CATEGORY_COLORS[index % CATEGORY_COLORS.length]
   return (
-    <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${colorClass} text-lg font-bold`}>
+    <div
+      className={`flex h-12 w-12 items-center justify-center rounded-xl ${colorClass} text-lg font-bold`}
+    >
       {name.charAt(0).toUpperCase()}
     </div>
   )
@@ -83,12 +85,14 @@ export function CreatePublicBookingPage() {
   useEffect(() => {
     if (customerInfoQuery.data) {
       const info = customerInfoQuery.data
-      if (info.customerName) setCustomerName(info.customerName)
-      if (info.customerPhone) {
-        const phone = info.customerPhone.trim().replace(/^\+/, '')
-        setCustomerPhone(CHILEAN_MOBILE_PHONE_PATTERN.test(phone) ? phone : '')
-      }
-      if (info.customerEmail) setCustomerEmail(info.customerEmail)
+      setTimeout(() => {
+        if (info.customerName) setCustomerName(info.customerName)
+        if (info.customerPhone) {
+          const phone = info.customerPhone.trim().replace(/^\+/, '')
+          setCustomerPhone(CHILEAN_MOBILE_PHONE_PATTERN.test(phone) ? phone : '')
+        }
+        if (info.customerEmail) setCustomerEmail(info.customerEmail)
+      }, 0)
     }
   }, [customerInfoQuery.data])
 
@@ -116,15 +120,16 @@ export function CreatePublicBookingPage() {
     if (customerInfoQuery.data?.lastLocationId && branchesQuery.data) {
       const matched = branchesQuery.data.find((b) => b.id === customerInfoQuery.data.lastLocationId)
       if (matched) {
-        setSelectedBranch(matched)
+        setTimeout(() => {
+          setSelectedBranch(matched)
+        }, 0)
       }
     }
   }, [branchesQuery.data, customerInfoQuery.data])
 
   const parsedSelectedDate = dayjs(selectedDate, 'DD/MM/YYYY', true)
-  const selectedDateIso = selectedDate && parsedSelectedDate.isValid()
-    ? parsedSelectedDate.format('YYYY-MM-DD')
-    : ''
+  const selectedDateIso =
+    selectedDate && parsedSelectedDate.isValid() ? parsedSelectedDate.format('YYYY-MM-DD') : ''
 
   const availabilityPayload: AgendaAvailabilityRequest | null =
     selectedBranch && selectedService && selectedDateIso
@@ -189,12 +194,17 @@ export function CreatePublicBookingPage() {
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(45,212,191,0.22),_transparent_38%),linear-gradient(180deg,_#f8fafc_0%,_#eef6f8_100%)] px-4 py-10">
       <section className="mx-auto max-w-2xl space-y-6">
         <div className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-teal-700">Asistente WhatsApp Centro Estetico</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-teal-700">
+            Asistente WhatsApp Centro Estetico
+          </p>
           <h1 className="mt-3 text-3xl font-semibold text-slate-950">Reserva tu hora</h1>
-          <p className="mt-2 text-sm leading-6 text-slate-600">Selecciona el servicio, sucursal y horario que prefieras.</p>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            Selecciona el servicio, sucursal y horario que prefieras.
+          </p>
           {token && customerInfoQuery.isSuccess && customerInfoQuery.data?.customerName ? (
             <div className="mt-3 rounded-xl bg-teal-50 px-4 py-3 text-sm text-teal-700">
-              Bienvenido de nuevo, {customerInfoQuery.data.customerName} &#x1f60a; Tus datos ya estan cargados.
+              Bienvenido de nuevo, {customerInfoQuery.data.customerName} &#x1f60a; Tus datos ya
+              estan cargados.
             </div>
           ) : null}
         </div>
@@ -303,7 +313,9 @@ export function CreatePublicBookingPage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 {(() => {
                   const bookable = servicesQuery.data.filter((s) => !s.requiresPriorEvaluation)
-                  const needsEvaluation = servicesQuery.data.filter((s) => s.requiresPriorEvaluation)
+                  const needsEvaluation = servicesQuery.data.filter(
+                    (s) => s.requiresPriorEvaluation,
+                  )
                   return (
                     <>
                       {bookable.map((svc) => (
@@ -342,7 +354,9 @@ export function CreatePublicBookingPage() {
                                 {svc.description ? (
                                   <p className="mt-1 text-sm text-slate-500">{svc.description}</p>
                                 ) : null}
-                                <p className="mt-2 text-sm text-slate-500">{svc.durationMinutes} min</p>
+                                <p className="mt-2 text-sm text-slate-500">
+                                  {svc.durationMinutes} min
+                                </p>
                                 <p className="mt-1 text-sm font-semibold text-teal-700">
                                   ${Number(svc.priceBase).toLocaleString('es-CL')}
                                 </p>
@@ -390,7 +404,9 @@ export function CreatePublicBookingPage() {
               </Card>
             ) : !branchesQuery.data || branchesQuery.data.length === 0 ? (
               <Card className="text-center">
-                <p className="text-sm text-slate-500">No hay sucursales disponibles para este servicio.</p>
+                <p className="text-sm text-slate-500">
+                  No hay sucursales disponibles para este servicio.
+                </p>
               </Card>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">
@@ -409,9 +425,7 @@ export function CreatePublicBookingPage() {
                     {branch.address ? (
                       <p className="mt-1 text-sm text-slate-500">{branch.address}</p>
                     ) : null}
-                    {branch.city ? (
-                      <p className="text-sm text-slate-500">{branch.city}</p>
-                    ) : null}
+                    {branch.city ? <p className="text-sm text-slate-500">{branch.city}</p> : null}
                   </button>
                 ))}
               </div>
@@ -437,7 +451,9 @@ export function CreatePublicBookingPage() {
             </div>
             <Card className="space-y-4">
               <div>
-                <label className="mb-2.5 block text-sm font-medium text-[#23385F]">Selecciona una fecha</label>
+                <label className="mb-2.5 block text-sm font-medium text-[#23385F]">
+                  Selecciona una fecha
+                </label>
                 <div className="relative">
                   <div
                     className={`flex h-12 w-full cursor-pointer items-center rounded-[14px] border bg-white px-4 text-sm transition ${
@@ -477,8 +493,18 @@ export function CreatePublicBookingPage() {
                       }
                     }}
                   >
-                    <svg className="mr-2 h-5 w-5 text-slate-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    <svg
+                      className="mr-2 h-5 w-5 text-slate-400"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
                     </svg>
                     {selectedDate || 'Seleccionar fecha'}
                   </div>
@@ -507,7 +533,9 @@ export function CreatePublicBookingPage() {
                   </div>
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
                     {availabilityQuery.isPending ? (
-                      <p className="col-span-full text-sm text-slate-500">Cargando disponibilidad...</p>
+                      <p className="col-span-full text-sm text-slate-500">
+                        Cargando disponibilidad...
+                      </p>
                     ) : availabilityQuery.isError ? (
                       <p className="col-span-full rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">
                         {getErrorMessage(
@@ -546,7 +574,9 @@ export function CreatePublicBookingPage() {
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-slate-500">Elige una fecha para ver los horarios disponibles.</p>
+                <p className="text-sm text-slate-500">
+                  Elige una fecha para ver los horarios disponibles.
+                </p>
               )}
             </Card>
             <div className="flex justify-between">
@@ -620,9 +650,7 @@ export function CreatePublicBookingPage() {
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-teal-700">
                   Resumen de tu reserva
                 </p>
-                <p className="mt-2 text-sm text-teal-800">
-                  Revisa los datos antes de confirmar.
-                </p>
+                <p className="mt-2 text-sm text-teal-800">Revisa los datos antes de confirmar.</p>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Info label="Servicio" value={selectedService?.name ?? ''} />
@@ -634,10 +662,7 @@ export function CreatePublicBookingPage() {
                   label="Horario"
                   value={`${formatTime(selectedSlot?.startsAt ?? '')} - ${formatTime(selectedSlot?.endsAt ?? '')}`}
                 />
-                <Info
-                  label="Profesional"
-                  value={selectedSlot?.professionalName ?? 'Por asignar'}
-                />
+                <Info label="Profesional" value={selectedSlot?.professionalName ?? 'Por asignar'} />
                 <Info label="Cabina" value={selectedSlot?.roomName ?? 'No requerida'} />
                 <Info label="Nombre" value={customerName} />
                 <Info label="Telefono" value={customerPhone} />
@@ -646,18 +671,22 @@ export function CreatePublicBookingPage() {
 
               {createBookingMutation.isError ? (
                 <div className="rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">
-                  <p>{getErrorMessage(
-                    createBookingMutation.error,
-                    'No fue posible crear la reserva. Intenta nuevamente.',
-                  )}</p>
+                  <p>
+                    {getErrorMessage(
+                      createBookingMutation.error,
+                      'No fue posible crear la reserva. Intenta nuevamente.',
+                    )}
+                  </p>
                   {createBookingMutation.error instanceof ApiClientError &&
                     Object.keys(createBookingMutation.error.fieldErrors).length > 0 && (
-                    <ul className="mt-1 list-inside list-disc">
-                      {Object.entries(createBookingMutation.error.fieldErrors).map(([field, msg]) => (
-                        <li key={field}>{msg}</li>
-                      ))}
-                    </ul>
-                  )}
+                      <ul className="mt-1 list-inside list-disc">
+                        {Object.entries(createBookingMutation.error.fieldErrors).map(
+                          ([field, msg]) => (
+                            <li key={field}>{msg}</li>
+                          ),
+                        )}
+                      </ul>
+                    )}
                 </div>
               ) : null}
 
@@ -715,9 +744,9 @@ export function CreatePublicBookingPage() {
               />
               <Info
                 label="Fecha y hora"
-                value={dayjs(
-                  createBookingMutation.data?.startsAt ?? selectedSlot?.startsAt,
-                ).format('DD/MM/YYYY HH:mm')}
+                value={dayjs(createBookingMutation.data?.startsAt ?? selectedSlot?.startsAt).format(
+                  'DD/MM/YYYY HH:mm',
+                )}
               />
               <Info
                 label="Cliente"

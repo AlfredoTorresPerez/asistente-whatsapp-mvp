@@ -90,7 +90,8 @@ export function formatEstadoRegistro(active: boolean | string | null | undefined
 
   const key = normalizeStatusKey(active)
   if (['active', 'enabled', 'activo'].includes(key)) return 'Activo'
-  if (['inactive', 'disabled', 'inactivo', 'desactivado', 'paused', 'pausado'].includes(key)) return 'Desactivado'
+  if (['inactive', 'disabled', 'inactivo', 'desactivado', 'paused', 'pausado'].includes(key))
+    return 'Desactivado'
   return formatEstado(active)
 }
 
@@ -111,15 +112,51 @@ export function formatEstadoActividad(value: string | null | undefined) {
 export function getEstadoTone(value: string | null | undefined): BadgeTone {
   const key = normalizeStatusKey(value)
 
-  if (['active', 'approved', 'completed', 'confirmed', 'delivered', 'enabled', 'paid', 'read', 'resolved'].includes(key)) {
+  if (
+    [
+      'active',
+      'approved',
+      'completed',
+      'confirmed',
+      'delivered',
+      'enabled',
+      'paid',
+      'read',
+      'resolved',
+    ].includes(key)
+  ) {
     return 'success'
   }
 
-  if (['cancelled', 'canceled', 'disabled', 'expired', 'failed', 'inactive', 'rejected', 'voided'].includes(key)) {
+  if (
+    [
+      'cancelled',
+      'canceled',
+      'disabled',
+      'expired',
+      'failed',
+      'inactive',
+      'rejected',
+      'voided',
+    ].includes(key)
+  ) {
     return 'danger'
   }
 
-  if (['draft', 'pending', 'partially_paid', 'partial', 'preparing', 'processing', 'requested', 'rescheduled', 'unpaid', 'unread'].includes(key)) {
+  if (
+    [
+      'draft',
+      'pending',
+      'partially_paid',
+      'partial',
+      'preparing',
+      'processing',
+      'requested',
+      'rescheduled',
+      'unpaid',
+      'unread',
+    ].includes(key)
+  ) {
     return 'warning'
   }
 

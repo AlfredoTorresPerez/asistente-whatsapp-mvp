@@ -230,7 +230,11 @@ export function CalendarSection() {
                   onConnect={() => connectGoogleCalendarRequest()}
                   onDisconnect={() => setDisconnectTarget(account)}
                   onSelectCalendar={(calendarId, calendarSummary) =>
-                    selectCalendarMutation.mutate({ accountId: account.id, calendarId, calendarSummary })
+                    selectCalendarMutation.mutate({
+                      accountId: account.id,
+                      calendarId,
+                      calendarSummary,
+                    })
                   }
                   key={account.id}
                 />
@@ -292,7 +296,10 @@ function AccountCard({
             {account.emailMasked ?? 'Sin correo vinculado'}
           </p>
         </div>
-        <StatusBadge label={toStatusLabel(account.authorizationStatus)} tone={toStatusTone(account.authorizationStatus)} />
+        <StatusBadge
+          label={toStatusLabel(account.authorizationStatus)}
+          tone={toStatusTone(account.authorizationStatus)}
+        />
       </div>
 
       {account.requiresReconnect ? (
@@ -362,12 +369,7 @@ function AccountCard({
           </Button>
         ) : null}
         {canManage && isConnected ? (
-          <Button
-            fullWidth
-            loading={disconnectLoading}
-            onClick={onDisconnect}
-            variant="danger"
-          >
+          <Button fullWidth loading={disconnectLoading} onClick={onDisconnect} variant="danger">
             Desconectar
           </Button>
         ) : null}

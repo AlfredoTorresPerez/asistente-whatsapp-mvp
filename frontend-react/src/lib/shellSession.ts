@@ -59,10 +59,7 @@ export function toShellUserFromAuthResponse(user: AuthUserResponse): ShellUser {
   }
 }
 
-export function mergeShellUserProfile(
-  user: ShellUser,
-  profile: UserProfileResponse,
-): ShellUser {
+export function mergeShellUserProfile(user: ShellUser, profile: UserProfileResponse): ShellUser {
   return {
     ...user,
     name: `${profile.firstName} ${profile.lastName}`,

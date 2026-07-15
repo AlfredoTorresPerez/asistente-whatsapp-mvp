@@ -1,4 +1,7 @@
-import { readStoredShellSessionSnapshot, writeStoredShellSessionSnapshot } from '../../lib/shellSession'
+import {
+  readStoredShellSessionSnapshot,
+  writeStoredShellSessionSnapshot,
+} from '../../lib/shellSession'
 import { traceService } from '../trace'
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080/api/v1'
@@ -40,7 +43,8 @@ export async function apiFetch<T>(path: string, init?: ApiFetchOptions) {
   const traceContext = traceService.start({
     componentName: callerName.includes('.') ? callerName.split('.')[0] : 'apiFetch',
     methodName: `${callerName} -> ${method} ${safePath}`,
-    purpose: 'Ejecutar funcion de frontend, enviar solicitud HTTP al backend y registrar trazabilidad de la operacion',
+    purpose:
+      'Ejecutar funcion de frontend, enviar solicitud HTTP al backend y registrar trazabilidad de la operacion',
     correlationId,
     data: {
       path: safePath,
@@ -164,7 +168,10 @@ function resolveCallerName() {
   const callerLine = stack
     .split('\n')
     .map((line) => line.trim())
-    .find((line) => !line.includes('resolveCallerName') && !line.includes('apiFetch') && line.includes('at '))
+    .find(
+      (line) =>
+        !line.includes('resolveCallerName') && !line.includes('apiFetch') && line.includes('at '),
+    )
 
   const match = callerLine?.match(/at\s+([^\s(]+)/)
   return match?.[1] ?? 'apiFetch'

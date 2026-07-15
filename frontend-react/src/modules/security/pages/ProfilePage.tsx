@@ -115,7 +115,10 @@ export function ProfilePage() {
       <PageHeader
         actions={
           <>
-            <Link className={buttonClassName({ variant: 'secondary' })} to="/profile/change-password">
+            <Link
+              className={buttonClassName({ variant: 'secondary' })}
+              to="/profile/change-password"
+            >
               Cambiar contrasena
             </Link>
             <Button
@@ -140,7 +143,8 @@ export function ProfilePage() {
               <div>
                 <p className="text-sm font-semibold text-[var(--color-text)]">Datos personales</p>
                 <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
-                  Esta informacion aparece en el menu de usuario y se usa para personalizar la experiencia.
+                  Esta informacion aparece en el menu de usuario y se usa para personalizar la
+                  experiencia.
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -152,12 +156,7 @@ export function ProfilePage() {
             <div className="mt-6 grid gap-5 md:grid-cols-2">
               <Input error={errors.firstName?.message} label="Nombre" {...register('firstName')} />
               <Input error={errors.lastName?.message} label="Apellido" {...register('lastName')} />
-              <Input
-                disabled
-                label="Correo"
-                value={profile.email}
-                className="text-slate-500"
-              />
+              <Input disabled label="Correo" value={profile.email} className="text-slate-500" />
               <Input
                 error={errors.phone?.message}
                 hint="Usa formato internacional, por ejemplo +56911112222."
@@ -203,7 +202,9 @@ export function ProfilePage() {
             <h2 className="mt-3 text-2xl font-semibold text-[var(--color-text)]">
               {profile.firstName} {profile.lastName}
             </h2>
-            <p className="mt-2 text-sm text-[var(--color-text-secondary)]">{profile.businessName}</p>
+            <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
+              {profile.businessName}
+            </p>
 
             <div className="mt-6 grid gap-3">
               <InfoRow label="Rol del usuario" value={profile.role} />
@@ -220,7 +221,8 @@ export function ProfilePage() {
               <div>
                 <p className="text-sm font-semibold text-[var(--color-text)]">Seguridad basica</p>
                 <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
-                  Cambia tu contrasena cuando sea necesario y manten actualizado tu contacto para recuperacion.
+                  Cambia tu contrasena cuando sea necesario y manten actualizado tu contacto para
+                  recuperacion.
                 </p>
                 <Link
                   className="mt-4 inline-flex text-sm font-semibold text-[var(--color-primary)] transition hover:text-[var(--color-primary-strong)]"
@@ -256,7 +258,13 @@ function ShieldIcon() {
         strokeLinejoin="round"
         strokeWidth="1.8"
       />
-      <path d="M9.5 12.2L11.4 14.1L14.9 10.6" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+      <path
+        d="M9.5 12.2L11.4 14.1L14.9 10.6"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
     </svg>
   )
 }

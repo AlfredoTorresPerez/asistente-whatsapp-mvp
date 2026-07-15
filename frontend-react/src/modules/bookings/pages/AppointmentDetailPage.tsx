@@ -22,7 +22,10 @@ import {
 import type { BookingSyncStatusResponse } from '../../../services/api/types'
 import { getBookingStatusLabel, getBookingStatusTone } from '../bookingOptions'
 import { usePermissions } from '../../../hooks/usePermissions'
-import { getBookingSyncStatusRequest, retryBookingSyncRequest } from '../../../services/api/calendarApi'
+import {
+  getBookingSyncStatusRequest,
+  retryBookingSyncRequest,
+} from '../../../services/api/calendarApi'
 
 function formatDateTime(value: string | null) {
   return value ? dayjs(value).format('DD MMM YYYY HH:mm') : 'Sin registro'
@@ -44,22 +47,25 @@ export function AppointmentDetailPage() {
     refetchInterval: isOnline ? 30_000 : false,
   })
 
-
   const confirmationLinkMutation = useMutation({
     mutationFn: async () => {
       if (!appointmentId) {
         throw new Error('No hay cita seleccionada.')
       }
-      return createBookingConfirmationLinkRequest(appointmentId, { expirationMinutes: 30, sendWhatsApp: true })
+      return createBookingConfirmationLinkRequest(appointmentId, {
+        expirationMinutes: 30,
+        sendWhatsApp: true,
+      })
     },
     onSuccess: async (response) => {
       setConfirmationUrl(response.confirmationUrl)
       await bookingQuery.refetch()
       showToast({
         title: response.status === 'SENT' ? 'Enlace enviado por WhatsApp' : 'Enlace generado',
-        description: response.status === 'SENT'
-          ? 'El cliente recibio el enlace de confirmacion por WhatsApp.'
-          : 'El enlace quedo generado, pero no se pudo confirmar el envio automatico por WhatsApp.',
+        description:
+          response.status === 'SENT'
+            ? 'El cliente recibio el enlace de confirmacion por WhatsApp.'
+            : 'El enlace quedo generado, pero no se pudo confirmar el envio automatico por WhatsApp.',
         tone: 'success',
       })
     },
@@ -129,13 +135,6 @@ export function AppointmentDetailPage() {
     },
   })
 
-
-
-
-
-
-
-
   const calendarSyncQuery = useQuery({
     queryKey: ['bookings', appointmentId, 'calendar-sync'],
     queryFn: () => getBookingSyncStatusRequest(appointmentId ?? ''),
@@ -178,7 +177,9 @@ export function AppointmentDetailPage() {
             {bookingQuery.data ? (
               <>
                 <Button
-                  disabled={confirmationLinkMutation.isPending || bookingQuery.data.status === 'CONFIRMED'}
+                  disabled={
+                    confirmationLinkMutation.isPending || bookingQuery.data.status === 'CONFIRMED'
+                  }
                   onClick={() => confirmationLinkMutation.mutate()}
                   variant="secondary"
                 >
@@ -186,9 +187,9 @@ export function AppointmentDetailPage() {
                 </Button>
                 <Button
                   disabled={
-                    cancellationLinkMutation.isPending
-                    || bookingQuery.data.status === 'CANCELADA'
-                    || bookingQuery.data.status === 'CANCELLED'
+                    cancellationLinkMutation.isPending ||
+                    bookingQuery.data.status === 'CANCELADA' ||
+                    bookingQuery.data.status === 'CANCELLED'
                   }
                   onClick={() => cancellationLinkMutation.mutate()}
                   variant="secondary"
@@ -217,14 +218,17 @@ export function AppointmentDetailPage() {
         <Card className="border-amber-200 bg-amber-50">
           <p className="text-sm font-semibold text-amber-900">Estado sin conexion</p>
           <p className="mt-2 text-sm leading-6 text-amber-800">
-            La ficha sigue visible, pero las acciones de edición, reprogramación o cancelación quedan bloqueadas.
+            La ficha sigue visible, pero las acciones de edición, reprogramación o cancelación
+            quedan bloqueadas.
           </p>
         </Card>
       ) : null}
 
       {confirmationUrl ? (
         <Card className="border-teal-200 bg-teal-50">
-          <p className="text-sm font-semibold text-teal-950">Enlace de confirmacion generado o enviado</p>
+          <p className="text-sm font-semibold text-teal-950">
+            Enlace de confirmacion generado o enviado
+          </p>
           <p className="mt-2 break-all text-sm text-teal-800">{confirmationUrl}</p>
         </Card>
       ) : null}
@@ -250,9 +254,13 @@ export function AppointmentDetailPage() {
             <Card className="border-emerald-100 bg-emerald-50/80">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Sucursal seleccionada</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">
+                    Sucursal seleccionada
+                  </p>
                   <h2 className="mt-2 text-2xl font-semibold text-emerald-950">
-                    {bookingQuery.data.locationName ?? bookingQuery.data.location ?? 'Sin sucursal definida'}
+                    {bookingQuery.data.locationName ??
+                      bookingQuery.data.location ??
+                      'Sin sucursal definida'}
                   </h2>
                   <p className="mt-1 text-sm text-emerald-800">
                     La disponibilidad y el profesional deben validarse contra esta sucursal.
@@ -266,101 +274,115 @@ export function AppointmentDetailPage() {
             </Card>
 
             <Card className="space-y-6">
-            <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[var(--color-border)] pb-6">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-500">
-                  Cliente
-                </p>
-                <h2 className="mt-2 text-[30px] font-semibold text-[var(--color-text)]">
-                  {bookingQuery.data.customerName}
-                </h2>
-                <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
-                  {bookingQuery.data.customerPhone} · {bookingQuery.data.customerEmail ?? 'Sin correo'}
-                </p>
+              <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[var(--color-border)] pb-6">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-500">
+                    Cliente
+                  </p>
+                  <h2 className="mt-2 text-[30px] font-semibold text-[var(--color-text)]">
+                    {bookingQuery.data.customerName}
+                  </h2>
+                  <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
+                    {bookingQuery.data.customerPhone} ·{' '}
+                    {bookingQuery.data.customerEmail ?? 'Sin correo'}
+                  </p>
+                </div>
+
+                <StatusBadge
+                  label={getBookingStatusLabel(bookingQuery.data.status)}
+                  tone={getBookingStatusTone(bookingQuery.data.status)}
+                />
               </div>
 
-              <StatusBadge
-                label={getBookingStatusLabel(bookingQuery.data.status)}
-                tone={getBookingStatusTone(bookingQuery.data.status)}
-              />
-            </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <InfoCard label="Asunto" value={bookingQuery.data.subject} />
+                <InfoCard
+                  label="Responsable"
+                  value={bookingQuery.data.assignedUserName ?? 'Sin asignar'}
+                />
+                <InfoCard label="Inicio" value={formatDateTime(bookingQuery.data.startsAt)} />
+                <InfoCard label="Duracion" value={`${bookingQuery.data.durationMinutes} minutos`} />
+                <InfoCard
+                  label="Sucursal"
+                  value={
+                    bookingQuery.data.locationName ??
+                    bookingQuery.data.location ??
+                    'Sin sucursal definida'
+                  }
+                />
+                <InfoCard label="Actualizada" value={formatDateTime(bookingQuery.data.updatedAt)} />
+              </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <InfoCard label="Asunto" value={bookingQuery.data.subject} />
-              <InfoCard label="Responsable" value={bookingQuery.data.assignedUserName ?? 'Sin asignar'} />
-              <InfoCard label="Inicio" value={formatDateTime(bookingQuery.data.startsAt)} />
-              <InfoCard label="Duracion" value={`${bookingQuery.data.durationMinutes} minutos`} />
-              <InfoCard label="Sucursal" value={bookingQuery.data.locationName ?? bookingQuery.data.location ?? 'Sin sucursal definida'} />
-              <InfoCard label="Actualizada" value={formatDateTime(bookingQuery.data.updatedAt)} />
-            </div>
+              <Card className="space-y-3 bg-slate-50">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
+                  Notas
+                </p>
+                <p className="text-sm leading-6 text-[var(--color-text-secondary)]">
+                  {bookingQuery.data.notes ?? 'Sin notas registradas para esta cita.'}
+                </p>
+              </Card>
 
-            <Card className="space-y-3 bg-slate-50">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
-                Notas
-              </p>
-              <p className="text-sm leading-6 text-[var(--color-text-secondary)]">
-                {bookingQuery.data.notes ?? 'Sin notas registradas para esta cita.'}
-              </p>
+              <div className="flex flex-wrap justify-end gap-3">
+                {bookingQuery.data.status !== 'CANCELLED' &&
+                bookingQuery.data.status !== 'CANCELADA' ? (
+                  <Button
+                    disabled={!isOnline}
+                    onClick={() => setCancelDialogOpen(true)}
+                    variant="danger"
+                  >
+                    Cancelar cita
+                  </Button>
+                ) : null}
+              </div>
             </Card>
 
-            <div className="flex flex-wrap justify-end gap-3">
-              {bookingQuery.data.status !== 'CANCELLED' && bookingQuery.data.status !== 'CANCELADA' ? (
-                <Button
-                  disabled={!isOnline}
-                  onClick={() => setCancelDialogOpen(true)}
-                  variant="danger"
-                >
-                  Cancelar cita
-                </Button>
-              ) : null}
-            </div>
-          </Card>
+            <Card className="space-y-4">
+              <h3 className="text-xl font-semibold text-[var(--color-text)]">
+                Trazabilidad operativa
+              </h3>
+              <TraceSection
+                empty="No hay enlaces publicos registrados."
+                items={(bookingQuery.data.publicLinks ?? []).map((link) => ({
+                  id: link.id,
+                  title: `${link.type} · ${link.status}`,
+                  detail: `${formatDateTime(link.expiresAt)} · ${link.url}`,
+                }))}
+                title="Enlaces publicos"
+              />
+              <TraceSection
+                empty="No hay recordatorios programados."
+                items={(bookingQuery.data.reminders ?? []).map((reminder) => ({
+                  id: reminder.id,
+                  title: `${reminder.reminderType} · ${reminder.channelType} · ${reminder.status}`,
+                  detail: `${formatDateTime(reminder.scheduledAt)}${reminder.sentAt ? ` · enviado ${formatDateTime(reminder.sentAt)}` : ''}${reminder.failureReason ? ` · ${reminder.failureReason}` : ''}`,
+                }))}
+                title="Recordatorios"
+              />
+              <TraceSection
+                empty="No hay correos registrados."
+                items={(bookingQuery.data.emailLogs ?? []).map((email) => ({
+                  id: email.id,
+                  title: `${email.templateKey} · ${email.status}${email.simulation ? ' · simulacion' : ''}`,
+                  detail: `${email.recipientEmail} · ${email.subject} · ${formatDateTime(email.createdAt)}`,
+                }))}
+                title="Correos"
+              />
+              <TraceSection
+                empty="No hay historial de estado."
+                items={(bookingQuery.data.statusHistory ?? []).map((history) => ({
+                  id: history.id,
+                  title: `${history.previousStatus ?? 'Inicio'} -> ${history.newStatus}`,
+                  detail: `${history.source} · ${formatDateTime(history.createdAt)}${history.reason ? ` · ${history.reason}` : ''}`,
+                }))}
+                title="Historial"
+              />
+            </Card>
 
-          <Card className="space-y-4">
-            <h3 className="text-xl font-semibold text-[var(--color-text)]">Trazabilidad operativa</h3>
-            <TraceSection
-              empty="No hay enlaces publicos registrados."
-              items={(bookingQuery.data.publicLinks ?? []).map((link) => ({
-                id: link.id,
-                title: `${link.type} · ${link.status}`,
-                detail: `${formatDateTime(link.expiresAt)} · ${link.url}`,
-              }))}
-              title="Enlaces publicos"
+            <CalendarSyncCard
+              calendarSyncQuery={calendarSyncQuery}
+              onRetry={() => retrySyncMutation.mutate()}
+              retryLoading={retrySyncMutation.isPending}
             />
-            <TraceSection
-              empty="No hay recordatorios programados."
-              items={(bookingQuery.data.reminders ?? []).map((reminder) => ({
-                id: reminder.id,
-                title: `${reminder.reminderType} · ${reminder.channelType} · ${reminder.status}`,
-                detail: `${formatDateTime(reminder.scheduledAt)}${reminder.sentAt ? ` · enviado ${formatDateTime(reminder.sentAt)}` : ''}${reminder.failureReason ? ` · ${reminder.failureReason}` : ''}`,
-              }))}
-              title="Recordatorios"
-            />
-            <TraceSection
-              empty="No hay correos registrados."
-              items={(bookingQuery.data.emailLogs ?? []).map((email) => ({
-                id: email.id,
-                title: `${email.templateKey} · ${email.status}${email.simulation ? ' · simulacion' : ''}`,
-                detail: `${email.recipientEmail} · ${email.subject} · ${formatDateTime(email.createdAt)}`,
-              }))}
-              title="Correos"
-            />
-            <TraceSection
-              empty="No hay historial de estado."
-              items={(bookingQuery.data.statusHistory ?? []).map((history) => ({
-                id: history.id,
-                title: `${history.previousStatus ?? 'Inicio'} -> ${history.newStatus}`,
-                detail: `${history.source} · ${formatDateTime(history.createdAt)}${history.reason ? ` · ${history.reason}` : ''}`,
-              }))}
-              title="Historial"
-            />
-          </Card>
-
-          <CalendarSyncCard
-            calendarSyncQuery={calendarSyncQuery}
-            onRetry={() => retrySyncMutation.mutate()}
-            retryLoading={retrySyncMutation.isPending}
-          />
           </div>
 
           <Card className="space-y-5">
@@ -473,13 +495,17 @@ function CalendarSyncCard({
 
   return (
     <Card className="space-y-4">
-      <h3 className="text-xl font-semibold text-[var(--color-text)]">Sincronización Google Calendar</h3>
+      <h3 className="text-xl font-semibold text-[var(--color-text)]">
+        Sincronización Google Calendar
+      </h3>
       {calendarSyncQuery.isPending ? (
         <p className="text-sm text-slate-500">Cargando estado de sincronización...</p>
       ) : calendarSyncQuery.isError ? (
         <p className="text-sm text-red-600">Error al cargar el estado de sincronización.</p>
       ) : syncRecords.length === 0 ? (
-        <p className="text-sm text-slate-500">No hay registros de sincronización para esta reserva.</p>
+        <p className="text-sm text-slate-500">
+          No hay registros de sincronización para esta reserva.
+        </p>
       ) : (
         <div className="space-y-3">
           {syncRecords.slice(0, 5).map((record) => (
@@ -490,12 +516,16 @@ function CalendarSyncCard({
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div className="space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <StatusBadge label={syncStatusLabel(record.syncStatus)} tone={syncStatusTone(record.syncStatus)} />
+                    <StatusBadge
+                      label={syncStatusLabel(record.syncStatus)}
+                      tone={syncStatusTone(record.syncStatus)}
+                    />
                     <span className="text-xs text-slate-500">{record.provider}</span>
                   </div>
                   {record.externalEventId ? (
                     <p className="text-xs text-slate-500">
-                      ID externo: {record.externalEventId.length > 30
+                      ID externo:{' '}
+                      {record.externalEventId.length > 30
                         ? `${record.externalEventId.substring(0, 30)}...`
                         : record.externalEventId}
                     </p>
@@ -512,12 +542,7 @@ function CalendarSyncCard({
               </div>
               {record.syncStatus === 'FAILED' && hasPermission('CALENDAR_CONFIG_MANAGE') ? (
                 <div className="mt-3">
-                  <Button
-                    loading={retryLoading}
-                    onClick={onRetry}
-                    size="sm"
-                    variant="secondary"
-                  >
+                  <Button loading={retryLoading} onClick={onRetry} size="sm" variant="secondary">
                     Reintentar sincronización
                   </Button>
                 </div>
@@ -537,7 +562,12 @@ function TraceSection({
 }: {
   title: string
   empty: string
-  items: Array<{ id: string; title: string; detail: string; action?: { label: string; onClick: () => void; disabled?: boolean } }>
+  items: Array<{
+    id: string
+    title: string
+    detail: string
+    action?: { label: string; onClick: () => void; disabled?: boolean }
+  }>
 }) {
   return (
     <div className="space-y-2 rounded-2xl border border-[var(--color-border)] bg-slate-50 p-4">

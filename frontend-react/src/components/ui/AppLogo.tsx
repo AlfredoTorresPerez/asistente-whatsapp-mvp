@@ -5,12 +5,7 @@ type AppLogoProps = HTMLAttributes<HTMLDivElement> & {
   compact?: boolean
 }
 
-export function AppLogo({
-  className,
-  compact = false,
-  inverted = false,
-  ...props
-}: AppLogoProps) {
+export function AppLogo({ className, compact = false, inverted = false, ...props }: AppLogoProps) {
   return (
     <div
       className={[

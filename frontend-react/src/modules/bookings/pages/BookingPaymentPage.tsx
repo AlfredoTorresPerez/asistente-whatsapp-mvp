@@ -89,7 +89,9 @@ export function BookingPaymentPage() {
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(45,212,191,0.22),_transparent_38%),linear-gradient(180deg,_#f8fafc_0%,_#eef6f8_100%)] px-4 py-10">
       <section className="mx-auto max-w-2xl space-y-6">
         <div className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-teal-700">Asistente WhatsApp Centro Estetico</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-teal-700">
+            Asistente WhatsApp Centro Estetico
+          </p>
           <h1 className="mt-3 text-3xl font-semibold text-slate-950">Pago de reserva</h1>
           <p className="mt-2 text-sm leading-6 text-slate-600">
             Revisa los datos del pago. Si la reserva requiere abono, puedes pagar desde esta pagina.
@@ -97,11 +99,15 @@ export function BookingPaymentPage() {
         </div>
 
         {paymentQuery.isPending ? (
-          <Card className="text-center"><p className="text-sm font-medium text-slate-700">Cargando datos del pago...</p></Card>
+          <Card className="text-center">
+            <p className="text-sm font-medium text-slate-700">Cargando datos del pago...</p>
+          </Card>
         ) : paymentQuery.isError || !data ? (
           <Card className="border-rose-200 bg-rose-50 text-center">
             <h2 className="text-xl font-semibold text-rose-900">Pago no encontrado</h2>
-            <p className="mt-2 text-sm leading-6 text-rose-700">El enlace de pago no existe o fue invalidado. Solicita ayuda por WhatsApp.</p>
+            <p className="mt-2 text-sm leading-6 text-rose-700">
+              El enlace de pago no existe o fue invalidado. Solicita ayuda por WhatsApp.
+            </p>
           </Card>
         ) : (
           <Card className="space-y-6">
@@ -109,19 +115,29 @@ export function BookingPaymentPage() {
               <p className="text-xs font-semibold uppercase tracking-[0.24em]">Estado</p>
               <h2 className="mt-2 text-2xl font-semibold">{statusLabel}</h2>
               {isPending && isSimulated && (
-                <p className="mt-2 text-sm">El pago esta pendiente. Usa los botones de simulacion para probar el flujo.</p>
+                <p className="mt-2 text-sm">
+                  El pago esta pendiente. Usa los botones de simulacion para probar el flujo.
+                </p>
               )}
               {isPending && isMercadoPago && (
-                <p className="mt-2 text-sm">Haz clic en "Pagar ahora" para completar el pago a traves de Mercado Pago.</p>
+                <p className="mt-2 text-sm">
+                  Haz clic en "Pagar ahora" para completar el pago a traves de Mercado Pago.
+                </p>
               )}
               {status === 'APPROVED' && (
-                <p className="mt-2 text-sm">El pago fue aprobado correctamente. La reserva quedo confirmada.</p>
+                <p className="mt-2 text-sm">
+                  El pago fue aprobado correctamente. La reserva quedo confirmada.
+                </p>
               )}
               {status === 'REJECTED' && (
-                <p className="mt-2 text-sm">El pago fue rechazado. La reserva no sera confirmada hasta recibir el pago.</p>
+                <p className="mt-2 text-sm">
+                  El pago fue rechazado. La reserva no sera confirmada hasta recibir el pago.
+                </p>
               )}
               {isExpired && (
-                <p className="mt-2 text-sm">El enlace de pago expiro. Solicita un nuevo enlace por WhatsApp.</p>
+                <p className="mt-2 text-sm">
+                  El enlace de pago expiro. Solicita un nuevo enlace por WhatsApp.
+                </p>
               )}
             </div>
 
@@ -136,7 +152,9 @@ export function BookingPaymentPage() {
               <Info label="Estado del pago" value={statusLabel} />
               <Info label="Moneda" value={data.currency} />
               <Info label="Proveedor" value={provider} />
-              {data.checkoutExpiresAt && <Info label="Vence" value={formatDateTime(data.checkoutExpiresAt)} />}
+              {data.checkoutExpiresAt && (
+                <Info label="Vence" value={formatDateTime(data.checkoutExpiresAt)} />
+              )}
             </div>
 
             {/* SIMULATED: mostrar botones de simulacion */}
@@ -193,7 +211,10 @@ export function BookingPaymentPage() {
 
             {simulateMutation.isError && (
               <p className="rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">
-                {getErrorMessage(simulateMutation.error, 'No fue posible procesar la simulacion del pago.')}
+                {getErrorMessage(
+                  simulateMutation.error,
+                  'No fue posible procesar la simulacion del pago.',
+                )}
               </p>
             )}
           </Card>

@@ -45,12 +45,22 @@ export function WeeklyCalendarView({
   )
 
   const hourLayout = useMemo(
-    () => buildAgendaHourLayout(calendarItems, visibleDays, dayAvailability, scheduleStartHour, scheduleEndHour),
+    () =>
+      buildAgendaHourLayout(
+        calendarItems,
+        visibleDays,
+        dayAvailability,
+        scheduleStartHour,
+        scheduleEndHour,
+      ),
     [calendarItems, visibleDays, dayAvailability, scheduleStartHour, scheduleEndHour],
   )
 
   const daysWithEvents = useMemo(() => getDaysWithEvents(calendarItems), [calendarItems])
-  const visibleDayKeys = useMemo(() => visibleDays.map((d) => d.format('YYYY-MM-DD')), [visibleDays])
+  const visibleDayKeys = useMemo(
+    () => visibleDays.map((d) => d.format('YYYY-MM-DD')),
+    [visibleDays],
+  )
 
   const dayAvailabilityMap = useMemo(() => {
     const map = new Map<string, DayAvailability>()
@@ -67,10 +77,14 @@ export function WeeklyCalendarView({
       {/* Header row */}
       <div
         className="grid border-b border-slate-200 bg-slate-50"
-        style={{ gridTemplateColumns: `${timeColumnWidth}px repeat(${calendarDays}, minmax(0, 1fr))` }}
+        style={{
+          gridTemplateColumns: `${timeColumnWidth}px repeat(${calendarDays}, minmax(0, 1fr))`,
+        }}
       >
         <div className="flex items-end justify-center border-r border-slate-200 pb-2 pt-3">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Hora</span>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+            Hora
+          </span>
         </div>
         {visibleDays.map((day) => {
           const fd = formatCalendarDay(day)
@@ -93,14 +107,14 @@ export function WeeklyCalendarView({
               <div className="mt-1 flex items-center gap-0.5">
                 <span
                   className={`inline-flex items-center justify-center text-sm font-bold leading-none ${
-                    isToday
-                      ? 'h-7 w-7 rounded-full bg-emerald-500 text-white'
-                      : 'text-slate-900'
+                    isToday ? 'h-7 w-7 rounded-full bg-emerald-500 text-white' : 'text-slate-900'
                   }`}
                 >
                   {fd.dayNumber}
                 </span>
-                <span className={`text-[10px] font-semibold ${isToday ? 'text-emerald-500' : 'text-slate-400'}`}>
+                <span
+                  className={`text-[10px] font-semibold ${isToday ? 'text-emerald-500' : 'text-slate-400'}`}
+                >
                   /{fd.month}
                 </span>
               </div>
@@ -160,29 +174,29 @@ export function WeeklyCalendarView({
                       key={`${dayKey}-${hour}`}
                       style={{ height: rowHeight }}
                     >
-                      {eventLayouts.length > 0 ? (
-                        eventLayouts.map(({ item, top, height, left, width }) => (
-                          <div
-                            key={item.bookingId}
-                            className="absolute"
-                            style={{
-                              left,
-                              width,
-                              top: `${top}px`,
-                              height: `${height}px`,
-                              padding: '1px',
-                              boxSizing: 'border-box',
-                            }}
-                          >
-                            <AgendaEventCard
-                              compact
-                              isSelected={selectedBookingId === item.bookingId}
-                              item={item}
-                              onClick={() => onSelectBooking(item.bookingId)}
-                            />
-                          </div>
-                        ))
-                      ) : null}
+                      {eventLayouts.length > 0
+                        ? eventLayouts.map(({ item, top, height, left, width }) => (
+                            <div
+                              key={item.bookingId}
+                              className="absolute"
+                              style={{
+                                left,
+                                width,
+                                top: `${top}px`,
+                                height: `${height}px`,
+                                padding: '1px',
+                                boxSizing: 'border-box',
+                              }}
+                            >
+                              <AgendaEventCard
+                                compact
+                                isSelected={selectedBookingId === item.bookingId}
+                                item={item}
+                                onClick={() => onSelectBooking(item.bookingId)}
+                              />
+                            </div>
+                          ))
+                        : null}
                     </div>
                   )
                 })}
@@ -198,4 +212,3 @@ export function WeeklyCalendarView({
     </div>
   )
 }
-

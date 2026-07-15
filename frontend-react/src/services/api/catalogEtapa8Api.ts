@@ -18,14 +18,18 @@ const toQueryString = (params: Record<string, string | number | boolean | null |
   return queryString ? `?${queryString}` : ''
 }
 
-export function listCatalogProducts(params: {
-  page?: number
-  size?: number
-  search?: string
-  categoryCode?: string
-  active?: boolean
-} = {}) {
-  return apiFetch<PagedResponse<CatalogProductResponse>>(`/catalog/products${toQueryString(params)}`)
+export function listCatalogProducts(
+  params: {
+    page?: number
+    size?: number
+    search?: string
+    categoryCode?: string
+    active?: boolean
+  } = {},
+) {
+  return apiFetch<PagedResponse<CatalogProductResponse>>(
+    `/catalog/products${toQueryString(params)}`,
+  )
 }
 
 export function getCatalogProduct(productId: string) {
@@ -53,8 +57,12 @@ export function updateCatalogProductStatus(productId: string, active: boolean) {
   })
 }
 
-export function listCatalogCategories(params: { page?: number; size?: number; active?: boolean } = {}) {
-  return apiFetch<PagedResponse<CatalogCategoryResponse>>(`/catalog/categories${toQueryString(params)}`)
+export function listCatalogCategories(
+  params: { page?: number; size?: number; active?: boolean } = {},
+) {
+  return apiFetch<PagedResponse<CatalogCategoryResponse>>(
+    `/catalog/categories${toQueryString(params)}`,
+  )
 }
 
 export function createCatalogCategory(request: UpsertCatalogCategoryRequest) {

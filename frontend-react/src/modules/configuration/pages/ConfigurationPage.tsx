@@ -266,10 +266,7 @@ export function ConfigurationPage() {
       />
 
       {configurationQuery.isPending && !configuration ? (
-        <LoadingState
-          message="Cargando configuracion local de WhatsApp Web."
-          variant="page"
-        />
+        <LoadingState message="Cargando configuracion local de WhatsApp Web." variant="page" />
       ) : null}
 
       {configurationQuery.isError && !configuration ? (
@@ -286,15 +283,24 @@ export function ConfigurationPage() {
             <div className="min-w-0 space-y-4 p-4 lg:p-6">
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-[24px] border border-emerald-100 bg-white px-4 py-3 shadow-[0_12px_32px_rgba(15,23,42,0.04)]">
                 <div>
-                  <p className="text-sm font-semibold text-slate-950">Configuracion de WhatsApp Web</p>
+                  <p className="text-sm font-semibold text-slate-950">
+                    Configuracion de WhatsApp Web
+                  </p>
                   <p className="text-xs text-slate-500">
                     Conecta el telefono de la empresa y administra la sesion activa.
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <StatusBadge label={toStatusLabel(configuration.sessionStatus)} tone={toStatusTone(configuration.sessionStatus)} />
                   <StatusBadge
-                    label={configuration.adapterReachable ? 'API local activa' : 'API local sin adaptador'}
+                    label={toStatusLabel(configuration.sessionStatus)}
+                    tone={toStatusTone(configuration.sessionStatus)}
+                  />
+                  <StatusBadge
+                    label={
+                      configuration.adapterReachable
+                        ? 'API local activa'
+                        : 'API local sin adaptador'
+                    }
                     tone={configuration.adapterReachable ? 'success' : 'warning'}
                   />
                 </div>
@@ -333,9 +339,7 @@ export function ConfigurationPage() {
         </div>
       ) : null}
 
-      {hasPermission('CALENDAR_CONFIG_VIEW') ? (
-        <CalendarSection />
-      ) : null}
+      {hasPermission('CALENDAR_CONFIG_VIEW') ? <CalendarSection /> : null}
     </section>
   )
 }
@@ -360,7 +364,10 @@ function ConnectionStatusCard({
           <p className="text-sm font-semibold text-slate-950">Estado de conexion</p>
           <p className="mt-1 text-xs text-slate-500">Sesion activa del numero empresarial.</p>
         </div>
-        <StatusBadge label={toStatusLabel(configuration.sessionStatus)} tone={toStatusTone(configuration.sessionStatus)} />
+        <StatusBadge
+          label={toStatusLabel(configuration.sessionStatus)}
+          tone={toStatusTone(configuration.sessionStatus)}
+        />
       </div>
 
       <div className="grid gap-5 md:grid-cols-[180px_minmax(0,1fr)]">
@@ -375,7 +382,10 @@ function ConnectionStatusCard({
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <InfoTile label="Ultima sincronizacion" value={formatDateTime(configuration.lastSynchronizationAt)} />
+          <InfoTile
+            label="Ultima sincronizacion"
+            value={formatDateTime(configuration.lastSynchronizationAt)}
+          />
           <InfoTile label="Sesion activa" value={`${configuration.activeSessionHours} hora(s)`} />
           <InfoTile label="Conectado desde" value={configuration.connectedFrom} />
           <InfoTile label="Modo adaptador" value={configuration.adapterMode ?? 'Experimental'} />
@@ -383,20 +393,10 @@ function ConnectionStatusCard({
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <Button
-          fullWidth
-          loading={disconnectLoading}
-          onClick={onDisconnect}
-          variant="danger"
-        >
+        <Button fullWidth loading={disconnectLoading} onClick={onDisconnect} variant="danger">
           Desconectar sesion
         </Button>
-        <Button
-          fullWidth
-          loading={reconnectLoading}
-          onClick={onReconnect}
-          variant="secondary"
-        >
+        <Button fullWidth loading={reconnectLoading} onClick={onReconnect} variant="secondary">
           Reiniciar sesion
         </Button>
       </div>
@@ -418,7 +418,9 @@ function QrConnectionCard({
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-sm font-semibold text-slate-950">Vincular nuevo dispositivo</p>
-          <p className="mt-1 text-xs text-slate-500">Escanea el codigo desde WhatsApp en tu telefono.</p>
+          <p className="mt-1 text-xs text-slate-500">
+            Escanea el codigo desde WhatsApp en tu telefono.
+          </p>
         </div>
         <Button loading={refreshLoading} onClick={onRefreshQr} size="sm">
           Generar QR
@@ -428,7 +430,12 @@ function QrConnectionCard({
       <div className="grid gap-5 md:grid-cols-[180px_minmax(0,1fr)]">
         <QrBlock qrCode={configuration.qrCode} />
         <ol className="space-y-3 text-sm text-slate-700">
-          {['Abre WhatsApp en tu telefono', 'Toca Menu > Dispositivos vinculados', 'Toca Vincular un dispositivo', 'Escanea este codigo QR'].map((step, index) => (
+          {[
+            'Abre WhatsApp en tu telefono',
+            'Toca Menu > Dispositivos vinculados',
+            'Toca Vincular un dispositivo',
+            'Escanea este codigo QR',
+          ].map((step, index) => (
             <li className="flex gap-3" key={step}>
               <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-xs font-bold text-emerald-700">
                 {index + 1}
@@ -440,7 +447,8 @@ function QrConnectionCard({
       </div>
 
       <div className="rounded-[18px] border border-emerald-100 bg-emerald-50 px-4 py-3 text-xs leading-5 text-emerald-800">
-        Este codigo QR es personal y temporal. No lo compartas con nadie para mantener segura la cuenta.
+        Este codigo QR es personal y temporal. No lo compartas con nadie para mantener segura la
+        cuenta.
       </div>
     </Card>
   )
@@ -488,7 +496,9 @@ function LinkedDevicesCard({ devices }: { devices: WhatsAppConfigurationLinkedDe
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-slate-950">Dispositivos vinculados</p>
-          <p className="mt-1 text-xs text-slate-500">Datos entregados por la API local del backend.</p>
+          <p className="mt-1 text-xs text-slate-500">
+            Datos entregados por la API local del backend.
+          </p>
         </div>
         <StatusBadge label={`${devices.length} dispositivo(s)`} tone="info" />
       </div>
@@ -508,11 +518,16 @@ function LinkedDevicesCard({ devices }: { devices: WhatsAppConfigurationLinkedDe
               <tr key={device.id}>
                 <td className="py-3">
                   <p className="font-semibold text-slate-950">{device.deviceName}</p>
-                  <p className="text-xs text-slate-500">{device.operatorName} · {device.browser}</p>
+                  <p className="text-xs text-slate-500">
+                    {device.operatorName} · {device.browser}
+                  </p>
                 </td>
                 <td className="py-3 text-slate-600">{device.location}</td>
                 <td className="py-3">
-                  <StatusBadge label={toDeviceStatusLabel(device.status)} tone={toDeviceStatusTone(device.status)} />
+                  <StatusBadge
+                    label={toDeviceStatusLabel(device.status)}
+                    tone={toDeviceStatusTone(device.status)}
+                  />
                 </td>
                 <td className="py-3 text-slate-600">{formatDateTime(device.lastActivityAt)}</td>
               </tr>
@@ -537,7 +552,9 @@ function PreferencesCard({
     <Card>
       <div>
         <p className="text-sm font-semibold text-slate-950">Preferencias generales</p>
-        <p className="mt-1 text-xs text-slate-500">Cada cambio se guarda inmediatamente mediante API.</p>
+        <p className="mt-1 text-xs text-slate-500">
+          Cada cambio se guarda inmediatamente mediante API.
+        </p>
       </div>
       <div className="mt-5 space-y-4">
         {preferenceDefinitions.map((preference) => (
@@ -574,14 +591,21 @@ function MainChannelCard({ configuration }: { configuration: WhatsAppConfigurati
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
         <InfoTile label="Nombre del canal" value={configuration.mainChannel.channelName} />
         <InfoTile label="Tipo de canal" value={configuration.mainChannel.channelType} />
-        <InfoTile label="Numero asociado" value={formatPhone(configuration.mainChannel.phoneNumber)} />
+        <InfoTile
+          label="Numero asociado"
+          value={formatPhone(configuration.mainChannel.phoneNumber)}
+        />
         <InfoTile label="Horario de atencion" value={configuration.mainChannel.businessHours} />
       </div>
     </Card>
   )
 }
 
-function SessionHistoryCard({ history }: { history: WhatsAppConfigurationSessionHistoryResponse[] }) {
+function SessionHistoryCard({
+  history,
+}: {
+  history: WhatsAppConfigurationSessionHistoryResponse[]
+}) {
   return (
     <Card>
       <div className="flex items-center justify-between gap-3">
@@ -607,7 +631,10 @@ function HistoryItem({ item }: { item: WhatsAppConfigurationSessionHistoryRespon
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-sm font-semibold text-slate-900">{item.title}</p>
-          <StatusBadge label={toHistoryToneLabel(item.tone)} tone={normalizeHistoryTone(item.tone)} />
+          <StatusBadge
+            label={toHistoryToneLabel(item.tone)}
+            tone={normalizeHistoryTone(item.tone)}
+          />
         </div>
         <p className="mt-1 text-xs text-slate-500">{item.actor}</p>
         <p className="mt-1 text-xs text-slate-400">{formatDateTime(item.occurredAt)}</p>

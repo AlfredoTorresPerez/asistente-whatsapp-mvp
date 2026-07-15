@@ -100,7 +100,8 @@ class FrontendTraceService {
       methodName: context.methodName,
       purpose: context.purpose,
       correlationId: context.correlationId,
-      executionTimeMs: 'startedAtMs' in context ? Math.round(performance.now() - context.startedAtMs) : undefined,
+      executionTimeMs:
+        'startedAtMs' in context ? Math.round(performance.now() - context.startedAtMs) : undefined,
       result: 'ERROR',
       error: this.normalizeError(error),
       data,
@@ -160,13 +161,16 @@ class FrontendTraceService {
       return
     }
 
-    const payload = this.sanitizeValue({
-      layer: 'frontend',
-      layerDescription: 'capa de interfaz',
-      level: level.toUpperCase(),
-      timestamp: new Date().toISOString(),
-      ...rawPayload,
-    }, 0)
+    const payload = this.sanitizeValue(
+      {
+        layer: 'frontend',
+        layerDescription: 'capa de interfaz',
+        level: level.toUpperCase(),
+        timestamp: new Date().toISOString(),
+        ...rawPayload,
+      },
+      0,
+    )
 
     const prefix = `[Frontend - capa de interfaz] ${message}`
 
@@ -213,9 +217,13 @@ class FrontendTraceService {
 
     if (typeof value === 'object') {
       const safeObject: Record<string, unknown> = {}
-      Object.entries(value as Record<string, unknown>).slice(0, 40).forEach(([key, item]) => {
-        safeObject[key] = this.isSensitiveKey(key) ? '[REDACTADO]' : this.sanitizeValue(item, depth + 1)
-      })
+      Object.entries(value as Record<string, unknown>)
+        .slice(0, 40)
+        .forEach(([key, item]) => {
+          safeObject[key] = this.isSensitiveKey(key)
+            ? '[REDACTADO]'
+            : this.sanitizeValue(item, depth + 1)
+        })
       return safeObject
     }
 
@@ -238,7 +246,9 @@ class FrontendTraceService {
 
   private isSensitiveKey(key: string) {
     const normalizedKey = key.replace(/[-_]/g, '').toLowerCase()
-    return sensitiveKeyFragments.some((fragment) => normalizedKey.includes(fragment.replace(/[-_]/g, '').toLowerCase()))
+    return sensitiveKeyFragments.some((fragment) =>
+      normalizedKey.includes(fragment.replace(/[-_]/g, '').toLowerCase()),
+    )
   }
 
   private truncate(value: string) {

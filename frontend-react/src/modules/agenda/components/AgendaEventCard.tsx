@@ -14,7 +14,14 @@ type AgendaEventCardProps = {
   style?: React.CSSProperties
 }
 
-export function AgendaEventCard({ item, isSelected, compact, onClick, showStatus, style }: AgendaEventCardProps) {
+export function AgendaEventCard({
+  item,
+  isSelected,
+  compact,
+  onClick,
+  showStatus,
+  style,
+}: AgendaEventCardProps) {
   const startTime = item.startTimeLocal ?? formatAgendaTime(item.startsAt)
   const endTime = item.endTimeLocal ?? formatAgendaTime(item.endsAt)
   const isWhatsApp = item.sourceChannel?.toUpperCase().includes('WHATSAPP')
@@ -49,9 +56,7 @@ export function AgendaEventCard({ item, isSelected, compact, onClick, showStatus
           <p className="truncate text-[10px] font-semibold leading-tight text-slate-800">
             {item.serviceName ?? item.subject}
           </p>
-          <p className="truncate text-[9px] leading-tight text-slate-500">
-            {item.customerName}
-          </p>
+          <p className="truncate text-[9px] leading-tight text-slate-500">{item.customerName}</p>
         </div>
       </button>
     )
@@ -69,10 +74,7 @@ export function AgendaEventCard({ item, isSelected, compact, onClick, showStatus
       type="button"
     >
       <div className="flex">
-        <div
-          className="w-1.5 shrink-0"
-          style={{ backgroundColor: statusStyle.hex }}
-        />
+        <div className="w-1.5 shrink-0" style={{ backgroundColor: statusStyle.hex }} />
         <div className="flex min-w-0 flex-1 flex-col gap-0.5 px-3 py-2.5">
           <div className="flex items-center justify-between gap-2">
             <span className="text-xs font-bold leading-tight text-slate-800">
@@ -87,9 +89,7 @@ export function AgendaEventCard({ item, isSelected, compact, onClick, showStatus
           <p className="truncate text-xs font-semibold leading-tight text-slate-900">
             {item.serviceName ?? item.subject}
           </p>
-          <p className="truncate text-[11px] leading-tight text-slate-500">
-            {item.customerName}
-          </p>
+          <p className="truncate text-[11px] leading-tight text-slate-500">{item.customerName}</p>
           {item.professionalName ? (
             <p className="truncate text-[10px] leading-tight text-slate-400">
               {item.professionalName}

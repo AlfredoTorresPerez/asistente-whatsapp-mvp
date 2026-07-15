@@ -8,7 +8,9 @@ import {
   translateConversationStatus,
 } from './conversationInbox'
 
-function conversation(overrides: Partial<ConversationSummaryResponse>): ConversationSummaryResponse {
+function conversation(
+  overrides: Partial<ConversationSummaryResponse>,
+): ConversationSummaryResponse {
   return {
     id: 'conversation-1',
     customerName: 'Laura Gomez',
@@ -30,7 +32,12 @@ function conversation(overrides: Partial<ConversationSummaryResponse>): Conversa
 describe('conversation inbox helpers', () => {
   const conversations = [
     conversation({ id: 'unread', unreadCount: 2, status: 'OPEN', customerName: 'Laura Gomez' }),
-    conversation({ id: 'assigned', assignedUserId: 'user-1', assignedUserName: 'Ana Lopez', status: 'IN_PROGRESS' }),
+    conversation({
+      id: 'assigned',
+      assignedUserId: 'user-1',
+      assignedUserName: 'Ana Lopez',
+      status: 'IN_PROGRESS',
+    }),
     conversation({ id: 'resolved', status: 'CLOSED', customerName: 'Carlos Martinez' }),
     conversation({ id: 'archived', status: 'ARCHIVED', customerName: 'Valentina Perez' }),
   ]

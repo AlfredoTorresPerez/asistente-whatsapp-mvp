@@ -8,7 +8,11 @@ type BusinessLocationSelectProps = {
   registration: UseFormRegisterReturn<'locationId'>
 }
 
-export function BusinessLocationSelect({ error, locations = [], registration }: BusinessLocationSelectProps) {
+export function BusinessLocationSelect({
+  error,
+  locations = [],
+  registration,
+}: BusinessLocationSelectProps) {
   const options = [
     {
       label: locations.length > 1 ? 'Selecciona sucursal' : 'Asignar sucursal automaticamente',
@@ -20,17 +24,10 @@ export function BusinessLocationSelect({ error, locations = [], registration }: 
     })),
   ]
 
-  const hint = locations.length > 1
-    ? 'Obligatorio cuando el negocio tiene mas de una sucursal activa.'
-    : 'Si hay una sola sucursal activa, se asigna automaticamente.'
+  const hint =
+    locations.length > 1
+      ? 'Obligatorio cuando el negocio tiene mas de una sucursal activa.'
+      : 'Si hay una sola sucursal activa, se asigna automaticamente.'
 
-  return (
-    <Select
-      error={error}
-      hint={hint}
-      label="Sucursal"
-      options={options}
-      {...registration}
-    />
-  )
+  return <Select error={error} hint={hint} label="Sucursal" options={options} {...registration} />
 }

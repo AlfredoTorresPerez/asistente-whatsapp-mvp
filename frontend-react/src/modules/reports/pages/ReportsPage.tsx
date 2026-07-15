@@ -117,16 +117,24 @@ function maskPhone(phone: string) {
 function KpiVariation({ value, label }: { value: number | null; label: string }) {
   if (value === null) return <span className="text-xs text-emerald-600 font-semibold">Nuevo</span>
   if (value === 0) return <span className="text-xs text-slate-400">0%</span>
-  const unfavorableIncrease = ['Canceladas', 'Ausencias', 'No asiste'].some(k => label.includes(k))
+  const unfavorableIncrease = ['Canceladas', 'Ausencias', 'No asiste'].some((k) =>
+    label.includes(k),
+  )
   const isPositive = unfavorableIncrease ? value < 0 : value > 0
   return (
     <span className={`text-xs font-semibold ${isPositive ? 'text-emerald-600' : 'text-red-600'}`}>
-      {value > 0 ? '+' : ''}{value}%
+      {value > 0 ? '+' : ''}
+      {value}%
     </span>
   )
 }
 
-function KpiCard({ label, currentValue, variationPercent, help }: {
+function KpiCard({
+  label,
+  currentValue,
+  variationPercent,
+  help,
+}: {
   label: string
   currentValue: number
   variationPercent: number | null
@@ -136,9 +144,10 @@ function KpiCard({ label, currentValue, variationPercent, help }: {
     <Card className="p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">{label}</p>
-          <p className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-slate-950"
-             title={help}>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+            {label}
+          </p>
+          <p className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-slate-950" title={help}>
             {label === 'Tasa de respuesta' || label === 'Conversion a cita'
               ? `${currentValue}%`
               : currentValue}
@@ -148,7 +157,9 @@ function KpiCard({ label, currentValue, variationPercent, help }: {
           </p>
         </div>
         <div className="group relative shrink-0">
-          <span className="inline-flex h-6 w-6 cursor-help items-center justify-center rounded-full border border-slate-200 text-xs font-semibold text-slate-400">?</span>
+          <span className="inline-flex h-6 w-6 cursor-help items-center justify-center rounded-full border border-slate-200 text-xs font-semibold text-slate-400">
+            ?
+          </span>
           <div className="absolute right-0 top-full z-10 mt-1 hidden w-64 rounded-xl border border-slate-200 bg-white p-3 text-xs leading-5 text-slate-600 shadow-lg group-hover:block">
             {help}
           </div>
@@ -198,11 +209,11 @@ export function ReportsPage() {
   const locations = locationsQuery.data ?? []
 
   const filteredProfessionals = filters.locationId
-    ? professionals.filter(p => !p.locationId || p.locationId === filters.locationId)
+    ? professionals.filter((p) => !p.locationId || p.locationId === filters.locationId)
     : professionals
 
   function handleFilterChange(key: string, value: string) {
-    setFilters(prev => {
+    setFilters((prev) => {
       const next = { ...prev, [key]: value }
       if (key === 'locationId') {
         next.professionalId = ''
@@ -227,7 +238,9 @@ export function ReportsPage() {
     rows.push('INDICADORES')
     rows.push('Indicador,Valor actual,Valor anterior,Variacion %')
     for (const kpi of data.kpis) {
-      rows.push(`${kpi.label},${kpi.currentValue},${kpi.previousValue},${kpi.variationPercent ?? '---'}`)
+      rows.push(
+        `${kpi.label},${kpi.currentValue},${kpi.previousValue},${kpi.variationPercent ?? '---'}`,
+      )
     }
     rows.push('')
 
@@ -241,7 +254,9 @@ export function ReportsPage() {
     rows.push('EMBUDO DE CONVERSION')
     rows.push('Etapa,Cantidad,Conversion etapa anterior,Conversion acumulada')
     for (const f of data.conversionFunnel) {
-      rows.push(`${f.name},${f.count},${f.conversionFromPrevious ?? '---'}%,${f.conversionFromFirst ?? '---'}%`)
+      rows.push(
+        `${f.name},${f.count},${f.conversionFromPrevious ?? '---'}%,${f.conversionFromFirst ?? '---'}%`,
+      )
     }
     rows.push('')
 
@@ -255,14 +270,20 @@ export function ReportsPage() {
     rows.push('CITAS POR DIA')
     rows.push('Fecha,Solicitada,Confirmada,Atendida,Cancelada,No asiste')
     for (const p of data.appointmentPerformance) {
-      rows.push(`${p.date},${p.solicitada},${p.confirmada},${p.completada},${p.cancelada},${p.ausencia}`)
+      rows.push(
+        `${p.date},${p.solicitada},${p.confirmada},${p.completada},${p.cancelada},${p.ausencia}`,
+      )
     }
     rows.push('')
 
     rows.push('PROSPECTOS')
-    rows.push('Nombre,Telefono,Ultimo contacto,Etapa,Responsable,Proxima cita,Sucursal,Servicio interes,Estado atencion')
+    rows.push(
+      'Nombre,Telefono,Ultimo contacto,Etapa,Responsable,Proxima cita,Sucursal,Servicio interes,Estado atencion',
+    )
     for (const p of data.prospects.items) {
-      rows.push(`${p.name},${p.phone},${p.lastContact},${p.stage},${p.responsible ?? ''},${p.nextAppointment ?? ''},${p.location ?? ''},${p.serviceInterest ?? ''},${p.attentionStatus}`)
+      rows.push(
+        `${p.name},${p.phone},${p.lastContact},${p.stage},${p.responsible ?? ''},${p.nextAppointment ?? ''},${p.location ?? ''},${p.serviceInterest ?? ''},${p.attentionStatus}`,
+      )
     }
 
     const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' })
@@ -279,7 +300,11 @@ export function ReportsPage() {
       <PageHeader
         actions={
           <div className="flex flex-wrap gap-2">
-            <Button disabled={!isOnline || reportsQuery.isFetching} onClick={clearFilters} variant="secondary">
+            <Button
+              disabled={!isOnline || reportsQuery.isFetching}
+              onClick={clearFilters}
+              variant="secondary"
+            >
               Limpiar filtros
             </Button>
             <Button disabled={!data || !isOnline} onClick={exportCsv} variant="secondary">
@@ -303,7 +328,7 @@ export function ReportsPage() {
             max={filters.to}
             type="date"
             value={filters.from}
-            onChange={e => handleFilterChange('from', e.target.value)}
+            onChange={(e) => handleFilterChange('from', e.target.value)}
           />
         </label>
         <label className="block">
@@ -313,7 +338,7 @@ export function ReportsPage() {
             min={filters.from}
             type="date"
             value={filters.to}
-            onChange={e => handleFilterChange('to', e.target.value)}
+            onChange={(e) => handleFilterChange('to', e.target.value)}
           />
         </label>
         <label className="block">
@@ -321,11 +346,13 @@ export function ReportsPage() {
           <select
             className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm min-w-[160px]"
             value={filters.locationId}
-            onChange={e => handleFilterChange('locationId', e.target.value)}
+            onChange={(e) => handleFilterChange('locationId', e.target.value)}
           >
             <option value="">Todas las sucursales</option>
-            {locations.map(l => (
-              <option key={l.id} value={l.id}>{l.name}</option>
+            {locations.map((l) => (
+              <option key={l.id} value={l.id}>
+                {l.name}
+              </option>
             ))}
           </select>
         </label>
@@ -334,11 +361,13 @@ export function ReportsPage() {
           <select
             className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm min-w-[160px]"
             value={filters.professionalId}
-            onChange={e => handleFilterChange('professionalId', e.target.value)}
+            onChange={(e) => handleFilterChange('professionalId', e.target.value)}
           >
             <option value="">Todos los profesionales</option>
-            {filteredProfessionals.map(p => (
-              <option key={p.id} value={p.id}>{p.name}</option>
+            {filteredProfessionals.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
             ))}
           </select>
         </label>
@@ -347,11 +376,13 @@ export function ReportsPage() {
           <select
             className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm min-w-[160px]"
             value={filters.serviceId}
-            onChange={e => handleFilterChange('serviceId', e.target.value)}
+            onChange={(e) => handleFilterChange('serviceId', e.target.value)}
           >
             <option value="">Todos los servicios</option>
-            {services.map(s => (
-              <option key={s.id} value={s.id}>{s.name}</option>
+            {services.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
             ))}
           </select>
         </label>
@@ -360,10 +391,12 @@ export function ReportsPage() {
           <select
             className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm min-w-[180px]"
             value={filters.bookingStatus}
-            onChange={e => handleFilterChange('bookingStatus', e.target.value)}
+            onChange={(e) => handleFilterChange('bookingStatus', e.target.value)}
           >
-            {BOOKING_STATUS_OPTIONS.map(o => (
-              <option key={o.value} value={o.value}>{o.label}</option>
+            {BOOKING_STATUS_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
             ))}
           </select>
         </label>
@@ -384,7 +417,7 @@ export function ReportsPage() {
       {data ? (
         <>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
-            {data.kpis.map(kpi => (
+            {data.kpis.map((kpi) => (
               <KpiCard key={kpi.label} {...kpi} />
             ))}
           </div>
@@ -392,10 +425,15 @@ export function ReportsPage() {
           <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
             <Card className="space-y-4 p-5">
               <p className="text-sm font-semibold text-slate-900">Conversaciones por canal</p>
-              {data.channelDistribution.length === 0 || data.channelDistribution.every(c => c.count === 0) ? (
-                <EmptyState description="No hay conversaciones en el periodo seleccionado." title="Sin datos" variant="card" />
+              {data.channelDistribution.length === 0 ||
+              data.channelDistribution.every((c) => c.count === 0) ? (
+                <EmptyState
+                  description="No hay conversaciones en el periodo seleccionado."
+                  title="Sin datos"
+                  variant="card"
+                />
               ) : (
-                data.channelDistribution.map(ch => (
+                data.channelDistribution.map((ch) => (
                   <div key={ch.channel}>
                     <div className="flex items-center justify-between text-sm">
                       <span className="font-medium text-slate-700">{ch.channel}</span>
@@ -403,7 +441,10 @@ export function ReportsPage() {
                     </div>
                     <div className="mt-2 flex items-center gap-2">
                       <div className="h-3 flex-1 overflow-hidden rounded-full bg-slate-100">
-                        <div className="h-full rounded-full bg-blue-500" style={{ width: `${Math.max(ch.percentage, 2)}%` }} />
+                        <div
+                          className="h-full rounded-full bg-blue-500"
+                          style={{ width: `${Math.max(ch.percentage, 2)}%` }}
+                        />
                       </div>
                       <span className="text-xs text-slate-500">{ch.percentage}%</span>
                     </div>
@@ -413,20 +454,51 @@ export function ReportsPage() {
             </Card>
 
             <Card className="p-5">
-              <p className="mb-4 text-sm font-semibold text-slate-900">Rendimiento de conversaciones</p>
+              <p className="mb-4 text-sm font-semibold text-slate-900">
+                Rendimiento de conversaciones
+              </p>
               {data.conversationPerformance.length === 0 ? (
-                <EmptyState description="No hay datos de conversaciones en el periodo." title="Sin datos" variant="card" />
+                <EmptyState
+                  description="No hay datos de conversaciones en el periodo."
+                  title="Sin datos"
+                  variant="card"
+                />
               ) : (
                 <ResponsiveContainer width="100%" height={280}>
                   <LineChart data={data.conversationPerformance}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                    <XAxis dataKey="date" tick={{ fontSize: 11 }} tickFormatter={v => dayjs(v).format('DD MMM')} />
+                    <XAxis
+                      dataKey="date"
+                      tick={{ fontSize: 11 }}
+                      tickFormatter={(v) => dayjs(v).format('DD MMM')}
+                    />
                     <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
-                    <Tooltip labelFormatter={v => formatDate(v as string)} />
+                    <Tooltip labelFormatter={(v) => formatDate(v as string)} />
                     <Legend />
-                    <Line type="monotone" dataKey="received" stroke="#3b82f6" strokeWidth={2} name="Recibidas" dot={false} />
-                    <Line type="monotone" dataKey="aiAnswered" stroke="#14b8a6" strokeWidth={2} name="Respondidas por IA" dot={false} />
-                    <Line type="monotone" dataKey="humanAnswered" stroke="#8b5cf6" strokeWidth={2} name="Atencion humana" dot={false} />
+                    <Line
+                      type="monotone"
+                      dataKey="received"
+                      stroke="#3b82f6"
+                      strokeWidth={2}
+                      name="Recibidas"
+                      dot={false}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="aiAnswered"
+                      stroke="#14b8a6"
+                      strokeWidth={2}
+                      name="Respondidas por IA"
+                      dot={false}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="humanAnswered"
+                      stroke="#8b5cf6"
+                      strokeWidth={2}
+                      name="Atencion humana"
+                      dot={false}
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               )}
@@ -437,7 +509,11 @@ export function ReportsPage() {
             <Card className="p-5">
               <p className="mb-4 text-sm font-semibold text-slate-900">Estado de citas</p>
               {data.appointmentDistribution.length === 0 ? (
-                <EmptyState description="No hay citas registradas en el periodo." title="Sin datos" variant="card" />
+                <EmptyState
+                  description="No hay citas registradas en el periodo."
+                  title="Sin datos"
+                  variant="card"
+                />
               ) : (
                 <ResponsiveContainer width="100%" height={280}>
                   <PieChart>
@@ -449,27 +525,34 @@ export function ReportsPage() {
                       cy="50%"
                       outerRadius={80}
                     >
-                      {data.appointmentDistribution.map(entry => (
+                      {data.appointmentDistribution.map((entry) => (
                         <Cell key={entry.status} fill={PIE_COLORS[entry.status] ?? '#94a3b8'} />
                       ))}
                     </Pie>
-                    <Tooltip content={({ active, payload }) => {
-                      if (!active || !payload?.length) return null
-                      const d = payload[0]?.payload as ReportsAppointmentDistributionPoint | undefined
-                      return (
-                        <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs shadow-lg">
-                          <p className="font-semibold text-slate-900">{d?.label ?? payload[0]?.name}</p>
-                          <p className="text-slate-600">{d?.count ?? payload[0]?.value} ({d?.percentage ?? 0}%)</p>
-                        </div>
-                      )
-                    }} />
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (!active || !payload?.length) return null
+                        const d = payload[0]?.payload as
+                          ReportsAppointmentDistributionPoint | undefined
+                        return (
+                          <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs shadow-lg">
+                            <p className="font-semibold text-slate-900">
+                              {d?.label ?? payload[0]?.name}
+                            </p>
+                            <p className="text-slate-600">
+                              {d?.count ?? payload[0]?.value} ({d?.percentage ?? 0}%)
+                            </p>
+                          </div>
+                        )
+                      }}
+                    />
                     <Legend
                       verticalAlign="bottom"
                       align="center"
                       iconType="circle"
                       iconSize={10}
                       formatter={(value: string) => {
-                        const entry = data.appointmentDistribution.find(e => e.label === value)
+                        const entry = data.appointmentDistribution.find((e) => e.label === value)
                         return `${value} (${entry?.count ?? 0})`
                       }}
                     />
@@ -480,8 +563,15 @@ export function ReportsPage() {
 
             <Card className="p-5">
               <p className="mb-4 text-sm font-semibold text-slate-900">Rendimiento de citas</p>
-              {data.appointmentPerformance.length === 0 || data.appointmentPerformance.every(p => p.solicitada + p.confirmada + p.completada + p.cancelada + p.ausencia === 0) ? (
-                <EmptyState description="No hay citas registradas en el periodo." title="Sin datos" variant="card" />
+              {data.appointmentPerformance.length === 0 ||
+              data.appointmentPerformance.every(
+                (p) => p.solicitada + p.confirmada + p.completada + p.cancelada + p.ausencia === 0,
+              ) ? (
+                <EmptyState
+                  description="No hay citas registradas en el periodo."
+                  title="Sin datos"
+                  variant="card"
+                />
               ) : (
                 <div className="overflow-x-auto max-h-[280px] overflow-y-auto">
                   <table className="w-full text-xs">
@@ -496,12 +586,20 @@ export function ReportsPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {data.appointmentPerformance.map(point => (
+                      {data.appointmentPerformance.map((point) => (
                         <tr key={point.date} className="border-t border-slate-100">
-                          <td className="py-2 pr-3 text-slate-700">{formatShortDate(point.date)}</td>
-                          <td className="py-2 pr-3 font-medium text-blue-600">{point.solicitada}</td>
-                          <td className="py-2 pr-3 font-medium text-emerald-600">{point.confirmada}</td>
-                          <td className="py-2 pr-3 font-medium text-slate-900">{point.completada}</td>
+                          <td className="py-2 pr-3 text-slate-700">
+                            {formatShortDate(point.date)}
+                          </td>
+                          <td className="py-2 pr-3 font-medium text-blue-600">
+                            {point.solicitada}
+                          </td>
+                          <td className="py-2 pr-3 font-medium text-emerald-600">
+                            {point.confirmada}
+                          </td>
+                          <td className="py-2 pr-3 font-medium text-slate-900">
+                            {point.completada}
+                          </td>
                           <td className="py-2 pr-3 font-medium text-red-500">{point.cancelada}</td>
                           <td className="py-2 font-medium text-amber-600">{point.ausencia}</td>
                         </tr>
@@ -514,9 +612,16 @@ export function ReportsPage() {
           </div>
 
           <Card className="p-5">
-            <p className="mb-4 text-sm font-semibold text-slate-900">Embudo de conversion comercial</p>
-            {data.conversionFunnel.length === 0 || data.conversionFunnel.every(f => f.count === 0) ? (
-              <EmptyState description="No hay datos suficientes para el embudo de conversion." title="Sin datos" variant="card" />
+            <p className="mb-4 text-sm font-semibold text-slate-900">
+              Embudo de conversion comercial
+            </p>
+            {data.conversionFunnel.length === 0 ||
+            data.conversionFunnel.every((f) => f.count === 0) ? (
+              <EmptyState
+                description="No hay datos suficientes para el embudo de conversion."
+                title="Sin datos"
+                variant="card"
+              />
             ) : (
               <FunnelChart funnel={data.conversionFunnel} />
             )}
@@ -535,30 +640,40 @@ export function ReportsPage() {
 }
 
 function FunnelChart({ funnel }: { funnel: ReportsFunnelStageResponse[] }) {
-  const maxCount = Math.max(...funnel.map(f => f.count), 1)
+  const maxCount = Math.max(...funnel.map((f) => f.count), 1)
 
   return (
     <div className="space-y-3">
-      {funnel.map(stage => {
+      {funnel.map((stage) => {
         const widthPct = maxCount > 0 ? (stage.count / maxCount) * 100 : 0
         return (
           <div key={stage.name} className="flex items-center gap-4">
-            <span className="w-44 text-right text-sm font-medium text-slate-700 shrink-0">{stage.name}</span>
+            <span className="w-44 text-right text-sm font-medium text-slate-700 shrink-0">
+              {stage.name}
+            </span>
             <div className="flex-1 flex items-center gap-3">
-              <div className="h-8 rounded-lg bg-gradient-to-r from-blue-500 to-blue-400 transition-all"
-                   style={{ width: `${Math.max(widthPct, 2)}%` }} />
-              <span className="text-sm font-semibold text-slate-900 whitespace-nowrap">{stage.count}</span>
+              <div
+                className="h-8 rounded-lg bg-gradient-to-r from-blue-500 to-blue-400 transition-all"
+                style={{ width: `${Math.max(widthPct, 2)}%` }}
+              />
+              <span className="text-sm font-semibold text-slate-900 whitespace-nowrap">
+                {stage.count}
+              </span>
             </div>
             <div className="w-28 text-right shrink-0">
               {stage.conversionFromPrevious != null ? (
-                <span className="text-xs text-slate-500">{stage.conversionFromPrevious}% vs. anterior</span>
+                <span className="text-xs text-slate-500">
+                  {stage.conversionFromPrevious}% vs. anterior
+                </span>
               ) : (
                 <span className="text-xs text-slate-400">---</span>
               )}
             </div>
             <div className="w-28 text-right shrink-0">
               {stage.conversionFromFirst != null ? (
-                <span className="text-xs text-emerald-600 font-medium">{stage.conversionFromFirst}% acumulado</span>
+                <span className="text-xs text-emerald-600 font-medium">
+                  {stage.conversionFromFirst}% acumulado
+                </span>
               ) : (
                 <span className="text-xs text-slate-400">100%</span>
               )}
@@ -587,7 +702,9 @@ function ProspectTable({
     <Card className="p-0">
       <div className="flex flex-col gap-3 border-b border-slate-200 px-5 py-4 xl:flex-row xl:items-center xl:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Vista operacional</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
+            Vista operacional
+          </p>
           <h2 className="mt-2 text-xl font-semibold text-slate-900">Prospectos y actividad</h2>
           <p className="mt-1 text-sm text-slate-500">{prospects.total} registro(s) encontrado(s)</p>
         </div>
@@ -595,7 +712,11 @@ function ProspectTable({
 
       {prospects.items.length === 0 ? (
         <div className="px-5 py-8">
-          <EmptyState description="No se encontraron prospectos para el periodo y filtros seleccionados." title="Sin resultados" variant="card" />
+          <EmptyState
+            description="No se encontraron prospectos para el periodo y filtros seleccionados."
+            title="Sin resultados"
+            variant="card"
+          />
         </div>
       ) : (
         <DataTableShell
@@ -611,16 +732,30 @@ function ProspectTable({
             'Servicio de interes',
             'Estado atencion',
           ]}
-          rows={prospects.items.map(p => buildProspectRow(p))}
+          rows={prospects.items.map((p) => buildProspectRow(p))}
         />
       )}
 
       {totalPages > 1 ? (
         <div className="flex items-center justify-between border-t border-slate-200 px-5 py-3">
-          <span className="text-sm text-slate-500">Pagina {page + 1} de {totalPages}</span>
+          <span className="text-sm text-slate-500">
+            Pagina {page + 1} de {totalPages}
+          </span>
           <div className="flex gap-2">
-            <Button disabled={page === 0} onClick={() => onPageChange(page - 1)} variant="secondary">Anterior</Button>
-            <Button disabled={page >= totalPages - 1} onClick={() => onPageChange(page + 1)} variant="secondary">Siguiente</Button>
+            <Button
+              disabled={page === 0}
+              onClick={() => onPageChange(page - 1)}
+              variant="secondary"
+            >
+              Anterior
+            </Button>
+            <Button
+              disabled={page >= totalPages - 1}
+              onClick={() => onPageChange(page + 1)}
+              variant="secondary"
+            >
+              Siguiente
+            </Button>
           </div>
         </div>
       ) : null}
@@ -633,15 +768,37 @@ function buildProspectRow(p: ReportsProspectRowResponse) {
     id: p.id,
     href: `/prospects/${p.id}`,
     cells: [
-      <span key={`${p.id}-name`} className="font-medium text-slate-900">{p.name}</span>,
-      <span key={`${p.id}-phone`} className="text-slate-600">{maskPhone(p.phone)}</span>,
-      <span key={`${p.id}-contact`} className="text-slate-600">{formatShortDate(p.lastContact)}</span>,
-      <StatusBadge key={`${p.id}-stage`} label={STAGE_LABELS[p.stage] ?? p.stage} tone={STAGE_TONES[p.stage] ?? 'neutral'} />,
-      <span key={`${p.id}-resp`} className="text-slate-600">{p.responsible ?? '---'}</span>,
-      <span key={`${p.id}-next`} className="text-slate-600">{formatShortDate(p.nextAppointment)}</span>,
-      <span key={`${p.id}-loc`} className="text-slate-600">{p.location ?? '---'}</span>,
-      <span key={`${p.id}-svc`} className="text-slate-600">{p.serviceInterest ?? '---'}</span>,
-      <StatusBadge key={`${p.id}-attn`} label={p.attentionStatus} tone={ATTENTION_TONES[p.attentionStatus] ?? 'neutral'} />,
+      <span key={`${p.id}-name`} className="font-medium text-slate-900">
+        {p.name}
+      </span>,
+      <span key={`${p.id}-phone`} className="text-slate-600">
+        {maskPhone(p.phone)}
+      </span>,
+      <span key={`${p.id}-contact`} className="text-slate-600">
+        {formatShortDate(p.lastContact)}
+      </span>,
+      <StatusBadge
+        key={`${p.id}-stage`}
+        label={STAGE_LABELS[p.stage] ?? p.stage}
+        tone={STAGE_TONES[p.stage] ?? 'neutral'}
+      />,
+      <span key={`${p.id}-resp`} className="text-slate-600">
+        {p.responsible ?? '---'}
+      </span>,
+      <span key={`${p.id}-next`} className="text-slate-600">
+        {formatShortDate(p.nextAppointment)}
+      </span>,
+      <span key={`${p.id}-loc`} className="text-slate-600">
+        {p.location ?? '---'}
+      </span>,
+      <span key={`${p.id}-svc`} className="text-slate-600">
+        {p.serviceInterest ?? '---'}
+      </span>,
+      <StatusBadge
+        key={`${p.id}-attn`}
+        label={p.attentionStatus}
+        tone={ATTENTION_TONES[p.attentionStatus] ?? 'neutral'}
+      />,
     ],
   }
 }

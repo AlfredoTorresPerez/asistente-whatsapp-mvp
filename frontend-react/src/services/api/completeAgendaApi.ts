@@ -45,7 +45,6 @@ export function createTemporaryAgendaBookingRequest(payload: CreateTemporaryAgen
   })
 }
 
-
 export function getAgendaFilterOptionsRequest(filters: { locationId?: string } = {}) {
   return apiFetch<AgendaFilterOptionsResponse>(`/agenda/filter-options${toSearchParams(filters)}`)
 }
@@ -62,7 +61,10 @@ export function getAgendaCalendarRequest(filters: {
   return apiFetch<AgendaCalendarResponse>(`/agenda/calendar${toSearchParams(filters)}`)
 }
 
-export function rescheduleAgendaBookingRequest(bookingId: string, payload: AgendaRescheduleRequest) {
+export function rescheduleAgendaBookingRequest(
+  bookingId: string,
+  payload: AgendaRescheduleRequest,
+) {
   return apiFetch<BookingDetailResponse>(`/agenda/bookings/${bookingId}/reschedule`, {
     method: 'PATCH',
     body: JSON.stringify(payload),

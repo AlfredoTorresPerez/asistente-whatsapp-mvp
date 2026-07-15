@@ -39,7 +39,10 @@ const DEFAULT_ITEM: AgendaCalendarItemResponse = {
   type: 'BOOKING',
 }
 
-function makeItem(startsAt: string, overrides: Partial<AgendaCalendarItemResponse> = {}): AgendaCalendarItemResponse {
+function makeItem(
+  startsAt: string,
+  overrides: Partial<AgendaCalendarItemResponse> = {},
+): AgendaCalendarItemResponse {
   const durationMinutes = overrides.durationMinutes ?? 60
   const startsAtDate = new Date(startsAt)
   const endsAtDate = new Date(startsAtDate.getTime() + durationMinutes * 60000)
@@ -52,7 +55,9 @@ function makeItem(startsAt: string, overrides: Partial<AgendaCalendarItemRespons
   }
 }
 
-function makeBusinessHours(overrides: Partial<BusinessHoursResponse> & { dayOfWeek: number }): BusinessHoursResponse {
+function makeBusinessHours(
+  overrides: Partial<BusinessHoursResponse> & { dayOfWeek: number },
+): BusinessHoursResponse {
   return {
     startTime: '09:00',
     endTime: '19:00',
@@ -60,7 +65,9 @@ function makeBusinessHours(overrides: Partial<BusinessHoursResponse> & { dayOfWe
   }
 }
 
-function makeDayAvailability(overrides: Partial<DayAvailability> & { dateKey: string }): DayAvailability {
+function makeDayAvailability(
+  overrides: Partial<DayAvailability> & { dateKey: string },
+): DayAvailability {
   return {
     dayOfWeek: 3,
     hasBusinessHours: true,
@@ -85,7 +92,12 @@ describe('computeScheduleRange', () => {
       makeDayAvailability({ dateKey: '2026-07-15', dayOfWeek: 3, startHour: 9, endHour: 19 }),
     ]
     const items = [
-      makeItem('2026-07-16T01:50:00.000Z', { startTimeLocal: '21:50', endTimeLocal: '22:50', dateLocal: '2026-07-15', durationMinutes: 60 }),
+      makeItem('2026-07-16T01:50:00.000Z', {
+        startTimeLocal: '21:50',
+        endTimeLocal: '22:50',
+        dateLocal: '2026-07-15',
+        durationMinutes: 60,
+      }),
     ]
     const result = computeScheduleRange(availability, items)
     expect(result.scheduleStartHour).toBe(9)
@@ -97,7 +109,12 @@ describe('computeScheduleRange', () => {
       makeDayAvailability({ dateKey: '2026-07-15', dayOfWeek: 3, startHour: 9, endHour: 19 }),
     ]
     const items = [
-      makeItem('2026-07-15T12:00:00-04:00', { startTimeLocal: '12:00', endTimeLocal: '13:00', dateLocal: '2026-07-15', durationMinutes: 60 }),
+      makeItem('2026-07-15T12:00:00-04:00', {
+        startTimeLocal: '12:00',
+        endTimeLocal: '13:00',
+        dateLocal: '2026-07-15',
+        durationMinutes: 60,
+      }),
     ]
     const result = computeScheduleRange(availability, items)
     expect(result.scheduleStartHour).toBe(9)
@@ -112,7 +129,12 @@ describe('computeScheduleRange', () => {
 
   it('extiende el rango cuando no hay disponibilidad pero hay items', () => {
     const items = [
-      makeItem('2026-07-16T01:50:00.000Z', { startTimeLocal: '21:50', endTimeLocal: '22:50', dateLocal: '2026-07-15', durationMinutes: 60 }),
+      makeItem('2026-07-16T01:50:00.000Z', {
+        startTimeLocal: '21:50',
+        endTimeLocal: '22:50',
+        dateLocal: '2026-07-15',
+        durationMinutes: 60,
+      }),
     ]
     const result = computeScheduleRange([], items)
     expect(result.scheduleStartHour).toBeLessThanOrEqual(21)
@@ -124,7 +146,12 @@ describe('computeScheduleRange', () => {
       makeDayAvailability({ dateKey: '2026-07-15', dayOfWeek: 3, startHour: 9, endHour: 19 }),
     ]
     const items = [
-      makeItem('2026-07-15T08:00:00-04:00', { startTimeLocal: '08:00', endTimeLocal: '08:30', dateLocal: '2026-07-15', durationMinutes: 30 }),
+      makeItem('2026-07-15T08:00:00-04:00', {
+        startTimeLocal: '08:00',
+        endTimeLocal: '08:30',
+        dateLocal: '2026-07-15',
+        durationMinutes: 30,
+      }),
     ]
     const result = computeScheduleRange(availability, items)
     expect(result.scheduleStartHour).toBe(8)
@@ -136,7 +163,12 @@ describe('computeScheduleRange', () => {
       makeDayAvailability({ dateKey: '2026-07-15', dayOfWeek: 3, startHour: 9, endHour: 19 }),
     ]
     const items = [
-      makeItem('2026-07-15T18:00:00-04:00', { startTimeLocal: '18:00', endTimeLocal: '20:00', dateLocal: '2026-07-15', durationMinutes: 120 }),
+      makeItem('2026-07-15T18:00:00-04:00', {
+        startTimeLocal: '18:00',
+        endTimeLocal: '20:00',
+        dateLocal: '2026-07-15',
+        durationMinutes: 120,
+      }),
     ]
     const result = computeScheduleRange(availability, items)
     expect(result.scheduleEndHour).toBeGreaterThanOrEqual(20)
@@ -147,8 +179,19 @@ describe('computeScheduleRange', () => {
       makeDayAvailability({ dateKey: '2026-07-15', dayOfWeek: 3, startHour: 9, endHour: 19 }),
     ]
     const items = [
-      makeItem('2026-07-16T01:50:00.000Z', { startTimeLocal: '21:50', endTimeLocal: '22:50', dateLocal: '2026-07-15', durationMinutes: 60 }),
-      makeItem('2026-07-15T10:00:00-04:00', { startTimeLocal: '10:00', endTimeLocal: '10:30', dateLocal: '2026-07-15', durationMinutes: 30, bookingId: 'other' }),
+      makeItem('2026-07-16T01:50:00.000Z', {
+        startTimeLocal: '21:50',
+        endTimeLocal: '22:50',
+        dateLocal: '2026-07-15',
+        durationMinutes: 60,
+      }),
+      makeItem('2026-07-15T10:00:00-04:00', {
+        startTimeLocal: '10:00',
+        endTimeLocal: '10:30',
+        dateLocal: '2026-07-15',
+        durationMinutes: 30,
+        bookingId: 'other',
+      }),
     ]
     const result = computeScheduleRange(availability, items)
     expect(result.scheduleStartHour).toBe(9)
@@ -158,8 +201,13 @@ describe('computeScheduleRange', () => {
 
 describe('buildDayAvailability', () => {
   const visibleDays = [
-    dayjs('2026-07-13'), dayjs('2026-07-14'), dayjs('2026-07-15'),
-    dayjs('2026-07-16'), dayjs('2026-07-17'), dayjs('2026-07-18'), dayjs('2026-07-19'),
+    dayjs('2026-07-13'),
+    dayjs('2026-07-14'),
+    dayjs('2026-07-15'),
+    dayjs('2026-07-16'),
+    dayjs('2026-07-17'),
+    dayjs('2026-07-18'),
+    dayjs('2026-07-19'),
   ]
 
   it('convierte business hours a DayAvailability correctamente', () => {
@@ -197,7 +245,11 @@ describe('getScheduleHours', () => {
 
 describe('getLocalHourMinute', () => {
   it('usa startTimeLocal cuando existe', () => {
-    const item = makeItem('2026-07-16T01:50:00.000Z', { startTimeLocal: '21:50', endTimeLocal: '22:50', dateLocal: '2026-07-15' })
+    const item = makeItem('2026-07-16T01:50:00.000Z', {
+      startTimeLocal: '21:50',
+      endTimeLocal: '22:50',
+      dateLocal: '2026-07-15',
+    })
     const result = getLocalHourMinute(item)
     expect(result.hour).toBe(21)
     expect(result.minute).toBe(50)
@@ -216,7 +268,11 @@ describe('getEventsForDayAndHour', () => {
   it('filtra items por dia y hora exacta', () => {
     const items = [
       makeItem('2026-07-16T01:50:00.000Z', { startTimeLocal: '21:50', dateLocal: '2026-07-15' }),
-      makeItem('2026-07-15T10:00:00-04:00', { startTimeLocal: '10:00', dateLocal: '2026-07-15', bookingId: 'other' }),
+      makeItem('2026-07-15T10:00:00-04:00', {
+        startTimeLocal: '10:00',
+        dateLocal: '2026-07-15',
+        bookingId: 'other',
+      }),
     ]
     const result = getEventsForDayAndHour(items, '2026-07-15', 21)
     expect(result).toHaveLength(1)
@@ -236,8 +292,16 @@ describe('getAllEventsForDay', () => {
   it('retorna todos los items de un dia', () => {
     const items = [
       makeItem('2026-07-16T01:50:00.000Z', { startTimeLocal: '21:50', dateLocal: '2026-07-15' }),
-      makeItem('2026-07-15T10:00:00-04:00', { startTimeLocal: '10:00', dateLocal: '2026-07-15', bookingId: 'other' }),
-      makeItem('2026-07-16T10:00:00-04:00', { startTimeLocal: '10:00', dateLocal: '2026-07-16', bookingId: 'next-day' }),
+      makeItem('2026-07-15T10:00:00-04:00', {
+        startTimeLocal: '10:00',
+        dateLocal: '2026-07-15',
+        bookingId: 'other',
+      }),
+      makeItem('2026-07-16T10:00:00-04:00', {
+        startTimeLocal: '10:00',
+        dateLocal: '2026-07-16',
+        bookingId: 'next-day',
+      }),
     ]
     const result = getAllEventsForDay(items, '2026-07-15')
     expect(result).toHaveLength(2)
@@ -246,7 +310,11 @@ describe('getAllEventsForDay', () => {
 
 describe('layoutEventsInCell', () => {
   it('posiciona evento unico correctamente', () => {
-    const item = makeItem('2026-07-16T01:50:00.000Z', { startTimeLocal: '21:50', dateLocal: '2026-07-15', durationMinutes: 60 })
+    const item = makeItem('2026-07-16T01:50:00.000Z', {
+      startTimeLocal: '21:50',
+      dateLocal: '2026-07-15',
+      durationMinutes: 60,
+    })
     const layouts = layoutEventsInCell([item], baseHourHeight)
     expect(layouts).toHaveLength(1)
     expect(layouts[0].top).toBeGreaterThan(0)
@@ -256,8 +324,18 @@ describe('layoutEventsInCell', () => {
 
   it('posiciona eventos multiples en paralelo', () => {
     const items = [
-      makeItem('2026-07-15T10:00:00-04:00', { startTimeLocal: '10:00', dateLocal: '2026-07-15', bookingId: 'a', durationMinutes: 30 }),
-      makeItem('2026-07-15T10:15:00-04:00', { startTimeLocal: '10:15', dateLocal: '2026-07-15', bookingId: 'b', durationMinutes: 30 }),
+      makeItem('2026-07-15T10:00:00-04:00', {
+        startTimeLocal: '10:00',
+        dateLocal: '2026-07-15',
+        bookingId: 'a',
+        durationMinutes: 30,
+      }),
+      makeItem('2026-07-15T10:15:00-04:00', {
+        startTimeLocal: '10:15',
+        dateLocal: '2026-07-15',
+        bookingId: 'b',
+        durationMinutes: 30,
+      }),
     ]
     const layouts = layoutEventsInCell(items, baseHourHeight)
     expect(layouts).toHaveLength(2)
@@ -267,16 +345,31 @@ describe('layoutEventsInCell', () => {
 
 describe('buildAgendaHourLayout', () => {
   const visibleDays = [
-    dayjs('2026-07-13'), dayjs('2026-07-14'), dayjs('2026-07-15'),
-    dayjs('2026-07-16'), dayjs('2026-07-17'), dayjs('2026-07-18'), dayjs('2026-07-19'),
+    dayjs('2026-07-13'),
+    dayjs('2026-07-14'),
+    dayjs('2026-07-15'),
+    dayjs('2026-07-16'),
+    dayjs('2026-07-17'),
+    dayjs('2026-07-18'),
+    dayjs('2026-07-19'),
   ]
 
   it('incluye items aunque esten fuera del horario laboral si el schedule range lo permite', () => {
     const items = [
-      makeItem('2026-07-16T01:50:00.000Z', { startTimeLocal: '21:50', dateLocal: '2026-07-15', durationMinutes: 60 }),
+      makeItem('2026-07-16T01:50:00.000Z', {
+        startTimeLocal: '21:50',
+        dateLocal: '2026-07-15',
+        durationMinutes: 60,
+      }),
     ]
     const dayAvailability = [
-      makeDayAvailability({ dateKey: '2026-07-15', dayOfWeek: 3, startHour: 9, endHour: 19, hasBusinessHours: true }),
+      makeDayAvailability({
+        dateKey: '2026-07-15',
+        dayOfWeek: 3,
+        startHour: 9,
+        endHour: 19,
+        hasBusinessHours: true,
+      }),
     ]
     const result = buildAgendaHourLayout(items, visibleDays, dayAvailability, 9, 23)
     expect(result.byHour[21]).toBeDefined()

@@ -75,8 +75,10 @@ export function CurrentTimeLine({
         className="border-t-2 border-dashed border-rose-400/80"
         style={{ position: 'absolute', top, left: `${timeColumnWidth + 4}px`, right: 0 }}
       >
-        <span className="absolute -top-3 rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-bold text-rose-600 shadow-sm"
-          style={{ left: '4px' }}>
+        <span
+          className="absolute -top-3 rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-bold text-rose-600 shadow-sm"
+          style={{ left: '4px' }}
+        >
           Ahora {label}
         </span>
       </div>

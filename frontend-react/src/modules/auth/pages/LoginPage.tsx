@@ -69,8 +69,8 @@ export function LoginPage() {
             Iniciar sesion
           </h2>
           <p className="mt-3 text-sm leading-6 text-[var(--color-text-secondary)]">
-            Ingresa con tu cuenta para gestionar conversaciones, prospectos y pedidos
-            desde un solo lugar.
+            Ingresa con tu cuenta para gestionar conversaciones, prospectos y pedidos desde un solo
+            lugar.
           </p>
         </div>
         <StatusBadge label="Demo" tone="info" />
@@ -85,7 +85,8 @@ export function LoginPage() {
             <div className="min-w-0">
               <p className="text-sm font-semibold text-[var(--color-text)]">Modo demo local</p>
               <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
-                Las credenciales de prueba deben estar documentadas solo para el entorno local controlado.
+                Las credenciales de prueba deben estar documentadas solo para el entorno local
+                controlado.
               </p>
             </div>
           </div>
@@ -166,8 +167,21 @@ function LockShieldIcon() {
         strokeLinejoin="round"
         strokeWidth="1.8"
       />
-      <path d="M9.5 11.5V10.75C9.5 9.23 10.73 8 12.25 8C13.77 8 15 9.23 15 10.75V11.5" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
-      <rect height="4.5" rx="1.4" stroke="currentColor" strokeWidth="1.8" width="6" x="9" y="11.5" />
+      <path
+        d="M9.5 11.5V10.75C9.5 9.23 10.73 8 12.25 8C13.77 8 15 9.23 15 10.75V11.5"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.8"
+      />
+      <rect
+        height="4.5"
+        rx="1.4"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        width="6"
+        x="9"
+        y="11.5"
+      />
     </svg>
   )
 }

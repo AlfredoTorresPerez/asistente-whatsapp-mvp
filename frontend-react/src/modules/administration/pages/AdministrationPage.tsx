@@ -104,7 +104,12 @@ export function AdministrationPage() {
               note={`${summary.users.active} usuario(s) activo(s) en la operacion actual.`}
             />
             <SummaryCard
-              badge={<StatusBadge label={toWhatsAppWebLabel(summary.whatsappWeb.status)} tone={getWhatsAppWebTone(summary.whatsappWeb.status)} />}
+              badge={
+                <StatusBadge
+                  label={toWhatsAppWebLabel(summary.whatsappWeb.status)}
+                  tone={getWhatsAppWebTone(summary.whatsappWeb.status)}
+                />
+              }
               label="Estado WhatsApp Web"
               value="Canal experimental"
               note="Adaptador desacoplado para demos, validacion temprana y pilotos controlados."
@@ -118,10 +123,14 @@ export function AdministrationPage() {
 
           <AdminAreaTabs activeArea={activeArea} onChange={setActiveArea} summary={summary} />
 
-          {activeArea === 'company' ? <CompanyAdminPanel companyName={summary.company.companyName} /> : null}
+          {activeArea === 'company' ? (
+            <CompanyAdminPanel companyName={summary.company.companyName} />
+          ) : null}
           {activeArea === 'locations' ? <LocationsAdminPanel /> : null}
           {activeArea === 'multisite' ? <MultisiteAdminPanel /> : null}
-          {activeArea === 'whatsapp-web' ? <WhatsAppAdminPanel status={summary.whatsappWeb.status} /> : null}
+          {activeArea === 'whatsapp-web' ? (
+            <WhatsAppAdminPanel status={summary.whatsappWeb.status} />
+          ) : null}
           {activeArea === 'users' ? (
             <UsersAdminPanel activeUsers={summary.users.active} totalUsers={summary.users.total} />
           ) : null}
@@ -188,7 +197,12 @@ function AdminAreaTabs({
       value: 'multisite',
     },
     {
-      badge: <StatusBadge label={toWhatsAppWebLabel(summary.whatsappWeb.status)} tone={getWhatsAppWebTone(summary.whatsappWeb.status)} />,
+      badge: (
+        <StatusBadge
+          label={toWhatsAppWebLabel(summary.whatsappWeb.status)}
+          tone={getWhatsAppWebTone(summary.whatsappWeb.status)}
+        />
+      ),
       description: 'Estado, QR, reconexion y pruebas del canal',
       label: 'Conexion WhatsApp Web',
       value: 'whatsapp-web',
@@ -240,7 +254,9 @@ function CompanyAdminPanel({ companyName }: { companyName: string }) {
           <StatusBadge label="Empresa" tone="info" />
           <h2 className="mt-3 text-xl font-semibold text-slate-950">Configuracion de empresa</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-            Administra los datos base de {companyName}: nombre comercial, contacto principal, moneda y zona horaria. Esta informacion se reutiliza en paneles, reglas de negocio y respuestas asistidas.
+            Administra los datos base de {companyName}: nombre comercial, contacto principal, moneda
+            y zona horaria. Esta informacion se reutiliza en paneles, reglas de negocio y respuestas
+            asistidas.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link to="/admin/company">
@@ -249,7 +265,9 @@ function CompanyAdminPanel({ companyName }: { companyName: string }) {
           </div>
         </div>
         <div className="border-t border-[var(--color-border)] bg-slate-50 p-5 lg:border-l lg:border-t-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Datos principales</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+            Datos principales
+          </p>
           <dl className="mt-4 space-y-3 text-sm">
             <div>
               <dt className="text-slate-500">Empresa activa</dt>
@@ -266,16 +284,18 @@ function CompanyAdminPanel({ companyName }: { companyName: string }) {
   )
 }
 
-
 function MultisiteAdminPanel() {
   return (
     <Card className="overflow-hidden p-0">
       <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="p-5">
           <StatusBadge label="Multisede" tone="info" />
-          <h2 className="mt-3 text-xl font-semibold text-slate-950">Operacion multisede completa</h2>
+          <h2 className="mt-3 text-xl font-semibold text-slate-950">
+            Operacion multisede completa
+          </h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-            Controla disponibilidad de catalogo, stock, profesionales, horarios, permisos de usuario y canales WhatsApp por sede.
+            Controla disponibilidad de catalogo, stock, profesionales, horarios, permisos de usuario
+            y canales WhatsApp por sede.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link to="/admin/multisite">
@@ -284,7 +304,9 @@ function MultisiteAdminPanel() {
           </div>
         </div>
         <div className="border-t border-[var(--color-border)] bg-slate-50 p-5 lg:border-l lg:border-t-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Cobertura</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+            Cobertura
+          </p>
           <ul className="mt-4 space-y-2 text-sm text-slate-700">
             <li>Catalogo y stock por sede</li>
             <li>Profesionales y horarios por sede</li>
@@ -304,7 +326,8 @@ function LocationsAdminPanel() {
           <StatusBadge label="Multisede" tone="info" />
           <h2 className="mt-3 text-xl font-semibold text-slate-950">Sedes del negocio</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-            Define las sedes que se usaran en agenda, conversaciones y futuras reglas de profesionales por sucursal.
+            Define las sedes que se usaran en agenda, conversaciones y futuras reglas de
+            profesionales por sucursal.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link to="/admin/locations">
@@ -313,7 +336,9 @@ function LocationsAdminPanel() {
           </div>
         </div>
         <div className="border-t border-[var(--color-border)] bg-slate-50 p-5 lg:border-l lg:border-t-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Operacion</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+            Operacion
+          </p>
           <p className="mt-4 text-2xl font-semibold text-slate-950">Agenda multisede</p>
           <p className="mt-2 text-sm leading-6 text-slate-700">
             Las citas pueden quedar asociadas a una sede real y no solo a una ubicacion en texto.
@@ -335,7 +360,8 @@ function WhatsAppAdminPanel({ status }: { status: string }) {
           </div>
           <h2 className="mt-3 text-xl font-semibold text-slate-950">Conexion WhatsApp Web</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-            Controla el estado del adaptador desacoplado, generacion de QR, reconexion y pruebas de envio. Mantiene la operacion separada para demos y validaciones controladas.
+            Controla el estado del adaptador desacoplado, generacion de QR, reconexion y pruebas de
+            envio. Mantiene la operacion separada para demos y validaciones controladas.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link to="/admin/whatsapp-web">
@@ -344,10 +370,13 @@ function WhatsAppAdminPanel({ status }: { status: string }) {
           </div>
         </div>
         <div className="border-t border-[var(--color-border)] bg-amber-50 p-5 lg:border-l lg:border-t-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-700">Estado del canal</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-700">
+            Estado del canal
+          </p>
           <p className="mt-4 text-2xl font-semibold text-slate-950">{toWhatsAppWebLabel(status)}</p>
           <p className="mt-2 text-sm leading-6 text-slate-700">
-            Para produccion, prioriza Cloud API o modo de simulacion controlado segun configuracion del ambiente.
+            Para produccion, prioriza Cloud API o modo de simulacion controlado segun configuracion
+            del ambiente.
           </p>
         </div>
       </div>
@@ -363,7 +392,8 @@ function UsersAdminPanel({ activeUsers, totalUsers }: { activeUsers: number; tot
           <StatusBadge label="Accesos" tone="info" />
           <h2 className="mt-3 text-xl font-semibold text-slate-950">Usuarios y roles</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-            Revisa usuarios registrados, roles operativos y asignacion de responsables para conversaciones, citas y administracion del negocio.
+            Revisa usuarios registrados, roles operativos y asignacion de responsables para
+            conversaciones, citas y administracion del negocio.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link to="/admin/users">
@@ -372,9 +402,15 @@ function UsersAdminPanel({ activeUsers, totalUsers }: { activeUsers: number; tot
           </div>
         </div>
         <div className="border-t border-[var(--color-border)] bg-slate-50 p-5 lg:border-l lg:border-t-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Resumen de usuarios</p>
-          <p className="mt-4 text-2xl font-semibold text-slate-950">{activeUsers}/{totalUsers}</p>
-          <p className="mt-2 text-sm leading-6 text-slate-700">Usuarios activos sobre el total registrado.</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+            Resumen de usuarios
+          </p>
+          <p className="mt-4 text-2xl font-semibold text-slate-950">
+            {activeUsers}/{totalUsers}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-slate-700">
+            Usuarios activos sobre el total registrado.
+          </p>
         </div>
       </div>
     </Card>
@@ -389,7 +425,8 @@ function SecurityAdminPanel({ sessionTimeoutMinutes }: { sessionTimeoutMinutes: 
           <StatusBadge label="Seguridad" tone="neutral" />
           <h2 className="mt-3 text-xl font-semibold text-slate-950">Seguridad</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-            Centraliza politicas, sesiones, auditoria y controles administrativos. La vista conserva una estructura compacta para mantener el panel contenido.
+            Centraliza politicas, sesiones, auditoria y controles administrativos. La vista conserva
+            una estructura compacta para mantener el panel contenido.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link to="/admin/security">
@@ -400,7 +437,9 @@ function SecurityAdminPanel({ sessionTimeoutMinutes }: { sessionTimeoutMinutes: 
         <div className="border-t border-[var(--color-border)] bg-slate-50 p-5 lg:border-l lg:border-t-0">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Sesion</p>
           <p className="mt-4 text-2xl font-semibold text-slate-950">{sessionTimeoutMinutes} min</p>
-          <p className="mt-2 text-sm leading-6 text-slate-700">Tiempo de espera configurado para sesiones administrativas.</p>
+          <p className="mt-2 text-sm leading-6 text-slate-700">
+            Tiempo de espera configurado para sesiones administrativas.
+          </p>
         </div>
       </div>
     </Card>

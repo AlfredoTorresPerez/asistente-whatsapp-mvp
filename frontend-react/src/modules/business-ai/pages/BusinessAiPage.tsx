@@ -1,5 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useReducer, useState } from 'react'
 import { ConfirmDialog } from '../../../components/overlay/ConfirmDialog'
 import { Modal } from '../../../components/overlay/Modal'
 import { Button } from '../../../components/ui/Button'
@@ -9,9 +9,19 @@ import { PageHeader } from '../../../components/ui/PageHeader'
 import { Select } from '../../../components/ui/Select'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { Textarea } from '../../../components/ui/Textarea'
-import { formatEstadoRegistro, getRegistroTone, isRegistroActivo } from '../../../lib/statusFormatters'
+import {
+  formatEstadoRegistro,
+  getRegistroTone,
+  isRegistroActivo,
+} from '../../../lib/statusFormatters'
 import { useToast } from '../../../lib/toast'
-import { BUSINESS_AI_AUDIT_PAGE_SIZE, getAuditTotalPages, isBusinessHourRangeValid, paginateAuditLogs, sortAuditLogsDescending } from '../lib/businessAiHelpers'
+import {
+  BUSINESS_AI_AUDIT_PAGE_SIZE,
+  getAuditTotalPages,
+  isBusinessHourRangeValid,
+  paginateAuditLogs,
+  sortAuditLogsDescending,
+} from '../lib/businessAiHelpers'
 import type { BusinessHoursDay } from '../lib/businessAiHelpers'
 import { formatRuleType } from '../../rules/lib/ruleTypeLabels'
 import {
@@ -33,7 +43,10 @@ import {
   getConversationsRequest,
   sendConversationMessageRequest,
 } from '../../../services/api/conversationsApi'
-import { getBusinessHoursRequest, saveBusinessHoursRequest } from '../../../services/api/completeAgendaApi'
+import {
+  getBusinessHoursRequest,
+  saveBusinessHoursRequest,
+} from '../../../services/api/completeAgendaApi'
 import { getBusinessLocationsRequest } from '../../../services/api/businessLocationsApi'
 import type {
   AestheticBusinessRuleResponse,
@@ -500,7 +513,10 @@ function logToRow(log: AestheticIntentLogResponse): KnowledgeRow {
   }
 }
 
-function buildServiceStatusRequest(service: AestheticServiceResponse, active: boolean): UpsertAestheticServiceRequest {
+function buildServiceStatusRequest(
+  service: AestheticServiceResponse,
+  active: boolean,
+): UpsertAestheticServiceRequest {
   return {
     active,
     aftercareRecommendations: service.aftercareRecommendations,
@@ -521,7 +537,10 @@ function buildServiceStatusRequest(service: AestheticServiceResponse, active: bo
   }
 }
 
-function buildProductStatusRequest(product: AestheticProductResponse, active: boolean): UpsertAestheticProductRequest {
+function buildProductStatusRequest(
+  product: AestheticProductResponse,
+  active: boolean,
+): UpsertAestheticProductRequest {
   return {
     active,
     categoryCode: product.categoryCode,
@@ -540,7 +559,10 @@ function buildProductStatusRequest(product: AestheticProductResponse, active: bo
   }
 }
 
-function buildRuleStatusRequest(rule: AestheticBusinessRuleResponse, active: boolean): UpsertAestheticBusinessRuleRequest {
+function buildRuleStatusRequest(
+  rule: AestheticBusinessRuleResponse,
+  active: boolean,
+): UpsertAestheticBusinessRuleRequest {
   return {
     active,
     code: rule.code,
@@ -576,6 +598,55 @@ function buildPrompt(config: AssistantConfigState, basePrompt: string) {
   ].join('\n')
 }
 
+const emptyHours: BusinessHoursDay[] = [
+  { day: 'Lunes', startTime: '09:00', endTime: '18:00' },
+  { day: 'Martes', startTime: '09:00', endTime: '18:00' },
+  { day: 'Miércoles', startTime: '09:00', endTime: '18:00' },
+  { day: 'Jueves', startTime: '09:00', endTime: '18:00' },
+  { day: 'Viernes', startTime: '09:00', endTime: '18:00' },
+  { day: 'Sábado', startTime: '09:00', endTime: '13:00' },
+  { day: 'Domingo', startTime: '', endTime: '' },
+]
+
+const DAY_MAP: Record<string, number> = {
+  Lunes: 1,
+  Martes: 2,
+  Miércoles: 3,
+  Jueves: 4,
+  Viernes: 5,
+  Sábado: 6,
+  Domingo: 7,
+}
+
+interface BusinessHoursState {
+  hours: BusinessHoursDay[]
+  saved: boolean
+}
+
+type BusinessHoursAction =
+  | { type: 'LOAD_SERVER'; hours: BusinessHoursDay[] }
+  | { type: 'SET_HOURS'; hours: BusinessHoursDay[] }
+  | { type: 'MARK_SAVED' }
+  | { type: 'MARK_UNSAVED' }
+
+function businessHoursReducer(
+  state: BusinessHoursState,
+  action: BusinessHoursAction,
+): BusinessHoursState {
+  switch (action.type) {
+    case 'LOAD_SERVER':
+      return { hours: action.hours, saved: true }
+    case 'SET_HOURS':
+      return { hours: action.hours, saved: false }
+    case 'MARK_SAVED':
+      return { ...state, saved: true }
+    case 'MARK_UNSAVED':
+      return { ...state, saved: false }
+    default:
+      return state
+  }
+}
+
 export function BusinessAiPage() {
   const queryClient = useQueryClient()
   const { showToast } = useToast()
@@ -596,22 +667,29 @@ export function BusinessAiPage() {
   const [previewResponse, setPreviewResponse] = useState('')
   const [showBaseModal, setShowBaseModal] = useState(false)
   const [editor, setEditor] = useState<EditorState>(emptyEditor)
-  const [rowToToggle, setRowToToggle] = useState<{ row: KnowledgeRow; active: boolean } | null>(null)
-  const [allowedTopics, setAllowedTopics] = useState(() => Object.fromEntries(allowedTopicDefaults.map((topic) => [topic, true])) as Record<string, boolean>)
-  const [blockedTopics, setBlockedTopics] = useState(() => Object.fromEntries(blockedTopicDefaults.map((topic) => [topic, true])) as Record<string, boolean>)
-  const emptyHours: BusinessHoursDay[] = [
-    { day: 'Lunes', startTime: '09:00', endTime: '18:00' },
-    { day: 'Martes', startTime: '09:00', endTime: '18:00' },
-    { day: 'Miércoles', startTime: '09:00', endTime: '18:00' },
-    { day: 'Jueves', startTime: '09:00', endTime: '18:00' },
-    { day: 'Viernes', startTime: '09:00', endTime: '18:00' },
-    { day: 'Sábado', startTime: '09:00', endTime: '13:00' },
-    { day: 'Domingo', startTime: '', endTime: '' },
-  ]
-  const DAY_MAP: Record<string, number> = { Lunes: 1, Martes: 2, 'Miércoles': 3, Jueves: 4, Viernes: 5, Sábado: 6, Domingo: 7 }
-  const [businessHours, setBusinessHours] = useState<BusinessHoursDay[]>(emptyHours)
+  const [rowToToggle, setRowToToggle] = useState<{ row: KnowledgeRow; active: boolean } | null>(
+    null,
+  )
+  const [allowedTopics, setAllowedTopics] = useState(
+    () =>
+      Object.fromEntries(allowedTopicDefaults.map((topic) => [topic, true])) as Record<
+        string,
+        boolean
+      >,
+  )
+  const [blockedTopics, setBlockedTopics] = useState(
+    () =>
+      Object.fromEntries(blockedTopicDefaults.map((topic) => [topic, true])) as Record<
+        string,
+        boolean
+      >,
+  )
+  const [businessHoursState, businessHoursDispatch] = useReducer(businessHoursReducer, {
+    hours: emptyHours,
+    saved: false,
+  })
+  const { hours: businessHours, saved: businessHoursSaved } = businessHoursState
   const [businessHoursError, setBusinessHoursError] = useState<string | null>(null)
-  const [businessHoursSaved, setBusinessHoursSaved] = useState(false)
   const [hoursLocationId, setHoursLocationId] = useState('')
   const [config, setConfig] = useState<AssistantConfigState>({
     active: true,
@@ -661,12 +739,13 @@ export function BusinessAiPage() {
 
   const conversationsQuery = useQuery({
     queryKey: ['business-ai', 'conversations', conversationSearch],
-    queryFn: () => getConversationsRequest({
-      page: 0,
-      size: 50,
-      search: conversationSearch.trim() || undefined,
-      status: 'OPEN',
-    }),
+    queryFn: () =>
+      getConversationsRequest({
+        page: 0,
+        size: 50,
+        search: conversationSearch.trim() || undefined,
+        status: 'OPEN',
+      }),
     placeholderData: keepPreviousData,
   })
 
@@ -674,8 +753,14 @@ export function BusinessAiPage() {
   const products = useMemo(() => productsQuery.data?.items ?? [], [productsQuery.data?.items])
   const rules = useMemo(() => rulesQuery.data?.items ?? [], [rulesQuery.data?.items])
   const logs = useMemo(() => logsQuery.data?.items ?? [], [logsQuery.data?.items])
-  const serviceCategories = useMemo(() => serviceCategoriesQuery.data?.items ?? [], [serviceCategoriesQuery.data?.items])
-  const productCategories = useMemo(() => productCategoriesQuery.data?.items ?? [], [productCategoriesQuery.data?.items])
+  const serviceCategories = useMemo(
+    () => serviceCategoriesQuery.data?.items ?? [],
+    [serviceCategoriesQuery.data?.items],
+  )
+  const productCategories = useMemo(
+    () => productCategoriesQuery.data?.items ?? [],
+    [productCategoriesQuery.data?.items],
+  )
   const locationsQuery = useQuery({
     queryKey: ['business-locations', 'ai-page'],
     queryFn: () => getBusinessLocationsRequest({ activeOnly: true }),
@@ -696,19 +781,29 @@ export function BusinessAiPage() {
       if (!locationId) throw new Error('No hay sucursales disponibles.')
       return saveBusinessHoursRequest({
         locationId,
-        hours: businessHours.filter((h) => h.startTime && h.endTime).map((h) => ({
-          dayOfWeek: DAY_MAP[h.day] ?? 1,
-          startTime: h.startTime,
-          endTime: h.endTime,
-        })),
+        hours: businessHours
+          .filter((h) => h.startTime && h.endTime)
+          .map((h) => ({
+            dayOfWeek: DAY_MAP[h.day] ?? 1,
+            startTime: h.startTime,
+            endTime: h.endTime,
+          })),
       })
     },
     onSuccess: () => {
-      setBusinessHoursSaved(true)
-      showToast({ title: 'Horario guardado', description: 'El horario de atención se actualizó correctamente.', tone: 'success' })
+      businessHoursDispatch({ type: 'MARK_SAVED' })
+      showToast({
+        title: 'Horario guardado',
+        description: 'El horario de atención se actualizó correctamente.',
+        tone: 'success',
+      })
     },
     onError: (error) => {
-      showToast({ title: 'No se pudo guardar el horario', description: error instanceof Error ? error.message : 'Intenta nuevamente.', tone: 'error' })
+      showToast({
+        title: 'No se pudo guardar el horario',
+        description: error instanceof Error ? error.message : 'Intenta nuevamente.',
+        tone: 'error',
+      })
     },
   })
 
@@ -719,15 +814,19 @@ export function BusinessAiPage() {
         const days: BusinessHoursDay[] = emptyHours.map((day) => {
           const dow = DAY_MAP[day.day]
           const match = serverHours.find((h) => h.dayOfWeek === dow)
-          return match ? { ...day, startTime: match.startTime.slice(0, 5), endTime: match.endTime.slice(0, 5) } : day
+          return match
+            ? { ...day, startTime: match.startTime.slice(0, 5), endTime: match.endTime.slice(0, 5) }
+            : day
         })
-        setBusinessHours(days)
-        setBusinessHoursSaved(true)
+        businessHoursDispatch({ type: 'LOAD_SERVER', hours: days })
       }
     }
   }, [businessHoursQuery.data])
 
-  const conversations = useMemo(() => conversationsQuery.data?.items ?? [], [conversationsQuery.data?.items])
+  const conversations = useMemo(
+    () => conversationsQuery.data?.items ?? [],
+    [conversationsQuery.data?.items],
+  )
 
   const operationalPromptRule = rules.find((rule) => rule.code === 'PROMPT_OPERATIVO_IA_NEGOCIO')
 
@@ -774,7 +873,8 @@ export function BusinessAiPage() {
     },
     onError: (error) => {
       showToast({
-        description: error instanceof Error ? error.message : 'No se pudo guardar la configuracion.',
+        description:
+          error instanceof Error ? error.message : 'No se pudo guardar la configuracion.',
         title: 'Error al guardar prompt',
         tone: 'error',
       })
@@ -793,12 +893,15 @@ export function BusinessAiPage() {
     mutationFn: async (state: EditorState) => {
       if (state.type === 'service') {
         const source = state.source?.service
-        const categoryCode = state.categoryCode || source?.categoryCode || serviceCategories[0]?.code || 'DEPILACION'
+        const categoryCode =
+          state.categoryCode || source?.categoryCode || serviceCategories[0]?.code || 'DEPILACION'
         const request: UpsertAestheticServiceRequest = {
           active: state.active,
           aftercareRecommendations: source?.aftercareRecommendations ?? null,
-          availabilityRules: source?.availabilityRules ?? 'Validar disponibilidad en agenda antes de confirmar.',
-          bookingRules: source?.bookingRules ?? 'Confirmar servicio, fecha y hora antes de reservar.',
+          availabilityRules:
+            source?.availabilityRules ?? 'Validar disponibilidad en agenda antes de confirmar.',
+          bookingRules:
+            source?.bookingRules ?? 'Confirmar servicio, fecha y hora antes de reservar.',
           cancellationRules: source?.cancellationRules ?? 'Avisar con anticipacion para reagendar.',
           categoryCode,
           code: source?.code ?? null,
@@ -821,7 +924,11 @@ export function BusinessAiPage() {
 
       if (state.type === 'product') {
         const source = state.source?.product
-        const categoryCode = state.categoryCode || source?.categoryCode || productCategories[0]?.code || 'POST_TRATAMIENTO'
+        const categoryCode =
+          state.categoryCode ||
+          source?.categoryCode ||
+          productCategories[0]?.code ||
+          'POST_TRATAMIENTO'
         const request: UpsertAestheticProductRequest = {
           active: state.active,
           categoryCode,
@@ -832,7 +939,8 @@ export function BusinessAiPage() {
           expirationDate: source?.expirationDate ?? null,
           name: state.title,
           price: Number(state.price) || 0,
-          recommendationRules: source?.recommendationRules ?? 'Recomendar solo si aporta al tratamiento consultado.',
+          recommendationRules:
+            source?.recommendationRules ?? 'Recomendar solo si aporta al tratamiento consultado.',
           stock: Number(state.stock) || 0,
           stockMinimum: source?.stockMinimum ?? 1,
           supplier: source?.supplier ?? null,
@@ -882,11 +990,17 @@ export function BusinessAiPage() {
   const statusMutation = useMutation({
     mutationFn: async ({ active, row }: { active: boolean; row: KnowledgeRow }) => {
       if (row.type === 'service' && row.service) {
-        return updateAestheticService(row.service.id, buildServiceStatusRequest(row.service, active))
+        return updateAestheticService(
+          row.service.id,
+          buildServiceStatusRequest(row.service, active),
+        )
       }
 
       if (row.type === 'product' && row.product) {
-        return updateAestheticProduct(row.product.id, buildProductStatusRequest(row.product, active))
+        return updateAestheticProduct(
+          row.product.id,
+          buildProductStatusRequest(row.product, active),
+        )
       }
 
       if (row.type === 'rule' && row.rule) {
@@ -918,7 +1032,10 @@ export function BusinessAiPage() {
       sendConversationMessageRequest(conversationId, { body }),
     onError: (error) => {
       showToast({
-        description: error instanceof Error ? error.message : 'No se pudo enviar la respuesta aprobada al cliente.',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'No se pudo enviar la respuesta aprobada al cliente.',
         title: 'No se pudo enviar',
         tone: 'error',
       })
@@ -927,7 +1044,8 @@ export function BusinessAiPage() {
       void queryClient.invalidateQueries({ queryKey: ['business-ai', 'conversations'] })
       void queryClient.invalidateQueries({ queryKey: ['conversations'] })
       showToast({
-        description: 'La respuesta aprobada fue enviada y registrada en la conversación seleccionada.',
+        description:
+          'La respuesta aprobada fue enviada y registrada en la conversación seleccionada.',
         title: 'Respuesta enviada',
         tone: 'success',
       })
@@ -968,9 +1086,10 @@ export function BusinessAiPage() {
     const totalLogs = logs.length
     const humanHandoffs = logs.filter((log) => log.requiresHumanHandoff).length
     const autoResolved = totalLogs === 0 ? 0 : ((totalLogs - humanHandoffs) / totalLogs) * 100
-    const averageConfidence = totalLogs === 0
-      ? 0
-      : logs.reduce((sum, log) => sum + normalizeConfidence(log.confidence), 0) / totalLogs
+    const averageConfidence =
+      totalLogs === 0
+        ? 0
+        : logs.reduce((sum, log) => sum + normalizeConfidence(log.confidence), 0) / totalLogs
     const suggestedToday = logs.filter((log) => {
       const created = new Date(log.createdAt)
       const today = new Date()
@@ -980,7 +1099,9 @@ export function BusinessAiPage() {
     return [
       {
         accent: config.active ? 'green' : 'orange',
-        description: config.active ? 'Asistente inteligente en funcionamiento' : 'Asistente pausado desde configuracion',
+        description: config.active
+          ? 'Asistente inteligente en funcionamiento'
+          : 'Asistente pausado desde configuracion',
         icon: 'spark',
         title: 'IA activa',
         value: config.active ? 'Si' : 'No',
@@ -1038,10 +1159,18 @@ export function BusinessAiPage() {
   }
 
   const openCreateModal = () => {
-    const type = activeTab === 'products' ? 'product' : activeTab === 'rules' || activeTab === 'policies' ? 'rule' : 'service'
+    const type =
+      activeTab === 'products'
+        ? 'product'
+        : activeTab === 'rules' || activeTab === 'policies'
+          ? 'rule'
+          : 'service'
     setEditor({
       ...emptyEditor,
-      categoryCode: type === 'product' ? productCategories[0]?.code ?? '' : serviceCategories[0]?.code ?? '',
+      categoryCode:
+        type === 'product'
+          ? (productCategories[0]?.code ?? '')
+          : (serviceCategories[0]?.code ?? ''),
       open: true,
       ruleType: activeTab === 'policies' ? 'SAFETY' : 'AI_RESPONSE',
       type,
@@ -1147,8 +1276,13 @@ export function BusinessAiPage() {
     sendApprovedMutation.mutate({ body: text, conversationId: selectedConversationId })
   }
 
-  const isLoading = servicesQuery.isLoading || productsQuery.isLoading || rulesQuery.isLoading || logsQuery.isLoading
-  const hasError = servicesQuery.isError || productsQuery.isError || rulesQuery.isError || logsQuery.isError
+  const isLoading =
+    servicesQuery.isLoading ||
+    productsQuery.isLoading ||
+    rulesQuery.isLoading ||
+    logsQuery.isLoading
+  const hasError =
+    servicesQuery.isError || productsQuery.isError || rulesQuery.isError || logsQuery.isError
 
   const sortedLogs = useMemo(() => sortAuditLogsDescending(logs), [logs])
   const totalAuditPages = getAuditTotalPages(sortedLogs.length)
@@ -1158,8 +1292,10 @@ export function BusinessAiPage() {
   const saveBusinessHours = () => {
     const invalidDay = businessHours.find((day) => !isBusinessHourRangeValid(day))
     if (invalidDay) {
-      setBusinessHoursSaved(false)
-      setBusinessHoursError(`Revisa el horario de ${invalidDay.day}: la hora de inicio debe ser menor que la hora de término.`)
+      businessHoursDispatch({ type: 'MARK_UNSAVED' })
+      setBusinessHoursError(
+        `Revisa el horario de ${invalidDay.day}: la hora de inicio debe ser menor que la hora de término.`,
+      )
       return
     }
 
@@ -1172,13 +1308,22 @@ export function BusinessAiPage() {
       <PageHeader
         actions={
           <>
-            <Button loading={savePromptMutation.isPending} onClick={() => savePromptMutation.mutate()} variant="secondary">
+            <Button
+              loading={savePromptMutation.isPending}
+              onClick={() => savePromptMutation.mutate()}
+              variant="secondary"
+            >
               Guardar instrucción
             </Button>
-            <Button loading={analyzeMutation.isPending} onClick={() => {
-              setActiveArea('conversation-preview')
-              runSimulation()
-            }}>Probar IA</Button>
+            <Button
+              loading={analyzeMutation.isPending}
+              onClick={() => {
+                setActiveArea('conversation-preview')
+                runSimulation()
+              }}
+            >
+              Probar IA
+            </Button>
           </>
         }
         description="Configura, entrena y supervisa el asistente inteligente de WhatsApp con datos reales del negocio."
@@ -1188,7 +1333,8 @@ export function BusinessAiPage() {
 
       {hasError ? (
         <Card className="border-red-100 bg-red-50 p-4 text-sm text-red-700">
-          No se pudo cargar parte de la información del negocio. Revisa que el servidor este disponible y vuelve a intentar.
+          No se pudo cargar parte de la información del negocio. Revisa que el servidor este
+          disponible y vuelve a intentar.
         </Card>
       ) : null}
 
@@ -1216,8 +1362,7 @@ export function BusinessAiPage() {
             selectedLocationId={hoursLocationId}
             saved={businessHoursSaved}
             onChange={(nextHours) => {
-              setBusinessHours(nextHours)
-              setBusinessHoursSaved(false)
+              businessHoursDispatch({ type: 'SET_HOURS', hours: nextHours })
             }}
             onLocationChange={setHoursLocationId}
             onSave={saveBusinessHours}
@@ -1341,11 +1486,29 @@ export function BusinessAiPage() {
   )
 }
 
-function AreaTabs({ activeArea, onChange }: { activeArea: BusinessAiArea; onChange: (area: BusinessAiArea) => void }) {
+function AreaTabs({
+  activeArea,
+  onChange,
+}: {
+  activeArea: BusinessAiArea
+  onChange: (area: BusinessAiArea) => void
+}) {
   const items: { label: string; value: BusinessAiArea; description: string }[] = [
-    { description: 'Prompt, tono y horario', label: 'Configuracion del asistente', value: 'assistant-config' },
-    { description: 'Límites, auditoria y simulador', label: 'Vista previa de conversación', value: 'conversation-preview' },
-    { description: 'Servicios, productos y reglas', label: 'Base de conocimiento', value: 'knowledge-base' },
+    {
+      description: 'Prompt, tono y horario',
+      label: 'Configuracion del asistente',
+      value: 'assistant-config',
+    },
+    {
+      description: 'Límites, auditoria y simulador',
+      label: 'Vista previa de conversación',
+      value: 'conversation-preview',
+    },
+    {
+      description: 'Servicios, productos y reglas',
+      label: 'Base de conocimiento',
+      value: 'knowledge-base',
+    },
   ]
 
   return (
@@ -1380,7 +1543,9 @@ function MetricCard({ metric }: { metric: MetricCardData }) {
   return (
     <Card className="min-h-[128px] p-4">
       <div className="flex items-start justify-between gap-3">
-        <div className={`inline-flex h-10 w-10 items-center justify-center rounded-[16px] ring-1 ${accentClasses}`}>
+        <div
+          className={`inline-flex h-10 w-10 items-center justify-center rounded-[16px] ring-1 ${accentClasses}`}
+        >
           <AiIcon name={metric.icon} />
         </div>
         <StatusBadge label="Hoy" tone={metric.accent === 'orange' ? 'warning' : 'success'} />
@@ -1408,9 +1573,15 @@ function AssistantConfigCard({
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-lg font-semibold text-slate-950">Configuracion del asistente</p>
-          <p className="mt-1 text-sm leading-6 text-slate-600">Define modo, tono, idioma y reglas operativas.</p>
+          <p className="mt-1 text-sm leading-6 text-slate-600">
+            Define modo, tono, idioma y reglas operativas.
+          </p>
         </div>
-        <Toggle checked={config.active} label="IA activada" onChange={(active) => onChange({ ...config, active })} />
+        <Toggle
+          checked={config.active}
+          label="IA activada"
+          onChange={(active) => onChange({ ...config, active })}
+        />
       </div>
 
       <div className="mt-4 space-y-4">
@@ -1508,7 +1679,9 @@ function BusinessHoursCard({
   saved: boolean
 }) {
   const updateDay = (index: number, field: 'startTime' | 'endTime', value: string) => {
-    onChange(hours.map((day, currentIndex) => currentIndex === index ? { ...day, [field]: value } : day))
+    onChange(
+      hours.map((day, currentIndex) => (currentIndex === index ? { ...day, [field]: value } : day)),
+    )
   }
 
   return (
@@ -1516,7 +1689,9 @@ function BusinessHoursCard({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-lg font-semibold text-slate-950">Horario de atención</p>
-          <p className="mt-1 text-sm leading-6 text-slate-600">Configura hora de inicio y término para cada día según la sucursal.</p>
+          <p className="mt-1 text-sm leading-6 text-slate-600">
+            Configura hora de inicio y término para cada día según la sucursal.
+          </p>
         </div>
         <StatusBadge label={saved ? 'Guardado' : 'Editable'} tone={saved ? 'success' : 'info'} />
       </div>
@@ -1529,7 +1704,9 @@ function BusinessHoursCard({
           value={selectedLocationId}
         >
           {locations.map((loc) => (
-            <option key={loc.id} value={loc.id}>{loc.name}</option>
+            <option key={loc.id} value={loc.id}>
+              {loc.name}
+            </option>
           ))}
         </select>
       </div>
@@ -1550,10 +1727,15 @@ function BusinessHoursCard({
             <span>Hora Término</span>
           </div>
           {hours.map((day, index) => (
-            <div className="grid gap-2 rounded-[18px] border border-[var(--color-border)] bg-white p-3 sm:grid-cols-[1fr_150px_150px] sm:items-center" key={day.day}>
+            <div
+              className="grid gap-2 rounded-[18px] border border-[var(--color-border)] bg-white p-3 sm:grid-cols-[1fr_150px_150px] sm:items-center"
+              key={day.day}
+            >
               <p className="text-sm font-semibold text-slate-950">{day.day}</p>
               <label className="block">
-                <span className="mb-1 block text-xs font-semibold text-slate-500 sm:hidden">Hora Inicio</span>
+                <span className="mb-1 block text-xs font-semibold text-slate-500 sm:hidden">
+                  Hora Inicio
+                </span>
                 <input
                   className="h-10 w-full rounded-[14px] border border-[var(--color-border)] px-3 text-sm outline-none focus:border-[var(--color-primary)]"
                   onChange={(event) => updateDay(index, 'startTime', event.target.value)}
@@ -1562,7 +1744,9 @@ function BusinessHoursCard({
                 />
               </label>
               <label className="block">
-                <span className="mb-1 block text-xs font-semibold text-slate-500 sm:hidden">Hora Término</span>
+                <span className="mb-1 block text-xs font-semibold text-slate-500 sm:hidden">
+                  Hora Término
+                </span>
                 <input
                   className="h-10 w-full rounded-[14px] border border-[var(--color-border)] px-3 text-sm outline-none focus:border-[var(--color-primary)]"
                   onChange={(event) => updateDay(index, 'endTime', event.target.value)}
@@ -1576,7 +1760,9 @@ function BusinessHoursCard({
       )}
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--color-border)] pt-4">
-        <p className="text-sm leading-6 text-slate-600">Estos horarios se usan en agenda completa, disponibilidad y reservas.</p>
+        <p className="text-sm leading-6 text-slate-600">
+          Estos horarios se usan en agenda completa, disponibilidad y reservas.
+        </p>
         <Button onClick={onSave}>Guardar horario</Button>
       </div>
     </Card>
@@ -1601,7 +1787,9 @@ function RulesCard({
   return (
     <Card className="p-5">
       <p className="text-lg font-semibold text-slate-950">Límites y reglas</p>
-      <p className="mt-1 text-sm leading-6 text-slate-600">Temas permitidos y bloqueados vienen seleccionados por defecto.</p>
+      <p className="mt-1 text-sm leading-6 text-slate-600">
+        Temas permitidos y bloqueados vienen seleccionados por defecto.
+      </p>
 
       <TopicChecklist
         className="mt-4"
@@ -1617,9 +1805,21 @@ function RulesCard({
       />
 
       <div className="mt-4 grid gap-2">
-        <Toggle checked={config.allowPrices} label="Permitir precios" onChange={(allowPrices) => onChange({ ...config, allowPrices })} />
-        <Toggle checked={config.allowBooking} label="Permitir agendamiento" onChange={(allowBooking) => onChange({ ...config, allowBooking })} />
-        <Toggle checked={config.allowPromotions} label="Permitir compartir promociones" onChange={(allowPromotions) => onChange({ ...config, allowPromotions })} />
+        <Toggle
+          checked={config.allowPrices}
+          label="Permitir precios"
+          onChange={(allowPrices) => onChange({ ...config, allowPrices })}
+        />
+        <Toggle
+          checked={config.allowBooking}
+          label="Permitir agendamiento"
+          onChange={(allowBooking) => onChange({ ...config, allowBooking })}
+        />
+        <Toggle
+          checked={config.allowPromotions}
+          label="Permitir compartir promociones"
+          onChange={(allowPromotions) => onChange({ ...config, allowPromotions })}
+        />
         <Toggle
           checked={config.requireAvailabilityCheck}
           label="No prometer disponibilidad sin verificar agenda"
@@ -1646,7 +1846,10 @@ function TopicChecklist({
       <p className="text-sm font-semibold text-slate-950">{title}</p>
       <div className="mt-2 grid gap-2 sm:grid-cols-2">
         {Object.entries(topics).map(([topic, checked]) => (
-          <label className="flex items-center gap-2 rounded-[14px] border border-[var(--color-border)] bg-white px-3 py-2 text-sm font-medium text-slate-700" key={topic}>
+          <label
+            className="flex items-center gap-2 rounded-[14px] border border-[var(--color-border)] bg-white px-3 py-2 text-sm font-medium text-slate-700"
+            key={topic}
+          >
             <input
               checked={checked}
               className="h-4 w-4"
@@ -1715,7 +1918,9 @@ function KnowledgeBaseCard({
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button onClick={onOpenFullBase} variant="secondary">Ver base completa</Button>
+          <Button onClick={onOpenFullBase} variant="secondary">
+            Ver base completa
+          </Button>
           <Button onClick={onAdd}>Agregar contenido</Button>
         </div>
       </div>
@@ -1780,11 +1985,12 @@ function KnowledgeBaseCard({
             const hasEditableStatus = item.type !== 'audit'
             const active = isRegistroActivo(item.status)
             const editDisabled = hasEditableStatus && !active
-            const statusTone = item.status === 'Requiere derivación'
-              ? 'warning'
-              : hasEditableStatus
-                ? getRegistroTone(item.status)
-                : 'info'
+            const statusTone =
+              item.status === 'Requiere derivación'
+                ? 'warning'
+                : hasEditableStatus
+                  ? getRegistroTone(item.status)
+                  : 'info'
 
             return (
               <article
@@ -1796,7 +2002,9 @@ function KnowledgeBaseCard({
               >
                 <div className="min-w-0">
                   <p className="line-clamp-2 text-sm font-semibold text-slate-950">{item.title}</p>
-                  <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">{item.description}</p>
+                  <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">
+                    {item.description}
+                  </p>
                 </div>
                 <p className="text-sm text-slate-600">{item.category}</p>
                 <StatusBadge label={item.status} tone={statusTone} />
@@ -1806,7 +2014,13 @@ function KnowledgeBaseCard({
                     disabled={editDisabled}
                     onClick={() => onEdit(item)}
                     size="sm"
-                    title={editDisabled ? 'Activa el contenido antes de editarlo.' : item.type === 'audit' ? 'Usar este registro de auditoria' : 'Editar contenido'}
+                    title={
+                      editDisabled
+                        ? 'Activa el contenido antes de editarlo.'
+                        : item.type === 'audit'
+                          ? 'Usar este registro de auditoria'
+                          : 'Editar contenido'
+                    }
                     variant="secondary"
                   >
                     {item.type === 'audit' ? 'Usar' : 'Editar'}
@@ -1884,17 +2098,26 @@ function ConversationPreviewCard({
   setPreviewResponse: (value: string) => void
   setSelectedConversationId: (value: string) => void
 }) {
-  const confidence = analysisResult ? formatPercent(normalizeConfidence(analysisResult.confianza)) : 'Sin prueba'
-  const response = previewResponse || 'Ejecuta una prueba para generar una respuesta con la base de conocimiento del negocio.'
+  const confidence = analysisResult
+    ? formatPercent(normalizeConfidence(analysisResult.confianza))
+    : 'Sin prueba'
+  const response =
+    previewResponse ||
+    'Ejecuta una prueba para generar una respuesta con la base de conocimiento del negocio.'
 
   return (
     <Card>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-lg font-semibold text-slate-950">Vista previa de conversación</p>
-          <p className="mt-2 text-sm leading-6 text-slate-600">Asi responderia la IA en tiempo real.</p>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            Asi responderia la IA en tiempo real.
+          </p>
         </div>
-        <StatusBadge label={`Confianza: ${confidence}`} tone={analysisResult?.requiereDerivacionHumana ? 'warning' : 'success'} />
+        <StatusBadge
+          label={`Confianza: ${confidence}`}
+          tone={analysisResult?.requiereDerivacionHumana ? 'warning' : 'success'}
+        />
       </div>
 
       <div className="mt-5 grid gap-3">
@@ -1939,8 +2162,12 @@ function ConversationPreviewCard({
       </div>
 
       <div className="mt-4 flex flex-wrap gap-3">
-        <Button onClick={onEdit} variant="secondary">{editable ? 'Terminar edición' : 'Editar'}</Button>
-        <Button disabled={!selectedConversationId} loading={sending} onClick={onApprove}>Aprobar y enviar</Button>
+        <Button onClick={onEdit} variant="secondary">
+          {editable ? 'Terminar edición' : 'Editar'}
+        </Button>
+        <Button disabled={!selectedConversationId} loading={sending} onClick={onApprove}>
+          Aprobar y enviar
+        </Button>
       </div>
     </Card>
   )
@@ -1968,7 +2195,14 @@ function SimulatorCard({
             Prueba como respondera tu IA a diferentes preguntas de tus clientes.
           </p>
         </div>
-        <StatusBadge label={analysisResult ? formatPercent(normalizeConfidence(analysisResult.confianza)) : 'Sin prueba'} tone="info" />
+        <StatusBadge
+          label={
+            analysisResult
+              ? formatPercent(normalizeConfidence(analysisResult.confianza))
+              : 'Sin prueba'
+          }
+          tone="info"
+        />
       </div>
 
       <div className="mt-5">
@@ -1983,12 +2217,15 @@ function SimulatorCard({
       <div className="mt-5 rounded-[22px] border border-[var(--color-border)] bg-slate-50 px-5 py-5">
         <p className="text-sm font-semibold text-slate-950">Respuesta generada por IA</p>
         <p className="mt-3 whitespace-pre-line text-sm leading-6 text-slate-700">
-          {analysisResult?.respuestaSugerida ?? 'Ejecuta una prueba para ver la respuesta sugerida.'}
+          {analysisResult?.respuestaSugerida ??
+            'Ejecuta una prueba para ver la respuesta sugerida.'}
         </p>
       </div>
 
       <div className="mt-5 flex flex-wrap gap-3">
-        <Button loading={loading} onClick={onRun}>Probar</Button>
+        <Button loading={loading} onClick={onRun}>
+          Probar
+        </Button>
       </div>
     </Card>
   )
@@ -2017,7 +2254,9 @@ function AuditCard({
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-lg font-semibold text-slate-950">Auditoría IA</p>
-          <p className="mt-1 text-sm leading-6 text-slate-600">Últimos 5 mensajes, ordenados del más reciente al más antiguo.</p>
+          <p className="mt-1 text-sm leading-6 text-slate-600">
+            Últimos 5 mensajes, ordenados del más reciente al más antiguo.
+          </p>
         </div>
         <StatusBadge label="5 por página" tone="info" />
       </div>
@@ -2029,18 +2268,30 @@ function AuditCard({
           </p>
         ) : (
           logs.map((item) => (
-            <button className="flex w-full gap-3 rounded-[18px] border border-[var(--color-border)] bg-white p-3 text-left transition hover:border-emerald-200" key={item.id} onClick={() => onSelectLog(item)} type="button">
+            <button
+              className="flex w-full gap-3 rounded-[18px] border border-[var(--color-border)] bg-white p-3 text-left transition hover:border-emerald-200"
+              key={item.id}
+              onClick={() => onSelectLog(item)}
+              type="button"
+            >
               <span
                 className={[
                   'mt-1 h-2.5 w-2.5 shrink-0 rounded-full',
-                  item.requiresHumanHandoff ? 'bg-amber-500' : normalizeConfidence(item.confidence) >= 70 ? 'bg-emerald-500' : 'bg-blue-500',
+                  item.requiresHumanHandoff
+                    ? 'bg-amber-500'
+                    : normalizeConfidence(item.confidence) >= 70
+                      ? 'bg-emerald-500'
+                      : 'bg-blue-500',
                 ].join(' ')}
               />
               <span className="min-w-0">
                 <span className="block text-sm font-semibold text-slate-950">{item.intent}</span>
-                <span className="mt-1 line-clamp-2 block text-sm leading-5 text-slate-600">{item.sourceMessage}</span>
+                <span className="mt-1 line-clamp-2 block text-sm leading-5 text-slate-600">
+                  {item.sourceMessage}
+                </span>
                 <span className="mt-1 block text-xs font-medium text-slate-400">
-                  {formatDateTime(item.createdAt)} · Confianza {formatPercent(normalizeConfidence(item.confidence))}
+                  {formatDateTime(item.createdAt)} · Confianza{' '}
+                  {formatPercent(normalizeConfidence(item.confidence))}
                 </span>
               </span>
             </button>
@@ -2049,10 +2300,26 @@ function AuditCard({
       </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--color-border)] pt-4">
-        <p className="text-sm text-slate-600">Mostrando {fromLog}-{toLog} de {totalLogs}</p>
+        <p className="text-sm text-slate-600">
+          Mostrando {fromLog}-{toLog} de {totalLogs}
+        </p>
         <div className="flex gap-2">
-          <Button disabled={page === 0} onClick={() => onPageChange(Math.max(page - 1, 0))} size="sm" variant="secondary">Anterior</Button>
-          <Button disabled={page >= totalPages - 1} onClick={() => onPageChange(Math.min(page + 1, totalPages - 1))} size="sm" variant="secondary">Siguiente</Button>
+          <Button
+            disabled={page === 0}
+            onClick={() => onPageChange(Math.max(page - 1, 0))}
+            size="sm"
+            variant="secondary"
+          >
+            Anterior
+          </Button>
+          <Button
+            disabled={page >= totalPages - 1}
+            onClick={() => onPageChange(Math.min(page + 1, totalPages - 1))}
+            size="sm"
+            variant="secondary"
+          >
+            Siguiente
+          </Button>
         </div>
       </div>
     </Card>
@@ -2080,9 +2347,10 @@ function ContentEditorModal({
     return null
   }
 
-  const categoryOptions = editor.type === 'product'
-    ? productCategories.map((category) => ({ label: category.name, value: category.code }))
-    : serviceCategories.map((category) => ({ label: category.name, value: category.code }))
+  const categoryOptions =
+    editor.type === 'product'
+      ? productCategories.map((category) => ({ label: category.name, value: category.code }))
+      : serviceCategories.map((category) => ({ label: category.name, value: category.code }))
 
   const typeOptions = [
     { label: 'Servicio', value: 'service' },
@@ -2099,30 +2367,57 @@ function ContentEditorModal({
           <p className="text-xl font-semibold text-slate-950">
             {editor.mode === 'create' ? 'Agregar contenido' : 'Editar contenido'}
           </p>
-          <p className="mt-2 text-sm text-slate-600">Actualiza la base que usa la IA para responder sobre el negocio.</p>
+          <p className="mt-2 text-sm text-slate-600">
+            Actualiza la base que usa la IA para responder sobre el negocio.
+          </p>
         </div>
 
         <Select
           disabled={editor.mode === 'edit'}
           label="Tipo"
-          onChange={(event) => onChange({ ...editor, type: event.target.value as EditorState['type'] })}
+          onChange={(event) =>
+            onChange({ ...editor, type: event.target.value as EditorState['type'] })
+          }
           options={typeOptions}
           value={editor.type}
         />
 
-        <Input label="Titulo" onChange={(event) => onChange({ ...editor, title: event.target.value })} value={editor.title} />
-        <Textarea label="Descripcion" onChange={(event) => onChange({ ...editor, description: event.target.value })} rows={5} value={editor.description} />
+        <Input
+          label="Titulo"
+          onChange={(event) => onChange({ ...editor, title: event.target.value })}
+          value={editor.title}
+        />
+        <Textarea
+          label="Descripcion"
+          onChange={(event) => onChange({ ...editor, description: event.target.value })}
+          rows={5}
+          value={editor.description}
+        />
 
         {editor.type === 'service' ? (
           <div className="grid gap-4 sm:grid-cols-3">
             <Select
               label="Categoria"
               onChange={(event) => onChange({ ...editor, categoryCode: event.target.value })}
-              options={categoryOptions.length ? categoryOptions : [{ label: 'Depilacion', value: 'DEPILACION' }]}
+              options={
+                categoryOptions.length
+                  ? categoryOptions
+                  : [{ label: 'Depilacion', value: 'DEPILACION' }]
+              }
               value={editor.categoryCode}
             />
-            <Input label="Precio" onChange={(event) => onChange({ ...editor, price: event.target.value })} type="number" value={editor.price} />
-            <Input label="Duración" onChange={(event) => onChange({ ...editor, durationMinutes: event.target.value })} type="number" value={editor.durationMinutes} />
+            <Input
+              label="Precio"
+              onChange={(event) => onChange({ ...editor, price: event.target.value })}
+              type="number"
+              value={editor.price}
+            />
+            <Input
+              label="Duración"
+              onChange={(event) => onChange({ ...editor, durationMinutes: event.target.value })}
+              type="number"
+              value={editor.durationMinutes}
+            />
           </div>
         ) : null}
 
@@ -2131,11 +2426,25 @@ function ContentEditorModal({
             <Select
               label="Categoria"
               onChange={(event) => onChange({ ...editor, categoryCode: event.target.value })}
-              options={categoryOptions.length ? categoryOptions : [{ label: 'Post tratamiento', value: 'POST_TRATAMIENTO' }]}
+              options={
+                categoryOptions.length
+                  ? categoryOptions
+                  : [{ label: 'Post tratamiento', value: 'POST_TRATAMIENTO' }]
+              }
               value={editor.categoryCode}
             />
-            <Input label="Precio" onChange={(event) => onChange({ ...editor, price: event.target.value })} type="number" value={editor.price} />
-            <Input label="Stock" onChange={(event) => onChange({ ...editor, stock: event.target.value })} type="number" value={editor.stock} />
+            <Input
+              label="Precio"
+              onChange={(event) => onChange({ ...editor, price: event.target.value })}
+              type="number"
+              value={editor.price}
+            />
+            <Input
+              label="Stock"
+              onChange={(event) => onChange({ ...editor, stock: event.target.value })}
+              type="number"
+              value={editor.stock}
+            />
           </div>
         ) : null}
 
@@ -2154,15 +2463,28 @@ function ContentEditorModal({
               ]}
               value={editor.ruleType}
             />
-            <Input label="Prioridad" onChange={(event) => onChange({ ...editor, priority: event.target.value })} type="number" value={editor.priority} />
+            <Input
+              label="Prioridad"
+              onChange={(event) => onChange({ ...editor, priority: event.target.value })}
+              type="number"
+              value={editor.priority}
+            />
           </div>
         ) : null}
 
-        <Toggle checked={editor.active} label="Contenido activo" onChange={(active) => onChange({ ...editor, active })} />
+        <Toggle
+          checked={editor.active}
+          label="Contenido activo"
+          onChange={(active) => onChange({ ...editor, active })}
+        />
 
         <div className="flex justify-end gap-3">
-          <Button onClick={onClose} variant="secondary">Cancelar</Button>
-          <Button disabled={!isValid} loading={loading} onClick={onSave}>Guardar</Button>
+          <Button onClick={onClose} variant="secondary">
+            Cancelar
+          </Button>
+          <Button disabled={!isValid} loading={loading} onClick={onSave}>
+            Guardar
+          </Button>
         </div>
       </div>
     </Modal>
@@ -2192,9 +2514,23 @@ function KnowledgeBaseModal({
       </div>
 
       <div className="mt-6 grid gap-4 md:grid-cols-3">
-        <KnowledgeColumn title="Servicios" items={services.map((service) => `${service.name} · ${formatMoney(service.priceBase)} · ${service.durationMinutes} min`)} />
-        <KnowledgeColumn title="Productos" items={products.map((product) => `${product.name} · ${formatMoney(product.price)} · stock ${product.stock}`)} />
-        <KnowledgeColumn title="Reglas" items={rules.map((rule) => `${rule.name} · ${rule.ruleType}`)} />
+        <KnowledgeColumn
+          title="Servicios"
+          items={services.map(
+            (service) =>
+              `${service.name} · ${formatMoney(service.priceBase)} · ${service.durationMinutes} min`,
+          )}
+        />
+        <KnowledgeColumn
+          title="Productos"
+          items={products.map(
+            (product) => `${product.name} · ${formatMoney(product.price)} · stock ${product.stock}`,
+          )}
+        />
+        <KnowledgeColumn
+          title="Reglas"
+          items={rules.map((rule) => `${rule.name} · ${rule.ruleType}`)}
+        />
       </div>
 
       <div className="mt-6 flex justify-end">
@@ -2213,7 +2549,10 @@ function KnowledgeColumn({ items, title }: { items: string[]; title: string }) {
           <p className="text-sm text-slate-500">Sin registros.</p>
         ) : (
           items.map((item) => (
-            <p className="rounded-2xl bg-white px-3 py-2 text-sm leading-5 text-slate-700" key={item}>
+            <p
+              className="rounded-2xl bg-white px-3 py-2 text-sm leading-5 text-slate-700"
+              key={item}
+            >
               {item}
             </p>
           ))
@@ -2248,7 +2587,9 @@ function ModeOption({
       <span
         className={[
           'mt-1 h-4 w-4 rounded-full border',
-          checked ? 'border-emerald-500 bg-emerald-500 shadow-[inset_0_0_0_4px_white]' : 'border-slate-300 bg-white',
+          checked
+            ? 'border-emerald-500 bg-emerald-500 shadow-[inset_0_0_0_4px_white]'
+            : 'border-slate-300 bg-white',
         ].join(' ')}
       />
       <span>
@@ -2259,8 +2600,15 @@ function ModeOption({
   )
 }
 
-
-function Toggle({ checked, label, onChange }: { checked?: boolean; label: string; onChange: (checked: boolean) => void }) {
+function Toggle({
+  checked,
+  label,
+  onChange,
+}: {
+  checked?: boolean
+  label: string
+  onChange: (checked: boolean) => void
+}) {
   return (
     <label className="flex cursor-pointer items-center justify-between gap-4 rounded-[18px] border border-[var(--color-border)] bg-white px-4 py-3">
       <span className="text-sm font-medium text-slate-700">{label}</span>
@@ -2270,7 +2618,12 @@ function Toggle({ checked, label, onChange }: { checked?: boolean; label: string
           checked ? 'bg-emerald-500' : 'bg-slate-300',
         ].join(' ')}
       >
-        <input checked={Boolean(checked)} className="sr-only" onChange={(event) => onChange(event.target.checked)} type="checkbox" />
+        <input
+          checked={Boolean(checked)}
+          className="sr-only"
+          onChange={(event) => onChange(event.target.checked)}
+          type="checkbox"
+        />
         <span
           className={[
             'absolute top-1 h-4 w-4 rounded-full bg-white shadow-sm transition',
@@ -2310,7 +2663,13 @@ function AiIcon({ name }: { name: MetricCardData['icon'] }) {
   if (name === 'chat') {
     return (
       <svg {...commonProps}>
-        <path d="M5 7.5C5 6.12 6.12 5 7.5 5H16.5C17.88 5 19 6.12 19 7.5V13.5C19 14.88 17.88 16 16.5 16H11L7 19V16H7.5C6.12 16 5 14.88 5 13.5V7.5Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+        <path
+          d="M5 7.5C5 6.12 6.12 5 7.5 5H16.5C17.88 5 19 6.12 19 7.5V13.5C19 14.88 17.88 16 16.5 16H11L7 19V16H7.5C6.12 16 5 14.88 5 13.5V7.5Z"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.8"
+        />
       </svg>
     )
   }
@@ -2318,8 +2677,20 @@ function AiIcon({ name }: { name: MetricCardData['icon'] }) {
   if (name === 'shield') {
     return (
       <svg {...commonProps}>
-        <path d="M12 3L19 6V11.5C19 16.1 15.8 20.37 12 21.5C8.2 20.37 5 16.1 5 11.5V6L12 3Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
-        <path d="M9 12L11 14L15.5 9.5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+        <path
+          d="M12 3L19 6V11.5C19 16.1 15.8 20.37 12 21.5C8.2 20.37 5 16.1 5 11.5V6L12 3Z"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.8"
+        />
+        <path
+          d="M9 12L11 14L15.5 9.5"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.8"
+        />
       </svg>
     )
   }
@@ -2327,8 +2698,17 @@ function AiIcon({ name }: { name: MetricCardData['icon'] }) {
   if (name === 'human') {
     return (
       <svg {...commonProps}>
-        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z" stroke="currentColor" strokeWidth="1.8" />
-        <path d="M5 19C5 16.79 8.13 15 12 15C15.87 15 19 16.79 19 19" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
+        <path
+          d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        />
+        <path
+          d="M5 19C5 16.79 8.13 15 12 15C15.87 15 19 16.79 19 19"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeWidth="1.8"
+        />
       </svg>
     )
   }
@@ -2336,16 +2716,38 @@ function AiIcon({ name }: { name: MetricCardData['icon'] }) {
   if (name === 'send') {
     return (
       <svg {...commonProps}>
-        <path d="M20 4L10.5 13.5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
-        <path d="M20 4L14 20L10.5 13.5L4 10L20 4Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+        <path
+          d="M20 4L10.5 13.5"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.8"
+        />
+        <path
+          d="M20 4L14 20L10.5 13.5L4 10L20 4Z"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.8"
+        />
       </svg>
     )
   }
 
   return (
     <svg {...commonProps}>
-      <path d="M12 3L13.7 8.3L19 10L13.7 11.7L12 17L10.3 11.7L5 10L10.3 8.3L12 3Z" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.8" />
-      <path d="M18 15L18.8 17.2L21 18L18.8 18.8L18 21L17.2 18.8L15 18L17.2 17.2L18 15Z" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.6" />
+      <path
+        d="M12 3L13.7 8.3L19 10L13.7 11.7L12 17L10.3 11.7L5 10L10.3 8.3L12 3Z"
+        stroke="currentColor"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M18 15L18.8 17.2L21 18L18.8 18.8L18 21L17.2 18.8L15 18L17.2 17.2L18 15Z"
+        stroke="currentColor"
+        strokeLinejoin="round"
+        strokeWidth="1.6"
+      />
     </svg>
   )
 }

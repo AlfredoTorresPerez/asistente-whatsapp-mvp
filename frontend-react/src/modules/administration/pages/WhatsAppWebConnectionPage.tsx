@@ -111,7 +111,6 @@ function toProcessingLabel(status: string) {
   }
 }
 
-
 type AiDecisionSource = {
   sourceMessage: string
   intent: string
@@ -177,7 +176,10 @@ function logToDecision(log: AestheticIntentLogResponse): AiDecisionSource {
   }
 }
 
-function previewToDecision(response: IntentAnalysisResponse, sourceMessage: string): AiDecisionSource {
+function previewToDecision(
+  response: IntentAnalysisResponse,
+  sourceMessage: string,
+): AiDecisionSource {
   return {
     sourceMessage,
     intent: response.intencion,
@@ -224,13 +226,26 @@ function getAppliedRules(decision: AiDecisionSource): string[] {
   if (decision.confidence < 0.6) {
     rules.add('Pedir aclaracion por baja confianza de interpretacion')
   }
-  if (decision.intent.includes('reservar') || decision.intent.includes('disponibilidad') || decision.intent.includes('reprogramar')) {
+  if (
+    decision.intent.includes('reservar') ||
+    decision.intent.includes('disponibilidad') ||
+    decision.intent.includes('reprogramar')
+  ) {
     rules.add('Validar disponibilidad y profesional antes de confirmar agenda')
   }
-  if (decision.intent.includes('precio') || decision.intent.includes('producto') || decision.intent.includes('duracion') || decision.intent.includes('promocion')) {
+  if (
+    decision.intent.includes('precio') ||
+    decision.intent.includes('producto') ||
+    decision.intent.includes('duracion') ||
+    decision.intent.includes('promocion')
+  ) {
     rules.add('Usar catalogo vigente; no inventar precio, stock, duracion ni promociones')
   }
-  if (decision.intent.includes('contraindicacion') || decision.intent.includes('recomendacion') || decision.intent.includes('evaluacion')) {
+  if (
+    decision.intent.includes('contraindicacion') ||
+    decision.intent.includes('recomendacion') ||
+    decision.intent.includes('evaluacion')
+  ) {
     rules.add('No emitir diagnosticos ni prometer resultados garantizados')
   }
   if (decision.suggestedResponse) {
@@ -314,7 +329,8 @@ export function WhatsAppWebConnectionPage() {
   const whatsAppWebQrQuery = useQuery({
     queryKey: ['administration', 'whatsapp-web', 'qr'],
     queryFn: getWhatsAppWebQrRequest,
-    refetchInterval: isOnline && isQrPending(whatsAppWebStatusQuery.data?.sessionStatus) ? 5_000 : false,
+    refetchInterval:
+      isOnline && isQrPending(whatsAppWebStatusQuery.data?.sessionStatus) ? 5_000 : false,
   })
 
   const intentLogsQuery = useQuery({
@@ -366,7 +382,8 @@ export function WhatsAppWebConnectionPage() {
       if (!latestStatus?.qrCode) {
         showToast({
           title: 'QR aun no disponible',
-          description: 'El adaptador sigue preparando el QR. Reintenta en unos segundos si no aparece.',
+          description:
+            'El adaptador sigue preparando el QR. Reintenta en unos segundos si no aparece.',
           tone: 'warning',
         })
       }
@@ -467,7 +484,8 @@ export function WhatsAppWebConnectionPage() {
       await queryClient.invalidateQueries({ queryKey: ['esthetic', 'intent', 'latest-log'] })
       showToast({
         title: 'Analisis IA actualizado',
-        description: 'Se interpretó el mensaje de prueba con el motor de reglas del centro estetico.',
+        description:
+          'Se interpretó el mensaje de prueba con el motor de reglas del centro estetico.',
         tone: 'success',
       })
     },
@@ -493,7 +511,8 @@ export function WhatsAppWebConnectionPage() {
   const previewDecision = intentPreviewMutation.data
     ? previewToDecision(intentPreviewMutation.data, lastAnalyzedMessage)
     : null
-  const latestDecision = previewDecision ?? (latestIntentLog ? logToDecision(latestIntentLog) : null)
+  const latestDecision =
+    previewDecision ?? (latestIntentLog ? logToDecision(latestIntentLog) : null)
 
   const onSubmit = handleSubmit(async (values) => {
     await testMessageMutation.mutateAsync(values)
@@ -525,7 +544,7 @@ export function WhatsAppWebConnectionPage() {
         tone: 'success',
       })
     }
-    setPreviousStatus(status?.sessionStatus ?? null)
+    setTimeout(() => setPreviousStatus(status?.sessionStatus ?? null), 0)
   }, [status?.sessionStatus, previousStatus, showToast])
 
   useEffect(() => {
@@ -535,7 +554,7 @@ export function WhatsAppWebConnectionPage() {
     }
 
     if (!qrData?.expiresAt || !qrData.qrCode) {
-      setQrExpiresIn(null)
+      setTimeout(() => setQrExpiresIn(null), 0)
       return
     }
 
@@ -611,12 +630,14 @@ export function WhatsAppWebConnectionPage() {
         <div className="flex flex-wrap items-center gap-3">
           <StatusBadge label="Experimental" tone="warning" />
           <StatusBadge
-            label={toStatusLabel(isSyncing ? 'SYNCING' : status?.sessionStatus ?? 'DISCONNECTED')}
+            label={toStatusLabel(isSyncing ? 'SYNCING' : (status?.sessionStatus ?? 'DISCONNECTED'))}
             tone={isSyncing ? 'info' : getStatusTone(status?.sessionStatus ?? 'DISCONNECTED')}
           />
         </div>
         <p className="mt-4 text-sm leading-7 text-slate-700">
-          Canal experimental WhatsApp Web: usado solo para demos, validacion temprana y pilotos controlados. Puede requerir reconexion manual mediante QR y no garantiza disponibilidad continua.
+          Canal experimental WhatsApp Web: usado solo para demos, validacion temprana y pilotos
+          controlados. Puede requerir reconexion manual mediante QR y no garantiza disponibilidad
+          continua.
         </p>
       </Card>
 
@@ -657,7 +678,9 @@ export function WhatsAppWebConnectionPage() {
               <div className="grid gap-4 md:grid-cols-2">
                 <SnapshotItem
                   label="Modo"
-                  value={status.adapterMode === 'EXPERIMENTAL' ? 'Experimental' : status.adapterMode}
+                  value={
+                    status.adapterMode === 'EXPERIMENTAL' ? 'Experimental' : status.adapterMode
+                  }
                 />
                 <SnapshotItem
                   label="Adaptador disponible"
@@ -733,11 +756,18 @@ export function WhatsAppWebConnectionPage() {
                         </p>
                         <StatusBadge
                           label={toProcessingLabel(event.processingStatus)}
-                          tone={event.processingStatus === 'FAILED' ? 'danger' : event.processingStatus === 'PROCESSED' ? 'success' : 'info'}
+                          tone={
+                            event.processingStatus === 'FAILED'
+                              ? 'danger'
+                              : event.processingStatus === 'PROCESSED'
+                                ? 'success'
+                                : 'info'
+                          }
                         />
                       </div>
                       <p className="mt-2 text-sm text-slate-600">
-                        ID de entrega: <span className="font-mono text-slate-700">{event.deliveryId}</span>
+                        ID de entrega:{' '}
+                        <span className="font-mono text-slate-700">{event.deliveryId}</span>
                       </p>
                       <p className="mt-1 text-sm text-slate-600">
                         Recibido {dayjs(event.receivedAt).format('DD/MM/YYYY HH:mm:ss')}
@@ -755,7 +785,9 @@ export function WhatsAppWebConnectionPage() {
             loading={intentLogsQuery.isPending && !latestDecision}
             onAnalyze={() => void analyzeCurrentTestMessage()}
             analyzing={intentPreviewMutation.isPending}
-            analyzeDisabled={!isOnline || intentPreviewMutation.isPending || !watchedTestMessage?.trim()}
+            analyzeDisabled={
+              !isOnline || intentPreviewMutation.isPending || !watchedTestMessage?.trim()
+            }
             showingPreview={Boolean(previewDecision)}
           />
 
@@ -850,9 +882,7 @@ export function WhatsAppWebConnectionPage() {
               <p className="text-sm font-semibold text-slate-900">
                 Escanea el QR con WhatsApp
                 {displayQrExpiresIn !== null && displayQrExpiresIn <= 30 ? (
-                  <span className="ml-2 text-red-600">
-                    ({displayQrExpiresIn}s restantes)
-                  </span>
+                  <span className="ml-2 text-red-600">({displayQrExpiresIn}s restantes)</span>
                 ) : null}
               </p>
               {displayQrCode.startsWith('data:image') ? (
@@ -958,7 +988,8 @@ function AiRuleResponseCard({
             Respuesta IA y reglas aplicadas
           </h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            Muestra la interpretacion del ultimo mensaje procesado y la decision del motor de reglas antes de responder al cliente.
+            Muestra la interpretacion del ultimo mensaje procesado y la decision del motor de reglas
+            antes de responder al cliente.
           </p>
         </div>
         <div className="flex flex-wrap justify-end gap-2">
@@ -968,7 +999,10 @@ function AiRuleResponseCard({
       </div>
 
       {loading ? (
-        <LoadingState message="Consultando el ultimo analisis de IA y reglas del centro estetico." variant="card" />
+        <LoadingState
+          message="Consultando el ultimo analisis de IA y reglas del centro estetico."
+          variant="card"
+        />
       ) : error ? (
         <ErrorState
           description="No fue posible recuperar el ultimo analisis registrado. Puedes intentar analizar el mensaje de prueba manualmente."
@@ -979,8 +1013,14 @@ function AiRuleResponseCard({
           <div className="grid gap-4 lg:grid-cols-4">
             <DecisionMetric label="Intencion" value={toIntentLabel(decision.intent)} />
             <DecisionMetric label="Confianza" value={`${Math.round(decision.confidence * 100)}%`} />
-            <DecisionMetric label="Consulta BD" value={decision.requiresDatabaseLookup ? 'Si' : 'No'} />
-            <DecisionMetric label="Derivacion" value={decision.requiresHumanHandoff ? 'Si' : 'No'} />
+            <DecisionMetric
+              label="Consulta BD"
+              value={decision.requiresDatabaseLookup ? 'Si' : 'No'}
+            />
+            <DecisionMetric
+              label="Derivacion"
+              value={decision.requiresHumanHandoff ? 'Si' : 'No'}
+            />
           </div>
 
           <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
@@ -1027,13 +1067,19 @@ function AiRuleResponseCard({
               <p className="text-sm font-semibold text-slate-950">Auditoria</p>
               <div className="mt-4 space-y-3 text-sm text-slate-600">
                 <p>
-                  Origen: <span className="font-semibold text-slate-800">{decision.sourceLabel}</span>
+                  Origen:{' '}
+                  <span className="font-semibold text-slate-800">{decision.sourceLabel}</span>
                 </p>
                 <p>
                   Modelo: <span className="font-mono text-slate-800">{decision.modelName}</span>
                 </p>
                 <p>
-                  Fecha: <span className="font-semibold text-slate-800">{decision.createdAt ? dayjs(decision.createdAt).format('DD/MM/YYYY HH:mm:ss') : 'No registrada'}</span>
+                  Fecha:{' '}
+                  <span className="font-semibold text-slate-800">
+                    {decision.createdAt
+                      ? dayjs(decision.createdAt).format('DD/MM/YYYY HH:mm:ss')
+                      : 'No registrada'}
+                  </span>
                 </p>
                 {decision.handoffReason ? (
                   <p className="rounded-[16px] border border-red-100 bg-red-50 px-3 py-3 text-red-700">
@@ -1059,9 +1105,15 @@ function AiRuleResponseCard({
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-blue-100 pt-5">
         <p className="max-w-2xl text-sm leading-6 text-slate-600">
-          Este recuadro es de auditoria operativa: permite validar que la IA interpreta la intencion y que las reglas impiden inventar precios, horarios, stock o indicaciones sensibles.
+          Este recuadro es de auditoria operativa: permite validar que la IA interpreta la intencion
+          y que las reglas impiden inventar precios, horarios, stock o indicaciones sensibles.
         </p>
-        <Button disabled={analyzeDisabled} loading={analyzing} onClick={onAnalyze} variant="secondary">
+        <Button
+          disabled={analyzeDisabled}
+          loading={analyzing}
+          onClick={onAnalyze}
+          variant="secondary"
+        >
           Analizar mensaje de prueba
         </Button>
       </div>
@@ -1082,7 +1134,9 @@ function EntityItem({ label, value }: { label: string; value: string | null }) {
   return (
     <div>
       <dt className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{label}</dt>
-      <dd className="mt-1 text-sm font-semibold text-slate-800">{value && value.trim() ? value : 'No detectado'}</dd>
+      <dd className="mt-1 text-sm font-semibold text-slate-800">
+        {value && value.trim() ? value : 'No detectado'}
+      </dd>
     </div>
   )
 }

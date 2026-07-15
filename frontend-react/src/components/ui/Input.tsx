@@ -10,17 +10,7 @@ type InputProps = InputHTMLAttributes<HTMLInputElement> & {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
-  {
-    className,
-    error,
-    hint,
-    id,
-    label,
-    leadingIcon,
-    trailing,
-    type = 'text',
-    ...props
-  },
+  { className, error, hint, id, label, leadingIcon, trailing, type = 'text', ...props },
   ref,
 ) {
   const inputId = id ?? props.name
@@ -34,7 +24,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       <span
         className={[
           'relative flex h-12 items-center rounded-[14px] border bg-white transition',
-          (type === 'date' || type === 'datetime-local') ? 'pb-1.5' : '',
+          type === 'date' || type === 'datetime-local' ? 'pb-1.5' : '',
           error
             ? 'border-red-300 ring-4 ring-red-100/60'
             : 'border-[var(--color-border)] focus-within:border-[var(--color-primary)] focus-within:ring-4 focus-within:ring-[var(--color-primary)]/12',

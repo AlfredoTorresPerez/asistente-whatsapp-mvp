@@ -11,7 +11,11 @@ import { FilterBar } from '../../../components/ui/FilterBar'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { buttonClassName } from '../../../components/ui/buttonStyles'
-import { formatEstadoRegistro, getRegistroTone, isRegistroActivo } from '../../../lib/statusFormatters'
+import {
+  formatEstadoRegistro,
+  getRegistroTone,
+  isRegistroActivo,
+} from '../../../lib/statusFormatters'
 import { useOnlineStatus } from '../../../lib/useOnlineStatus'
 import { listAestheticRules, updateAestheticRule } from '../../../services/api/aestheticApi'
 import type { AestheticBusinessRuleResponse } from '../../../services/api/types'
@@ -32,7 +36,10 @@ export function AutomationRulesPage() {
   const [ruleTypeInput, setRuleTypeInput] = useState('')
   const [activeInput, setActiveInput] = useState<ActiveFilter>('')
   const [filters, setFilters] = useState({ active: '' as ActiveFilter, ruleType: '' })
-  const [ruleToToggle, setRuleToToggle] = useState<{ rule: AestheticBusinessRuleResponse; active: boolean } | null>(null)
+  const [ruleToToggle, setRuleToToggle] = useState<{
+    rule: AestheticBusinessRuleResponse
+    active: boolean
+  } | null>(null)
   const [inlineError, setInlineError] = useState<string | null>(null)
 
   const rulesQuery = useQuery({
@@ -49,17 +56,26 @@ export function AutomationRulesPage() {
   })
 
   const statusMutation = useMutation({
-    mutationFn: async ({ active, rule }: { rule: AestheticBusinessRuleResponse; active: boolean }) => updateAestheticRule(rule.id, {
+    mutationFn: async ({
       active,
-      code: rule.code,
-      description: rule.description,
-      name: rule.name,
-      priority: rule.priority,
-      rulePayload: rule.rulePayload,
-      ruleType: rule.ruleType,
-    }),
+      rule,
+    }: {
+      rule: AestheticBusinessRuleResponse
+      active: boolean
+    }) =>
+      updateAestheticRule(rule.id, {
+        active,
+        code: rule.code,
+        description: rule.description,
+        name: rule.name,
+        priority: rule.priority,
+        rulePayload: rule.rulePayload,
+        ruleType: rule.ruleType,
+      }),
     onError: (error) => {
-      setInlineError(error instanceof Error ? error.message : 'No fue posible actualizar el estado de la regla.')
+      setInlineError(
+        error instanceof Error ? error.message : 'No fue posible actualizar el estado de la regla.',
+      )
     },
     onSuccess: async () => {
       setInlineError(null)
@@ -70,7 +86,13 @@ export function AutomationRulesPage() {
   })
 
   const rules = useMemo(() => rulesQuery.data?.items ?? [], [rulesQuery.data?.items])
-  const ruleTypes = useMemo(() => Array.from(new Set([...DEFAULT_RULE_TYPE_OPTIONS, ...rules.map((rule) => rule.ruleType)])).sort(), [rules])
+  const ruleTypes = useMemo(
+    () =>
+      Array.from(
+        new Set([...DEFAULT_RULE_TYPE_OPTIONS, ...rules.map((rule) => rule.ruleType)]),
+      ).sort(),
+    [rules],
+  )
   const activeCount = rules.filter((rule) => rule.active).length
   const pausedCount = rules.filter((rule) => !rule.active).length
   const highPriority = rules.filter((rule) => rule.priority <= 20).length
@@ -97,9 +119,17 @@ export function AutomationRulesPage() {
       />
 
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <MetricCard label="Reglas visibles" value={String(rulesQuery.data?.totalItems ?? 0)} tone="info" />
+        <MetricCard
+          label="Reglas visibles"
+          value={String(rulesQuery.data?.totalItems ?? 0)}
+          tone="info"
+        />
         <MetricCard label="Activas" value={String(activeCount)} tone="success" />
-        <MetricCard label="Desactivadas" value={String(pausedCount)} tone={pausedCount > 0 ? 'warning' : 'success'} />
+        <MetricCard
+          label="Desactivadas"
+          value={String(pausedCount)}
+          tone={pausedCount > 0 ? 'warning' : 'success'}
+        />
         <MetricCard label="Prioridad alta" value={String(highPriority)} tone="warning" />
       </div>
 
@@ -107,23 +137,37 @@ export function AutomationRulesPage() {
         <FilterBar
           actions={
             <>
-              <Button onClick={applyFilters} size="sm" type="button">Aplicar filtros</Button>
-              <Button onClick={clearFilters} size="sm" type="button" variant="secondary">Limpiar</Button>
+              <Button onClick={applyFilters} size="sm" type="button">
+                Aplicar filtros
+              </Button>
+              <Button onClick={clearFilters} size="sm" type="button" variant="secondary">
+                Limpiar
+              </Button>
             </>
           }
         >
           <label className="block">
             <span className="mb-1.5 block text-sm font-medium text-slate-700">Tipo de regla</span>
-            <select className={fieldClassName} onChange={(event) => setRuleTypeInput(event.target.value)} value={ruleTypeInput}>
+            <select
+              className={fieldClassName}
+              onChange={(event) => setRuleTypeInput(event.target.value)}
+              value={ruleTypeInput}
+            >
               <option value="">Todos</option>
               {ruleTypes.map((type) => (
-                <option key={type} value={type}>{formatRuleType(type)}</option>
+                <option key={type} value={type}>
+                  {formatRuleType(type)}
+                </option>
               ))}
             </select>
           </label>
           <label className="block">
             <span className="mb-1.5 block text-sm font-medium text-slate-700">Estado</span>
-            <select className={fieldClassName} onChange={(event) => setActiveInput(event.target.value as ActiveFilter)} value={activeInput}>
+            <select
+              className={fieldClassName}
+              onChange={(event) => setActiveInput(event.target.value as ActiveFilter)}
+              value={activeInput}
+            >
               <option value="">Todos</option>
               <option value="true">Activas</option>
               <option value="false">Desactivadas</option>
@@ -179,23 +223,48 @@ export function AutomationRulesPage() {
                   <article
                     className={[
                       'grid gap-3 rounded-[20px] border p-4 transition md:grid-cols-[minmax(0,1.1fr)_150px_90px_120px_minmax(0,1.2fr)_auto] md:items-center',
-                      active ? 'border-[var(--color-border)] bg-white' : 'border-amber-200 bg-amber-50/70',
+                      active
+                        ? 'border-[var(--color-border)] bg-white'
+                        : 'border-amber-200 bg-amber-50/70',
                     ].join(' ')}
                     key={rule.id}
                   >
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-[var(--color-text)]">{rule.name}</p>
-                      <p className="mt-1 truncate text-xs uppercase tracking-[0.16em] text-slate-500">{rule.code}</p>
+                      <p className="truncate text-sm font-semibold text-[var(--color-text)]">
+                        {rule.name}
+                      </p>
+                      <p className="mt-1 truncate text-xs uppercase tracking-[0.16em] text-slate-500">
+                        {rule.code}
+                      </p>
                     </div>
-                    <p className="text-sm font-semibold text-slate-700">{formatRuleType(rule.ruleType)}</p>
+                    <p className="text-sm font-semibold text-slate-700">
+                      {formatRuleType(rule.ruleType)}
+                    </p>
                     <p className="text-sm text-slate-700">Prioridad {rule.priority}</p>
-                    <StatusBadge label={formatEstadoRegistro(rule.active)} tone={getRegistroTone(rule.active)} />
-                    <p className="line-clamp-2 text-sm leading-5 text-slate-700">{rule.description}</p>
+                    <StatusBadge
+                      label={formatEstadoRegistro(rule.active)}
+                      tone={getRegistroTone(rule.active)}
+                    />
+                    <p className="line-clamp-2 text-sm leading-5 text-slate-700">
+                      {rule.description}
+                    </p>
                     <div className="flex flex-wrap justify-end gap-2">
                       {active ? (
-                        <Link className={buttonClassName({ size: 'sm', variant: 'secondary' })} title={`Editar ${rule.name}`} to={`/automation-rules/${rule.id}/edit`}>Editar</Link>
+                        <Link
+                          className={buttonClassName({ size: 'sm', variant: 'secondary' })}
+                          title={`Editar ${rule.name}`}
+                          to={`/automation-rules/${rule.id}/edit`}
+                        >
+                          Editar
+                        </Link>
                       ) : (
-                        <span aria-disabled="true" className={`${buttonClassName({ size: 'sm', variant: 'secondary' })} pointer-events-none opacity-60`} title="No se puede editar una regla desactivada.">Editar</span>
+                        <span
+                          aria-disabled="true"
+                          className={`${buttonClassName({ size: 'sm', variant: 'secondary' })} pointer-events-none opacity-60`}
+                          title="No se puede editar una regla desactivada."
+                        >
+                          Editar
+                        </span>
                       )}
                       <Button
                         disabled={statusMutation.isPending}
@@ -216,11 +285,31 @@ export function AutomationRulesPage() {
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--color-border)] pt-4">
           <p className="text-sm text-slate-600">
-            Página {(rulesQuery.data?.page ?? 0) + 1} de {Math.max(rulesQuery.data?.totalPages ?? 1, 1)} · 10 registros por página
+            Página {(rulesQuery.data?.page ?? 0) + 1} de{' '}
+            {Math.max(rulesQuery.data?.totalPages ?? 1, 1)} · 10 registros por página
           </p>
           <div className="flex gap-2">
-            <Button disabled={page === 0 || rulesQuery.isFetching} onClick={() => setPage((current) => Math.max(current - 1, 0))} size="sm" variant="secondary">Anterior</Button>
-            <Button disabled={!rulesQuery.data || rulesQuery.data.totalPages === 0 || page >= rulesQuery.data.totalPages - 1 || rulesQuery.isFetching} onClick={() => setPage((current) => current + 1)} size="sm" variant="secondary">Siguiente</Button>
+            <Button
+              disabled={page === 0 || rulesQuery.isFetching}
+              onClick={() => setPage((current) => Math.max(current - 1, 0))}
+              size="sm"
+              variant="secondary"
+            >
+              Anterior
+            </Button>
+            <Button
+              disabled={
+                !rulesQuery.data ||
+                rulesQuery.data.totalPages === 0 ||
+                page >= rulesQuery.data.totalPages - 1 ||
+                rulesQuery.isFetching
+              }
+              onClick={() => setPage((current) => current + 1)}
+              size="sm"
+              variant="secondary"
+            >
+              Siguiente
+            </Button>
           </div>
         </div>
       </Card>
@@ -228,7 +317,11 @@ export function AutomationRulesPage() {
       <ConfirmDialog
         confirmLabel={ruleToToggle?.active ? 'Activar' : 'Desactivar'}
         confirmLoading={statusMutation.isPending}
-        description={ruleToToggle ? `La regla ${ruleToToggle.rule.name} quedara ${ruleToToggle.active ? 'activa' : 'desactivada'}, pero no será eliminada físicamente.` : 'Confirma el cambio de estado de la regla.'}
+        description={
+          ruleToToggle
+            ? `La regla ${ruleToToggle.rule.name} quedara ${ruleToToggle.active ? 'activa' : 'desactivada'}, pero no será eliminada físicamente.`
+            : 'Confirma el cambio de estado de la regla.'
+        }
         onCancel={() => setRuleToToggle(null)}
         onConfirm={() => {
           if (ruleToToggle) {
@@ -243,13 +336,25 @@ export function AutomationRulesPage() {
   )
 }
 
-function MetricCard({ label, tone, value }: { label: string; tone: 'success' | 'warning' | 'info'; value: string }) {
+function MetricCard({
+  label,
+  tone,
+  value,
+}: {
+  label: string
+  tone: 'success' | 'warning' | 'info'
+  value: string
+}) {
   return (
     <Card className="p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">{label}</p>
-          <p className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[var(--color-text)]">{value}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">
+            {label}
+          </p>
+          <p className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[var(--color-text)]">
+            {value}
+          </p>
         </div>
         <StatusBadge label="BD" tone={tone} />
       </div>

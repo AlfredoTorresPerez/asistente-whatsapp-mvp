@@ -22,10 +22,16 @@ describe('business AI helpers', () => {
   })
 
   it('validates start time before end time', () => {
-    expect(isBusinessHourRangeValid({ day: 'Lunes', startTime: '09:00', endTime: '18:00' })).toBe(true)
-    expect(isBusinessHourRangeValid({ day: 'Lunes', startTime: '18:00', endTime: '09:00' })).toBe(false)
+    expect(isBusinessHourRangeValid({ day: 'Lunes', startTime: '09:00', endTime: '18:00' })).toBe(
+      true,
+    )
+    expect(isBusinessHourRangeValid({ day: 'Lunes', startTime: '18:00', endTime: '09:00' })).toBe(
+      false,
+    )
     expect(isBusinessHourRangeValid({ day: 'Domingo', startTime: '', endTime: '' })).toBe(true)
-    expect(isBusinessHourRangeValid({ day: 'Domingo', startTime: '09:00', endTime: '' })).toBe(false)
+    expect(isBusinessHourRangeValid({ day: 'Domingo', startTime: '09:00', endTime: '' })).toBe(
+      false,
+    )
   })
 
   it('sorts audit entries by newest first and paginates exactly five items', () => {

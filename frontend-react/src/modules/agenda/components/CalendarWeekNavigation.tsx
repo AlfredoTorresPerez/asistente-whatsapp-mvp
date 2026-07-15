@@ -8,7 +8,12 @@ type CalendarWeekNavigationProps = {
   onDateChange: (date: string) => void
 }
 
-export function CalendarWeekNavigation({ currentDate, today, itemsCount, onDateChange }: CalendarWeekNavigationProps) {
+export function CalendarWeekNavigation({
+  currentDate,
+  today,
+  itemsCount,
+  onDateChange,
+}: CalendarWeekNavigationProps) {
   const weekStart = dayjs(currentDate).startOf('day')
   const daysFromMonday = (weekStart.day() + 6) % 7
   const monday = weekStart.subtract(daysFromMonday, 'day')
@@ -19,7 +24,8 @@ export function CalendarWeekNavigation({ currentDate, today, itemsCount, onDateC
       <div>
         <h2 className="text-sm font-semibold text-slate-900">Calendario semanal</h2>
         <p className="mt-0.5 text-xs text-slate-500">
-          {monday.format('DD/MM/YYYY')} - {sunday.format('DD/MM/YYYY')} &middot; {itemsCount} reservas
+          {monday.format('DD/MM/YYYY')} - {sunday.format('DD/MM/YYYY')} &middot; {itemsCount}{' '}
+          reservas
         </p>
       </div>
       <div className="flex flex-wrap gap-1.5">

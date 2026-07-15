@@ -27,8 +27,5 @@ export function changePasswordRequest(payload: ChangePasswordRequest) {
 }
 
 export function getAuditLogRequest(page = 0, size = 20) {
-  return apiFetch<PagedResponse<AuditLogResponse>>(
-    `/security/audit-log?page=${page}&size=${size}`,
-  )
+  return apiFetch<PagedResponse<AuditLogResponse>>(`/security/audit-log?page=${page}&size=${size}`)
 }
-

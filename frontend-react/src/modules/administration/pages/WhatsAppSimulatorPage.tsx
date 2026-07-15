@@ -85,9 +85,7 @@ export function WhatsAppSimulatorPage() {
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
             Mensaje de simulacion
           </p>
-          <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-            Simular mensaje entrante
-          </h2>
+          <h2 className="mt-2 text-2xl font-semibold text-slate-950">Simular mensaje entrante</h2>
         </div>
 
         <form className="grid gap-4 md:grid-cols-2" onSubmit={onSubmit}>
@@ -117,11 +115,7 @@ export function WhatsAppSimulatorPage() {
             <Link to="/conversations">
               <Button variant="secondary">Ir a conversaciones</Button>
             </Link>
-            <Button
-              disabled={simMutation.isPending}
-              loading={simMutation.isPending}
-              type="submit"
-            >
+            <Button disabled={simMutation.isPending} loading={simMutation.isPending} type="submit">
               Enviar simulacion
             </Button>
           </div>

@@ -16,12 +16,7 @@ import { createConversationRequest } from '../../../services/api/conversationsAp
 const schema = z.object({
   customerName: z.string().trim().min(1, 'Ingresa el nombre del cliente.').max(160),
   customerPhone: z.string().trim().min(8, 'Ingresa un telefono valido.').max(30),
-  customerEmail: z
-    .string()
-    .trim()
-    .max(255)
-    .email('Ingresa un correo valido.')
-    .or(z.literal('')),
+  customerEmail: z.string().trim().max(255).email('Ingresa un correo valido.').or(z.literal('')),
   initialMessage: z.string().trim().max(1000, 'El mensaje no puede superar los 1000 caracteres.'),
 })
 
@@ -92,7 +87,8 @@ export function NewConversationPage() {
         <Card className="border-amber-200 bg-amber-50">
           <p className="text-sm font-semibold text-amber-900">Sin conexion</p>
           <p className="mt-2 text-sm leading-6 text-amber-800">
-            Debes recuperar internet para crear una conversacion nueva y enviar mensajes por el canal.
+            Debes recuperar internet para crear una conversacion nueva y enviar mensajes por el
+            canal.
           </p>
         </Card>
       ) : null}
@@ -135,7 +131,11 @@ export function NewConversationPage() {
               <Button onClick={() => navigate('/conversations')} variant="secondary">
                 Cancelar
               </Button>
-              <Button disabled={!isOnline} loading={createMutation.isPending || isSubmitting} type="submit">
+              <Button
+                disabled={!isOnline}
+                loading={createMutation.isPending || isSubmitting}
+                type="submit"
+              >
                 Crear conversacion
               </Button>
             </div>

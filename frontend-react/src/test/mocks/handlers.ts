@@ -32,9 +32,7 @@ export const handlers = [
     const body = await request.json()
     return HttpResponse.json({ ...mockProfile, ...(body as object) })
   }),
-  http.post(wc('/users/me/change-password'), () =>
-    HttpResponse.json({ status: 'OK' }),
-  ),
+  http.post(wc('/users/me/change-password'), () => HttpResponse.json({ status: 'OK' })),
   http.get(wc('/admin/summary'), () => HttpResponse.json(mockAdminSummary)),
   http.get(wc('/admin/security'), () => HttpResponse.json(mockSecurityPolicy)),
   http.patch(wc('/admin/security'), async ({ request }) => {
@@ -79,24 +77,16 @@ export const handlers = [
       businessName: null,
     }),
   ),
-  http.post(wc('/whatsapp-web/connect'), () =>
-    HttpResponse.json({ status: 'CONNECTING' }),
-  ),
-  http.post(wc('/whatsapp-web/disconnect'), () =>
-    HttpResponse.json({ status: 'DISCONNECTED' }),
-  ),
+  http.post(wc('/whatsapp-web/connect'), () => HttpResponse.json({ status: 'CONNECTING' })),
+  http.post(wc('/whatsapp-web/disconnect'), () => HttpResponse.json({ status: 'DISCONNECTED' })),
   http.post(wc('/whatsapp-web/refresh-qr'), () =>
     HttpResponse.json({ qrBase64: 'data:image/png;base64,iVBORw0KGgo=' }),
   ),
   http.post(wc('/whatsapp-web/test-message'), () =>
     HttpResponse.json({ status: 'SENT', messageId: 'test-msg-1' }),
   ),
-  http.post(wc('/test/whatsapp-inbound'), () =>
-    HttpResponse.json({ status: 'PROCESSED' }),
-  ),
-  http.get(wc('/business-locations'), () =>
-    HttpResponse.json(mockBusinessLocations),
-  ),
+  http.post(wc('/test/whatsapp-inbound'), () => HttpResponse.json({ status: 'PROCESSED' })),
+  http.get(wc('/business-locations'), () => HttpResponse.json(mockBusinessLocations)),
   http.post(wc('/business-locations'), async ({ request }) => {
     const body = await request.json()
     return HttpResponse.json({ id: 'new-location', ...(body as object) }, { status: 201 })

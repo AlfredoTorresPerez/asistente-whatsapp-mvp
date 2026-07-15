@@ -55,8 +55,7 @@ const PUBLIC_LAYOUT_VARIANTS: Record<string, PublicLayoutVariant> = {
   '/forgot-password': {
     heading: 'Recupera tu cuenta y manten tu negocio',
     accent: 'siempre en marcha',
-    description:
-      'Te ayudamos a recuperar el acceso a tu cuenta de forma segura y rapida.',
+    description: 'Te ayudamos a recuperar el acceso a tu cuenta de forma segura y rapida.',
     trustTitle: 'Tu seguridad es nuestra prioridad',
     trustText: 'Usamos doble nivel empresarial para proteger tu informacion.',
     features: [
@@ -107,8 +106,7 @@ const PUBLIC_LAYOUT_VARIANTS: Record<string, PublicLayoutVariant> = {
   '/reset-password': {
     heading: 'Recupera tu cuenta y manten tu negocio',
     accent: 'siempre en marcha',
-    description:
-      'Te ayudamos a proteger tu cuenta con una nueva contrasena segura.',
+    description: 'Te ayudamos a proteger tu cuenta con una nueva contrasena segura.',
     trustTitle: 'Tu seguridad es nuestra prioridad',
     trustText: 'Usamos doble nivel empresarial para proteger tu informacion.',
     features: [
@@ -155,8 +153,7 @@ export function PublicLayout() {
 
             <div className="mt-10 max-w-[380px]">
               <h1 className="text-[34px] leading-[1.08] font-semibold">
-                {variant.heading}{' '}
-                <span className="text-[#4ADE80]">{variant.accent}</span>
+                {variant.heading} <span className="text-[#4ADE80]">{variant.accent}</span>
               </h1>
               <p className="mt-5 text-sm leading-7 text-blue-50/82">{variant.description}</p>
             </div>
@@ -184,9 +181,7 @@ export function PublicLayout() {
                   </span>
                   <div>
                     <p className="text-sm font-semibold text-white">{feature.title}</p>
-                    <p className="mt-1 text-xs leading-5 text-blue-50/72">
-                      {feature.description}
-                    </p>
+                    <p className="mt-1 text-xs leading-5 text-blue-50/72">{feature.description}</p>
                   </div>
                 </div>
               ))}
@@ -240,7 +235,13 @@ function FeatureIcon({ tone }: { tone: 'blue' | 'green' | 'violet' }) {
     return (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M12 6V18" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
-        <path d="M7 11L12 6L17 11" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+        <path
+          d="M7 11L12 6L17 11"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+        />
       </svg>
     )
   }
@@ -267,8 +268,20 @@ function FeatureIcon({ tone }: { tone: 'blue' | 'green' | 'violet' }) {
 function ShieldIcon() {
   return (
     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 3L19 6V11.5C19 16.1 15.8 20.37 12 21.5C8.2 20.37 5 16.1 5 11.5V6L12 3Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-      <path d="M9.5 12.2L11.4 14.1L14.9 10.6" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+      <path
+        d="M12 3L19 6V11.5C19 16.1 15.8 20.37 12 21.5C8.2 20.37 5 16.1 5 11.5V6L12 3Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+      />
+      <path
+        d="M9.5 12.2L11.4 14.1L14.9 10.6"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+      />
     </svg>
   )
 }

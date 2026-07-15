@@ -118,8 +118,8 @@ export function ResetPasswordPage() {
             Nueva contrasena
           </h2>
           <p className="mt-3 text-sm leading-6 text-[var(--color-text-secondary)]">
-            El enlace fue verificado. Define una nueva contrasena para volver a tu panel de
-            trabajo con seguridad.
+            El enlace fue verificado. Define una nueva contrasena para volver a tu panel de trabajo
+            con seguridad.
           </p>
         </div>
         <StatusBadge label="Enlace verificado" tone="success" />

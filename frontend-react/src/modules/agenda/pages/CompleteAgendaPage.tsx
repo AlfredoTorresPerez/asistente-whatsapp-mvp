@@ -20,7 +20,10 @@ import {
   getBusinessHoursRequest,
 } from '../../../services/api/completeAgendaApi'
 import { getBusinessLocationsRequest } from '../../../services/api/businessLocationsApi'
-import { createBookingConfirmationLinkRequest, getBookingDetailRequest } from '../../../services/api/bookingsApi'
+import {
+  createBookingConfirmationLinkRequest,
+  getBookingDetailRequest,
+} from '../../../services/api/bookingsApi'
 import type { AgendaCalendarItemResponse, BookingDetailResponse } from '../../../services/api/types'
 import { CalendarWeekNavigation } from '../components/CalendarWeekNavigation'
 import { WeeklyCalendarView } from '../components/WeeklyCalendarView'
@@ -61,10 +64,17 @@ function getInitials(name: string) {
   return parts.map((part) => part[0]?.toUpperCase()).join('')
 }
 
-function getWhatsAppStatus(item: AgendaCalendarItemResponse | null, detail?: BookingDetailResponse) {
+function getWhatsAppStatus(
+  item: AgendaCalendarItemResponse | null,
+  detail?: BookingDetailResponse,
+) {
   const lastWhatsAppReminder = (detail?.reminders ?? [])
     .filter((reminder) => reminder.channelType === 'WHATSAPP')
-    .sort((first, second) => dayjs(second.sentAt ?? second.scheduledAt).valueOf() - dayjs(first.sentAt ?? first.scheduledAt).valueOf())[0]
+    .sort(
+      (first, second) =>
+        dayjs(second.sentAt ?? second.scheduledAt).valueOf() -
+        dayjs(first.sentAt ?? first.scheduledAt).valueOf(),
+    )[0]
 
   if (lastWhatsAppReminder?.sentAt) {
     return `WhatsApp enviado ${dayjs(lastWhatsAppReminder.sentAt).format('DD/MM HH:mm')}`
@@ -207,19 +217,33 @@ export function CompleteAgendaPage() {
   )
 
   useEffect(() => {
-    if (serviceId && !serviceOptions.some((option) => option.value === serviceId)) {
-      setServiceId('')
-    }
-    if (professionalId && !professionalOptions.some((option) => option.value === professionalId)) {
-      setProfessionalId('')
-    }
-    if (roomId && !roomOptions.some((option) => option.value === roomId)) {
-      setRoomId('')
-    }
+    const id = setTimeout(() => {
+      if (serviceId && !serviceOptions.some((option) => option.value === serviceId)) {
+        setServiceId('')
+      }
+      if (
+        professionalId &&
+        !professionalOptions.some((option) => option.value === professionalId)
+      ) {
+        setProfessionalId('')
+      }
+      if (roomId && !roomOptions.some((option) => option.value === roomId)) {
+        setRoomId('')
+      }
+    }, 0)
+    return () => clearTimeout(id)
   }, [professionalId, professionalOptions, roomId, roomOptions, serviceId, serviceOptions])
 
   const calendarQuery = useQuery({
-    queryKey: ['agenda-calendar-week', weekStart.format('YYYY-MM-DD'), locationId, professionalId, roomId, serviceId, statusFilter],
+    queryKey: [
+      'agenda-calendar-week',
+      weekStart.format('YYYY-MM-DD'),
+      locationId,
+      professionalId,
+      roomId,
+      serviceId,
+      statusFilter,
+    ],
     queryFn: () =>
       getAgendaCalendarRequest({
         from: `${weekStart.format('YYYY-MM-DD')}T00:00:00-04:00`,
@@ -241,7 +265,10 @@ export function CompleteAgendaPage() {
   )
 
   const selectedItem = useMemo(
-    () => calendarItems.find((item) => item.bookingId === selectedBookingId) ?? calendarItems[0] ?? null,
+    () =>
+      calendarItems.find((item) => item.bookingId === selectedBookingId) ??
+      calendarItems[0] ??
+      null,
     [calendarItems, selectedBookingId],
   )
 
@@ -254,14 +281,20 @@ export function CompleteAgendaPage() {
   const bookingDetail = bookingDetailQuery.data
 
   useEffect(() => {
-    if (calendarItems.length === 0) {
-      setSelectedBookingId(null)
-      return
-    }
+    const id = setTimeout(() => {
+      if (calendarItems.length === 0) {
+        setSelectedBookingId(null)
+        return
+      }
 
-    if (!selectedBookingId || !calendarItems.some((item) => item.bookingId === selectedBookingId)) {
-      setSelectedBookingId(calendarItems[0].bookingId)
-    }
+      if (
+        !selectedBookingId ||
+        !calendarItems.some((item) => item.bookingId === selectedBookingId)
+      ) {
+        setSelectedBookingId(calendarItems[0].bookingId)
+      }
+    }, 0)
+    return () => clearTimeout(id)
   }, [calendarItems, selectedBookingId])
 
   const availabilityMutation = useMutation({
@@ -321,7 +354,8 @@ export function CompleteAgendaPage() {
       } else {
         showToast({
           title: 'No se pudo crear la reserva',
-          description: apiError?.message ?? 'El horario pudo quedar ocupado o faltan datos obligatorios.',
+          description:
+            apiError?.message ?? 'El horario pudo quedar ocupado o faltan datos obligatorios.',
           tone: 'error',
         })
       }
@@ -337,7 +371,8 @@ export function CompleteAgendaPage() {
     onSuccess: () => {
       showToast({
         title: 'Confirmacion enviada',
-        description: 'Se genero y envio el enlace de confirmacion por WhatsApp cuando el canal esta disponible.',
+        description:
+          'Se genero y envio el enlace de confirmacion por WhatsApp cuando el canal esta disponible.',
         tone: 'success',
       })
       void bookingDetailQuery.refetch()
@@ -353,7 +388,8 @@ export function CompleteAgendaPage() {
   })
 
   const cancelMutation = useMutation({
-    mutationFn: (bookingId: string) => cancelAgendaBookingRequest(bookingId, { reason: cancelReason.trim() }),
+    mutationFn: (bookingId: string) =>
+      cancelAgendaBookingRequest(bookingId, { reason: cancelReason.trim() }),
     onSuccess: () => {
       setCancelReason('')
       showToast({
@@ -366,9 +402,10 @@ export function CompleteAgendaPage() {
     },
     onError: (error) => {
       const apiError = error as ApiClientError
-      const description = apiError?.fieldErrors && Object.keys(apiError.fieldErrors).length > 0
-        ? Object.values(apiError.fieldErrors)[0]
-        : apiError?.message ?? 'El motivo es obligatorio o la reserva ya no permite cambios.'
+      const description =
+        apiError?.fieldErrors && Object.keys(apiError.fieldErrors).length > 0
+          ? Object.values(apiError.fieldErrors)[0]
+          : (apiError?.message ?? 'El motivo es obligatorio o la reserva ya no permite cambios.')
       showToast({
         title: 'No se pudo cancelar la reserva',
         description,
@@ -445,7 +482,12 @@ export function CompleteAgendaPage() {
             options={statusOptions}
             value={statusFilter}
           />
-          <Input label="Semana" onChange={(event) => setDate(event.target.value)} type="date" value={date} />
+          <Input
+            label="Semana"
+            onChange={(event) => setDate(event.target.value)}
+            type="date"
+            value={date}
+          />
           <Button onClick={() => calendarQuery.refetch()} variant="secondary">
             Actualizar
           </Button>
@@ -480,30 +522,67 @@ export function CompleteAgendaPage() {
                       {getInitials(selectedItem.customerName)}
                     </div>
                     <div>
-                      <h2 className="text-lg font-bold text-slate-900">{selectedItem.customerName}</h2>
-                      <p className="text-sm text-slate-500">{bookingDetail?.customerPhone ?? selectedItem.customerPhone}</p>
+                      <h2 className="text-lg font-bold text-slate-900">
+                        {selectedItem.customerName}
+                      </h2>
+                      <p className="text-sm text-slate-500">
+                        {bookingDetail?.customerPhone ?? selectedItem.customerPhone}
+                      </p>
                     </div>
                   </div>
-                  <StatusBadge label={getStatusLabel(selectedItem.status)} tone={
-                    selectedStatusStyle.hex === '#10b981' ? 'success' :
-                    selectedStatusStyle.hex === '#f59e0b' ? 'warning' :
-                    selectedStatusStyle.hex === '#f87171' ? 'danger' : 'info'
-                  } />
+                  <StatusBadge
+                    label={getStatusLabel(selectedItem.status)}
+                    tone={
+                      selectedStatusStyle.hex === '#10b981'
+                        ? 'success'
+                        : selectedStatusStyle.hex === '#f59e0b'
+                          ? 'warning'
+                          : selectedStatusStyle.hex === '#f87171'
+                            ? 'danger'
+                            : 'info'
+                    }
+                  />
                 </div>
 
                 <div className="grid gap-3 rounded-3xl border border-slate-100 bg-slate-50 p-4 text-sm">
-                  <DetailRow icon="Servicio" label="Servicio" value={selectedItem.serviceName ?? selectedItem.subject} />
-                  <DetailRow icon="Fecha" label="Fecha y hora" value={`${formatLongDate(selectedItem.startsAt)} · ${formatTimeRange(selectedItem)}`} />
-                  <DetailRow icon="Equipo" label="Profesional" value={selectedItem.professionalName ?? 'Profesional por asignar'} />
-                  <DetailRow icon="Lugar" label="Ubicacion" value={selectedItem.roomName ?? selectedItem.locationName ?? 'Sin ubicacion'} />
-                  <DetailRow icon="Tiempo" label="Duracion" value={`${selectedItem.durationMinutes} minutos`} />
-                  <DetailRow icon="WA" label="Estado WhatsApp" value={getWhatsAppStatus(selectedItem, bookingDetail)} />
+                  <DetailRow
+                    icon="Servicio"
+                    label="Servicio"
+                    value={selectedItem.serviceName ?? selectedItem.subject}
+                  />
+                  <DetailRow
+                    icon="Fecha"
+                    label="Fecha y hora"
+                    value={`${formatLongDate(selectedItem.startsAt)} · ${formatTimeRange(selectedItem)}`}
+                  />
+                  <DetailRow
+                    icon="Equipo"
+                    label="Profesional"
+                    value={selectedItem.professionalName ?? 'Profesional por asignar'}
+                  />
+                  <DetailRow
+                    icon="Lugar"
+                    label="Ubicacion"
+                    value={selectedItem.roomName ?? selectedItem.locationName ?? 'Sin ubicacion'}
+                  />
+                  <DetailRow
+                    icon="Tiempo"
+                    label="Duracion"
+                    value={`${selectedItem.durationMinutes} minutos`}
+                  />
+                  <DetailRow
+                    icon="WA"
+                    label="Estado WhatsApp"
+                    value={getWhatsAppStatus(selectedItem, bookingDetail)}
+                  />
                 </div>
 
                 <div className="space-y-2">
                   <h3 className="text-sm font-semibold text-slate-800">Notas internas</h3>
                   <div className="rounded-2xl border border-slate-100 bg-white p-4 text-sm text-slate-600">
-                    {bookingDetailQuery.isLoading ? 'Cargando detalle...' : bookingDetail?.notes ?? 'Sin notas registradas.'}
+                    {bookingDetailQuery.isLoading
+                      ? 'Cargando detalle...'
+                      : (bookingDetail?.notes ?? 'Sin notas registradas.')}
                   </div>
                 </div>
 
@@ -516,13 +595,25 @@ export function CompleteAgendaPage() {
                   >
                     Confirmar por WhatsApp
                   </Button>
-                  <Button fullWidth onClick={() => navigate(`/appointments/${selectedItem.bookingId}/reschedule`)} variant="secondary">
+                  <Button
+                    fullWidth
+                    onClick={() => navigate(`/appointments/${selectedItem.bookingId}/reschedule`)}
+                    variant="secondary"
+                  >
                     Reprogramar
                   </Button>
-                  <Button fullWidth onClick={() => navigate(`/appointments/${selectedItem.bookingId}/edit`)} variant="secondary">
+                  <Button
+                    fullWidth
+                    onClick={() => navigate(`/appointments/${selectedItem.bookingId}/edit`)}
+                    variant="secondary"
+                  >
                     Editar notas
                   </Button>
-                  <Button fullWidth onClick={() => navigate(`/appointments/${selectedItem.bookingId}`)} variant="secondary">
+                  <Button
+                    fullWidth
+                    onClick={() => navigate(`/appointments/${selectedItem.bookingId}`)}
+                    variant="secondary"
+                  >
                     Ver historial del cliente
                   </Button>
                 </div>
@@ -550,7 +641,8 @@ export function CompleteAgendaPage() {
               <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center">
                 <h2 className="text-base font-semibold text-slate-800">Selecciona una reserva</h2>
                 <p className="mt-2 text-sm text-slate-500">
-                  Al posicionarte sobre una cita se mostrara el cliente, el servicio, la trazabilidad y las acciones disponibles.
+                  Al posicionarte sobre una cita se mostrara el cliente, el servicio, la
+                  trazabilidad y las acciones disponibles.
                 </p>
               </div>
             )}
@@ -563,13 +655,16 @@ export function CompleteAgendaPage() {
           <div>
             <h2 className="text-lg font-semibold text-slate-900">Agentes involucrados</h2>
             <p className="mt-1 text-sm text-slate-500">
-              Cada cita queda conectada con agenda, cliente, profesional, servicio, notificaciones y administracion.
+              Cada cita queda conectada con agenda, cliente, profesional, servicio, notificaciones y
+              administracion.
             </p>
           </div>
           <div className="grid gap-3 md:grid-cols-2">
             {getAgentRows(selectedItem, bookingDetail).map((agent) => (
               <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4" key={agent.name}>
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-600">Agente {agent.name}</p>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-600">
+                  Agente {agent.name}
+                </p>
                 <p className="mt-2 text-sm text-slate-700">{agent.detail}</p>
               </div>
             ))}
@@ -580,9 +675,13 @@ export function CompleteAgendaPage() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <h2 className="text-lg font-semibold text-slate-900">Trazabilidad reciente</h2>
-              <p className="mt-1 text-sm text-slate-500">Eventos de estado, recordatorios y acciones operativas.</p>
+              <p className="mt-1 text-sm text-slate-500">
+                Eventos de estado, recordatorios y acciones operativas.
+              </p>
             </div>
-            {bookingDetailQuery.isFetching ? <StatusBadge label="Actualizando" tone="info" /> : null}
+            {bookingDetailQuery.isFetching ? (
+              <StatusBadge label="Actualizando" tone="info" />
+            ) : null}
           </div>
           <div className="space-y-3">
             {activityItems.length === 0 ? (
@@ -591,12 +690,17 @@ export function CompleteAgendaPage() {
               </div>
             ) : (
               activityItems.map((activity) => (
-                <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-100 bg-white p-4" key={activity.id}>
+                <div
+                  className="flex items-center justify-between gap-3 rounded-2xl border border-slate-100 bg-white p-4"
+                  key={activity.id}
+                >
                   <div>
                     <p className="text-sm font-semibold text-slate-800">{activity.title}</p>
                     <p className="text-xs text-slate-500">{activity.detail}</p>
                   </div>
-                  <p className="text-xs font-semibold text-slate-400">{dayjs(activity.at).format('DD/MM HH:mm')}</p>
+                  <p className="text-xs font-semibold text-slate-400">
+                    {dayjs(activity.at).format('DD/MM HH:mm')}
+                  </p>
                 </div>
               ))
             )}
@@ -620,7 +724,9 @@ export function CompleteAgendaPage() {
               options={[
                 { label: 'Selecciona sucursal', value: '' },
                 ...(locationsQuery.data ?? []).map((location) => ({
-                  label: location.commune ? `${location.name} - ${location.commune}` : location.name,
+                  label: location.commune
+                    ? `${location.name} - ${location.commune}`
+                    : location.name,
                   value: location.id,
                 })),
               ]}
@@ -630,10 +736,18 @@ export function CompleteAgendaPage() {
               disabled={filterOptionsQuery.isLoading}
               label="Servicio"
               onChange={(event) => setServiceId(event.target.value)}
-              options={[{ label: 'Selecciona servicio', value: '' }, ...serviceOptions.filter((option) => option.value)]}
+              options={[
+                { label: 'Selecciona servicio', value: '' },
+                ...serviceOptions.filter((option) => option.value),
+              ]}
               value={serviceId}
             />
-            <Input label="Fecha" onChange={(event) => setDate(event.target.value)} type="date" value={date} />
+            <Input
+              label="Fecha"
+              onChange={(event) => setDate(event.target.value)}
+              type="date"
+              value={date}
+            />
             <Select
               label="Preferencia"
               onChange={() => undefined}
@@ -669,10 +783,14 @@ export function CompleteAgendaPage() {
           </Button>
 
           <div className="rounded-3xl border border-slate-100 bg-slate-50 p-4">
-            <h3 className="text-sm font-semibold text-slate-800">Horarios sugeridos por la agenda</h3>
+            <h3 className="text-sm font-semibold text-slate-800">
+              Horarios sugeridos por la agenda
+            </h3>
             <div className="mt-3 grid gap-3 md:grid-cols-2">
               {slots.length === 0 ? (
-                <p className="text-sm text-slate-500">Consulta disponibilidad para ver horarios validos.</p>
+                <p className="text-sm text-slate-500">
+                  Consulta disponibilidad para ver horarios validos.
+                </p>
               ) : (
                 slots.map((slot) => (
                   <button
@@ -684,11 +802,20 @@ export function CompleteAgendaPage() {
                   >
                     <div className="flex items-center justify-between gap-3">
                       <strong className="text-slate-900">{formatAgendaTime(slot.startsAt)}</strong>
-                      <StatusBadge label={slot.available ? 'Disponible' : 'Bloqueado'} tone={slot.available ? 'success' : 'danger'} />
+                      <StatusBadge
+                        label={slot.available ? 'Disponible' : 'Bloqueado'}
+                        tone={slot.available ? 'success' : 'danger'}
+                      />
                     </div>
-                    <p className="mt-2 text-sm text-slate-600">{slot.professionalName ?? 'Profesional por asignar'}</p>
-                    <p className="text-sm text-slate-500">{slot.roomName ?? 'Sin cabina requerida'}</p>
-                    <p className="mt-2 text-xs text-slate-400">Duracion: {slot.durationMinutes} minutos</p>
+                    <p className="mt-2 text-sm text-slate-600">
+                      {slot.professionalName ?? 'Profesional por asignar'}
+                    </p>
+                    <p className="text-sm text-slate-500">
+                      {slot.roomName ?? 'Sin cabina requerida'}
+                    </p>
+                    <p className="mt-2 text-xs text-slate-400">
+                      Duracion: {slot.durationMinutes} minutos
+                    </p>
                   </button>
                 ))
               )}
@@ -700,16 +827,36 @@ export function CompleteAgendaPage() {
           <div>
             <h2 className="text-lg font-semibold text-slate-900">Datos del cliente WhatsApp</h2>
             <p className="mt-1 text-sm text-slate-500">
-              Al elegir un horario se crea reserva temporal, enlace de confirmacion y bloqueo de cupo.
+              Al elegir un horario se crea reserva temporal, enlace de confirmacion y bloqueo de
+              cupo.
             </p>
           </div>
-          <Input label="Cliente" onChange={(event) => setCustomerName(event.target.value)} value={customerName} />
-          <Input label="Telefono WhatsApp" onChange={(event) => setCustomerPhone(event.target.value)} value={customerPhone} />
-          <Input label="Correo opcional" onChange={(event) => setCustomerEmail(event.target.value)} type="email" value={customerEmail} />
-          <Textarea label="Notas de agenda" onChange={(event) => setNotes(event.target.value)} rows={5} value={notes} />
+          <Input
+            label="Cliente"
+            onChange={(event) => setCustomerName(event.target.value)}
+            value={customerName}
+          />
+          <Input
+            label="Telefono WhatsApp"
+            onChange={(event) => setCustomerPhone(event.target.value)}
+            value={customerPhone}
+          />
+          <Input
+            label="Correo opcional"
+            onChange={(event) => setCustomerEmail(event.target.value)}
+            type="email"
+            value={customerEmail}
+          />
+          <Textarea
+            label="Notas de agenda"
+            onChange={(event) => setNotes(event.target.value)}
+            rows={5}
+            value={notes}
+          />
           <div className="rounded-3xl bg-blue-50 p-4 text-sm text-blue-900">
-            Flujo coordinado: WhatsApp registra mensaje, orquestador detecta intencion, agenda calcula disponibilidad,
-            recursos validan profesional y cabina, enlace confirma reserva y auditoria registra el evento.
+            Flujo coordinado: WhatsApp registra mensaje, orquestador detecta intencion, agenda
+            calcula disponibilidad, recursos validan profesional y cabina, enlace confirma reserva y
+            auditoria registra el evento.
           </div>
         </Card>
       </div>

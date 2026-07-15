@@ -43,15 +43,10 @@ export function validateResetPasswordTokenRequest(token: string) {
   )
 }
 
-export function resetPasswordRequest(
-  token: string,
-  newPassword: string,
-  confirmPassword: string,
-) {
+export function resetPasswordRequest(token: string, newPassword: string, confirmPassword: string) {
   return apiFetch<StatusResponse>('/auth/reset-password', {
     auth: false,
     body: JSON.stringify({ token, newPassword, confirmPassword }),
     method: 'POST',
   })
 }
-

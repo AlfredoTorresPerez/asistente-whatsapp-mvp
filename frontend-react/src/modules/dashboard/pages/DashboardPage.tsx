@@ -178,7 +178,11 @@ export function DashboardPage() {
       <form className="space-y-3" onSubmit={onSubmit}>
         <FilterBar
           actions={
-            <Button disabled={!isOnline || isSubmitting} loading={isSubmitting || dashboardSummaryQuery.isFetching} type="submit">
+            <Button
+              disabled={!isOnline || isSubmitting}
+              loading={isSubmitting || dashboardSummaryQuery.isFetching}
+              type="submit"
+            >
               Actualizar
             </Button>
           }
@@ -202,7 +206,9 @@ export function DashboardPage() {
           <div className="rounded-[1.5rem] border border-[var(--color-border)] bg-slate-50 px-4 py-3">
             <p className="text-sm font-medium text-slate-700">Responsable actual</p>
             <p className="mt-2 text-base font-semibold text-slate-950">{user?.name}</p>
-            <p className="mt-1 text-sm text-slate-600">Filtro opcional reservado para etapas posteriores.</p>
+            <p className="mt-1 text-sm text-slate-600">
+              Filtro opcional reservado para etapas posteriores.
+            </p>
           </div>
 
           <div className="rounded-[1.5rem] border border-[var(--color-border)] bg-slate-50 px-4 py-3">
@@ -299,15 +305,22 @@ export function DashboardPage() {
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <p className="text-sm font-semibold text-slate-950">{appointment.subject}</p>
+                          <p className="text-sm font-semibold text-slate-950">
+                            {appointment.subject}
+                          </p>
                           <p className="mt-1 text-sm text-slate-600">{appointment.customerName}</p>
                         </div>
-                        <StatusBadge label={formatEstadoActividad(appointment.status)} tone={getEstadoTone(appointment.status)} />
+                        <StatusBadge
+                          label={formatEstadoActividad(appointment.status)}
+                          tone={getEstadoTone(appointment.status)}
+                        />
                       </div>
                       <p className="mt-3 text-sm text-slate-600">
                         {formatDateTime(appointment.startsAt)} · {appointment.durationMinutes} min
                       </p>
-                      <p className="mt-1 text-sm text-slate-500">{appointment.location ?? 'Sin ubicacion definida'}</p>
+                      <p className="mt-1 text-sm text-slate-500">
+                        {appointment.location ?? 'Sin ubicacion definida'}
+                      </p>
                     </Link>
                   ))
                 )}
@@ -336,7 +349,10 @@ export function DashboardPage() {
                       {resolveActivityRoute(activity) ? (
                         <p className="text-xs font-medium text-blue-600">Abrir detalle</p>
                       ) : (
-                        <p className="text-xs font-medium text-slate-400" title="No existe una pantalla de detalle implementada para este tipo de actividad.">
+                        <p
+                          className="text-xs font-medium text-slate-400"
+                          title="No existe una pantalla de detalle implementada para este tipo de actividad."
+                        >
                           Sin detalle disponible
                         </p>
                       )}
@@ -363,14 +379,8 @@ export function DashboardPage() {
                   label="Conversaciones con seguimiento"
                   value={data.kpis.openConversations}
                 />
-                <SummaryLine
-                  label="Prospectos en movimiento"
-                  value={data.kpis.newProspects}
-                />
-                <SummaryLine
-                  label="Citas pendientes"
-                  value={data.kpis.pendingAppointments}
-                />
+                <SummaryLine label="Prospectos en movimiento" value={data.kpis.newProspects} />
+                <SummaryLine label="Citas pendientes" value={data.kpis.pendingAppointments} />
               </div>
             </Card>
           </div>
@@ -402,9 +412,7 @@ function SeriesCard({
 
   return (
     <Card>
-      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
-        Tendencia
-      </p>
+      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Tendencia</p>
       <h2 className="mt-3 text-2xl font-semibold text-slate-950">{title}</h2>
       <p className="mt-3 text-sm leading-6 text-slate-600">{description}</p>
 

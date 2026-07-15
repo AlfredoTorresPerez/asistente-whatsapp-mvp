@@ -1,7 +1,6 @@
 import { z } from 'zod'
 
-export const PASSWORD_POLICY_HINT =
-  'Minimo 8 caracteres, al menos una mayuscula y un numero.'
+export const PASSWORD_POLICY_HINT = 'Minimo 8 caracteres, al menos una mayuscula y un numero.'
 
 export function buildPasswordSchema(fieldLabel: string) {
   return z
@@ -11,4 +10,3 @@ export function buildPasswordSchema(fieldLabel: string) {
     .regex(/[A-Z]/, `${fieldLabel} debe incluir al menos una mayuscula.`)
     .regex(/\d/, `${fieldLabel} debe incluir al menos un numero.`)
 }
-

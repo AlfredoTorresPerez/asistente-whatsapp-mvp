@@ -95,7 +95,10 @@ export function getItemStartHour(item: AgendaCalendarItemResponse) {
   return getLocalHourMinute(item).hour
 }
 
-export function buildDayAvailability(businessHours: BusinessHoursResponse[], visibleDays: dayjs.Dayjs[]): DayAvailability[] {
+export function buildDayAvailability(
+  businessHours: BusinessHoursResponse[],
+  visibleDays: dayjs.Dayjs[],
+): DayAvailability[] {
   const hoursByDay: Record<number, { startTime: number; endTime: number }> = {}
   for (const bh of businessHours) {
     const startHour = Number(bh.startTime.slice(0, 2))
@@ -111,7 +114,7 @@ export function buildDayAvailability(businessHours: BusinessHoursResponse[], vis
     }
   }
 
-return visibleDays.map((day) => {
+  return visibleDays.map((day) => {
     const jsDay = day.day()
     const sqlDay = jsDay === 0 ? 7 : jsDay
 
@@ -155,10 +158,17 @@ export function computeScheduleRange(
 }
 
 export function getScheduleHours(scheduleStartHour: number, scheduleEndHour: number) {
-  return Array.from({ length: scheduleEndHour - scheduleStartHour + 1 }, (_, index) => scheduleStartHour + index)
+  return Array.from(
+    { length: scheduleEndHour - scheduleStartHour + 1 },
+    (_, index) => scheduleStartHour + index,
+  )
 }
 
-export function getEventsForDayAndHour(items: AgendaCalendarItemResponse[], dayKey: string, hour: number) {
+export function getEventsForDayAndHour(
+  items: AgendaCalendarItemResponse[],
+  dayKey: string,
+  hour: number,
+) {
   return items
     .filter((item) => {
       const itemDayKey = item.dateLocal ?? getAgendaDateKey(item.startsAt)
@@ -192,12 +202,18 @@ export function getDaysWithEvents(items: AgendaCalendarItemResponse[]) {
   return withEvents
 }
 
-export function calcProportionalHeight(item: AgendaCalendarItemResponse, rowHeight: number): number {
+export function calcProportionalHeight(
+  item: AgendaCalendarItemResponse,
+  rowHeight: number,
+): number {
   const ratio = Math.min(item.durationMinutes / 60, 1)
   return Math.max(36, Math.floor(ratio * (rowHeight - 4)))
 }
 
-export function layoutEventsInCell(events: AgendaCalendarItemResponse[], rowHeight: number): EventLayout[] {
+export function layoutEventsInCell(
+  events: AgendaCalendarItemResponse[],
+  rowHeight: number,
+): EventLayout[] {
   if (events.length === 0) return []
   const sorted = [...events].sort((a, b) => {
     const ma = getLocalHourMinute(a).minute
@@ -208,13 +224,15 @@ export function layoutEventsInCell(events: AgendaCalendarItemResponse[], rowHeig
   if (sorted.length === 1) {
     const item = sorted[0]
     const minute = getLocalHourMinute(item).minute
-    return [{
-      item,
-      top: (minute / 60) * (rowHeight - 2) + 1,
-      height: Math.max(36, Math.min(calcProportionalHeight(item, rowHeight), rowHeight - 2)),
-      left: '2px',
-      width: 'calc(100% - 4px)',
-    }]
+    return [
+      {
+        item,
+        top: (minute / 60) * (rowHeight - 2) + 1,
+        height: Math.max(36, Math.min(calcProportionalHeight(item, rowHeight), rowHeight - 2)),
+        left: '2px',
+        width: 'calc(100% - 4px)',
+      },
+    ]
   }
 
   const groups: AgendaCalendarItemResponse[][] = []
@@ -341,24 +359,106 @@ export function formatLongDate(value: string) {
   return `${weekDayLabels[dateValue.day()]}, ${dateValue.format('DD/MM/YYYY')}`
 }
 
-const statusColorMap: Record<string, { bar: string; bg: string; text: string; hex: string; label: string }> = {
-  CONFIRMED: { bar: 'bg-emerald-500', bg: 'bg-emerald-50', text: 'text-emerald-900', hex: '#10b981', label: 'Confirmada' },
-  CONFIRMADA: { bar: 'bg-emerald-500', bg: 'bg-emerald-50', text: 'text-emerald-900', hex: '#10b981', label: 'Confirmada' },
-  PENDIENTE_CONFIRMACION: { bar: 'bg-amber-400', bg: 'bg-amber-50', text: 'text-amber-900', hex: '#f59e0b', label: 'Pendiente' },
-  PENDING_CONFIRMATION: { bar: 'bg-amber-400', bg: 'bg-amber-50', text: 'text-amber-900', hex: '#f59e0b', label: 'Pendiente' },
-  TEMPORARY: { bar: 'bg-amber-400', bg: 'bg-amber-50', text: 'text-amber-900', hex: '#f59e0b', label: 'Temporal' },
-  RESCHEDULED: { bar: 'bg-sky-400', bg: 'bg-sky-50', text: 'text-sky-900', hex: '#38bdf8', label: 'Reprogramada' },
-  REPROGRAMADA: { bar: 'bg-sky-400', bg: 'bg-sky-50', text: 'text-sky-900', hex: '#38bdf8', label: 'Reprogramada' },
-  CANCELLED: { bar: 'bg-red-400', bg: 'bg-red-50', text: 'text-red-900', hex: '#f87171', label: 'Cancelada' },
-  CANCELADA: { bar: 'bg-red-400', bg: 'bg-red-50', text: 'text-red-900', hex: '#f87171', label: 'Cancelada' },
-  COMPLETED: { bar: 'bg-slate-400', bg: 'bg-slate-50', text: 'text-slate-800', hex: '#94a3b8', label: 'Completada' },
-  ATENDIDA: { bar: 'bg-slate-400', bg: 'bg-slate-50', text: 'text-slate-800', hex: '#94a3b8', label: 'Atendida' },
-  NO_SHOW: { bar: 'bg-orange-400', bg: 'bg-orange-50', text: 'text-orange-900', hex: '#fb923c', label: 'No asistió' },
+const statusColorMap: Record<
+  string,
+  { bar: string; bg: string; text: string; hex: string; label: string }
+> = {
+  CONFIRMED: {
+    bar: 'bg-emerald-500',
+    bg: 'bg-emerald-50',
+    text: 'text-emerald-900',
+    hex: '#10b981',
+    label: 'Confirmada',
+  },
+  CONFIRMADA: {
+    bar: 'bg-emerald-500',
+    bg: 'bg-emerald-50',
+    text: 'text-emerald-900',
+    hex: '#10b981',
+    label: 'Confirmada',
+  },
+  PENDIENTE_CONFIRMACION: {
+    bar: 'bg-amber-400',
+    bg: 'bg-amber-50',
+    text: 'text-amber-900',
+    hex: '#f59e0b',
+    label: 'Pendiente',
+  },
+  PENDING_CONFIRMATION: {
+    bar: 'bg-amber-400',
+    bg: 'bg-amber-50',
+    text: 'text-amber-900',
+    hex: '#f59e0b',
+    label: 'Pendiente',
+  },
+  TEMPORARY: {
+    bar: 'bg-amber-400',
+    bg: 'bg-amber-50',
+    text: 'text-amber-900',
+    hex: '#f59e0b',
+    label: 'Temporal',
+  },
+  RESCHEDULED: {
+    bar: 'bg-sky-400',
+    bg: 'bg-sky-50',
+    text: 'text-sky-900',
+    hex: '#38bdf8',
+    label: 'Reprogramada',
+  },
+  REPROGRAMADA: {
+    bar: 'bg-sky-400',
+    bg: 'bg-sky-50',
+    text: 'text-sky-900',
+    hex: '#38bdf8',
+    label: 'Reprogramada',
+  },
+  CANCELLED: {
+    bar: 'bg-red-400',
+    bg: 'bg-red-50',
+    text: 'text-red-900',
+    hex: '#f87171',
+    label: 'Cancelada',
+  },
+  CANCELADA: {
+    bar: 'bg-red-400',
+    bg: 'bg-red-50',
+    text: 'text-red-900',
+    hex: '#f87171',
+    label: 'Cancelada',
+  },
+  COMPLETED: {
+    bar: 'bg-slate-400',
+    bg: 'bg-slate-50',
+    text: 'text-slate-800',
+    hex: '#94a3b8',
+    label: 'Completada',
+  },
+  ATENDIDA: {
+    bar: 'bg-slate-400',
+    bg: 'bg-slate-50',
+    text: 'text-slate-800',
+    hex: '#94a3b8',
+    label: 'Atendida',
+  },
+  NO_SHOW: {
+    bar: 'bg-orange-400',
+    bg: 'bg-orange-50',
+    text: 'text-orange-900',
+    hex: '#fb923c',
+    label: 'No asistió',
+  },
 }
 
 export function getStatusStyle(status: string) {
   const normalized = status.toUpperCase()
-  return statusColorMap[normalized] ?? { bar: 'bg-slate-400', bg: 'bg-slate-50', text: 'text-slate-800', label: status }
+  return (
+    statusColorMap[normalized] ?? {
+      bar: 'bg-slate-400',
+      bg: 'bg-slate-50',
+      text: 'text-slate-800',
+      label: status,
+    }
+  )
 }
 
 export function getStatusLabel(status: string) {

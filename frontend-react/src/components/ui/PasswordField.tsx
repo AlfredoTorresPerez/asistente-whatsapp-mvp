@@ -8,34 +8,36 @@ type PasswordFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   hint?: string
 }
 
-export const PasswordField = forwardRef<HTMLInputElement, PasswordFieldProps>(function PasswordField(
-  { error, hint, label, placeholder = 'Ingresa tu contrasena', ...props },
-  ref,
-) {
-  const [visible, setVisible] = useState(false)
+export const PasswordField = forwardRef<HTMLInputElement, PasswordFieldProps>(
+  function PasswordField(
+    { error, hint, label, placeholder = 'Ingresa tu contrasena', ...props },
+    ref,
+  ) {
+    const [visible, setVisible] = useState(false)
 
-  return (
-    <Input
-      {...props}
-      ref={ref}
-      error={error}
-      hint={hint}
-      label={label}
-      placeholder={placeholder}
-      trailing={
-        <button
-          aria-label={visible ? 'Ocultar contrasena' : 'Mostrar contrasena'}
-          className="inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
-          onClick={() => setVisible((currentValue) => !currentValue)}
-          type="button"
-        >
-          {visible ? <EyeOffIcon /> : <EyeIcon />}
-        </button>
-      }
-      type={visible ? 'text' : 'password'}
-    />
-  )
-})
+    return (
+      <Input
+        {...props}
+        ref={ref}
+        error={error}
+        hint={hint}
+        label={label}
+        placeholder={placeholder}
+        trailing={
+          <button
+            aria-label={visible ? 'Ocultar contrasena' : 'Mostrar contrasena'}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+            onClick={() => setVisible((currentValue) => !currentValue)}
+            type="button"
+          >
+            {visible ? <EyeOffIcon /> : <EyeIcon />}
+          </button>
+        }
+        type={visible ? 'text' : 'password'}
+      />
+    )
+  },
+)
 
 function EyeIcon() {
   return (

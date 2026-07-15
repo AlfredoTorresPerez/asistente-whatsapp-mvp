@@ -111,7 +111,9 @@ export function NewAppointmentFromConversationPage() {
       <PageHeader
         actions={
           <Button
-            onClick={() => navigate(conversationId ? `/conversations/${conversationId}` : '/conversations')}
+            onClick={() =>
+              navigate(conversationId ? `/conversations/${conversationId}` : '/conversations')
+            }
             variant="secondary"
           >
             Volver a la conversación
@@ -178,7 +180,12 @@ export function NewAppointmentFromConversationPage() {
                 />
               </div>
 
-              <Textarea error={errors.notes?.message} label="Notas" rows={6} {...register('notes')} />
+              <Textarea
+                error={errors.notes?.message}
+                label="Notas"
+                rows={6}
+                {...register('notes')}
+              />
 
               <div className="flex flex-wrap justify-end gap-3">
                 <Button
@@ -187,7 +194,11 @@ export function NewAppointmentFromConversationPage() {
                 >
                   Cancelar
                 </Button>
-                <Button disabled={!isOnline} loading={createMutation.isPending || isSubmitting} type="submit">
+                <Button
+                  disabled={!isOnline}
+                  loading={createMutation.isPending || isSubmitting}
+                  type="submit"
+                >
                   Crear cita
                 </Button>
               </div>
@@ -204,7 +215,10 @@ export function NewAppointmentFromConversationPage() {
             <ul className="space-y-3 text-sm leading-6 text-[var(--color-text-secondary)]">
               <li>Telefono: {conversationQuery.data.customer.phone}</li>
               <li>Estado del hilo: {conversationQuery.data.status}</li>
-              <li>Último mensaje: {conversationQuery.data.lastMessagePreview ?? 'Sin mensaje reciente'}</li>
+              <li>
+                Último mensaje:{' '}
+                {conversationQuery.data.lastMessagePreview ?? 'Sin mensaje reciente'}
+              </li>
             </ul>
           </Card>
         </div>

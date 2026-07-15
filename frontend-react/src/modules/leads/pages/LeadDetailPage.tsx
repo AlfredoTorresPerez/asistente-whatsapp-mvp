@@ -21,7 +21,12 @@ import {
   getLeadDetailRequest,
   updateLeadStageRequest,
 } from '../../../services/api/leadsApi'
-import { getLeadOriginLabel, getLeadStageLabel, getLeadStageTone, leadStageOptions } from '../leadOptions'
+import {
+  getLeadOriginLabel,
+  getLeadStageLabel,
+  getLeadStageTone,
+  leadStageOptions,
+} from '../leadOptions'
 
 const noteSchema = z.object({
   noteText: z.string().trim().min(1, 'Escribe una nota antes de guardar.').max(2000),
@@ -177,7 +182,8 @@ export function LeadDetailPage() {
                 </div>
 
                 <div className="rounded-[18px] border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-slate-600">
-                  Ultima actualizacion: {dayjs(leadQuery.data.updatedAt).format('DD MMM YYYY HH:mm')}
+                  Ultima actualizacion:{' '}
+                  {dayjs(leadQuery.data.updatedAt).format('DD MMM YYYY HH:mm')}
                 </div>
               </div>
             </Card>
@@ -301,7 +307,8 @@ export function LeadDetailPage() {
             </Link>
 
             <div className="rounded-[20px] border border-[var(--color-border)] bg-slate-50 p-4 text-sm leading-6 text-[var(--color-text-secondary)]">
-              La etapa puede cambiarse directamente desde esta vista para validar el flujo del embudo.
+              La etapa puede cambiarse directamente desde esta vista para validar el flujo del
+              embudo.
             </div>
           </Card>
         </div>

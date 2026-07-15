@@ -155,7 +155,6 @@ export function createBookingFromLeadRequest(
   })
 }
 
-
 export function createBookingConfirmationLinkRequest(
   bookingId: string,
   payload: CreateBookingConfirmationLinkRequest = {},
@@ -194,48 +193,66 @@ export function getPublicBookingConfirmationRequest(token: string) {
 
 export async function confirmPublicBookingRequest(token: string) {
   try {
-    return await apiFetch<PublicBookingConfirmationResponse>(`/public/booking-confirmations/${token}/confirm`, {
-      method: 'POST',
-      auth: false,
-    })
+    return await apiFetch<PublicBookingConfirmationResponse>(
+      `/public/booking-confirmations/${token}/confirm`,
+      {
+        method: 'POST',
+        auth: false,
+      },
+    )
   } catch (error) {
     if (error instanceof ApiClientError && (error.status === 403 || error.status === 405)) {
-      return apiFetch<PublicBookingConfirmationResponse>(`/public/booking-confirmations/${token}/confirm?fallback=${Date.now()}`, {
-        method: 'GET',
-        auth: false,
-        headers: {
-          'Cache-Control': 'no-store',
+      return apiFetch<PublicBookingConfirmationResponse>(
+        `/public/booking-confirmations/${token}/confirm?fallback=${Date.now()}`,
+        {
+          method: 'GET',
+          auth: false,
+          headers: {
+            'Cache-Control': 'no-store',
+          },
         },
-      })
+      )
     }
 
     throw error
   }
 }
 
-
-export function getPublicBookingConfirmationAvailabilityRequest(token: string, date: string, maxSlots = 12) {
+export function getPublicBookingConfirmationAvailabilityRequest(
+  token: string,
+  date: string,
+  maxSlots = 12,
+) {
   const searchParams = new URLSearchParams({ date, maxSlots: String(maxSlots) })
-  return apiFetch<AgendaAvailabilityResponse>(`/public/booking-confirmations/${token}/availability?${searchParams.toString()}`, {
-    auth: false,
-  })
+  return apiFetch<AgendaAvailabilityResponse>(
+    `/public/booking-confirmations/${token}/availability?${searchParams.toString()}`,
+    {
+      auth: false,
+    },
+  )
 }
 
 export function reschedulePublicBookingFromConfirmationRequest(
   token: string,
   payload: PublicBookingRescheduleFromConfirmationRequest,
 ) {
-  return apiFetch<PublicBookingConfirmationResponse>(`/public/booking-confirmations/${token}/reschedule`, {
-    method: 'POST',
-    auth: false,
-    body: JSON.stringify(payload),
-  })
+  return apiFetch<PublicBookingConfirmationResponse>(
+    `/public/booking-confirmations/${token}/reschedule`,
+    {
+      method: 'POST',
+      auth: false,
+      body: JSON.stringify(payload),
+    },
+  )
 }
 
 export function getPublicBookingPaymentDetailRequest(paymentId: string) {
-  return apiFetch<PublicBookingPaymentDetailResponse>(`/public/booking-payments/${paymentId}/detail`, {
-    auth: false,
-  })
+  return apiFetch<PublicBookingPaymentDetailResponse>(
+    `/public/booking-payments/${paymentId}/detail`,
+    {
+      auth: false,
+    },
+  )
 }
 
 export function simulateBookingPaymentRequest(paymentId: string, action: 'APPROVED' | 'REJECTED') {
@@ -250,11 +267,14 @@ export function cancelPublicBookingFromConfirmationRequest(
   token: string,
   payload: PublicBookingCancellationFromConfirmationRequest,
 ) {
-  return apiFetch<PublicBookingConfirmationResponse>(`/public/booking-confirmations/${token}/cancel`, {
-    method: 'POST',
-    auth: false,
-    body: JSON.stringify(payload),
-  })
+  return apiFetch<PublicBookingConfirmationResponse>(
+    `/public/booking-confirmations/${token}/cancel`,
+    {
+      method: 'POST',
+      auth: false,
+      body: JSON.stringify(payload),
+    },
+  )
 }
 
 export function getPublicBookingRescheduleRequest(token: string) {
@@ -285,10 +305,18 @@ export function getPublicBookingRescheduleAvailabilityRequest(
   date: string,
   maxSlots = 40,
 ) {
-  const searchParams = new URLSearchParams({ serviceId, locationId, date, maxSlots: String(maxSlots) })
-  return apiFetch<AgendaAvailabilityResponse>(`/public/booking-reschedules/${token}/${bookingId}/availability?${searchParams.toString()}`, {
-    auth: false,
+  const searchParams = new URLSearchParams({
+    serviceId,
+    locationId,
+    date,
+    maxSlots: String(maxSlots),
   })
+  return apiFetch<AgendaAvailabilityResponse>(
+    `/public/booking-reschedules/${token}/${bookingId}/availability?${searchParams.toString()}`,
+    {
+      auth: false,
+    },
+  )
 }
 
 export function reschedulePublicBookingRequest(
@@ -296,11 +324,14 @@ export function reschedulePublicBookingRequest(
   bookingId: string,
   payload: PublicBookingRescheduleRequest,
 ) {
-  return apiFetch<CustomerBookingItemResponse>(`/public/booking-reschedules/${token}/${bookingId}/reschedule`, {
-    method: 'POST',
-    auth: false,
-    body: JSON.stringify(payload),
-  })
+  return apiFetch<CustomerBookingItemResponse>(
+    `/public/booking-reschedules/${token}/${bookingId}/reschedule`,
+    {
+      method: 'POST',
+      auth: false,
+      body: JSON.stringify(payload),
+    },
+  )
 }
 
 export function getPublicBookingCancellationRequest(token: string) {
@@ -310,11 +341,14 @@ export function getPublicBookingCancellationRequest(token: string) {
 }
 
 export function confirmPublicBookingCancellationRequest(token: string, reason?: string) {
-  return apiFetch<PublicBookingCancellationResponse>(`/public/booking-cancellations/${token}/confirm`, {
-    method: 'POST',
-    auth: false,
-    body: JSON.stringify({ reason }),
-  })
+  return apiFetch<PublicBookingCancellationResponse>(
+    `/public/booking-cancellations/${token}/confirm`,
+    {
+      method: 'POST',
+      auth: false,
+      body: JSON.stringify({ reason }),
+    },
+  )
 }
 
 export function getPublicLandingCategoriesRequest() {
@@ -322,15 +356,22 @@ export function getPublicLandingCategoriesRequest() {
 }
 
 export function getPublicLandingServicesByCategoryRequest(categoryCode: string) {
-  return apiFetch<PublicServiceItemResponse[]>(`/public/landing/categories/${categoryCode}/services`, { auth: false })
+  return apiFetch<PublicServiceItemResponse[]>(
+    `/public/landing/categories/${categoryCode}/services`,
+    { auth: false },
+  )
 }
 
 export function getPublicLandingServiceDetailRequest(serviceId: string) {
-  return apiFetch<PublicServiceDetailResponse>(`/public/landing/services/${serviceId}`, { auth: false })
+  return apiFetch<PublicServiceDetailResponse>(`/public/landing/services/${serviceId}`, {
+    auth: false,
+  })
 }
 
 export function getPublicLandingServiceBranchesRequest(serviceId: string) {
-  return apiFetch<PublicServiceBranchResponse[]>(`/public/landing/services/${serviceId}/branches`, { auth: false })
+  return apiFetch<PublicServiceBranchResponse[]>(`/public/landing/services/${serviceId}/branches`, {
+    auth: false,
+  })
 }
 
 export function getPublicLandingAvailabilityRequest(payload: AgendaAvailabilityRequest) {
@@ -342,7 +383,9 @@ export function getPublicLandingAvailabilityRequest(payload: AgendaAvailabilityR
 }
 
 export function getPublicLandingCustomerInfoRequest(token: string) {
-  return apiFetch<PublicCustomerInfoResponse>(`/public/landing/customer-info/${token}`, { auth: false })
+  return apiFetch<PublicCustomerInfoResponse>(`/public/landing/customer-info/${token}`, {
+    auth: false,
+  })
 }
 
 export function createPublicLandingBookingRequest(payload: CreatePublicBookingRequest) {
@@ -360,17 +403,23 @@ export function getCustomerBookingsRequest(token: string) {
 }
 
 export function cancelCustomerBookingRequest(token: string, bookingId: string, reason?: string) {
-  return apiFetch<{ status: string; bookingId: string }>(`/public/customer-bookings/${enc(token)}/${bookingId}/cancel`, {
-    method: 'POST',
-    auth: false,
-    body: JSON.stringify({ reason }),
-  })
+  return apiFetch<{ status: string; bookingId: string }>(
+    `/public/customer-bookings/${enc(token)}/${bookingId}/cancel`,
+    {
+      method: 'POST',
+      auth: false,
+      body: JSON.stringify({ reason }),
+    },
+  )
 }
 
 export function getCustomerBookingReschedulePreviewRequest(token: string, bookingId: string) {
-  return apiFetch<CustomerBookingReschedulePreviewResponse>(`/public/customer-bookings/${enc(token)}/${bookingId}/reschedule`, {
-    auth: false,
-  })
+  return apiFetch<CustomerBookingReschedulePreviewResponse>(
+    `/public/customer-bookings/${enc(token)}/${bookingId}/reschedule`,
+    {
+      auth: false,
+    },
+  )
 }
 
 export function getCustomerBookingRescheduleAvailabilityRequest(
@@ -381,9 +430,12 @@ export function getCustomerBookingRescheduleAvailabilityRequest(
   date: string,
 ) {
   const searchParams = new URLSearchParams({ serviceId, locationId, date })
-  return apiFetch<AgendaAvailabilityResponse>(`/public/customer-bookings/${enc(token)}/${bookingId}/reschedule/availability?${searchParams.toString()}`, {
-    auth: false,
-  })
+  return apiFetch<AgendaAvailabilityResponse>(
+    `/public/customer-bookings/${enc(token)}/${bookingId}/reschedule/availability?${searchParams.toString()}`,
+    {
+      auth: false,
+    },
+  )
 }
 
 export function rescheduleCustomerBookingRequest(
@@ -391,9 +443,12 @@ export function rescheduleCustomerBookingRequest(
   bookingId: string,
   payload: CustomerBookingRescheduleRequest,
 ) {
-  return apiFetch<CustomerBookingItemResponse>(`/public/customer-bookings/${enc(token)}/${bookingId}/reschedule`, {
-    method: 'POST',
-    auth: false,
-    body: JSON.stringify(payload),
-  })
+  return apiFetch<CustomerBookingItemResponse>(
+    `/public/customer-bookings/${enc(token)}/${bookingId}/reschedule`,
+    {
+      method: 'POST',
+      auth: false,
+      body: JSON.stringify(payload),
+    },
+  )
 }

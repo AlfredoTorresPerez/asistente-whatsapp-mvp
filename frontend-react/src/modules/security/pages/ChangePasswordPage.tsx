@@ -79,7 +79,8 @@ export function ChangePasswordPage() {
               <div>
                 <p className="text-sm font-semibold text-[var(--color-text)]">Credenciales</p>
                 <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
-                  Para completar el cambio necesitamos tu contrasena actual y la nueva combinacion segura.
+                  Para completar el cambio necesitamos tu contrasena actual y la nueva combinacion
+                  segura.
                 </p>
               </div>
               <StatusBadge label="Sesion protegida" tone="success" />

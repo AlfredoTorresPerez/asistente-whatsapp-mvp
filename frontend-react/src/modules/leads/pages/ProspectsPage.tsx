@@ -16,7 +16,12 @@ import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { useShellSession } from '../../../lib/shellSession'
 import { useOnlineStatus } from '../../../lib/useOnlineStatus'
 import { getLeadsRequest } from '../../../services/api/leadsApi'
-import { getLeadOriginLabel, getLeadStageLabel, getLeadStageTone, leadOriginOptions } from '../leadOptions'
+import {
+  getLeadOriginLabel,
+  getLeadStageLabel,
+  getLeadStageTone,
+  leadOriginOptions,
+} from '../leadOptions'
 
 const fieldClassName =
   'w-full rounded-2xl border border-[var(--color-border)] bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100'
@@ -86,11 +91,7 @@ export function ProspectsPage() {
   return (
     <section className="space-y-6">
       <PageHeader
-        actions={
-          <Button onClick={() => navigate('/prospects/new')}>
-            Crear prospecto
-          </Button>
-        }
+        actions={<Button onClick={() => navigate('/prospects/new')}>Crear prospecto</Button>}
         description="Embudo comercial para prospectos demo con filtros por estado, origen y responsable, ademas de acceso al detalle y seguimiento."
         eyebrow="Prospectos"
         title="Prospectos"
@@ -193,7 +194,9 @@ export function ProspectsPage() {
         <Card className="space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold text-[var(--color-text)]">Detalle de prospectos</p>
+              <p className="text-sm font-semibold text-[var(--color-text)]">
+                Detalle de prospectos
+              </p>
               <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
                 Listado tabular con 10 registros por pagina y acceso directo al detalle.
               </p>
@@ -206,7 +209,15 @@ export function ProspectsPage() {
               <table className="min-w-full border-separate border-spacing-0">
                 <thead>
                   <tr className="bg-slate-50">
-                    {['Prospecto', 'Contacto', 'Estado', 'Origen', 'Responsable', 'Ultima actualizacion', 'Accion'].map((column) => (
+                    {[
+                      'Prospecto',
+                      'Contacto',
+                      'Estado',
+                      'Origen',
+                      'Responsable',
+                      'Ultima actualizacion',
+                      'Accion',
+                    ].map((column) => (
                       <th
                         key={column}
                         className="border-b border-[var(--color-border)] px-5 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500"
@@ -228,10 +239,15 @@ export function ProspectsPage() {
                       </td>
                       <td className="border-b border-[var(--color-border)] px-5 py-4 text-sm text-slate-700">
                         <p>{lead.phone}</p>
-                        <p className="mt-1 text-[var(--color-text-secondary)]">{lead.email ?? 'Sin correo registrado'}</p>
+                        <p className="mt-1 text-[var(--color-text-secondary)]">
+                          {lead.email ?? 'Sin correo registrado'}
+                        </p>
                       </td>
                       <td className="border-b border-[var(--color-border)] px-5 py-4 text-sm text-slate-700">
-                        <StatusBadge label={getLeadStageLabel(lead.stage)} tone={getLeadStageTone(lead.stage)} />
+                        <StatusBadge
+                          label={getLeadStageLabel(lead.stage)}
+                          tone={getLeadStageTone(lead.stage)}
+                        />
                       </td>
                       <td className="border-b border-[var(--color-border)] px-5 py-4 text-sm text-slate-700">
                         {getLeadOriginLabel(lead.sourceType)}
@@ -243,7 +259,11 @@ export function ProspectsPage() {
                         {dayjs(lead.updatedAt).format('DD MMM YYYY HH:mm')}
                       </td>
                       <td className="border-b border-[var(--color-border)] px-5 py-4 text-right text-sm">
-                        <Button onClick={() => navigate(`/prospects/${lead.id}`)} size="sm" variant="secondary">
+                        <Button
+                          onClick={() => navigate(`/prospects/${lead.id}`)}
+                          size="sm"
+                          variant="secondary"
+                        >
                           Ver detalle
                         </Button>
                       </td>
@@ -256,7 +276,8 @@ export function ProspectsPage() {
 
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--color-border)] pt-5">
             <p className="text-sm text-slate-600">
-              Pagina {(leadsQuery.data?.page ?? 0) + 1} de {Math.max(leadsQuery.data?.totalPages ?? 1, 1)} · 10 registros por pagina
+              Pagina {(leadsQuery.data?.page ?? 0) + 1} de{' '}
+              {Math.max(leadsQuery.data?.totalPages ?? 1, 1)} · 10 registros por pagina
             </p>
             <div className="flex gap-2">
               <Button

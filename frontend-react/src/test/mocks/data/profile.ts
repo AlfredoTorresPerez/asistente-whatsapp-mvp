@@ -85,7 +85,12 @@ export const mockWhatsAppConfig = {
     outOfHoursMessage: false,
   },
   linkedDevices: [
-    { deviceName: 'Chrome', operatorName: 'Carla Mendez', status: 'ACTIVE', lastActivityAt: '2026-07-15T10:30:00Z' },
+    {
+      deviceName: 'Chrome',
+      operatorName: 'Carla Mendez',
+      status: 'ACTIVE',
+      lastActivityAt: '2026-07-15T10:30:00Z',
+    },
   ],
   mainChannel: {
     name: 'WhatsApp Principal',
@@ -95,7 +100,13 @@ export const mockWhatsAppConfig = {
     autoReplyEnabled: true,
   },
   history: [
-    { eventType: 'CONNECTED', actorName: 'Carla Mendez', eventTitle: 'Sesion conectada', timestamp: '2026-07-15T10:00:00Z', tone: 'success' },
+    {
+      eventType: 'CONNECTED',
+      actorName: 'Carla Mendez',
+      eventTitle: 'Sesion conectada',
+      timestamp: '2026-07-15T10:00:00Z',
+      tone: 'success',
+    },
   ],
 }
 
@@ -133,14 +144,28 @@ export const mockMultisiteSummary = {
       locationName: 'Sucursal Providencia',
       locationCode: 'PROV',
       active: true,
-      metrics: { conversations: 45, leads: 12, bookings: 28, orders: 15, productsWithStock: 34, professionals: 6 },
+      metrics: {
+        conversations: 45,
+        leads: 12,
+        bookings: 28,
+        orders: 15,
+        productsWithStock: 34,
+        professionals: 6,
+      },
     },
     {
       locationId: '11111111-1111-1111-1111-111111111112',
       locationName: 'Sucursal Las Condes',
       locationCode: 'LSC',
       active: true,
-      metrics: { conversations: 30, leads: 8, bookings: 20, orders: 10, productsWithStock: 28, professionals: 4 },
+      metrics: {
+        conversations: 30,
+        leads: 8,
+        bookings: 20,
+        orders: 10,
+        productsWithStock: 28,
+        professionals: 4,
+      },
     },
   ],
 }

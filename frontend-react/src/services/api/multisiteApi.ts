@@ -30,11 +30,17 @@ export function getMultisiteSummaryRequest() {
   return apiFetch<MultisiteLocationSummaryResponse[]>('/multisite/summary')
 }
 
-export function getMultisiteCatalogAvailabilityRequest(filters: { locationId?: string | null } = {}) {
-  return apiFetch<MultisiteCatalogAvailabilityResponse[]>(`/multisite/catalog-availability${toSearchParams(filters)}`)
+export function getMultisiteCatalogAvailabilityRequest(
+  filters: { locationId?: string | null } = {},
+) {
+  return apiFetch<MultisiteCatalogAvailabilityResponse[]>(
+    `/multisite/catalog-availability${toSearchParams(filters)}`,
+  )
 }
 
-export function updateMultisiteCatalogAvailabilityRequest(payload: UpsertCatalogAvailabilityRequest) {
+export function updateMultisiteCatalogAvailabilityRequest(
+  payload: UpsertCatalogAvailabilityRequest,
+) {
   return apiFetch<MultisiteCatalogAvailabilityResponse[]>('/multisite/catalog-availability', {
     method: 'PUT',
     body: JSON.stringify(payload),
@@ -46,7 +52,9 @@ export function getMultisiteProfessionalsRequest() {
 }
 
 export function getMultisiteSchedulesRequest(filters: { locationId?: string | null } = {}) {
-  return apiFetch<ProfessionalScheduleResponse[]>(`/multisite/professional-schedules${toSearchParams(filters)}`)
+  return apiFetch<ProfessionalScheduleResponse[]>(
+    `/multisite/professional-schedules${toSearchParams(filters)}`,
+  )
 }
 
 export function createMultisiteScheduleRequest(payload: UpsertProfessionalScheduleRequest) {
@@ -71,7 +79,10 @@ export function getMultisiteChannelsRequest() {
   return apiFetch<MultisiteChannelResponse[]>('/multisite/channels')
 }
 
-export function updateMultisiteChannelLocationRequest(channelId: string, payload: UpdateChannelLocationRequest) {
+export function updateMultisiteChannelLocationRequest(
+  channelId: string,
+  payload: UpdateChannelLocationRequest,
+) {
   return apiFetch<MultisiteChannelResponse[]>(`/multisite/channels/${channelId}/location`, {
     method: 'PUT',
     body: JSON.stringify(payload),

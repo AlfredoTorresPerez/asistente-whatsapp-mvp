@@ -176,13 +176,25 @@ export function NewAppointmentFromProspectPage() {
                 {...register('location')}
               />
 
-              <Textarea error={errors.notes?.message} label="Notas" rows={6} {...register('notes')} />
+              <Textarea
+                error={errors.notes?.message}
+                label="Notas"
+                rows={6}
+                {...register('notes')}
+              />
 
               <div className="flex flex-wrap justify-end gap-3">
-                <Button onClick={() => navigate(`/prospects/${leadQuery.data.id}`)} variant="secondary">
+                <Button
+                  onClick={() => navigate(`/prospects/${leadQuery.data.id}`)}
+                  variant="secondary"
+                >
                   Cancelar
                 </Button>
-                <Button disabled={!isOnline} loading={createMutation.isPending || isSubmitting} type="submit">
+                <Button
+                  disabled={!isOnline}
+                  loading={createMutation.isPending || isSubmitting}
+                  type="submit"
+                >
                   Crear cita
                 </Button>
               </div>

@@ -1,6 +1,7 @@
 import type { ConversationSummaryResponse } from '../../../services/api/types'
 
-export type ConversationInboxCategory = 'ALL' | 'UNREAD' | 'ASSIGNED' | 'PENDING' | 'RESOLVED' | 'ARCHIVED'
+export type ConversationInboxCategory =
+  'ALL' | 'UNREAD' | 'ASSIGNED' | 'PENDING' | 'RESOLVED' | 'ARCHIVED'
 export type ConversationCustomerTag = 'NEW' | 'CUSTOMER' | 'VIP' | 'LEAD' | 'UNKNOWN'
 
 export type ConversationInboxFilters = {
@@ -13,14 +14,15 @@ export type ConversationInboxFilters = {
 
 export const CONVERSATION_INBOX_DEFAULT_PAGE_SIZE = 10
 
-export const conversationInboxCategories: Array<{ key: ConversationInboxCategory; label: string }> = [
-  { key: 'ALL', label: 'Todas' },
-  { key: 'UNREAD', label: 'No leidos' },
-  { key: 'ASSIGNED', label: 'Asignadas' },
-  { key: 'PENDING', label: 'Pendientes' },
-  { key: 'RESOLVED', label: 'Resueltas' },
-  { key: 'ARCHIVED', label: 'Archivadas' },
-]
+export const conversationInboxCategories: Array<{ key: ConversationInboxCategory; label: string }> =
+  [
+    { key: 'ALL', label: 'Todas' },
+    { key: 'UNREAD', label: 'No leidos' },
+    { key: 'ASSIGNED', label: 'Asignadas' },
+    { key: 'PENDING', label: 'Pendientes' },
+    { key: 'RESOLVED', label: 'Resueltas' },
+    { key: 'ARCHIVED', label: 'Archivadas' },
+  ]
 
 export function translateConversationStatus(status: string | null | undefined) {
   const normalized = (status ?? '').toUpperCase()
@@ -70,8 +72,11 @@ export function getConversationStatusTone(status: string | null | undefined, unr
   return 'neutral'
 }
 
-export function inferConversationCustomerTag(conversation: ConversationSummaryResponse): ConversationCustomerTag {
-  const text = `${conversation.customerName} ${conversation.customerPhone} ${conversation.lastMessagePreview ?? ''}`.toLowerCase()
+export function inferConversationCustomerTag(
+  conversation: ConversationSummaryResponse,
+): ConversationCustomerTag {
+  const text =
+    `${conversation.customerName} ${conversation.customerPhone} ${conversation.lastMessagePreview ?? ''}`.toLowerCase()
   const unreadCount = conversation.unreadCount ?? 0
 
   if (text.includes('vip')) {
@@ -82,7 +87,12 @@ export function inferConversationCustomerTag(conversation: ConversationSummaryRe
     return 'NEW'
   }
 
-  if (conversation.prospectId || text.includes('lead') || text.includes('cotizar') || text.includes('presupuesto')) {
+  if (
+    conversation.prospectId ||
+    text.includes('lead') ||
+    text.includes('cotizar') ||
+    text.includes('presupuesto')
+  ) {
     return 'LEAD'
   }
 
@@ -116,7 +126,9 @@ export function matchesConversationCategory(
   }
 
   if (category === 'ASSIGNED') {
-    return Boolean(conversation.assignedUserId || conversation.assignedUserName) || status === 'ASSIGNED'
+    return (
+      Boolean(conversation.assignedUserId || conversation.assignedUserName) || status === 'ASSIGNED'
+    )
   }
 
   if (category === 'PENDING') {
@@ -182,13 +194,17 @@ export function filterConversations(
 
     if (filters.status !== 'ALL') {
       const translatedStatus = translateConversationStatus(conversation.status).toLowerCase()
-      if (conversation.status.toUpperCase() !== filters.status && translatedStatus !== filters.status.toLowerCase()) {
+      if (
+        conversation.status.toUpperCase() !== filters.status &&
+        translatedStatus !== filters.status.toLowerCase()
+      ) {
         return false
       }
     }
 
     if (filters.assignee !== 'ALL') {
-      const assigneeKey = conversation.assignedUserId ?? conversation.assignedUserName ?? 'UNASSIGNED'
+      const assigneeKey =
+        conversation.assignedUserId ?? conversation.assignedUserName ?? 'UNASSIGNED'
       if (filters.assignee === 'UNASSIGNED') {
         if (conversation.assignedUserId || conversation.assignedUserName) {
           return false
