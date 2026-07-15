@@ -134,6 +134,7 @@ export const appRoutes: RouteObject[] = [
 export const router = createBrowserRouter(appRoutes)
 
 // Componente para verificar permisos granulares
+// eslint-disable-next-line react-refresh/only-export-components
 function RequirePermission({
   permission,
   children,
@@ -151,6 +152,7 @@ function RequirePermission({
 }
 
 // Componente para verificar que el usuario tenga al menos uno de los permisos
+// eslint-disable-next-line react-refresh/only-export-components
 function RequireAnyPermission({
   permissions,
   children,
@@ -161,23 +163,6 @@ function RequireAnyPermission({
   const { user } = useShellSession()
 
   if (!user || !permissions.some((p) => user.permissions?.includes(p))) {
-    return <Navigate replace to="/dashboard" />
-  }
-
-  return children
-}
-
-// Componente legacy para compatibilidad con roles
-function RequireRole({
-  allowedRoles,
-  children,
-}: {
-  allowedRoles: string[]
-  children: ReactNode
-}) {
-  const { user } = useShellSession()
-
-  if (!user || !allowedRoles.includes(user.role)) {
     return <Navigate replace to="/dashboard" />
   }
 

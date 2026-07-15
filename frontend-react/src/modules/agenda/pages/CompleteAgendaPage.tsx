@@ -25,16 +25,13 @@ import type { AgendaCalendarItemResponse, BookingDetailResponse } from '../../..
 import { CalendarWeekNavigation } from '../components/CalendarWeekNavigation'
 import { WeeklyCalendarView } from '../components/WeeklyCalendarView'
 import {
-  agendaTimeZone,
   buildVisibleDays,
   calendarDays,
   formatAgendaTime,
   formatLongDate,
   formatTimeRange,
-  getAgendaDateKey,
   getStatusLabel,
   getStatusStyle,
-  getWeekStart,
 } from '../components/agendaUtils'
 
 const today = dayjs().format('YYYY-MM-DD')

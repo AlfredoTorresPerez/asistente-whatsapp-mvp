@@ -45,7 +45,6 @@ const DAY_LABELS: Record<number, string> = {
   7: 'Domingo',
 }
 
-const emptyHourEntry = { dayOfWeek: 1, startTime: '09:00', endTime: '18:00' }
 const defaultHours: { dayOfWeek: number; startTime: string; endTime: string }[] = [
   { dayOfWeek: 1, startTime: '09:00', endTime: '18:00' },
   { dayOfWeek: 2, startTime: '09:00', endTime: '18:00' },

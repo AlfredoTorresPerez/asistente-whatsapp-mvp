@@ -1,5 +1,5 @@
 import type { AgendaCalendarItemResponse } from '../../../services/api/types'
-import { getServiceColor, getStatusStyle } from './agendaUtils'
+import { getStatusStyle } from './agendaUtils'
 
 function formatEventTime(startTime: string, endTime: string) {
   return `${startTime}-${endTime}`

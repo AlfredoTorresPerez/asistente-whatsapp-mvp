@@ -28,7 +28,6 @@ import { getBusinessLocationsRequest } from '../../../services/api/businessLocat
 import { getReportsSummaryRequest } from '../../../services/api/reportsApi'
 import type {
   ReportsAppointmentDistributionPoint,
-  ReportsConversationPerformancePoint,
   ReportsFunnelStageResponse,
   ReportsProspectRowResponse,
   ReportsSummaryResponse,
@@ -106,10 +105,6 @@ function formatDate(value: string) {
 
 function formatShortDate(value: string | null) {
   return value ? dayjs(value).format('DD MMM') : '---'
-}
-
-function formatPhone(value: string | null) {
-  return value ?? '---'
 }
 
 function maskPhone(phone: string) {

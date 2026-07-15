@@ -38,10 +38,6 @@ const defaultFilters: FiltersValues = {
   assignedUserId: '',
 }
 
-function formatDateTime(value: string) {
-  return dayjs(value).format('DD MMM YYYY HH:mm')
-}
-
 function syncStatusTone(status: string): string {
   switch (status) {
     case 'SYNCED': return 'bg-emerald-500'

@@ -8,23 +8,18 @@ import { ErrorState } from '../../../components/feedback/ErrorState'
 import { LoadingState } from '../../../components/feedback/LoadingState'
 import { Button } from '../../../components/ui/Button'
 import { Card } from '../../../components/ui/Card'
-import { Input } from '../../../components/ui/Input'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { buttonClassName } from '../../../components/ui/buttonStyles'
-import { formatEstadoPago, getEstadoTone } from '../../../lib/statusFormatters'
 import { useToast } from '../../../lib/toast'
 import { useOnlineStatus } from '../../../lib/useOnlineStatus'
 import {
   cancelBookingRequest,
   createBookingCancellationLinkRequest,
   createBookingConfirmationLinkRequest,
-  createBookingPaymentLinkRequest,
   getBookingDetailRequest,
-  refundBookingPaymentRequest,
-  registerBookingManualPaymentRequest,
 } from '../../../services/api/bookingsApi'
-import type { BookingSyncStatusResponse, CreateBookingPaymentLinkRequest } from '../../../services/api/types'
+import type { BookingSyncStatusResponse } from '../../../services/api/types'
 import { getBookingStatusLabel, getBookingStatusTone } from '../bookingOptions'
 import { usePermissions } from '../../../hooks/usePermissions'
 import { getBookingSyncStatusRequest, retryBookingSyncRequest } from '../../../services/api/calendarApi'
@@ -41,11 +36,6 @@ export function AppointmentDetailPage() {
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
   const [confirmationUrl, setConfirmationUrl] = useState<string | null>(null)
   const [publicActionUrl, setPublicActionUrl] = useState<string | null>(null)
-  const [paymentUrl, setPaymentUrl] = useState<string | null>(null)
-  const [paymentPurpose, setPaymentPurpose] = useState<'DEPOSIT' | 'FULL' | 'MANUAL'>('DEPOSIT')
-  const [manualAmount, setManualAmount] = useState('')
-  const [manualReference, setManualReference] = useState('')
-  const [fullAmount, setFullAmount] = useState('')
 
   const bookingQuery = useQuery({
     queryKey: ['bookings', 'detail', appointmentId],
@@ -139,102 +129,12 @@ export function AppointmentDetailPage() {
     },
   })
 
-  const paymentLinkMutation = useMutation({
-    mutationFn: async () => {
-      if (!appointmentId) {
-        throw new Error('No hay cita seleccionada.')
-      }
-      const payload: CreateBookingPaymentLinkRequest = {
-        paymentPurpose,
-        expirationMinutes: 30,
-        sendWhatsApp: true,
-        sendEmail: true,
-      }
-      if (paymentPurpose === 'FULL' && fullAmount) {
-        payload.amount = Number(fullAmount)
-      }
-      return createBookingPaymentLinkRequest(appointmentId, payload)
-    },
-    onSuccess: async (response) => {
-      setPaymentUrl(response.checkoutUrl)
-      await bookingQuery.refetch()
-      showToast({
-        title: 'Enlace de pago generado',
-        description: 'El link quedo asociado a la reserva y listo para compartir.',
-        tone: 'success',
-      })
-    },
-    onError: () => {
-      showToast({
-        title: 'No se pudo generar el pago',
-        description: 'Verifica que la reserva requiera abono y siga activa.',
-        tone: 'error',
-      })
-    },
-  })
 
-  const manualPaymentMutation = useMutation({
-    mutationFn: async () => {
-      if (!appointmentId) {
-        throw new Error('No hay cita seleccionada.')
-      }
-      const amount = Number(manualAmount || bookingQuery.data?.depositAmount || 0)
-      return registerBookingManualPaymentRequest(appointmentId, {
-        amount,
-        currency: 'CLP',
-        provider: 'MANUAL',
-        providerPaymentId: manualReference.trim() || undefined,
-        idempotencyKey: manualReference.trim() ? `manual:${appointmentId}:${manualReference.trim()}` : undefined,
-        status: 'APPROVED',
-        notes: 'Pago registrado desde detalle de cita.',
-      })
-    },
-    onSuccess: async () => {
-      setManualAmount('')
-      setManualReference('')
-      await bookingQuery.refetch()
-      showToast({
-        title: 'Pago registrado',
-        description: 'El abono quedo auditado en la reserva.',
-        tone: 'success',
-      })
-    },
-    onError: () => {
-      showToast({
-        title: 'No se pudo registrar el pago',
-        description: 'Revisa el monto y la referencia del pago.',
-        tone: 'error',
-      })
-    },
-  })
 
-  const refundPaymentMutation = useMutation({
-    mutationFn: async (paymentId: string) => {
-      if (!appointmentId) {
-        throw new Error('No hay cita seleccionada.')
-      }
-      return refundBookingPaymentRequest(appointmentId, paymentId, {
-        reason: 'Reembolso registrado desde detalle de cita.',
-      })
-    },
-    onSuccess: async () => {
-      await bookingQuery.refetch()
-      showToast({
-        title: 'Pago reembolsado',
-        description: 'El estado del pago quedo actualizado y auditado.',
-        tone: 'success',
-      })
-    },
-    onError: () => {
-      showToast({
-        title: 'No se pudo reembolsar',
-        description: 'Solo los pagos aprobados pueden marcarse como reembolsados.',
-        tone: 'error',
-      })
-    },
-  })
 
-  const { hasPermission } = usePermissions()
+
+
+
 
   const calendarSyncQuery = useQuery({
     queryKey: ['bookings', appointmentId, 'calendar-sync'],

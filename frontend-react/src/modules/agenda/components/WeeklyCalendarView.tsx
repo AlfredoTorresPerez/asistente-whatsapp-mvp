@@ -15,7 +15,7 @@ import {
   getScheduleHours,
   layoutEventsInCell,
 } from './agendaUtils'
-import type { AgendaHourLayout, DayAvailability } from './agendaUtils'
+import type { DayAvailability } from './agendaUtils'
 
 type WeeklyCalendarViewProps = {
   calendarItems: AgendaCalendarItemResponse[]

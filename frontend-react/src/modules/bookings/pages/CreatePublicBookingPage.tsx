@@ -20,7 +20,6 @@ import type {
   AgendaSlotResponse,
   CreatePublicBookingRequest,
   PublicCategoryResponse,
-  PublicCustomerInfoResponse,
   PublicServiceBranchResponse,
   PublicServiceItemResponse,
 } from '../../../services/api/types'

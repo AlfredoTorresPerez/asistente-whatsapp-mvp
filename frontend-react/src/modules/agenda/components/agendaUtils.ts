@@ -10,16 +10,6 @@ export const calendarDays = 7
 export const weekDayLabels = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab']
 export const scheduleHoursStep = 1
 
-const dayOfWeekMap: Record<number, { label: string; shortLabel: string }> = {
-  1: { label: 'Lunes', shortLabel: 'Lun' },
-  2: { label: 'Martes', shortLabel: 'Mar' },
-  3: { label: 'Miércoles', shortLabel: 'Mie' },
-  4: { label: 'Jueves', shortLabel: 'Jue' },
-  5: { label: 'Viernes', shortLabel: 'Vie' },
-  6: { label: 'Sábado', shortLabel: 'Sab' },
-  7: { label: 'Domingo', shortLabel: 'Dom' },
-}
-
 export type EventLayout = {
   item: AgendaCalendarItemResponse
   top: number

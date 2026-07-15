@@ -264,6 +264,7 @@ function storeQr(qr: WhatsAppWebQrResponse) {
   try {
     localStorage.setItem(QR_STORAGE_KEY, JSON.stringify(qr))
   } catch {
+    // noop
   }
 }
 
@@ -271,6 +272,7 @@ function clearStoredQr() {
   try {
     localStorage.removeItem(QR_STORAGE_KEY)
   } catch {
+    // noop
   }
 }
 

@@ -205,7 +205,7 @@ describe('getLocalHourMinute', () => {
 
   it('fallback a la conversion desde startsAt cuando no hay startTimeLocal', () => {
     const item = makeItem('2026-07-16T01:50:00.000Z', { dateLocal: '2026-07-15' })
-    delete (item as any).startTimeLocal
+    delete (item as Record<string, unknown>).startTimeLocal
     const result = getLocalHourMinute(item)
     expect(result.hour).toBe(21)
     expect(result.minute).toBe(50)
