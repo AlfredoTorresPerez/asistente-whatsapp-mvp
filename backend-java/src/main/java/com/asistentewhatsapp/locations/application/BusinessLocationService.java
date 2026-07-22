@@ -1,5 +1,7 @@
 package com.asistentewhatsapp.locations.application;
 
+import com.asistentewhatsapp.cloudapi.onboarding.MetaOnboardingRepository;
+import com.asistentewhatsapp.cloudapi.onboarding.MetaOnboardingRepository.ChannelAccountRecord;
 import com.asistentewhatsapp.locations.api.BusinessLocationResponse;
 import com.asistentewhatsapp.locations.api.UpsertBusinessLocationRequest;
 import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository;
@@ -7,6 +9,8 @@ import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcReposi
 import com.asistentewhatsapp.security.domain.AuthenticatedUser;
 import com.asistentewhatsapp.shared.exception.ApiException;
 import com.asistentewhatsapp.shared.exception.ConflictException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -18,9 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class BusinessLocationService {
 
     private final BusinessLocationJdbcRepository businessLocationJdbcRepository;
+    private final MetaOnboardingRepository metaOnboardingRepository;
 
-    public BusinessLocationService(BusinessLocationJdbcRepository businessLocationJdbcRepository) {
+    public BusinessLocationService(
+            BusinessLocationJdbcRepository businessLocationJdbcRepository,
+            MetaOnboardingRepository metaOnboardingRepository) {
         this.businessLocationJdbcRepository = businessLocationJdbcRepository;
+        this.metaOnboardingRepository = metaOnboardingRepository;
     }
 
     @Transactional(readOnly = true)
@@ -94,6 +102,36 @@ public class BusinessLocationService {
         }
         businessLocationJdbcRepository.deactivate(authenticatedUser.businessId(), locationId);
         return getDetail(authenticatedUser, locationId);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, String> commercialQr(AuthenticatedUser authenticatedUser, UUID locationId) {
+        BusinessLocationRecord location = businessLocationJdbcRepository.findById(authenticatedUser.businessId(), locationId);
+
+        ChannelAccountRecord channel = metaOnboardingRepository.findCloudApiChannel(authenticatedUser.businessId())
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "WHATSAPP_NOT_CONFIGURED",
+                        "WhatsApp Cloud API no esta configurado para este negocio."));
+
+        String phone = channel.phoneNumber();
+        if (phone == null || phone.isBlank()) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "NO_PHONE_NUMBER",
+                    "El canal de WhatsApp no tiene un numero telefonico configurado.");
+        }
+        String cleanPhone = phone.replaceAll("\\D", "");
+        String prefix = location.code() != null ? "SEDE:" + location.code() + " " : "";
+        String message = prefix + "Quiero realizar una reserva";
+        String encodedMessage = URLEncoder.encode(message, StandardCharsets.UTF_8);
+        String waUrl = "https://wa.me/" + cleanPhone + "?text=" + encodedMessage;
+
+        String displayPhone = channel.displayPhoneNumber() != null ? channel.displayPhoneNumber() : cleanPhone;
+
+        return Map.of(
+                "waUrl", waUrl,
+                "phoneNumber", cleanPhone,
+                "displayPhoneNumber", displayPhone,
+                "prefilledMessage", message,
+                "locationCode", location.code() != null ? location.code() : "",
+                "locationName", location.name() != null ? location.name() : "");
     }
 
     private void ensureCodeAvailable(UUID businessId, String code, UUID excludedLocationId) {

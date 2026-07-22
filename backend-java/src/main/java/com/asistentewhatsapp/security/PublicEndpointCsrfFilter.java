@@ -16,8 +16,7 @@ public class PublicEndpointCsrfFilter extends OncePerRequestFilter {
 
     private static final List<String> PROTECTED_PATHS = List.of(
             "/api/v1/public/booking-confirmations/",
-            "/api/v1/public/customer-bookings/",
-            "/api/v1/integrations/");
+            "/api/v1/public/customer-bookings/");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,

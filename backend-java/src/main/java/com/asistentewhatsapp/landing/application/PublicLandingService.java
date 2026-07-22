@@ -18,6 +18,8 @@ import com.asistentewhatsapp.channels.application.ChannelDispatchRequest;
 import com.asistentewhatsapp.channels.application.ChannelDispatchResponse;
 import com.asistentewhatsapp.channels.application.ChannelDispatchService;
 import com.asistentewhatsapp.channels.domain.MessageChannelType;
+import com.asistentewhatsapp.cloudapi.onboarding.MetaOnboardingRepository;
+import com.asistentewhatsapp.cloudapi.onboarding.MetaOnboardingRepository.ChannelAccountRecord;
 import com.asistentewhatsapp.customerbookings.application.CustomerBookingService;
 import com.asistentewhatsapp.landing.api.CreatePublicBookingRequest;
 import com.asistentewhatsapp.landing.api.PublicCustomerInfoResponse;
@@ -25,6 +27,7 @@ import com.asistentewhatsapp.landing.api.LandingLocationItemResponse;
 import com.asistentewhatsapp.landing.api.LandingPageResponse;
 import com.asistentewhatsapp.landing.api.LandingPageResponse.LandingCompanyResponse;
 import com.asistentewhatsapp.landing.api.LandingServiceItemResponse;
+import com.asistentewhatsapp.landing.api.WhatsAppEntryResponse;
 import com.asistentewhatsapp.landing.api.PublicCategoryResponse;
 import com.asistentewhatsapp.landing.api.PublicServiceBranchResponse;
 import com.asistentewhatsapp.landing.api.PublicServiceDetailResponse;
@@ -77,6 +80,7 @@ public class PublicLandingService {
     private final BusinessRepository businessRepository;
     private final AestheticCenterJdbcRepository aestheticRepository;
     private final BusinessLocationJdbcRepository locationRepository;
+    private final MetaOnboardingRepository metaOnboardingRepository;
     private final CompleteAgendaJdbcRepository agendaRepository;
     private final BookingEmailService bookingEmailService;
     private final TransactionalEmailService transactionalEmailService;
@@ -94,6 +98,7 @@ public class PublicLandingService {
             BusinessRepository businessRepository,
             AestheticCenterJdbcRepository aestheticRepository,
             BusinessLocationJdbcRepository locationRepository,
+            MetaOnboardingRepository metaOnboardingRepository,
             CompleteAgendaJdbcRepository agendaRepository,
             BookingEmailService bookingEmailService,
             TransactionalEmailService transactionalEmailService,
@@ -109,6 +114,7 @@ public class PublicLandingService {
         this.businessRepository = businessRepository;
         this.aestheticRepository = aestheticRepository;
         this.locationRepository = locationRepository;
+        this.metaOnboardingRepository = metaOnboardingRepository;
         this.agendaRepository = agendaRepository;
         this.bookingEmailService = bookingEmailService;
         this.transactionalEmailService = transactionalEmailService;
@@ -507,10 +513,49 @@ public class PublicLandingService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public WhatsAppEntryResponse getWhatsAppEntry() {
+        BusinessEntity business = findDefaultBusiness();
+        UUID businessId = business.getId();
+
+        BusinessLocationRecord location = locationRepository.findDefaultActive(businessId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "NO_ACTIVE_LOCATION",
+                        "No hay una sede activa configurada."));
+
+        ChannelAccountRecord channel = metaOnboardingRepository.findCloudApiChannel(businessId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "WHATSAPP_NOT_CONFIGURED",
+                        "WhatsApp Cloud API no esta configurado para este negocio."));
+
+        String phone = channel.phoneNumber();
+        if (phone == null || phone.isBlank()) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "NO_PHONE_NUMBER",
+                    "El canal de WhatsApp no tiene un numero telefonico configurado.");
+        }
+        String cleanPhone = phone.replaceAll("\\D", "");
+        String prefix = location.code() != null ? "SEDE:" + location.code() + " " : "";
+        String message = prefix + "Quiero realizar una reserva";
+        String encodedMessage = URLEncoder.encode(message, StandardCharsets.UTF_8);
+        String waUrl = "https://wa.me/" + cleanPhone + "?text=" + encodedMessage;
+
+        return new WhatsAppEntryResponse(
+                waUrl,
+                cleanPhone,
+                channel.displayPhoneNumber() != null ? channel.displayPhoneNumber() : cleanPhone,
+                message,
+                location.code() != null ? location.code() : "",
+                location.name());
+    }
+
     private BusinessEntity findDefaultBusiness() {
-        return businessRepository.findFirstByActiveTrueOrderByCreatedAtAsc()
-                .orElseThrow(() -> new ApiException(HttpStatus.INTERNAL_SERVER_ERROR,
-                        "NO_BUSINESS_CONFIGURED", "No hay un negocio configurado en el sistema.", java.util.Map.of()));
+        return metaOnboardingRepository.findCentralizedChannel()
+                .map(channel -> businessRepository.findById(channel.businessId())
+                        .orElseThrow(() -> new ApiException(HttpStatus.INTERNAL_SERVER_ERROR,
+                                "NO_BUSINESS_FOR_CHANNEL", "El canal centralizado no tiene un negocio valido.",
+                                java.util.Map.of())))
+                .orElseGet(() -> businessRepository.findFirstByActiveTrueOrderByCreatedAtAsc()
+                        .orElseThrow(() -> new ApiException(HttpStatus.INTERNAL_SERVER_ERROR,
+                                "NO_BUSINESS_CONFIGURED", "No hay un negocio configurado en el sistema.",
+                                java.util.Map.of())));
     }
 
     private AgendaAvailabilityResponse emptyAvailability(LocationRecord location,

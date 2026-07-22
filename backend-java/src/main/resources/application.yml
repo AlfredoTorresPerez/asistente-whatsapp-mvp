@@ -78,7 +78,7 @@ app:
       enabled: ${APP_WHATSAPP_WEB_ENABLED:false}
       base-url: ${APP_WHATSAPP_WEB_BASE_URL:http://localhost:3001}
       api-key: ${APP_WHATSAPP_WEB_API_KEY:dev-whatsapp-web-key}
-      default-phone-number: ${APP_WHATSAPP_WEB_DEFAULT_PHONE_NUMBER:56950954580}
+      default-phone-number: ${APP_WHATSAPP_WEB_DEFAULT_PHONE_NUMBER:56927305158}
       webhook-secret: ${APP_WHATSAPP_WEB_WEBHOOK_SECRET:dev-whatsapp-web-webhook-secret}
       webhook-tolerance-seconds: ${APP_WHATSAPP_WEB_WEBHOOK_TOLERANCE_SECONDS:300}
       demo-fallback-enabled: ${APP_WHATSAPP_WEB_DEMO_FALLBACK_ENABLED:false}
@@ -89,10 +89,19 @@ app:
       enabled: ${APP_WHATSAPP_CLOUD_API_ENABLED:false}
       base-url: ${APP_WHATSAPP_CLOUD_API_BASE_URL:https://graph.facebook.com}
       api-version: ${APP_WHATSAPP_CLOUD_API_VERSION:v23.0}
+      app-id: ${APP_WHATSAPP_CLOUD_API_APP_ID:}
+      app-secret: ${APP_WHATSAPP_CLOUD_API_APP_SECRET:}
+      webhook-verify-token: ${APP_WHATSAPP_CLOUD_API_WEBHOOK_VERIFY_TOKEN:}
+      webhook-public-url: ${APP_WHATSAPP_CLOUD_API_WEBHOOK_PUBLIC_URL:}
+      webhook-signature-required: ${APP_WHATSAPP_CLOUD_API_WEBHOOK_SIGNATURE_REQUIRED:true}
+      credential-encryption-secret: ${APP_WHATSAPP_CLOUD_API_CREDENTIAL_ENCRYPTION_SECRET:}
       phone-number-id: ${APP_WHATSAPP_CLOUD_API_PHONE_NUMBER_ID:}
+      business-account-id: ${APP_WHATSAPP_CLOUD_API_BUSINESS_ACCOUNT_ID:}
       access-token: ${APP_WHATSAPP_CLOUD_API_ACCESS_TOKEN:}
-      default-phone-number: ${APP_WHATSAPP_CLOUD_API_DEFAULT_PHONE_NUMBER:${APP_WHATSAPP_WEB_DEFAULT_PHONE_NUMBER:56950954580}}
+      default-phone-number: ${APP_WHATSAPP_CLOUD_API_DEFAULT_PHONE_NUMBER:${APP_WHATSAPP_WEB_DEFAULT_PHONE_NUMBER:56927305158}}
       dry-run-enabled: ${APP_WHATSAPP_CLOUD_API_DRY_RUN_ENABLED:false}
+      connect-timeout-seconds: ${APP_WHATSAPP_CLOUD_API_CONNECT_TIMEOUT_SECONDS:5}
+      read-timeout-seconds: ${APP_WHATSAPP_CLOUD_API_READ_TIMEOUT_SECONDS:15}
   ai:
     agents:
       enabled: ${APP_AI_AGENTS_ENABLED:true}

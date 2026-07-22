@@ -67,6 +67,11 @@ public class PublicLandingController {
         return publicLandingService.getCustomerInfo(token);
     }
 
+    @GetMapping("/whatsapp-entry")
+    public WhatsAppEntryResponse whatsappEntry() {
+        return publicLandingService.getWhatsAppEntry();
+    }
+
     @PostMapping("/bookings")
     @ResponseStatus(HttpStatus.CREATED)
     public Map<String, Object> createBooking(@Valid @RequestBody CreatePublicBookingRequest request) {

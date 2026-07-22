@@ -3,17 +3,22 @@ app:
   rate-limiting:
     enabled: ${APP_RATE_LIMITING_ENABLED:true}
   logging:
-    include-message-body: ${APP_LOGGING_INCLUDE_MESSAGE_BODY:true}
+    include-message-body: ${APP_LOGGING_INCLUDE_MESSAGE_BODY:false}
   channels:
+    whatsapp:
+      provider: ${APP_WHATSAPP_CHANNEL_PROVIDER:META_CLOUD_API}
     whatsapp-web:
       enabled: ${APP_WHATSAPP_WEB_ENABLED:false}
       simulator-enabled: ${APP_WHATSAPP_WEB_SIMULATOR_ENABLED:true}
       demo-fallback-enabled: ${APP_WHATSAPP_WEB_DEMO_FALLBACK_ENABLED:true}
-  test:
-    enabled: true
+    whatsapp-cloud-api:
+      enabled: ${APP_WHATSAPP_CLOUD_API_ENABLED:true}
+      dry-run-enabled: ${APP_WHATSAPP_CLOUD_API_DRY_RUN_ENABLED:true}
+      webhook-signature-required: ${APP_WHATSAPP_CLOUD_API_WEBHOOK_SIGNATURE_REQUIRED:true}
   ai:
     agents:
       auto-reply-enabled: ${APP_AI_AGENTS_AUTO_REPLY_ENABLED:false}
+      safe-mode-enabled: ${APP_AI_AGENTS_SAFE_MODE_ENABLED:true}
   email:
     enabled: ${APP_EMAIL_ENABLED:false}
     simulation-enabled: ${APP_EMAIL_SIMULATION_ENABLED:true}
@@ -34,11 +39,3 @@ sentry:
 logging:
   level:
     com.asistentewhatsapp: ${APP_LOG_LEVEL:DEBUG}
-
-spring:
-  datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/asistente}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:change-me-local}
-  flyway:
-    locations: classpath:db/migration,classpath:db/seed

@@ -7,8 +7,17 @@ public record WhatsAppCloudApiProperties(
         boolean enabled,
         String baseUrl,
         String apiVersion,
+        String appId,
+        String appSecret,
+        String webhookVerifyToken,
+        String webhookPublicUrl,
+        boolean webhookSignatureRequired,
+        String credentialEncryptionSecret,
         String phoneNumberId,
+        String businessAccountId,
         String accessToken,
         String defaultPhoneNumber,
-        boolean dryRunEnabled) {
+        boolean dryRunEnabled,
+        int connectTimeoutSeconds,
+        int readTimeoutSeconds) {
 }

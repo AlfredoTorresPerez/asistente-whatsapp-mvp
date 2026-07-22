@@ -595,6 +595,7 @@ public class CompleteAgendaJdbcRepository {
             sql.append(" and b.room_id = :roomId\n");
             params.addValue("roomId", roomId);
         }
+        sql.append(" for update skip locked\n");
         Integer count = jdbcTemplate.queryForObject(sql.toString(), params, Integer.class);
         boolean result = count != null && count > 0;
         logOutput("hasConflict", result);
@@ -622,6 +623,7 @@ public class CompleteAgendaJdbcRepository {
             sql.append(" and b.id <> :bookingId\n");
             params.addValue("bookingId", bookingId);
         }
+        sql.append(" for update skip locked\n");
         Integer count = jdbcTemplate.queryForObject(sql.toString(), params, Integer.class);
         return count != null && count > 0;
     }

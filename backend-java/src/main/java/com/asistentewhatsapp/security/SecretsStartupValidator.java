@@ -29,11 +29,24 @@ public class SecretsStartupValidator implements ApplicationRunner {
             {"APP_DB_PASSWORD", "Base de datos"},
             {"APP_JWT_SECRET", "JWT"},
             {"APP_MERCADOPAGO_ACCESS_TOKEN", "MercadoPago"},
-            {"APP_WHATSAPP_CLOUD_API_ACCESS_TOKEN", "WhatsApp Cloud API"},
-            {"APP_WHATSAPP_CLOUD_API_PHONE_NUMBER_ID", "WhatsApp Phone Number ID"},
             {"APP_WHATSAPP_WEB_WEBHOOK_SECRET", "WhatsApp Web webhook"},
             {"APP_BOOKING_PAYMENT_WEBHOOK_SECRET", "Pagos webhook"},
         };
+
+        boolean cloudApiEnabled = "true".equalsIgnoreCase(
+                environment.getProperty("app.channels.whatsapp-cloud-api.enabled"));
+        if (cloudApiEnabled) {
+            String[][] cloudSecrets = {
+                {"APP_WHATSAPP_CLOUD_API_APP_ID", "WhatsApp Cloud API App ID"},
+                {"APP_WHATSAPP_CLOUD_API_APP_SECRET", "WhatsApp Cloud API App Secret"},
+                {"APP_WHATSAPP_CLOUD_API_WEBHOOK_VERIFY_TOKEN", "WhatsApp Cloud API Webhook Verify Token"},
+                {"APP_WHATSAPP_CLOUD_API_CREDENTIAL_ENCRYPTION_SECRET", "WhatsApp Cloud API Encryption Secret"},
+            };
+            String[][] extended = new String[secretsToCheck.length + cloudSecrets.length][];
+            System.arraycopy(secretsToCheck, 0, extended, 0, secretsToCheck.length);
+            System.arraycopy(cloudSecrets, 0, extended, secretsToCheck.length, cloudSecrets.length);
+            secretsToCheck = extended;
+        }
 
         for (String[] secret : secretsToCheck) {
             String value = environment.getProperty(secret[0]);

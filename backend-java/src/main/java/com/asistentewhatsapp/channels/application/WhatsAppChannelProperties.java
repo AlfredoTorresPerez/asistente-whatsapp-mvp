@@ -19,6 +19,7 @@ public class WhatsAppChannelProperties {
         WEB,
         WHATSAPP_WEB,
         CLOUD_API,
+        META_CLOUD_API,
         DISABLED
     }
 }

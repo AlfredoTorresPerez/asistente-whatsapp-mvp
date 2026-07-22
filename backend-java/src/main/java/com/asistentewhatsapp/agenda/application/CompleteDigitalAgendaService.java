@@ -28,6 +28,7 @@ import com.asistentewhatsapp.bookings.application.BookingStateMachine;
 import com.asistentewhatsapp.bookings.application.BookingConfirmationService;
 import com.asistentewhatsapp.bookings.application.AvailabilityService;
 import com.asistentewhatsapp.bookings.infrastructure.BookingJdbcRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import com.asistentewhatsapp.calendar.application.CalendarSyncService;
 import com.asistentewhatsapp.channels.application.ChannelDispatchRequest;
 import com.asistentewhatsapp.channels.application.ChannelDispatchService;
@@ -142,7 +143,7 @@ public class CompleteDigitalAgendaService {
                 service.durationMinutes(), service.requiresRoom(), service.requiresDeposit(), slots);
     }
 
-    @Transactional
+    @Transactional(noRollbackFor = DataIntegrityViolationException.class)
     public BookingDetailResponse createTemporaryBooking(AuthenticatedUser user, CreateTemporaryAgendaBookingRequest request) {
         LocationRecord location = repository.findLocation(user.businessId(), request.locationId());
         ServiceRecord service = repository.findService(user.businessId(), request.locationId(), request.serviceId());

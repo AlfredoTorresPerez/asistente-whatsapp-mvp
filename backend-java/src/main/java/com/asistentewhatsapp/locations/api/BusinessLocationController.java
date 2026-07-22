@@ -4,6 +4,7 @@ import com.asistentewhatsapp.locations.application.BusinessLocationService;
 import com.asistentewhatsapp.security.domain.AuthenticatedUser;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -71,5 +72,13 @@ public class BusinessLocationController {
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
             @PathVariable UUID locationId) {
         return businessLocationService.deactivate(authenticatedUser, locationId);
+    }
+
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_VIEW')")
+    @GetMapping({"/api/business-locations/{locationId}/commercial-qr", "/api/v1/business-locations/{locationId}/commercial-qr"})
+    public Map<String, String> commercialQr(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @PathVariable UUID locationId) {
+        return businessLocationService.commercialQr(authenticatedUser, locationId);
     }
 }

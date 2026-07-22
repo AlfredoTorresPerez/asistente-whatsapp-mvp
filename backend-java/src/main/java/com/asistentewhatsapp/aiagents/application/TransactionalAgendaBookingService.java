@@ -44,6 +44,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,7 +58,7 @@ public class TransactionalAgendaBookingService {
     private static final java.util.Map<String, String> TEST_PHONE_MAP = java.util.Map.of(
             "224145803620505", "56950954580");
     private static final String DEMO_CUSTOMER_NAME = "Cliente WhatsApp";
-    private static final String DEMO_CUSTOMER_PHONE = "+56900000000";
+    private static final String DEMO_CUSTOMER_PHONE = "+56999900003";
     private static final ZoneId DEFAULT_BUSINESS_ZONE = ZoneId.of("America/Santiago");
     private static final Pattern ISO_DATE_PATTERN = Pattern.compile("\\b(20\\d{2})-(\\d{1,2})-(\\d{1,2})\\b");
     private static final Pattern EXPLICIT_DATE_PATTERN = Pattern.compile("\\b(\\d{1,2})[/-](\\d{1,2})(?:[/-](\\d{2,4}))?\\b");
@@ -183,7 +184,7 @@ public class TransactionalAgendaBookingService {
         return sb.toString();
     }
 
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @Transactional(propagation = Propagation.REQUIRED)
     public Optional<String> createTemporaryBookingLink(
             UUID businessId,
             UUID customerId,
@@ -321,6 +322,26 @@ public class TransactionalAgendaBookingService {
                             + " expirationMinutes=" + expirationMinutes()
                             + " urlCreated=true sendWhatsApp=" + sendWhatsApp);
             return Optional.of(successResponse(service.get(), location.get(), dateText, timeText, link, traceId, traceConversationId));
+        } catch (DataIntegrityViolationException exception) {
+            boolean isOverlapConflict = false;
+            for (Throwable cause = exception; cause != null; cause = cause.getCause()) {
+                if (cause instanceof java.sql.SQLException sqlEx
+                        && "23P01".equals(sqlEx.getSQLState())) {
+                    isOverlapConflict = true;
+                    break;
+                }
+            }
+            if (isOverlapConflict) {
+                AiTraceLogger.warn("BOOKING_CONCURRENT_CONFLICT", traceId, traceConversationId, null, "TransactionalAgendaBookingService",
+                        "errorType=DataIntegrityViolationException detail=exclusion_constraint_violation"
+                                + " functionalMessage=Ese horario acaba de ser ocupado. Por favor revisa la disponibilidad nuevamente.");
+                return Optional.of("Ese horario acaba de ser ocupado. Por favor revisa la disponibilidad nuevamente.");
+            }
+            AiTraceLogger.error("DATA_INTEGRITY_ERROR", traceId, traceConversationId, null, "TransactionalAgendaBookingService",
+                    "errorType=" + exception.getClass().getSimpleName()
+                            + " functionalMessage=No fue posible crear la reserva temporal en este momento. Puedo revisar otro horario o derivarte con una persona del equipo.",
+                    exception);
+            return Optional.of("No fue posible crear la reserva temporal en este momento. Puedo revisar otro horario o derivarte con una persona del equipo.");
         } catch (RuntimeException exception) {
             AiTraceLogger.error("FLOW_ERROR", traceId, traceConversationId, null, "TransactionalAgendaBookingService",
                     "errorType=" + exception.getClass().getSimpleName()
@@ -1366,6 +1387,14 @@ public class TransactionalAgendaBookingService {
         if (normalized.isBlank()) {
             return Optional.empty();
         }
+        if (containsWholeToken(normalized, "antes") && containsWholeToken(normalized, "posible")
+                || containsWholeToken(normalized, "cuanto") && containsWholeToken(normalized, "antes")
+                || normalized.contains("lo antes posible")
+                || normalized.contains("cuanto antes")
+                || normalized.contains("apenas puedas")
+                || normalized.contains("ni bien puedas")) {
+            return Optional.of(today);
+        }
         Matcher iso = ISO_DATE_PATTERN.matcher(normalized);
         if (iso.find()) {
             int year = Integer.parseInt(iso.group(1));
@@ -1443,6 +1472,18 @@ public class TransactionalAgendaBookingService {
     private Optional<LocalTime> resolveTime(String rawTime) {
         String value = rawTime == null ? "" : rawTime.trim();
         String normalized = normalize(value);
+        if (normalized.contains("lo antes posible") || normalized.contains("cuanto antes")
+                || normalized.contains("apenas puedas") || normalized.contains("ni bien puedas")) {
+            LocalTime now = LocalTime.now(DEFAULT_BUSINESS_ZONE);
+            LocalTime nextSlot = now.plusHours(1).withMinute(0).withSecond(0).withNano(0);
+            if (nextSlot.isBefore(LocalTime.of(8, 0))) {
+                return Optional.of(LocalTime.of(9, 0));
+            }
+            if (nextSlot.isAfter(LocalTime.of(20, 0))) {
+                return Optional.of(LocalTime.of(9, 0));
+            }
+            return Optional.of(nextSlot);
+        }
         Matcher matcher = TIME_PATTERN.matcher(value);
         if (!matcher.find()) {
             return Optional.empty();

@@ -83,6 +83,23 @@ public class WhatsAppWebChannelJdbcRepository {
         return items.stream().findFirst();
     }
 
+    public Optional<ChannelAccountRecord> findChannelAccountByPhoneNumberId(String phoneNumberId) {
+        if (phoneNumberId == null || phoneNumberId.isBlank()) {
+            return Optional.empty();
+        }
+        List<ChannelAccountRecord> items = jdbcTemplate.query(
+                """
+                        select id, business_id, session_key, status, phone_number, last_qr_code, last_qr_at, last_event_at
+                        from channel_account
+                        where provider_name = 'META_CLOUD_API'
+                          and phone_number_id = ?
+                        limit 1
+                        """,
+                new ChannelAccountRowMapper(),
+                phoneNumberId);
+        return items.stream().findFirst();
+    }
+
     public UUID upsertChannelAccount(
             UUID businessId,
             String sessionKey,

@@ -28,6 +28,11 @@ public class ChannelDispatchController {
     @PostMapping("/dispatch")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ChannelDispatchResponse dispatch(@AuthenticationPrincipal AuthenticatedUser authenticatedUser, @Valid @RequestBody ChannelDispatchRequest request) {
-        return channelDispatchService.dispatch(request);
+        ChannelDispatchRequest secureRequest = new ChannelDispatchRequest(
+                authenticatedUser.businessId(),
+                request.channelType(),
+                request.recipientPhone(),
+                request.body());
+        return channelDispatchService.dispatch(secureRequest);
     }
 }

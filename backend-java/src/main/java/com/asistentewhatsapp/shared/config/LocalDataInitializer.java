@@ -39,7 +39,7 @@ public class LocalDataInitializer implements ApplicationRunner {
         LocalDate dayAfter = LocalDate.now().plusDays(2);
 
         int facialBookingId = jdbc.queryForObject(
-            "SELECT count(*) FROM booking WHERE id = ? AND business_id = ?",
+            "SELECT count(*) FROM booking WHERE id = ?::uuid AND business_id = ?::uuid",
             Integer.class,
             "68000000-0000-0000-0000-000000000001",
             BUSINESS_ID
@@ -48,26 +48,33 @@ public class LocalDataInitializer implements ApplicationRunner {
         int updated = jdbc.update("""
             UPDATE booking SET
                 starts_at = CASE id
-                    WHEN ? THEN ?::timestamp
-                    WHEN ? THEN ?::timestamp
+                    WHEN ?::uuid THEN ?::timestamp
+                    WHEN ?::uuid THEN ?::timestamp
                 END,
-                ends_at = starts_at + (duration_minutes || ' minutes')::interval,
+                ends_at = CASE id
+                    WHEN ?::uuid THEN ?::timestamp + (duration_minutes || ' minutes')::interval
+                    WHEN ?::uuid THEN ?::timestamp + (duration_minutes || ' minutes')::interval
+                END,
                 service_id = CASE id
-                    WHEN ? THEN (SELECT id FROM aesthetic_service WHERE business_id = ? AND code = 'FAC-LIMPIEZA' LIMIT 1)
-                    WHEN ? THEN (SELECT id FROM aesthetic_service WHERE business_id = ? AND code = 'DEP-LASER' LIMIT 1)
+                    WHEN ?::uuid THEN (SELECT id FROM aesthetic_service WHERE business_id = ?::uuid AND code = 'FAC-LIMPIEZA' LIMIT 1)
+                    WHEN ?::uuid THEN (SELECT id FROM aesthetic_service WHERE business_id = ?::uuid AND code = 'DEP-LASER' LIMIT 1)
                 END,
                 professional_id = CASE id
-                    WHEN ? THEN (SELECT id FROM aesthetic_professional WHERE business_id = ? AND full_name = 'Carla Mendez' LIMIT 1)
-                    WHEN ? THEN (SELECT id FROM aesthetic_professional WHERE business_id = ? AND full_name = 'Daniela Soto' LIMIT 1)
+                    WHEN ?::uuid THEN (SELECT id FROM aesthetic_professional WHERE business_id = ?::uuid AND full_name = 'Carla Mendez' LIMIT 1)
+                    WHEN ?::uuid THEN (SELECT id FROM aesthetic_professional WHERE business_id = ?::uuid AND full_name = 'Daniela Soto' LIMIT 1)
                 END,
                 room_id = CASE id
-                    WHEN ? THEN (SELECT r.id FROM agenda_room r WHERE r.business_id = ? AND r.code LIKE '%cabina-1' LIMIT 1)
-                    WHEN ? THEN (SELECT r.id FROM agenda_room r WHERE r.business_id = ? AND r.code LIKE '%cabina-2' LIMIT 1)
+                    WHEN ?::uuid THEN (SELECT r.id FROM agenda_room r WHERE r.business_id = ?::uuid AND r.code LIKE '%cabina-1' LIMIT 1)
+                    WHEN ?::uuid THEN (SELECT r.id FROM agenda_room r WHERE r.business_id = ?::uuid AND r.code LIKE '%cabina-2' LIMIT 1)
                 END
-            WHERE business_id = ?
-              AND id IN (?, ?)
+            WHERE business_id = ?::uuid
+              AND id IN (?::uuid, ?::uuid)
               AND starts_at < CURRENT_TIMESTAMP - INTERVAL '1 hour'
             """,
+            "68000000-0000-0000-0000-000000000001",
+            LocalDateTime.of(tomorrow, LocalTime.of(14, 0)),
+            "68000000-0000-0000-0000-000000000002",
+            LocalDateTime.of(tomorrow, LocalTime.of(17, 0)),
             "68000000-0000-0000-0000-000000000001",
             LocalDateTime.of(tomorrow, LocalTime.of(14, 0)),
             "68000000-0000-0000-0000-000000000002",

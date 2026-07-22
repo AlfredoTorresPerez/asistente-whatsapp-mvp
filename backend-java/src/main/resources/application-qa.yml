@@ -1,0 +1,42 @@
+app:
+  environment: qa
+  rate-limiting:
+    enabled: ${APP_RATE_LIMITING_ENABLED:true}
+  logging:
+    include-message-body: ${APP_LOGGING_INCLUDE_MESSAGE_BODY:false}
+  channels:
+    whatsapp-web:
+      enabled: ${APP_WHATSAPP_WEB_ENABLED:false}
+      simulator-enabled: false
+      demo-fallback-enabled: false
+  ai:
+    agents:
+      auto-reply-enabled: ${APP_AI_AGENTS_AUTO_REPLY_ENABLED:false}
+  email:
+    enabled: ${APP_EMAIL_ENABLED:false}
+    simulation-enabled: ${APP_EMAIL_SIMULATION_ENABLED:true}
+  calendar:
+    google:
+      enabled: ${APP_CALENDAR_GOOGLE_ENABLED:false}
+
+springdoc:
+  api-docs:
+    enabled: ${SPRINGDOC_ENABLED:true}
+  swagger-ui:
+    enabled: ${SPRINGDOC_ENABLED:true}
+
+sentry:
+  enabled: ${SENTRY_ENABLED:false}
+  dsn: ${SENTRY_DSN:}
+
+logging:
+  level:
+    com.asistentewhatsapp: ${APP_LOG_LEVEL:INFO}
+
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/asistente_qa}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:change-me-qa}
+  flyway:
+    locations: classpath:db/migration
