@@ -12,11 +12,11 @@ VALUES (
     'WHATSAPP',
     'demo-sales',
     'CONNECTED',
-    '56900000000',
+    '56927305158',
     now()
 )
 ON CONFLICT (business_id, channel_type) DO UPDATE
-SET status = 'CONNECTED', phone_number = '56900000000', last_event_at = now();
+SET status = 'CONNECTED', phone_number = '56927305158', last_event_at = now();
 
 -- Clientes de prueba para simular mensajes entrantes
 INSERT INTO customer (id, business_id, display_name, phone, normalized_phone, created_at)

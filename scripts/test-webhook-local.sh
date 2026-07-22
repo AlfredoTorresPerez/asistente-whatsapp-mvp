@@ -20,7 +20,7 @@ read -r -d '' PAYLOAD <<EOF
   "sessionKey": "${SESSION_KEY}",
   "payload": {
     "from": "56950954580",
-    "to": "56900000000",
+    "to": "56927305158",
     "body": "Hola, quiero agendar una hora",
     "externalMessageId": "test-msg-$(date +%s)",
     "chatId": "56950954580@c.us",

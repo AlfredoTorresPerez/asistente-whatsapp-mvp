@@ -81,15 +81,22 @@ pass "docker compose up -d --build OK"
 
 # 2. Wait Healthchecks
 log "2/8 - Esperando healthchecks (máx ${TIMEOUT_MINUTES} min)..."
+declare -A CONTAINER_MAP=(
+    ["postgres"]="asistente-postgres"
+    ["backend-java"]="asistente-backend"
+    ["frontend-react"]="asistente-frontend"
+    ["whatsapp-web-service"]="asistente-whatsapp-web"
+)
 SERVICES=("postgres" "backend-java" "frontend-react")
 [[ "$PROFILE" == "whatsapp" ]] && SERVICES+=("whatsapp-web-service")
 
 for svc in "${SERVICES[@]}"; do
-    info "  Esperando $svc..."
+    container_name="${CONTAINER_MAP[$svc]}"
+    info "  Esperando $svc (container=$container_name)..."
     healthy=false
     for ((i=1; i<=90; i++)); do
         check_timeout
-        state=$(docker inspect --format='{{.State.Health.Status}}' "asistente-$svc" 2>/dev/null || echo "none")
+        state=$(docker inspect --format='{{.State.Health.Status}}' "$container_name" 2>/dev/null || echo "none")
         [[ "$state" == "healthy" ]] && { healthy=true; break; }
         [[ "$state" == "unhealthy" ]] && { fail "$svc unhealthy"; exit 2; }
         sleep 2
@@ -127,9 +134,9 @@ TOKEN=$(curl -sf -X POST "http://localhost:8080/api/v1/auth/login" \
 pass "Login admin@demo.cl OK"
 
 AUTH_HEADER="Authorization: Bearer $TOKEN"
-BIZ=$(curl -sf -H "$AUTH_HEADER" "http://localhost:8080/api/v1/businesses/current" | jq -r '.id // empty')
-[[ -n "$BIZ" ]] || { fail "businesses/current sin id"; exit 3; }
-pass "GET /businesses/current OK (id=$BIZ)"
+BIZ=$(curl -sf -H "$AUTH_HEADER" "http://localhost:8080/api/v1/company" | jq -r '.id // empty')
+[[ -n "$BIZ" ]] || { fail "/api/v1/company sin id"; exit 3; }
+pass "GET /api/v1/company OK (id=$BIZ)"
 
 if [[ "$QUICK" == true ]]; then
     echo -e "\n${CYAN}═══════════════════════════════════════════${NC}"

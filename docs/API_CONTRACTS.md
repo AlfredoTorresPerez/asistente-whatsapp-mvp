@@ -286,13 +286,24 @@ Estos endpoints son del backend Java hacia el frontend. El backend habla interna
 | --- | --- | --- | --- | --- |
 | `POST` | `/api/v1/integrations/whatsapp-web/webhook` | HMAC | `{ "eventType": "MESSAGE_RECEIVED", "deliveryId": "uuid", "occurredAt": "...", "payload": { ... } }` | `{ "status": "ACCEPTED" }` |
 
-### Headers requeridos del webhook
+### Integracion WhatsApp Cloud API
+
+| Metodo | Ruta | Auth | Request | Response |
+| --- | --- | --- | --- | --- |
+| `GET` | `/api/v1/integrations/whatsapp-cloud/webhook` | Verify Token (query) | `hub.mode`, `hub.verify_token`, `hub.challenge` | `200` con `hub.challenge` como texto plano |
+| `POST` | `/api/v1/integrations/whatsapp-cloud/webhook` | HMAC-SHA256 (X-Hub-Signature-256) | Payload JSON de Meta Cloud API | `{ "status": "ACCEPTED" }` |
+
+### Headers requeridos del webhook WhatsApp Cloud API
+
+- `X-Hub-Signature-256` (HMAC-SHA256 del body con App Secret)
+
+### Headers requeridos del webhook WhatsApp Web
 
 - `X-WhatsApp-Web-Timestamp`
 - `X-WhatsApp-Web-Signature`
 - `X-WhatsApp-Web-Delivery-Id`
 
-### Event types del webhook
+### Event types del webhook WhatsApp Web
 
 - `SESSION_STATUS_CHANGED`
 - `QR_UPDATED`

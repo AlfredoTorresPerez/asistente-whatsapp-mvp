@@ -89,7 +89,7 @@ docker compose -f docker-compose.local.yml config
 
 ```bash
 # 1. Preparar entorno
-cp .env.local.example .env.local
+cp .env.local.template .env.local
 # Editar .env.local con valores reales si es necesario
 
 # 2. Iniciar todo

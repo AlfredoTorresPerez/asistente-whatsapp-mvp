@@ -38,7 +38,7 @@ PAYLOAD=$(cat <<EOF | jq -c .
   "payload": {
     "from": "$PHONE",
     "body": "$MSG",
-    "to": "56900000000",
+    "to": "56927305158",
     "externalMessageId": "ext-$DELIVERY_ID",
     "chatId": "$PHONE@c.us",
     "hasMedia": false,

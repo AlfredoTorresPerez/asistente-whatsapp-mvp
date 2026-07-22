@@ -153,7 +153,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:8080/api/v1/whatsapp-web
 ## Checklist Rápido Pre-Test
 
 - [ ] `.env.local` copiado con config AI explícita (ver arriba)
-- [ ] `docker compose -f docker-compose.local.yml --profile dev-visual up -d`
+- [ ] `docker compose -f docker-compose.local.yml --profile whatsapp up -d`
 - [ ] Backend compila: `cd backend-java && ./mvnw compile`
 - [ ] QR escaneado y `whatsapp-web-service` health `runtimeReady=true`
 - [ ] Canal WhatsApp `CONNECTED` en `/api/v1/whatsapp-web/status`
@@ -164,7 +164,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:8080/api/v1/whatsapp-web
 
 ```bash
 # Ver logs outbox worker en tiempo real
-docker logs -f asistente-backend-java | grep -E "AI_OUTBOX|AI_ROUTE|INTENT_DETECTED|WHATSAPP_RESPONSE"
+docker logs -f asistente-backend | grep -E "AI_OUTBOX|AI_ROUTE|INTENT_DETECTED|WHATSAPP_RESPONSE"
 
 # Ver channel_event_log
 docker exec -it asistente-postgres psql -U assistant -d asistente_whatsapp -c "SELECT * FROM channel_event_log ORDER BY received_at DESC LIMIT 10;"

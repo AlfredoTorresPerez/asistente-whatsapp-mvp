@@ -51,7 +51,7 @@ Script único que valida todo el stack local en < 3 minutos:
 | **0** | ✅ TODO PASS | OK |
 | **1** | ❌ Docker compose falló | Revisar `docker compose logs` |
 | **2** | ❌ Healthchecks timeout | Algún servicio no llegó a `healthy` |
-| **3** | ❌ API/Auth falló | Backend down, login inválido, o `/businesses/current` 404 |
+| **3** | ❌ API/Auth falló | Backend down, login inválido, o `/api/v1/company` 404 |
 | **4** | ❌ WhatsApp Web falló | Sesión no CONNECTED/QR_PENDING, webhook error |
 | **5** | ❌ IA Auto-reply falló | Outbox no procesó, o no hubo MESSAGE_SENT |
 
@@ -78,7 +78,7 @@ Script único que valida todo el stack local en < 3 minutos:
        ▼
 4. Auth + API Smoke
    ├── POST /api/v1/auth/login (admin@demo.cl / Cambiar123!) → accessToken
-   └── GET /api/v1/businesses/current → 200 + id
+    └── GET /api/v1/company → 200 + id
        │
        ▼
 5. WhatsApp Web Status [whatsapp profile]
@@ -122,8 +122,8 @@ docker compose -f docker-compose.local.yml logs -f
 ### Exit 2 — Healthcheck Timeout
 ```bash
 docker ps --format "table {{.Names}}\t{{.Status}}"
-docker logs asistente-backend-java
-docker logs asistente-frontend-react
+docker logs asistente-backend
+docker logs asistente-frontend
 docker logs asistente-whatsapp-web
 ```
 
@@ -157,7 +157,7 @@ curl -H "Authorization: Bearer $TOKEN" \
   http://localhost:8080/api/v1/ai/outbox/stats
 
 # Logs worker
-docker logs asistente-backend-java | grep -E "AI_OUTBOX|AI_ROUTE|WHATSAPP_RESPONSE"
+docker logs asistente-backend | grep -E "AI_OUTBOX|AI_ROUTE|WHATSAPP_RESPONSE"
 
 # Verificar seed
 docker exec -it asistente-postgres psql -U assistant -d asistente_whatsapp \

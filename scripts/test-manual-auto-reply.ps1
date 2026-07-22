@@ -5,7 +5,7 @@
 
 .PREREQUISITES
     - Docker Desktop corriendo
-    - docker compose -f docker-compose.local.yml --profile dev-visual up -d
+    - docker compose -f docker-compose.local.yml --profile whatsapp up -d
     - Backend Java compilado y corriendo (puerto 8080)
     - whatsapp-web-service conectado y con sesión activa (CONNECTED)
 
@@ -84,7 +84,7 @@ $payload = @{
     payload = @{
         from = $phone
         body = $message
-        to = "56900000000"
+        to = "56927305158"
         externalMessageId = "ext-$deliveryId"
         chatId = "$phone@c.us"
         hasMedia = $false

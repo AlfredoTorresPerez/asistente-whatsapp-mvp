@@ -122,16 +122,23 @@ try {
 
 # 2. Wait Healthchecks
 Write-Status "2/8 - Esperando healthchecks (máx $TimeoutMinutes min)..."
+$containerMap = @{
+    "postgres"              = "asistente-postgres"
+    "backend-java"          = "asistente-backend"
+    "frontend-react"        = "asistente-frontend"
+    "whatsapp-web-service"  = "asistente-whatsapp-web"
+}
 $services = @("postgres", "backend-java", "frontend-react")
 if ($Profile -eq "whatsapp") { $services += "whatsapp-web-service" }
 
 foreach ($svc in $services) {
-    Write-Info "  Esperando $svc..."
+    $containerName = $containerMap[$svc]
+    Write-Info "  Esperando $svc (container=$containerName)..."
     $healthy = $false
     $retries = 90  # 3 min / 2s
     for ($i = 1; $i -le $retries; $i++) {
         Check-Timeout
-        $state = docker inspect --format='{{.State.Health.Status}}' "asistente-$svc" 2>$null
+        $state = docker inspect --format='{{.State.Health.Status}}' $containerName 2>$null
         if ($state -eq "healthy") { $healthy = $true; break }
         if ($state -eq "unhealthy") { Write-Fail "$svc está unhealthy"; exit 2 }
         Start-Sleep -Seconds 2
@@ -180,10 +187,10 @@ try {
 $headers = @{ Authorization = "Bearer $token" }
 
 try {
-    $biz = Invoke-RestMethod -Uri "http://localhost:8080/api/v1/businesses/current" -Headers $headers -Method Get -TimeoutSec 10
-    if (-not $biz.id) { Write-Fail "businesses/current no devolvió id"; exit 3 }
-    Write-Pass "GET /businesses/current OK (id=$($biz.id))"
-} catch { Write-Fail "businesses/current falló: $_"; exit 3 }
+    $biz = Invoke-RestMethod -Uri "http://localhost:8080/api/v1/company" -Headers $headers -Method Get -TimeoutSec 10
+    if (-not $biz.id) { Write-Fail "/api/v1/company no devolvió id"; exit 3 }
+    Write-Pass "GET /api/v1/company OK (id=$($biz.id))"
+} catch { Write-Fail "/api/v1/company falló: $_"; exit 3 }
 
 if ($Quick) {
     Write-Host "`n═══════════════════════════════════════════" -ForegroundColor $C_Cyan
