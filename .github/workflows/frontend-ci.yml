@@ -2,12 +2,12 @@ name: Frontend CI
 
 on:
   push:
-    branches: [main, develop, 'feature/**', 'fix/**']
+    branches: [main, master, develop, 'feature/**', 'fix/**']
     paths:
       - 'frontend-react/**'
       - '.github/workflows/frontend-ci.yml'
   pull_request:
-    branches: [main, develop]
+    branches: [main, master, develop]
     paths:
       - 'frontend-react/**'
 
@@ -33,7 +33,6 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Format check
         run: pnpm format:check
-        continue-on-error: true
       - name: Lint
         run: pnpm lint
       - name: Test

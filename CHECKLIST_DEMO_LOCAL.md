@@ -1,5 +1,9 @@
 # Checklist Demo Local
 
+> **Modo de uso:** Ejecutar `.\scripts\verify_mvp_local.ps1 -Quick` para validación rápida.
+> Para validación completa con WhatsApp Web: `.\scripts\verify_mvp_local.ps1 -Profile whatsapp`.
+> Ver `docs/VALIDACION_LOCAL_3MIN.md` para más detalles.
+
 ## Estado General: LISTO CON OBSERVACIONES
 
 | #  | Item                                      | Estado    | Archivo/Modulo                            | Observacion                                                                 | Riesgo |

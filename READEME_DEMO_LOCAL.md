@@ -1,5 +1,8 @@
 # Demo Local - Asistente de Reservas por WhatsApp
 
+> **NOTA:** Este documento ha sido reemplazado por `README-LOCAL.md` (guía técnica) y `docs/DEMO_LOCAL_READINESS.md` (checklist demo).
+> Se mantiene por compatibilidad; consultar los documentos actualizados para información completa.
+
 ## Requisitos Previos
 
 - Docker Desktop (Windows) con WSL2 habilitado

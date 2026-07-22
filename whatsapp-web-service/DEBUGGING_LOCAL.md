@@ -32,14 +32,14 @@ docker compose -f docker-compose.local.yml up -d --build
 ### Opción B: Con WhatsApp Web (headless, recomendado)
 ```bash
 cp whatsapp-web-service/.env.local.template .env.local
-docker compose -f docker-compose.local.yml --profile dev-visual up -d --build whatsapp-web-service
+docker compose -f docker-compose.local.yml --profile whatsapp up -d --build whatsapp-web-service
 # O si ya están arriba los otros:
-docker compose -f docker-compose.local.yml --profile dev-visual up -d whatsapp-web-service
+docker compose -f docker-compose.local.yml --profile whatsapp up -d whatsapp-web-service
 ```
 
 ### Opción C: Con VNC visual (debug visual)
 ```bash
-docker compose -f docker-compose.local.yml --profile dev-visual up -d whatsapp-web-service
+docker compose -f docker-compose.local.yml --profile whatsapp up -d whatsapp-web-service
 # Luego abre: http://localhost:6080/vnc.html?autoconnect=true&resize=scale
 ```
 
@@ -218,7 +218,7 @@ curl -X POST -H "X-API-Key: dev-whatsapp-web-key" -H "Content-Type: application/
 ### Simular mensaje entrante (prueba webhook)
 ```bash
 curl -X POST -H "X-API-Key: dev-whatsapp-web-key" -H "Content-Type: application/json" \
-  -d '{"from":"56950954580","to":"56900000000","body":"Hola, ¿cómo están?"}' \
+  -d '{"from":"56950954580","to":"56927305158","body":"Hola, ¿cómo están?"}' \
   http://localhost:3001/api/v1/messages/simulate-inbound | jq .
 ```
 

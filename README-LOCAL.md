@@ -1,5 +1,16 @@
 # Asistente WhatsApp MVP — Entorno Local
 
+## Modos de uso local
+
+| Modo | Comando | Requisitos | Auto-respuesta IA |
+|------|---------|------------|-------------------|
+| **Demo base** (sin WhatsApp real) | `docker compose -f docker-compose.local.yml up -d` | Solo Docker | Desactivada por defecto |
+| **Demo con WhatsApp Web** | `docker compose -f docker-compose.local.yml --profile whatsapp up -d` | + Escanear QR en /admin/whatsapp-web | Desactivada por defecto |
+| **Debug auto-respuesta IA** | `APP_AI_AGENTS_AUTO_REPLY_ENABLED=true` + modo WhatsApp | + Sesión WhatsApp CONNECTED | Activar manualmente en `.env.local` |
+
+> **Importante:** La auto-respuesta IA (`APP_AI_AGENTS_AUTO_REPLY_ENABLED`) está desactivada por defecto en entorno local.
+> Para probarla, ver `docs/DEBUGGING_AUTO_REPLY_LOCAL.md`.
+
 ## Levantar en 3 Comandos
 
 ```bash

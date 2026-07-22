@@ -19,8 +19,8 @@ const autoConnectEnabled = String(process.env.WHATSAPP_WEB_AUTO_CONNECT ?? "true
 const companyPhoneNumber = normalizeOptionalPhone(
   process.env.WHATSAPP_WEB_COMPANY_PHONE_NUMBER
     ?? process.env.WHATSAPP_WEB_DEFAULT_PHONE_NUMBER
-    ?? "56900000000",
-) ?? "56900000000";
+    ?? "56927305158",
+) ?? "56927305158";
 const testCustomerPhoneNumber = normalizeOptionalPhone(
   process.env.WHATSAPP_WEB_TEST_CUSTOMER_PHONE_NUMBER
     ?? "56950954580",
