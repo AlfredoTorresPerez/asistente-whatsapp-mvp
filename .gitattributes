@@ -1,0 +1,25 @@
+* text=auto eol=lf
+
+*.java text diff=java
+*.sql text diff=sql
+*.yml text
+*.yaml text
+*.xml text
+*.properties text
+*.ts text diff=typescript
+*.tsx text diff=typescript
+*.js text
+*.json text
+*.md text
+*.css text
+*.html text
+*.sh text eol=lf
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+
+*.png binary
+*.jpg binary
+*.ico binary
+*.zip binary
+*.jar binary
+*.class binary
