@@ -1,0 +1,33 @@
+{
+  "object": "whatsapp_business_account",
+  "entry": [{
+    "id": "123456789",
+    "changes": [{
+      "field": "messages",
+      "value": {
+        "messaging_product": "whatsapp",
+        "metadata": {
+          "display_phone_number": "56911112222",
+          "phone_number_id": "123456789012345"
+        },
+        "contacts": [{
+          "profile": {"name": "Maria Lopez"},
+          "wa_id": "56950954581"
+        }],
+        "messages": [{
+          "from": "56950954581",
+          "id": "wamid.testbutton456",
+          "timestamp": "1720000100",
+          "type": "interactive",
+          "interactive": {
+            "type": "button_reply",
+            "button_reply": {
+              "id": "btn_yes",
+              "title": "Si, quiero"
+            }
+          }
+        }]
+      }
+    }]
+  }]
+}

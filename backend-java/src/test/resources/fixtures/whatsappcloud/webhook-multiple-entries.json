@@ -1,0 +1,50 @@
+{
+  "object": "whatsapp_business_account",
+  "entry": [{
+    "id": "business_1",
+    "changes": [{
+      "field": "messages",
+      "value": {
+        "messaging_product": "whatsapp",
+        "metadata": {
+          "display_phone_number": "56911112222",
+          "phone_number_id": "123456789012345"
+        },
+        "contacts": [{"profile": {"name": "Ana"}, "wa_id": "56911111111"}],
+        "messages": [{
+          "from": "56911111111",
+          "id": "wamid.multi1",
+          "timestamp": "1720000400",
+          "text": {"body": "Mensaje uno"},
+          "type": "text"
+        }, {
+          "from": "56911111111",
+          "id": "wamid.multi2",
+          "timestamp": "1720000401",
+          "text": {"body": "Mensaje dos"},
+          "type": "text"
+        }]
+      }
+    }]
+  }, {
+    "id": "business_2",
+    "changes": [{
+      "field": "messages",
+      "value": {
+        "messaging_product": "whatsapp",
+        "metadata": {
+          "display_phone_number": "56933334444",
+          "phone_number_id": "678901234567"
+        },
+        "contacts": [{"profile": {"name": "Pedro"}, "wa_id": "56922222222"}],
+        "messages": [{
+          "from": "56922222222",
+          "id": "wamid.multi3",
+          "timestamp": "1720000500",
+          "text": {"body": "Otro mensaje"},
+          "type": "text"
+        }]
+      }
+    }]
+  }]
+}

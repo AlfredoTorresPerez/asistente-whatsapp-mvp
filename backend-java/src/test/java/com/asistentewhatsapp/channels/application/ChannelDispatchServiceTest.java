@@ -22,7 +22,7 @@ class ChannelDispatchServiceTest {
     @Test
     void dispatchUsesExplicitWebProvider() {
         CanalWhatsApp webChannel = whatsAppChannel(WhatsAppChannelProvider.WHATSAPP_WEB, "web-1", "SENT");
-        CanalWhatsApp cloudChannel = whatsAppChannel(WhatsAppChannelProvider.CLOUD_API, "cloud-1", "SENT");
+        CanalWhatsApp cloudChannel = whatsAppChannel(WhatsAppChannelProvider.META_CLOUD_API, "cloud-1", "SENT");
         WhatsAppChannelProperties properties = properties(WhatsAppChannelProperties.Provider.WEB);
         ChannelDispatchService service = new ChannelDispatchService(
                 List.of(webChannel, cloudChannel),
@@ -37,8 +37,8 @@ class ChannelDispatchServiceTest {
     @Test
     void dispatchUsesExplicitCloudProvider() {
         CanalWhatsApp webChannel = whatsAppChannel(WhatsAppChannelProvider.WHATSAPP_WEB, "web-1", "SENT");
-        CanalWhatsApp cloudChannel = whatsAppChannel(WhatsAppChannelProvider.CLOUD_API, "cloud-1", "SENT");
-        WhatsAppChannelProperties properties = properties(WhatsAppChannelProperties.Provider.CLOUD_API);
+        CanalWhatsApp cloudChannel = whatsAppChannel(WhatsAppChannelProvider.META_CLOUD_API, "cloud-1", "SENT");
+        WhatsAppChannelProperties properties = properties(WhatsAppChannelProperties.Provider.META_CLOUD_API);
         ChannelDispatchService service = new ChannelDispatchService(
                 List.of(webChannel, cloudChannel),
                 List.of(webChannel, cloudChannel),
@@ -52,7 +52,7 @@ class ChannelDispatchServiceTest {
     @Test
     void dispatchFailsWhenConfiguredProviderIsMissing() {
         CanalWhatsApp webChannel = whatsAppChannel(WhatsAppChannelProvider.WHATSAPP_WEB, "web-1", "SENT");
-        WhatsAppChannelProperties properties = properties(WhatsAppChannelProperties.Provider.CLOUD_API);
+        WhatsAppChannelProperties properties = properties(WhatsAppChannelProperties.Provider.META_CLOUD_API);
         ChannelDispatchService service = new ChannelDispatchService(
                 List.of(webChannel),
                 List.of(webChannel),
@@ -60,7 +60,7 @@ class ChannelDispatchServiceTest {
 
         assertThatThrownBy(() -> service.dispatch(request()))
                 .isInstanceOf(UnsupportedMessagingChannelException.class)
-                .hasMessageContaining("CLOUD_API");
+                .hasMessageContaining("META_CLOUD_API");
     }
 
     @Test
