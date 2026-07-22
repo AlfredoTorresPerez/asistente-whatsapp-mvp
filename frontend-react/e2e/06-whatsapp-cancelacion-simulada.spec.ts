@@ -1,18 +1,17 @@
 import { test, expect } from '@playwright/test'
-import { setupMocksForAgenda, setupMockCalendarResponse, openCompleteAgenda } from './helpers/agenda.helper'
 import { sendInboundWhatsAppMessage } from './helpers/whatsapp-simulator.helper'
 
 const QA_CUSTOMER_PHONE = '+56900000002'
 const QA_CUSTOMER_NAME = 'QA_AUTO_CLIENTE_CANCELACION'
 
 test.describe('NIVEL 9 — Flujo WhatsApp simulado: cancelar', () => {
-  test('QA-09-001: Cliente con reserva activa pide cancelar', { tag: '@wpp-cancel' }, async ({ page }) => {
+  test('QA-09-001: Cliente con reserva activa pide cancelar', { tag: '@wpp-cancel' }, async () => {
     const result = await sendInboundWhatsAppMessage(QA_CUSTOMER_PHONE, 'Quiero cancelar mi reserva')
     test.skip(!result.ok, 'Endpoint de simulacion WhatsApp no disponible — BLOCKED')
     expect(result.ok).toBeTruthy()
   })
 
-  test('QA-09-007: Estado cambia a CANCELLED', { tag: '@wpp-cancel' }, async ({ page }) => {
+  test('QA-09-007: Estado cambia a CANCELLED', { tag: '@wpp-cancel' }, async () => {
     await setupMocksForAgenda(page)
     const mockItems = [{
       bookingId: 'qa-auto-cancel-1',

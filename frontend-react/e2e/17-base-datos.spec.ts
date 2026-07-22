@@ -1,6 +1,6 @@
-import { test, expect } from '@playwright/test'
+import { test } from '@playwright/test'
 import { markBlocked, generateJsonReport, generateMarkdownReport } from './helpers/report.helper'
-import { connectTestDatabase, isDbAvailable } from './helpers/db.helper'
+import { isDbAvailable } from './helpers/db.helper'
 
 test.describe('NIVEL 15: Base de Datos', () => {
 

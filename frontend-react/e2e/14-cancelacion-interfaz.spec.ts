@@ -1,8 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { injectMockSession, setupDefaultMocks } from './helpers/auth.helper'
 import { setupMocksForAgenda, setupMockCalendarResponse, buildMockCalendarItems } from './helpers/agenda.helper'
-import { markBlocked, markPassed, generateJsonReport, generateMarkdownReport } from './helpers/report.helper'
-import { apiPost, apiGet } from './helpers/api.helper'
+import { markBlocked, generateJsonReport, generateMarkdownReport } from './helpers/report.helper'
 
 test.describe('NIVEL 8: Cancelación desde Interfaz (TST-114 a TST-137)', () => {
 

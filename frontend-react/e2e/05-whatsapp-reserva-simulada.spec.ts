@@ -1,18 +1,17 @@
 import { test, expect } from '@playwright/test'
-import { setupMocksForAgenda, setupMockCalendarResponse, openCompleteAgenda } from './helpers/agenda.helper'
 import { sendInboundWhatsAppMessage } from './helpers/whatsapp-simulator.helper'
 
 const QA_CUSTOMER_PHONE = '+56900000001'
 const QA_CUSTOMER_NAME = 'QA_AUTO_CLIENTE_RESERVA'
 
 test.describe('NIVEL 7 — Flujo WhatsApp simulado: reservar', () => {
-  test('QA-07-001: Enviar mensaje de reserva simulado', { tag: '@wpp-sim' }, async ({ page }) => {
+  test('QA-07-001: Enviar mensaje de reserva simulado', { tag: '@wpp-sim' }, async () => {
     const result = await sendInboundWhatsAppMessage(QA_CUSTOMER_PHONE, 'Quiero reservar limpieza facial')
     test.skip(!result.ok, 'Endpoint de simulacion WhatsApp no disponible — BLOCKED')
     expect(result.ok).toBeTruthy()
   })
 
-  test('QA-07-009: Reserva aparece en Agenda completa', { tag: '@wpp-sim' }, async ({ page }) => {
+  test('QA-07-009: Reserva aparece en Agenda completa', { tag: '@wpp-sim' }, async () => {
     await setupMocksForAgenda(page)
     const mockItems = [{
       bookingId: 'qa-auto-wpp-booking-1',

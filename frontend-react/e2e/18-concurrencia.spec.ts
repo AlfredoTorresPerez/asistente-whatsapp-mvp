@@ -1,6 +1,5 @@
-import { test, expect } from '@playwright/test'
+import { test } from '@playwright/test'
 import { markBlocked, generateJsonReport, generateMarkdownReport } from './helpers/report.helper'
-import { apiPost } from './helpers/api.helper'
 
 test.describe('NIVEL 16: Concurrencia (PRE-RES-034 / TST-034)', () => {
 

@@ -24,7 +24,6 @@ export const QA_MOCK_LOCATIONS = [
   { id: 'loc-qa-001', code: 'qa-prov', name: 'QA Sucursal Providencia', address: 'Av. Providencia 1234', commune: 'Providencia', active: true },
 ]
 
-const today = dayjs().format('YYYY-MM-DD')
 const weekStart = dayjs().startOf('week').add(1, 'day').format('YYYY-MM-DD')
 
 export function buildMockCalendarItems(count = 3) {
@@ -96,7 +95,7 @@ export async function openCompleteAgenda(page: Page) {
   await page.waitForTimeout(500)
 }
 
-export async function selectWeek(page: Page, startDate: string, _endDate?: string) {
+export async function selectWeek(page: Page, startDate: string) {
   const dateInput = page.locator('input[type="date"]').first()
   await dateInput.fill(startDate)
   await page.keyboard.press('Enter')

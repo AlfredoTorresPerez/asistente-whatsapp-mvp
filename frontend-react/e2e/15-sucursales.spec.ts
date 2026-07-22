@@ -1,7 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { injectMockSession, setupDefaultMocks } from './helpers/auth.helper'
 import { markBlocked, generateJsonReport, generateMarkdownReport } from './helpers/report.helper'
-import { apiGet } from './helpers/api.helper'
 
 test.describe('NIVEL 13: Sucursales 1 a 8 (TST-MUL-001 a TST-MUL-008)', () => {
 

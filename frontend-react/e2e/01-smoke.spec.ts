@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test'
-import { setupMocksForAgenda, setupMockCalendarResponse, openCompleteAgenda } from './helpers/agenda.helper'
 
 test.describe('NIVEL 1 — Smoke Tests basicos', () => {
   test('QA-01-001: Frontend carga en http://localhost:5173', async ({ page }) => {

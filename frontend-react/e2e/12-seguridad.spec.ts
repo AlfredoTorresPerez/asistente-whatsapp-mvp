@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test'
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const VALID_SESSION = {
   accessToken: 'qa-auto-sec-token',
   expiresAt: new Date(Date.now() + 86400000).toISOString(),

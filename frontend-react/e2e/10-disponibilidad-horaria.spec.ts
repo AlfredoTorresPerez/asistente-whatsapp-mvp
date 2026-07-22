@@ -120,7 +120,7 @@ test.describe('NIVEL 5 — Disponibilidad horaria', () => {
   test('QA-05-006: Slots no disponibles muestran etiqueta Bloqueado', async ({ page }) => {
     await setupAvailSection(page)
 
-    const mockSlots = buildMockAvailabilitySlots(2).map((slot, i) => ({
+    const mockSlots = buildMockAvailabilitySlots(2).map((slot) => ({
       ...slot,
       available: false,
       reason: 'Bloqueado por administracion',

@@ -75,7 +75,6 @@ export function generateMarkdownReport(): string {
   const blocked = results.filter(r => r.estado === 'BLOCKED').length
 
   const criticalFailures = results.filter(r => r.estado === 'FAILED')
-  const minorFailures: TestResult[] = []
 
   let md = `# Status de Pruebas Automatizadas — Asistente de Negocios WhatsApp
 

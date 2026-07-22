@@ -1,18 +1,17 @@
 import { test, expect } from '@playwright/test'
-import { setupMocksForAgenda, setupMockCalendarResponse, openCompleteAgenda } from './helpers/agenda.helper'
 import { sendInboundWhatsAppMessage } from './helpers/whatsapp-simulator.helper'
 
 const QA_CUSTOMER_PHONE = '+56900000003'
 const QA_CUSTOMER_NAME = 'QA_AUTO_CLIENTE_REPROGRAMACION'
 
 test.describe('NIVEL 10 — Flujo WhatsApp simulado: reprogramar', () => {
-  test('QA-10-001: Cliente con reserva activa pide reprogramar', { tag: '@wpp-reschedule' }, async ({ page }) => {
+  test('QA-10-001: Cliente con reserva activa pide reprogramar', { tag: '@wpp-reschedule' }, async () => {
     const result = await sendInboundWhatsAppMessage(QA_CUSTOMER_PHONE, 'Quiero reprogramar mi reserva')
     test.skip(!result.ok, 'Endpoint de simulacion WhatsApp no disponible — BLOCKED')
     expect(result.ok).toBeTruthy()
   })
 
-  test('QA-10-007: Reserva anterior queda RESCHEDULED', { tag: '@wpp-reschedule' }, async ({ page }) => {
+  test('QA-10-007: Reserva anterior queda RESCHEDULED', { tag: '@wpp-reschedule' }, async () => {
     await setupMocksForAgenda(page)
     const mockItems = [{
       bookingId: 'qa-auto-reschedule-old-1',

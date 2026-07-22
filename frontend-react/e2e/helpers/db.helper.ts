@@ -19,23 +19,23 @@ export async function cleanTestData(): Promise<{ ok: boolean; error?: string }> 
   return { ok: true }
 }
 
-export async function findBookingByCustomerAndDate(_customerPhone: string, _date: string): Promise<unknown | null> {
+export async function findBookingByCustomerAndDate(): Promise<unknown | null> {
   return null
 }
 
-export async function getBookingStatus(_bookingId: string): Promise<string | null> {
+export async function getBookingStatus(): Promise<string | null> {
   return null
 }
 
-export async function assertBookingStatus(_bookingId: string, _expectedStatus: string): Promise<boolean> {
+export async function assertBookingStatus(): Promise<boolean> {
   return false
 }
 
-export async function assertNoDuplicateBooking(_customerId: string, _professionalId: string, _startsAt: string): Promise<boolean> {
+export async function assertNoDuplicateBooking(): Promise<boolean> {
   return false
 }
 
-export async function assertBookingHistoryExists(_bookingId: string): Promise<boolean> {
+export async function assertBookingHistoryExists(): Promise<boolean> {
   return false
 }
 

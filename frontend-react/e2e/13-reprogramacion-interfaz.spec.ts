@@ -1,8 +1,7 @@
-import { test, expect } from '@playwright/test'
+import { test } from '@playwright/test'
 import { injectMockSession, setupDefaultMocks } from './helpers/auth.helper'
-import { setupMocksForAgenda, setupMockCalendarResponse, buildMockCalendarItems, QA_MOCK_SERVICES, QA_MOCK_PROFESSIONALS } from './helpers/agenda.helper'
+import { setupMocksForAgenda, setupMockCalendarResponse, buildMockCalendarItems } from './helpers/agenda.helper'
 import { markBlocked, generateJsonReport, generateMarkdownReport } from './helpers/report.helper'
-import { apiPatch } from './helpers/api.helper'
 
 test.describe('NIVEL 7: Reprogramación desde Interfaz (TST-084 a TST-113)', () => {
 

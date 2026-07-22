@@ -1,7 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { injectMockSession, setupDefaultMocks } from './helpers/auth.helper'
 import { markBlocked, generateJsonReport, generateMarkdownReport } from './helpers/report.helper'
-import { apiGet } from './helpers/api.helper'
 
 test.describe('NIVEL 14: Profesional (PRO-001 a PRO-020)', () => {
 
