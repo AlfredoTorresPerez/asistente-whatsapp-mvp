@@ -309,4 +309,20 @@ test.skip(true, 'Ruta /reservas/pagar/ no implementada en el frontend — BLOCKE
 
 ---
 
-*Documento generado a partir del analisis de 48 pruebas E2E ejecutadas el 2026-07-06.*
+## Estado de Correcciones
+
+| # | Hallazgo | Estado | Notas |
+|---|----------|--------|-------|
+| 1 | Patron glob string no matchea query params | ✅ Corregido | `auth.helper.ts` y `agenda.helper.ts` usan regex |
+| 2 | Catch-all `**/api/v1/**` se antepone a rutas especificas | ✅ Corregido | No se usan catch-all glob; solo rutas especificas con regex |
+| 3 | `getWhatsAppStatus()` crash por `reminders` undefined | ✅ Corregido | `CompleteAgendaPage.tsx:71` usa `(detail?.reminders ?? [])` |
+| 4 | 401 en `business-locations` limpia sesion via evento global | ✅ Corregido | Regex matchea query params; ya no hay 401 inesperados |
+| 5 | Falta mock para `bookings/:id` | ✅ Corregido | `agenda.helper.ts:74` mockea `/api/v1/bookings/` |
+| 6 | `getByRole('heading')` strict mode violation | ✅ Corregido | `booking-public-pages.spec.ts` usa `.first()` |
+| 7 | Selector CSS `[class*="border-l-"]` no encuentra elementos | ❌ Pendiente | Requiere refactor del selector en `04-agenda-visual.spec.ts:108` |
+| 8 | `getByText()` ambiguedad con nombres duplicados | ✅ Corregido | Tests usan `.first()` |
+| 9 | Ruta `/reservas/pagar/` no existe en el frontend | ❌ Bloqueado | Depende de implementacion de ruta de pago publico; marcado como BLOCKED |
+
+---
+
+*Documento generado a partir del analisis de 48 pruebas E2E ejecutadas el 2026-07-06. Actualizado Julio 2026.*

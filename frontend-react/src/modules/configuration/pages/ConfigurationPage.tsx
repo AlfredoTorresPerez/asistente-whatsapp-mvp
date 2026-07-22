@@ -8,25 +8,37 @@ import { PageHeader } from '../../../components/ui/PageHeader'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { useToast } from '../../../lib/toast'
 import {
+  deactivateWhatsAppChannelRequest,
+  getWhatsAppChannelRequest,
+  updateWhatsAppChannelRequest,
+  validateWhatsAppChannelRequest,
+} from '../../../services/api/whatsappChannelApi'
+import {
   connectWhatsAppConfigurationRequest,
   disconnectWhatsAppConfigurationRequest,
   getWhatsAppConfigurationRequest,
   refreshWhatsAppConfigurationQrRequest,
   updateWhatsAppConfigurationPreferencesRequest,
 } from '../../../services/api/configurationApi'
+import {
+  completeOnboardingRequest,
+  revalidateOnboardingRequest,
+  disconnectOnboardingRequest,
+} from '../../../services/api/whatsappChannelApi'
 import type {
-  WhatsAppConfigurationLinkedDeviceResponse,
+  WhatsAppChannelResponse,
   WhatsAppConfigurationPreferencesResponse,
-  WhatsAppConfigurationResponse,
-  WhatsAppConfigurationSessionHistoryResponse,
 } from '../../../services/api/types'
 import { CalendarSection } from '../components/CalendarSection'
 import { usePermissions } from '../../../hooks/usePermissions'
+import { metaEmbeddedSignup } from '../../../services/MetaEmbeddedSignup'
+import { useState } from 'react'
 
 type BadgeTone = 'success' | 'warning' | 'danger' | 'neutral' | 'info'
 type PreferenceKey = keyof WhatsAppConfigurationPreferencesResponse
 
-const configurationQueryKey = ['configuration', 'whatsapp'] as const
+const channelQueryKey = ['whatsapp', 'channel'] as const
+const legacyConfigQueryKey = ['configuration', 'whatsapp'] as const
 
 const preferenceDefinitions: Array<{
   key: PreferenceKey
@@ -56,19 +68,13 @@ const preferenceDefinitions: Array<{
 ]
 
 function formatPhone(phoneNumber: string | null) {
-  if (!phoneNumber) {
-    return 'Sin telefono vinculado'
-  }
-  if (phoneNumber.startsWith('+')) {
-    return phoneNumber
-  }
+  if (!phoneNumber) return 'Sin telefono vinculado'
+  if (phoneNumber.startsWith('+')) return phoneNumber
   return `+${phoneNumber}`
 }
 
 function formatDateTime(value: string | null) {
-  if (!value) {
-    return 'Sin registro'
-  }
+  if (!value) return 'Sin registro'
   return dayjs(value).format('DD/MM/YYYY HH:mm')
 }
 
@@ -101,72 +107,100 @@ function toStatusTone(status: string): BadgeTone {
   }
 }
 
-function toDeviceStatusLabel(status: string) {
-  switch (status) {
-    case 'ONLINE':
-      return 'En linea'
-    case 'PENDING':
-      return 'Pendiente'
-    case 'ERROR':
-      return 'Error'
-    default:
-      return 'Desconectado'
-  }
-}
-
-function toDeviceStatusTone(status: string): BadgeTone {
-  switch (status) {
-    case 'ONLINE':
-      return 'success'
-    case 'PENDING':
-      return 'warning'
-    case 'ERROR':
-      return 'danger'
-    default:
-      return 'neutral'
-  }
-}
-
-function normalizeHistoryTone(tone: string): BadgeTone {
-  if (tone === 'success' || tone === 'warning' || tone === 'danger' || tone === 'info') {
-    return tone
-  }
-  return 'neutral'
-}
-
-function toHistoryToneLabel(tone: string) {
-  switch (normalizeHistoryTone(tone)) {
-    case 'success':
-      return 'Correcto'
-    case 'warning':
-      return 'Atencion'
-    case 'danger':
-      return 'Error'
-    case 'info':
-      return 'Informativo'
-    default:
-      return 'Registro'
-  }
-}
+const PROVIDER_META_CLOUD_API = 'META_CLOUD_API'
+const PROVIDER_WHATSAPP_WEB = 'WHATSAPP_WEB'
 
 export function ConfigurationPage() {
   const { showToast } = useToast()
   const queryClient = useQueryClient()
   const { hasPermission } = usePermissions()
-  const configurationQuery = useQuery({
-    queryKey: configurationQueryKey,
-    queryFn: getWhatsAppConfigurationRequest,
+  const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false)
+  const [showEditConfig, setShowEditConfig] = useState(false)
+
+  const channelQuery = useQuery({
+    queryKey: channelQueryKey,
+    queryFn: getWhatsAppChannelRequest,
     refetchInterval: 30_000,
   })
-  const configuration = configurationQuery.data
+  const channel = channelQuery.data
+
+  const isMetaCloudApi = channel?.providerType === PROVIDER_META_CLOUD_API
+  const isWhatsAppWeb = channel?.providerType === PROVIDER_WHATSAPP_WEB
+  const hasChannel = !!channel?.providerType
+
+  const legacyConfigQuery = useQuery({
+    queryKey: legacyConfigQueryKey,
+    queryFn: getWhatsAppConfigurationRequest,
+    enabled: isWhatsAppWeb,
+    refetchInterval: 30_000,
+  })
+  const legacyConfig = legacyConfigQuery.data
+
+  const validateMutation = useMutation({
+    mutationFn: validateWhatsAppChannelRequest,
+    onSuccess: (response) => {
+      showToast({
+        title: response.valid ? 'Configuracion valida' : 'Configuracion invalida',
+        description: response.message,
+        tone: response.valid ? 'success' : 'warning',
+      })
+    },
+    onError: () => {
+      showToast({
+        title: 'Error al validar',
+        description: 'No fue posible validar la configuracion.',
+        tone: 'error',
+      })
+    },
+  })
+
+  const deactivateMutation = useMutation({
+    mutationFn: deactivateWhatsAppChannelRequest,
+    onSuccess: (response) => {
+      queryClient.setQueryData(channelQueryKey, response)
+      setShowDeactivateConfirm(false)
+      showToast({
+        title: 'Canal desactivado',
+        description: 'El canal WhatsApp se desactivo.',
+        tone: 'success',
+      })
+    },
+    onError: () => {
+      showToast({
+        title: 'Error al desactivar',
+        description: 'No fue posible desactivar el canal.',
+        tone: 'error',
+      })
+    },
+  })
+
+  const updateConfigMutation = useMutation({
+    mutationFn: updateWhatsAppChannelRequest,
+    onSuccess: (response) => {
+      queryClient.setQueryData(channelQueryKey, response)
+      setShowEditConfig(false)
+      showToast({
+        title: 'Configuracion actualizada',
+        description: 'Los cambios se guardaron correctamente.',
+        tone: 'success',
+      })
+    },
+    onError: () => {
+      showToast({
+        title: 'Error al actualizar',
+        description: 'No fue posible guardar la configuracion.',
+        tone: 'error',
+      })
+    },
+  })
 
   const updatePreferencesMutation = useMutation({
     mutationFn: updateWhatsAppConfigurationPreferencesRequest,
     onSuccess: (response) => {
-      queryClient.setQueryData(configurationQueryKey, response)
+      queryClient.setQueryData(legacyConfigQueryKey, response)
       showToast({
         title: 'Preferencia actualizada',
-        description: 'La configuracion fue guardada en la API local.',
+        description: 'La configuracion fue guardada.',
         tone: 'success',
       })
     },
@@ -175,17 +209,17 @@ export function ConfigurationPage() {
   const connectMutation = useMutation({
     mutationFn: connectWhatsAppConfigurationRequest,
     onSuccess: (response) => {
-      queryClient.setQueryData(configurationQueryKey, response)
+      queryClient.setQueryData(legacyConfigQueryKey, response)
       showToast({
         title: 'Vinculacion solicitada',
-        description: 'La API local solicito iniciar la sesion WhatsApp Web.',
+        description: 'Se solicito iniciar la sesion WhatsApp Web.',
         tone: 'success',
       })
     },
     onError: () => {
       showToast({
         title: 'No fue posible vincular',
-        description: 'Verifica que el servicio whatsapp-web-service este levantado localmente.',
+        description: 'Verifica que el servicio este levantado.',
         tone: 'error',
       })
     },
@@ -194,17 +228,17 @@ export function ConfigurationPage() {
   const refreshQrMutation = useMutation({
     mutationFn: refreshWhatsAppConfigurationQrRequest,
     onSuccess: (response) => {
-      queryClient.setQueryData(configurationQueryKey, response)
+      queryClient.setQueryData(legacyConfigQueryKey, response)
       showToast({
         title: 'QR actualizado',
-        description: 'Se solicito un nuevo codigo QR al adaptador local.',
+        description: 'Se solicito un nuevo codigo QR.',
         tone: 'success',
       })
     },
     onError: () => {
       showToast({
         title: 'No fue posible generar QR',
-        description: 'Verifica el adaptador local de WhatsApp Web.',
+        description: 'Verifica el adaptador local.',
         tone: 'error',
       })
     },
@@ -213,32 +247,175 @@ export function ConfigurationPage() {
   const disconnectMutation = useMutation({
     mutationFn: disconnectWhatsAppConfigurationRequest,
     onSuccess: (response) => {
-      queryClient.setQueryData(configurationQueryKey, response)
+      queryClient.setQueryData(legacyConfigQueryKey, response)
       showToast({
         title: 'Sesion desconectada',
-        description: 'La API local solicito cerrar la sesion WhatsApp Web.',
+        description: 'Se cerro la sesion WhatsApp Web.',
         tone: 'success',
       })
     },
     onError: () => {
       showToast({
         title: 'No fue posible desconectar',
-        description: 'Verifica el estado del adaptador local.',
+        description: 'Verifica el estado del adaptador.',
         tone: 'error',
       })
     },
   })
 
-  function handlePreferenceToggle(key: PreferenceKey) {
-    if (!configuration || updatePreferencesMutation.isPending) {
+  const [onboardingState, setOnboardingState] = useState<{
+    step:
+      | 'idle'
+      | 'opening-meta'
+      | 'authorizing'
+      | 'validating-waba'
+      | 'validating-phone'
+      | 'subscribing-webhook'
+      | 'connected'
+      | 'error'
+    errorMessage?: string
+  }>({ step: 'idle' })
+
+  const completeOnboardingMutation = useMutation({
+    mutationFn: completeOnboardingRequest,
+    onSuccess: (result) => {
+      setOnboardingState({ step: 'connected' })
+      queryClient.invalidateQueries({ queryKey: channelQueryKey })
+      showToast({
+        title: 'Conexion exitosa',
+        description: `Canal ${result.providerType} conectado correctamente.`,
+        tone: 'success',
+      })
+    },
+    onError: (error: Error) => {
+      setOnboardingState({ step: 'error', errorMessage: error.message })
+      showToast({
+        title: 'Error de conexion',
+        description: error.message,
+        tone: 'error',
+      })
+    },
+  })
+
+  const revalidateMutation = useMutation({
+    mutationFn: revalidateOnboardingRequest,
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: channelQueryKey })
+      showToast({
+        title: 'Revalidacion exitosa',
+        description: `Estado: ${result.operationalStatus}`,
+        tone: 'success',
+      })
+    },
+    onError: (error: Error) => {
+      showToast({
+        title: 'Error de revalidacion',
+        description: error.message,
+        tone: 'error',
+      })
+    },
+  })
+
+  const disconnectCloudMutation = useMutation({
+    mutationFn: disconnectOnboardingRequest,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: channelQueryKey })
+      showToast({
+        title: 'Canal desconectado',
+        description: 'Las credenciales fueron eliminadas.',
+        tone: 'success',
+      })
+    },
+    onError: (error: Error) => {
+      showToast({
+        title: 'Error al desconectar',
+        description: error.message,
+        tone: 'error',
+      })
+    },
+  })
+
+  async function handleConnectWithMeta() {
+    const appId = import.meta.env.VITE_META_APP_ID as string | undefined
+    const configId = import.meta.env.VITE_META_EMBEDDED_SIGNUP_CONFIG_ID as string | undefined
+
+    if (!appId || !configId) {
+      showToast({
+        title: 'Meta no configurado',
+        description:
+          'Las variables VITE_META_APP_ID y VITE_META_EMBEDDED_SIGNUP_CONFIG_ID deben estar definidas en el entorno.',
+        tone: 'error',
+      })
       return
     }
 
+    setOnboardingState({ step: 'opening-meta' })
+
+    try {
+      const result = await metaEmbeddedSignup.openSignupDialog({ appId, configId, businessId: '' })
+
+      setOnboardingState({ step: 'authorizing' })
+
+      if (!result.code) {
+        setOnboardingState({
+          step: 'error',
+          errorMessage: 'Meta no devolvio un codigo de autorizacion.',
+        })
+        return
+      }
+
+      setOnboardingState({ step: 'validating-waba' })
+
+      if (!result.wabaId) {
+        setOnboardingState({
+          step: 'error',
+          errorMessage:
+            'Meta no devolvio un WABA ID. Verifica que el Embedded Signup este configurado correctamente.',
+        })
+        return
+      }
+
+      setOnboardingState({ step: 'validating-phone' })
+
+      if (!result.phoneNumberId) {
+        setOnboardingState({
+          step: 'error',
+          errorMessage: 'Meta no devolvio un Phone Number ID.',
+        })
+        return
+      }
+
+      setOnboardingState({ step: 'subscribing-webhook' })
+
+      completeOnboardingMutation.mutate({
+        code: result.code,
+        redirectUri: window.location.origin,
+        wabaId: result.wabaId,
+        phoneNumberId: result.phoneNumberId,
+      })
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'El flujo de conexion fue cancelado o fallo.'
+      setOnboardingState({ step: 'error', errorMessage: message })
+    }
+  }
+
+  function handlePreferenceToggle(key: PreferenceKey) {
+    if (!legacyConfig || updatePreferencesMutation.isPending) return
     updatePreferencesMutation.mutate({
-      ...configuration.preferences,
-      [key]: !configuration.preferences[key],
+      ...legacyConfig.preferences,
+      [key]: !legacyConfig.preferences[key],
     })
   }
+
+  const isLoading = channelQuery.isPending && !channel
+  const isError = channelQuery.isError && !channel
+  const canManage = hasPermission('WHATSAPP_CONFIG_MANAGE')
+
+  const title = 'Configuracion del canal de WhatsApp'
+  const description = isMetaCloudApi
+    ? 'Administra el numero empresarial registrado en Meta, su estado operativo y la recepcion de mensajes.'
+    : 'Centro de control para gestionar conexion, dispositivos, QR y preferencias operativas de WhatsApp.'
 
   return (
     <section className="space-y-6">
@@ -246,127 +423,305 @@ export function ConfigurationPage() {
         actions={
           <>
             <Button
-              loading={configurationQuery.isFetching}
-              onClick={() => void configurationQuery.refetch()}
+              loading={channelQuery.isFetching}
+              onClick={() => void channelQuery.refetch()}
               variant="secondary"
             >
               Actualizar estado
             </Button>
-            <Button
-              loading={refreshQrMutation.isPending}
-              onClick={() => refreshQrMutation.mutate()}
-            >
-              Vincular dispositivo
-            </Button>
+            {!hasChannel && canManage ? (
+              <Button onClick={() => setShowEditConfig(true)}>Configurar canal</Button>
+            ) : null}
           </>
         }
-        description="Centro de control para gestionar conexion, dispositivos, QR y preferencias operativas de WhatsApp."
+        description={description}
         eyebrow="Configuracion"
-        title="Configuracion de WhatsApp Web"
+        title={title}
       />
 
-      {configurationQuery.isPending && !configuration ? (
-        <LoadingState message="Cargando configuracion local de WhatsApp Web." variant="page" />
+      {isLoading ? (
+        <LoadingState message="Cargando configuracion del canal WhatsApp." variant="page" />
       ) : null}
 
-      {configurationQuery.isError && !configuration ? (
+      {isError ? (
         <ErrorState
-          description="No pudimos recuperar la configuracion desde la API local. Verifica que backend-java este levantado."
-          onRetry={() => void configurationQuery.refetch()}
+          description="No pudimos recuperar la configuracion desde la API."
+          onRetry={() => void channelQuery.refetch()}
           title="No fue posible cargar configuracion"
         />
       ) : null}
 
-      {configuration ? (
+      {!hasChannel && !isLoading ? (
+        <Card className="flex flex-col items-center gap-4 p-12 text-center">
+          <div className="rounded-full bg-slate-100 p-6">
+            <WhatsAppIcon className="h-12 w-12 text-slate-400" />
+          </div>
+          <div>
+            <p className="text-lg font-semibold text-slate-900">
+              El canal de Meta todavia no esta configurado.
+            </p>
+            <p className="mt-1 text-sm text-slate-500">
+              Configura un canal de WhatsApp para comenzar a recibir mensajes.
+            </p>
+          </div>
+          {canManage ? (
+            <Button onClick={() => setShowEditConfig(true)}>Configurar canal</Button>
+          ) : null}
+        </Card>
+      ) : null}
+
+      {channel && hasChannel ? (
         <div className="overflow-hidden rounded-[32px] border border-[var(--color-border)] bg-white shadow-[0_28px_90px_rgba(15,23,42,0.08)]">
           <div className="min-h-[720px] bg-[#FBFCFF]">
             <div className="min-w-0 space-y-4 p-4 lg:p-6">
-              <div className="flex flex-wrap items-center justify-between gap-3 rounded-[24px] border border-emerald-100 bg-white px-4 py-3 shadow-[0_12px_32px_rgba(15,23,42,0.04)]">
-                <div>
-                  <p className="text-sm font-semibold text-slate-950">
-                    Configuracion de WhatsApp Web
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    Conecta el telefono de la empresa y administra la sesion activa.
-                  </p>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <StatusBadge
-                    label={toStatusLabel(configuration.sessionStatus)}
-                    tone={toStatusTone(configuration.sessionStatus)}
-                  />
-                  <StatusBadge
-                    label={
-                      configuration.adapterReachable
-                        ? 'API local activa'
-                        : 'API local sin adaptador'
-                    }
-                    tone={configuration.adapterReachable ? 'success' : 'warning'}
-                  />
-                </div>
-              </div>
+              {isMetaCloudApi ? (
+                <CloudApiHeader channel={channel} />
+              ) : (
+                <WhatsAppWebHeader channel={channel} />
+              )}
 
               <div className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
-                <ConnectionStatusCard
-                  configuration={configuration}
-                  disconnectLoading={disconnectMutation.isPending}
-                  onDisconnect={() => disconnectMutation.mutate()}
-                  onReconnect={() => connectMutation.mutate()}
-                  reconnectLoading={connectMutation.isPending}
-                />
-                <QrConnectionCard
-                  configuration={configuration}
-                  onRefreshQr={() => refreshQrMutation.mutate()}
-                  refreshLoading={refreshQrMutation.isPending}
-                />
+                <ChannelStatusCard channel={channel} />
+                {isMetaCloudApi ? <MetaCloudConfigurationSummary channel={channel} /> : null}
               </div>
 
-              <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
-                <LinkedDevicesCard devices={configuration.linkedDevices} />
-                <PreferencesCard
-                  disabled={updatePreferencesMutation.isPending}
-                  onToggle={handlePreferenceToggle}
-                  preferences={configuration.preferences}
-                />
-              </div>
+              {isMetaCloudApi && canManage ? (
+                <div className="flex flex-wrap gap-3">
+                  {onboardingState.step !== 'idle' && onboardingState.step !== 'connected' ? (
+                    <OnboardingProgress
+                      step={onboardingState.step}
+                      errorMessage={onboardingState.errorMessage}
+                    />
+                  ) : null}
 
-              <div className="grid gap-4 xl:grid-cols-[1fr_1fr]">
-                <MainChannelCard configuration={configuration} />
-                <SessionHistoryCard history={configuration.sessionHistory} />
-              </div>
+                  {channel.operationalStatus !== 'CONNECTED' &&
+                  channel.registrationStatus !== 'REGISTERED' ? (
+                    <Button
+                      loading={onboardingState.step !== 'idle' && onboardingState.step !== 'error'}
+                      onClick={() => void handleConnectWithMeta()}
+                    >
+                      Conectar con Meta
+                    </Button>
+                  ) : null}
+
+                  {channel.operationalStatus === 'CONNECTED' ? (
+                    <>
+                      <Button
+                        loading={validateMutation.isPending}
+                        onClick={() => void validateMutation.mutate()}
+                        variant="secondary"
+                      >
+                        Probar conexion
+                      </Button>
+                      <Button
+                        loading={revalidateMutation.isPending}
+                        onClick={() => void revalidateMutation.mutate()}
+                        variant="secondary"
+                      >
+                        Revalidar
+                      </Button>
+                      <Button
+                        loading={disconnectCloudMutation.isPending}
+                        onClick={() => void disconnectCloudMutation.mutate()}
+                        variant="danger"
+                      >
+                        Desconectar
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        loading={validateMutation.isPending}
+                        onClick={() => void validateMutation.mutate()}
+                        variant="secondary"
+                      >
+                        Probar conexion
+                      </Button>
+                      <Button onClick={() => setShowEditConfig(true)} variant="secondary">
+                        Editar configuracion
+                      </Button>
+                    </>
+                  )}
+                </div>
+              ) : null}
+
+              {isWhatsAppWeb && legacyConfig ? (
+                <>
+                  <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+                    <QrConnectionCard
+                      qrCode={legacyConfig.qrCode}
+                      onRefreshQr={() => refreshQrMutation.mutate()}
+                      refreshLoading={refreshQrMutation.isPending}
+                    />
+                    <PreferencesCard
+                      disabled={updatePreferencesMutation.isPending}
+                      onToggle={handlePreferenceToggle}
+                      preferences={legacyConfig.preferences}
+                    />
+                  </div>
+
+                  <div className="grid gap-4 xl:grid-cols-[1fr_1fr]">
+                    <MainChannelCard
+                      channelName={legacyConfig.mainChannel.channelName}
+                      channelType={legacyConfig.mainChannel.channelType}
+                      phoneNumber={legacyConfig.mainChannel.phoneNumber}
+                      businessHours={legacyConfig.mainChannel.businessHours}
+                      active={legacyConfig.mainChannel.automaticResponsesEnabled}
+                    />
+                    <SessionHistoryCard
+                      history={channel.recentEvents.map((e) => ({
+                        id: e.id,
+                        title: e.title,
+                        actor: e.actor,
+                        tone: e.tone as 'success' | 'warning' | 'danger' | 'neutral' | 'info',
+                        occurredAt: e.occurredAt,
+                      }))}
+                    />
+                  </div>
+
+                  <div className="flex flex-wrap gap-3">
+                    <Button
+                      loading={connectMutation.isPending}
+                      onClick={() => connectMutation.mutate()}
+                    >
+                      Conectar
+                    </Button>
+                    <Button
+                      loading={refreshQrMutation.isPending}
+                      onClick={() => refreshQrMutation.mutate()}
+                      variant="secondary"
+                    >
+                      Refrescar QR
+                    </Button>
+                    <Button
+                      loading={disconnectMutation.isPending}
+                      onClick={() => disconnectMutation.mutate()}
+                      variant="danger"
+                    >
+                      Desconectar
+                    </Button>
+                  </div>
+                </>
+              ) : null}
+
+              {isMetaCloudApi ? (
+                <div className="grid gap-4 xl:grid-cols-[1fr_1fr]">
+                  <MetaConfigDetailCard channel={channel} />
+                  <SessionHistoryCard
+                    history={channel.recentEvents.map((e) => ({
+                      id: e.id,
+                      title: e.title,
+                      actor: e.actor,
+                      tone: e.tone as 'success' | 'warning' | 'danger' | 'neutral' | 'info',
+                      occurredAt: e.occurredAt,
+                    }))}
+                  />
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
       ) : null}
 
-      {hasPermission('CALENDAR_CONFIG_VIEW') ? <CalendarSection /> : null}
+      {showDeactivateConfirm ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <Card className="mx-4 w-full max-w-md space-y-4 p-6">
+            <p className="text-lg font-semibold text-slate-900">Desactivar canal</p>
+            <p className="text-sm text-slate-600">
+              Al desactivar el canal no se recibiran mensajes entrantes. La configuracion se
+              conserva.
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button onClick={() => setShowDeactivateConfirm(false)} variant="secondary">
+                Cancelar
+              </Button>
+              <Button
+                loading={deactivateMutation.isPending}
+                onClick={() => deactivateMutation.mutate()}
+                variant="danger"
+              >
+                Desactivar
+              </Button>
+            </div>
+          </Card>
+        </div>
+      ) : null}
+
+      {showEditConfig && canManage ? (
+        <EditConfigDialog
+          channel={channel}
+          onClose={() => setShowEditConfig(false)}
+          onSave={(data) => updateConfigMutation.mutate(data)}
+          saving={updateConfigMutation.isPending}
+        />
+      ) : null}
+
+      {isWhatsAppWeb ? <CalendarSection /> : null}
     </section>
   )
 }
 
-function ConnectionStatusCard({
-  configuration,
-  disconnectLoading,
-  onDisconnect,
-  onReconnect,
-  reconnectLoading,
-}: {
-  configuration: WhatsAppConfigurationResponse
-  disconnectLoading: boolean
-  onDisconnect: () => void
-  onReconnect: () => void
-  reconnectLoading: boolean
-}) {
+function CloudApiHeader({ channel }: { channel: WhatsAppChannelResponse }) {
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-[24px] border border-emerald-100 bg-white px-4 py-3 shadow-[0_12px_32px_rgba(15,23,42,0.04)]">
+      <div>
+        <p className="text-sm font-semibold text-slate-950">
+          Numero central de WhatsApp de la empresa
+        </p>
+        <p className="text-xs text-slate-500">
+          Canal centralizado que atiende todas las sucursales. No requiere asignacion por sede.
+        </p>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <StatusBadge
+          label={channel.registrationLabel ?? 'No configurado'}
+          tone={registrationTone(channel.registrationStatus)}
+        />
+        <StatusBadge
+          label={channel.active ? 'Canal activo' : 'Canal inactivo'}
+          tone={channel.active ? 'success' : 'neutral'}
+        />
+        <StatusBadge
+          label={channel.credentialLabel ?? 'No configurado'}
+          tone={credentialTone(channel.credentialStatus)}
+        />
+      </div>
+    </div>
+  )
+}
+
+function WhatsAppWebHeader({ channel }: { channel: WhatsAppChannelResponse }) {
+  const sessionStatus = channel.operationalStatus === 'CONNECTED' ? 'CONNECTED' : 'DISCONNECTED'
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-[24px] border border-emerald-100 bg-white px-4 py-3 shadow-[0_12px_32px_rgba(15,23,42,0.04)]">
+      <div>
+        <p className="text-sm font-semibold text-slate-950">Configuracion de WhatsApp Web</p>
+        <p className="text-xs text-slate-500">
+          Conecta el telefono de la empresa y administra la sesion activa.
+        </p>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <StatusBadge label={toStatusLabel(sessionStatus)} tone={toStatusTone(sessionStatus)} />
+        <StatusBadge
+          label="API local"
+          tone={channel.operationalStatus === 'CONNECTED' ? 'success' : 'warning'}
+        />
+      </div>
+    </div>
+  )
+}
+
+function ChannelStatusCard({ channel }: { channel: WhatsAppChannelResponse }) {
   return (
     <Card className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold text-slate-950">Estado de conexion</p>
-          <p className="mt-1 text-xs text-slate-500">Sesion activa del numero empresarial.</p>
+          <p className="text-sm font-semibold text-slate-950">Estado del canal</p>
+          <p className="mt-1 text-xs text-slate-500">Informacion operativa del canal WhatsApp.</p>
         </div>
         <StatusBadge
-          label={toStatusLabel(configuration.sessionStatus)}
-          tone={toStatusTone(configuration.sessionStatus)}
+          label={channel.operationalLabel ?? 'Inactivo'}
+          tone={operationalTone(channel.operationalStatus)}
         />
       </div>
 
@@ -376,40 +731,117 @@ function ConnectionStatusCard({
             <WhatsAppIcon className="h-14 w-14" />
           </div>
           <p className="mt-4 text-center text-sm font-semibold text-slate-950">
-            {formatPhone(configuration.phoneNumber)}
+            {formatPhone(channel.displayPhoneNumber ?? channel.normalizedPhoneNumber)}
           </p>
-          <p className="mt-1 text-center text-xs text-slate-500">{configuration.businessName}</p>
+          <p className="mt-1 text-center text-xs text-slate-500">{channel.businessName}</p>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
+          <InfoTile label="Proveedor" value={channel.providerLabel} />
+          <InfoTile label="Numero registrado" value={formatPhone(channel.displayPhoneNumber)} />
+          <InfoTile label="Estado de registro" value={channel.registrationLabel ?? '-'} />
+          <InfoTile label="Notificacion" value={channel.webhookLabel ?? '-'} />
+          <InfoTile label="Credencial" value={channel.credentialLabel ?? '-'} />
+          <InfoTile label="Ultima validacion" value={formatDateTime(channel.lastHealthCheckAt)} />
           <InfoTile
-            label="Ultima sincronizacion"
-            value={formatDateTime(configuration.lastSynchronizationAt)}
+            label="Ultimo mensaje recibido"
+            value={formatDateTime(channel.lastMessageReceivedAt)}
           />
-          <InfoTile label="Sesion activa" value={`${configuration.activeSessionHours} hora(s)`} />
-          <InfoTile label="Conectado desde" value={configuration.connectedFrom} />
-          <InfoTile label="Modo adaptador" value={configuration.adapterMode ?? 'Experimental'} />
+          <InfoTile
+            label="Ultimo mensaje enviado"
+            value={formatDateTime(channel.lastMessageSentAt)}
+          />
         </div>
       </div>
 
+      {channel.lastErrorMessage ? (
+        <div className="rounded-[18px] border border-red-200 bg-red-50 px-4 py-3 text-xs leading-5 text-red-800">
+          {channel.lastErrorMessage}
+        </div>
+      ) : null}
+    </Card>
+  )
+}
+
+function MetaCloudConfigurationSummary({ channel }: { channel: WhatsAppChannelResponse }) {
+  const cloud = channel.metaCloudConfig
+  return (
+    <Card className="space-y-5">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-sm font-semibold text-slate-950">Resumen de Meta</p>
+          <p className="mt-1 text-xs text-slate-500">Configuracion de la cuenta empresarial.</p>
+        </div>
+      </div>
       <div className="grid gap-3 sm:grid-cols-2">
-        <Button fullWidth loading={disconnectLoading} onClick={onDisconnect} variant="danger">
-          Desconectar sesion
-        </Button>
-        <Button fullWidth loading={reconnectLoading} onClick={onReconnect} variant="secondary">
-          Reiniciar sesion
-        </Button>
+        <InfoTile label="Proveedor" value="Meta WhatsApp Cloud API" />
+        <InfoTile label="Empresa" value={channel.businessName} />
+        <InfoTile label="Numero central" value={formatPhone(channel.displayPhoneNumber)} />
+        <InfoTile label="Cobertura" value="Todas las sucursales" />
+        <InfoTile label="Estado de registro" value={channel.registrationLabel ?? '-'} />
+        <InfoTile label="Canal activo" value={channel.active ? 'Si' : 'No'} />
+        {cloud ? (
+          <>
+            <InfoTile label="ID del numero" value={cloud.phoneNumberId ?? '-'} />
+            <InfoTile label="ID cuenta empresarial" value={cloud.businessAccountId ?? '-'} />
+            <InfoTile label="Version API" value={cloud.graphApiVersion ?? '-'} />
+            <InfoTile label="Webhook" value={cloud.webhookLabel ?? '-'} />
+            <InfoTile
+              label="Credencial configurada"
+              value={cloud.credentialStatus === 'CONFIGURED' ? 'Si' : 'No'}
+            />
+          </>
+        ) : null}
+      </div>
+    </Card>
+  )
+}
+
+function MetaConfigDetailCard({ channel }: { channel: WhatsAppChannelResponse }) {
+  const cloud = channel.metaCloudConfig
+  return (
+    <Card>
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-slate-950">Configuracion de Meta</p>
+          <p className="mt-1 text-xs text-slate-500">Detalles tecnicos del canal Cloud API.</p>
+        </div>
+      </div>
+      <div className="mt-5 grid gap-4 sm:grid-cols-2">
+        <InfoTile label="Numero central visible" value={formatPhone(channel.displayPhoneNumber)} />
+        <InfoTile label="Numero normalizado" value={channel.normalizedPhoneNumber ?? '-'} />
+        <InfoTile label="Modo de operacion" value="Centralizado" />
+        <InfoTile label="Sucursales atendidas" value="Todas" />
+        {cloud ? (
+          <>
+            <InfoTile label="ID tecnico del numero" value={cloud.phoneNumberId ?? '-'} />
+            <InfoTile label="ID cuenta empresarial" value={cloud.businessAccountId ?? '-'} />
+            <InfoTile label="Version API Graph" value={cloud.graphApiVersion ?? '-'} />
+            <InfoTile label="URL webhook" value={cloud.webhookCallbackUrl ?? '-'} />
+            <InfoTile label="Estado webhook" value={cloud.webhookLabel ?? '-'} />
+            <InfoTile
+              label="Credencial"
+              value={
+                cloud.credentialStatus === 'CONFIGURED' ? 'Configurada: Si' : 'Configurada: No'
+              }
+            />
+            {cloud.tokenExpiresAt ? (
+              <InfoTile label="Vencimiento token" value={formatDateTime(cloud.tokenExpiresAt)} />
+            ) : null}
+            <InfoTile label="Canal activo" value={cloud.active ? 'Si' : 'No'} />
+          </>
+        ) : null}
       </div>
     </Card>
   )
 }
 
 function QrConnectionCard({
-  configuration,
+  qrCode,
   onRefreshQr,
   refreshLoading,
 }: {
-  configuration: WhatsAppConfigurationResponse
+  qrCode: string | null
   onRefreshQr: () => void
   refreshLoading: boolean
 }) {
@@ -426,9 +858,8 @@ function QrConnectionCard({
           Generar QR
         </Button>
       </div>
-
       <div className="grid gap-5 md:grid-cols-[180px_minmax(0,1fr)]">
-        <QrBlock qrCode={configuration.qrCode} />
+        <QrBlock qrCode={qrCode} />
         <ol className="space-y-3 text-sm text-slate-700">
           {[
             'Abre WhatsApp en tu telefono',
@@ -445,10 +876,8 @@ function QrConnectionCard({
           ))}
         </ol>
       </div>
-
       <div className="rounded-[18px] border border-emerald-100 bg-emerald-50 px-4 py-3 text-xs leading-5 text-emerald-800">
-        Este codigo QR es personal y temporal. No lo compartas con nadie para mantener segura la
-        cuenta.
+        Este codigo QR es personal y temporal. No lo compartas con nadie.
       </div>
     </Card>
   )
@@ -462,7 +891,6 @@ function QrBlock({ qrCode }: { qrCode: string | null }) {
       </div>
     )
   }
-
   if (qrCode) {
     return (
       <div className="rounded-[24px] border border-slate-200 bg-white p-4">
@@ -472,7 +900,6 @@ function QrBlock({ qrCode }: { qrCode: string | null }) {
       </div>
     )
   }
-
   return (
     <div className="grid h-[180px] grid-cols-7 gap-1 rounded-[24px] border border-dashed border-slate-300 bg-white p-4">
       {Array.from({ length: 49 }).map((_, index) => (
@@ -487,55 +914,6 @@ function QrBlock({ qrCode }: { qrCode: string | null }) {
         />
       ))}
     </div>
-  )
-}
-
-function LinkedDevicesCard({ devices }: { devices: WhatsAppConfigurationLinkedDeviceResponse[] }) {
-  return (
-    <Card>
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <p className="text-sm font-semibold text-slate-950">Dispositivos vinculados</p>
-          <p className="mt-1 text-xs text-slate-500">
-            Datos entregados por la API local del backend.
-          </p>
-        </div>
-        <StatusBadge label={`${devices.length} dispositivo(s)`} tone="info" />
-      </div>
-
-      <div className="mt-5 overflow-x-auto">
-        <table className="w-full min-w-[620px] text-left text-sm">
-          <thead className="text-xs uppercase tracking-[0.14em] text-slate-400">
-            <tr>
-              <th className="pb-3 font-semibold">Dispositivo / operador</th>
-              <th className="pb-3 font-semibold">Ubicacion</th>
-              <th className="pb-3 font-semibold">Estado</th>
-              <th className="pb-3 font-semibold">Ultima actividad</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {devices.map((device) => (
-              <tr key={device.id}>
-                <td className="py-3">
-                  <p className="font-semibold text-slate-950">{device.deviceName}</p>
-                  <p className="text-xs text-slate-500">
-                    {device.operatorName} · {device.browser}
-                  </p>
-                </td>
-                <td className="py-3 text-slate-600">{device.location}</td>
-                <td className="py-3">
-                  <StatusBadge
-                    label={toDeviceStatusLabel(device.status)}
-                    tone={toDeviceStatusTone(device.status)}
-                  />
-                </td>
-                <td className="py-3 text-slate-600">{formatDateTime(device.lastActivityAt)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </Card>
   )
 }
 
@@ -575,7 +953,19 @@ function PreferencesCard({
   )
 }
 
-function MainChannelCard({ configuration }: { configuration: WhatsAppConfigurationResponse }) {
+function MainChannelCard({
+  channelName,
+  channelType,
+  phoneNumber,
+  businessHours,
+  active,
+}: {
+  channelName: string
+  channelType: string
+  phoneNumber: string | null
+  businessHours: string
+  active: boolean
+}) {
   return (
     <Card>
       <div className="flex items-center justify-between gap-3">
@@ -583,19 +973,13 @@ function MainChannelCard({ configuration }: { configuration: WhatsAppConfigurati
           <p className="text-sm font-semibold text-slate-950">Canal principal</p>
           <p className="mt-1 text-xs text-slate-500">Configuracion operativa del canal activo.</p>
         </div>
-        <StatusBadge
-          label={configuration.mainChannel.automaticResponsesEnabled ? 'Activo' : 'Inactivo'}
-          tone={configuration.mainChannel.automaticResponsesEnabled ? 'success' : 'neutral'}
-        />
+        <StatusBadge label={active ? 'Activo' : 'Inactivo'} tone={active ? 'success' : 'neutral'} />
       </div>
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
-        <InfoTile label="Nombre del canal" value={configuration.mainChannel.channelName} />
-        <InfoTile label="Tipo de canal" value={configuration.mainChannel.channelType} />
-        <InfoTile
-          label="Numero asociado"
-          value={formatPhone(configuration.mainChannel.phoneNumber)}
-        />
-        <InfoTile label="Horario de atencion" value={configuration.mainChannel.businessHours} />
+        <InfoTile label="Nombre del canal" value={channelName} />
+        <InfoTile label="Tipo de canal" value={channelType} />
+        <InfoTile label="Numero asociado" value={formatPhone(phoneNumber)} />
+        <InfoTile label="Horario de atencion" value={businessHours} />
       </div>
     </Card>
   )
@@ -604,41 +988,181 @@ function MainChannelCard({ configuration }: { configuration: WhatsAppConfigurati
 function SessionHistoryCard({
   history,
 }: {
-  history: WhatsAppConfigurationSessionHistoryResponse[]
+  history: Array<{
+    id: string
+    title: string
+    actor: string
+    tone: string
+    occurredAt: string | null
+  }>
 }) {
+  function normalizeTone(tone: string): BadgeTone {
+    if (tone === 'success' || tone === 'warning' || tone === 'danger' || tone === 'info')
+      return tone
+    return 'neutral'
+  }
+  function toneLabel(tone: string) {
+    switch (normalizeTone(tone)) {
+      case 'success':
+        return 'Correcto'
+      case 'warning':
+        return 'Atencion'
+      case 'danger':
+        return 'Error'
+      case 'info':
+        return 'Informativo'
+      default:
+        return 'Registro'
+    }
+  }
   return (
     <Card>
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-slate-950">Historial de sesiones</p>
-          <p className="mt-1 text-xs text-slate-500">Eventos recientes del canal local.</p>
+          <p className="text-sm font-semibold text-slate-950">Historial del canal</p>
+          <p className="mt-1 text-xs text-slate-500">Eventos recientes del canal.</p>
         </div>
         <StatusBadge label="Ver todo" tone="info" />
       </div>
       <div className="mt-5 space-y-4">
-        {history.map((item) => (
-          <HistoryItem item={item} key={item.id} />
-        ))}
+        {history.length === 0 ? (
+          <p className="text-sm text-slate-400">Sin eventos registrados.</p>
+        ) : (
+          history.map((item) => (
+            <div className="flex items-start gap-3" key={item.id}>
+              <span className="mt-1 h-2.5 w-2.5 rounded-full bg-emerald-500" />
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-semibold text-slate-900">{item.title}</p>
+                  <StatusBadge label={toneLabel(item.tone)} tone={normalizeTone(item.tone)} />
+                </div>
+                <p className="mt-1 text-xs text-slate-500">{item.actor}</p>
+                <p className="mt-1 text-xs text-slate-400">{formatDateTime(item.occurredAt)}</p>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </Card>
   )
 }
 
-function HistoryItem({ item }: { item: WhatsAppConfigurationSessionHistoryResponse }) {
+function EditConfigDialog({
+  channel,
+  onClose,
+  onSave,
+  saving,
+}: {
+  channel: WhatsAppChannelResponse | undefined
+  onClose: () => void
+  onSave: (data: Record<string, string | null>) => void
+  saving: boolean
+}) {
+  const cloud = channel?.metaCloudConfig
+  const [form, setForm] = useState({
+    displayPhoneNumber: channel?.displayPhoneNumber ?? '',
+    normalizedPhoneNumber: channel?.normalizedPhoneNumber ?? '',
+    phoneNumberId: cloud?.phoneNumberId ?? '',
+    businessAccountId: cloud?.businessAccountId ?? '',
+    graphApiVersion: cloud?.graphApiVersion ?? 'v23.0',
+    webhookCallbackUrl: cloud?.webhookCallbackUrl ?? '',
+  })
+
+  function handleChange(field: string, value: string) {
+    setForm((prev) => ({ ...prev, [field]: value }))
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    const data: Record<string, string | null> = {}
+    Object.entries(form).forEach(([key, value]) => {
+      data[key] = value.trim() || null
+    })
+    onSave(data)
+  }
+
   return (
-    <div className="flex items-start gap-3">
-      <span className="mt-1 h-2.5 w-2.5 rounded-full bg-emerald-500" />
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm font-semibold text-slate-900">{item.title}</p>
-          <StatusBadge
-            label={toHistoryToneLabel(item.tone)}
-            tone={normalizeHistoryTone(item.tone)}
-          />
-        </div>
-        <p className="mt-1 text-xs text-slate-500">{item.actor}</p>
-        <p className="mt-1 text-xs text-slate-400">{formatDateTime(item.occurredAt)}</p>
-      </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <Card className="mx-4 w-full max-w-lg space-y-4 p-6">
+        <p className="text-lg font-semibold text-slate-900">Editar configuracion del canal</p>
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+              Numero visible
+            </label>
+            <input
+              className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm"
+              value={form.displayPhoneNumber}
+              onChange={(e) => handleChange('displayPhoneNumber', e.target.value)}
+              placeholder="+56 9 XXXX XXXX"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+              Numero normalizado
+            </label>
+            <input
+              className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm"
+              value={form.normalizedPhoneNumber}
+              onChange={(e) => handleChange('normalizedPhoneNumber', e.target.value)}
+              placeholder="569XXXXXXX"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+              ID tecnico del numero (Phone Number ID)
+            </label>
+            <input
+              className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm"
+              value={form.phoneNumberId}
+              onChange={(e) => handleChange('phoneNumberId', e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+              ID cuenta empresarial (WABA ID)
+            </label>
+            <input
+              className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm"
+              value={form.businessAccountId}
+              onChange={(e) => handleChange('businessAccountId', e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+              Version API Graph
+            </label>
+            <input
+              className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm"
+              value={form.graphApiVersion}
+              onChange={(e) => handleChange('graphApiVersion', e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+              URL del webhook
+            </label>
+            <input
+              className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm"
+              value={form.webhookCallbackUrl}
+              onChange={(e) => handleChange('webhookCallbackUrl', e.target.value)}
+              placeholder="https://tudominio.com/api/v1/integrations/whatsapp-cloud/webhook"
+            />
+          </div>
+          <div className="rounded-[14px] border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-800">
+            Las credenciales de acceso, secreto de aplicacion y token de verificacion se configuran
+            mediante variables de entorno por seguridad.
+          </div>
+          <div className="flex justify-end gap-3">
+            <Button disabled={saving} onClick={onClose} type="button" variant="secondary">
+              Cancelar
+            </Button>
+            <Button loading={saving} type="submit">
+              Guardar
+            </Button>
+          </div>
+        </form>
+      </Card>
     </div>
   )
 }
@@ -702,5 +1226,106 @@ function WhatsAppIcon({ className }: { className: string }) {
         fill="currentColor"
       />
     </svg>
+  )
+}
+
+function registrationTone(status: string | null): BadgeTone {
+  switch (status) {
+    case 'REGISTERED':
+      return 'success'
+    case 'PENDING':
+      return 'warning'
+    case 'ERROR':
+      return 'danger'
+    default:
+      return 'neutral'
+  }
+}
+
+function operationalTone(status: string | null): BadgeTone {
+  switch (status) {
+    case 'CONNECTED':
+      return 'success'
+    case 'CONFIGURING':
+    case 'DEGRADED':
+      return 'warning'
+    case 'DISCONNECTED':
+    case 'ERROR':
+      return 'danger'
+    default:
+      return 'neutral'
+  }
+}
+
+function credentialTone(status: string | null): BadgeTone {
+  switch (status) {
+    case 'CONFIGURED':
+      return 'success'
+    case 'EXPIRING':
+      return 'warning'
+    case 'EXPIRED':
+    case 'INVALID':
+      return 'danger'
+    default:
+      return 'neutral'
+  }
+}
+
+const ONBOARDING_STEPS: Array<{ step: string; label: string }> = [
+  { step: 'opening-meta', label: 'Abriendo Meta' },
+  { step: 'authorizing', label: 'Autorizacion recibida' },
+  { step: 'validating-waba', label: 'Validando WABA' },
+  { step: 'validating-phone', label: 'Validando numero' },
+  { step: 'subscribing-webhook', label: 'Suscribiendo webhook' },
+  { step: 'connected', label: 'Conectado' },
+]
+
+function OnboardingProgress({ step, errorMessage }: { step: string; errorMessage?: string }) {
+  const currentIndex = ONBOARDING_STEPS.findIndex((s) => s.step === step)
+  const isError = step === 'error'
+  return (
+    <div className="w-full space-y-3 rounded-[18px] border border-emerald-100 bg-emerald-50 px-4 py-3">
+      <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+        {isError ? 'Error de conexion' : 'Conectando con Meta...'}
+      </p>
+      <div className="space-y-2">
+        {ONBOARDING_STEPS.map((s, index) => {
+          const isActive = index === currentIndex && !isError
+          const isDone = index < currentIndex && !isError
+          const isFailed = isError && index === currentIndex
+          return (
+            <div className="flex items-center gap-2 text-xs" key={s.step}>
+              {isDone ? (
+                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-[10px] text-white">
+                  &#10003;
+                </span>
+              ) : isActive ? (
+                <span className="flex h-4 w-4 items-center justify-center rounded-full border-2 border-emerald-500" />
+              ) : isFailed ? (
+                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
+                  &#10007;
+                </span>
+              ) : (
+                <span className="flex h-4 w-4 items-center justify-center rounded-full border border-slate-300" />
+              )}
+              <span
+                className={
+                  isDone
+                    ? 'text-emerald-700'
+                    : isActive
+                      ? 'font-semibold text-emerald-900'
+                      : isFailed
+                        ? 'text-red-700'
+                        : 'text-slate-400'
+                }
+              >
+                {s.label}
+              </span>
+            </div>
+          )
+        })}
+      </div>
+      {errorMessage ? <p className="text-xs leading-5 text-red-700">{errorMessage}</p> : null}
+    </div>
   )
 }

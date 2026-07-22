@@ -23,6 +23,7 @@ export default defineConfig([
     },
     rules: {
       'react-hooks/set-state-in-effect': 'warn',
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
     },
   },
 ])

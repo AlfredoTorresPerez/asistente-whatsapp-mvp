@@ -41,6 +41,7 @@ import type {
   RegisterBookingManualPaymentRequest,
   RescheduleBookingRequest,
   UpdateBookingRequest,
+  WhatsAppEntryResponse,
 } from './types'
 
 type GetBookingsFilters = {
@@ -394,6 +395,10 @@ export function createPublicLandingBookingRequest(payload: CreatePublicBookingRe
     auth: false,
     body: JSON.stringify(payload),
   })
+}
+
+export function getPublicLandingWhatsAppEntryRequest() {
+  return apiFetch<WhatsAppEntryResponse>('/public/landing/whatsapp-entry', { auth: false })
 }
 
 export function getCustomerBookingsRequest(token: string) {

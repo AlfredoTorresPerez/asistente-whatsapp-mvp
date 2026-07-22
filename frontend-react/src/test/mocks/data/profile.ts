@@ -72,7 +72,7 @@ export const mockRoles = [
 
 export const mockWhatsAppConfig = {
   status: 'CONNECTED',
-  phoneNumber: '+56900000000',
+  phoneNumber: '+56999900001',
   businessName: 'Centro Estetico Bella',
   lastSyncAt: '2026-07-15T10:00:00Z',
   sessionActiveHours: 72,
@@ -95,7 +95,7 @@ export const mockWhatsAppConfig = {
   mainChannel: {
     name: 'WhatsApp Principal',
     type: 'WHATSAPP_WEB',
-    phoneNumber: '+56900000000',
+    phoneNumber: '+56999900001',
     businessHours: 'Lun-Vie 09:00-18:00',
     autoReplyEnabled: true,
   },
@@ -119,7 +119,7 @@ export const mockBusinessLocations = [
     city: 'Santiago',
     commune: 'Providencia',
     phone: '+56955550100',
-    whatsappNumber: '+56900000000',
+    whatsappNumber: '+56999900001',
     timezone: 'America/Santiago',
     active: true,
   },
@@ -131,7 +131,7 @@ export const mockBusinessLocations = [
     city: 'Santiago',
     commune: 'Las Condes',
     phone: '+56955550101',
-    whatsappNumber: '+56900000001',
+    whatsappNumber: '+56999900002',
     timezone: 'America/Santiago',
     active: true,
   },

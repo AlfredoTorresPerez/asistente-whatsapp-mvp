@@ -1,5 +1,9 @@
 import { apiFetch } from './httpClient'
-import type { BusinessLocationResponse, UpsertBusinessLocationRequest } from './types'
+import type {
+  BusinessLocationResponse,
+  CommercialQrResponse,
+  UpsertBusinessLocationRequest,
+} from './types'
 
 function toSearchParams(filters: Record<string, string | number | boolean | undefined | null>) {
   const searchParams = new URLSearchParams()
@@ -41,4 +45,8 @@ export function deactivateBusinessLocationRequest(locationId: string) {
   return apiFetch<BusinessLocationResponse>(`/business-locations/${locationId}`, {
     method: 'DELETE',
   })
+}
+
+export function getBusinessLocationCommercialQrRequest(locationId: string) {
+  return apiFetch<CommercialQrResponse>(`/business-locations/${locationId}/commercial-qr`)
 }

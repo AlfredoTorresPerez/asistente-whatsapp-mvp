@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { CommercialWhatsAppQr } from '../../../components/whatsapp/CommercialWhatsAppQr'
+import { Modal } from '../../../components/overlay/Modal'
 import { ApiClientError } from '../../../services/api/httpClient'
 import { ErrorState } from '../../../components/feedback/ErrorState'
 import { LoadingState } from '../../../components/feedback/LoadingState'
@@ -13,6 +15,7 @@ import { useToast } from '../../../lib/toast'
 import {
   createBusinessLocationRequest,
   deactivateBusinessLocationRequest,
+  getBusinessLocationCommercialQrRequest,
   getBusinessLocationsRequest,
   updateBusinessLocationRequest,
 } from '../../../services/api/businessLocationsApi'
@@ -197,6 +200,15 @@ export function AdminLocationsPage() {
     queryKey: ['agenda-business-hours', form.id],
     queryFn: () => getBusinessHoursRequest(form.id!),
     enabled: !!form.id,
+  })
+
+  const [qrLocationId, setQrLocationId] = useState<string | null>(null)
+
+  const commercialQrQuery = useQuery({
+    queryKey: ['business-location-commercial-qr', qrLocationId],
+    queryFn: () => getBusinessLocationCommercialQrRequest(qrLocationId!),
+    enabled: Boolean(qrLocationId),
+    retry: false,
   })
 
   const saveHoursMutation = useMutation({
@@ -445,6 +457,15 @@ export function AdminLocationsPage() {
                     >
                       Editar
                     </Button>
+                    <Button
+                      className="px-2.5 text-xs"
+                      disabled={!location.active}
+                      onClick={() => setQrLocationId(location.active ? location.id : null)}
+                      size="sm"
+                      variant="secondary"
+                    >
+                      Ver QR comercial
+                    </Button>
                     {location.active ? (
                       <Button
                         className="px-2.5 text-xs"
@@ -690,6 +711,68 @@ export function AdminLocationsPage() {
           ) : null}
         </>
       ) : null}
+
+      <Modal
+        maxWidthClassName="max-w-[520px]"
+        onClose={() => setQrLocationId(null)}
+        open={Boolean(qrLocationId)}
+      >
+        <div className="space-y-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+                QR comercial
+              </p>
+              {commercialQrQuery.data ? (
+                <h3 className="mt-1 text-lg font-semibold text-slate-950">
+                  {commercialQrQuery.data.locationName}
+                </h3>
+              ) : null}
+            </div>
+            <button
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+              onClick={() => setQrLocationId(null)}
+              type="button"
+            >
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {commercialQrQuery.isLoading ? (
+            <div className="flex animate-pulse items-center gap-4">
+              <div className="h-40 w-40 flex-shrink-0 rounded-xl bg-slate-200" />
+              <div className="flex-1 space-y-3">
+                <div className="h-4 w-24 rounded bg-slate-200" />
+                <div className="h-3 w-48 rounded bg-slate-200" />
+                <div className="h-10 w-36 rounded-xl bg-slate-200" />
+              </div>
+            </div>
+          ) : commercialQrQuery.isError ? (
+            <div className="rounded-xl bg-rose-50 px-4 py-4 text-sm text-rose-700">
+              <p className="font-semibold">No fue posible cargar el QR</p>
+              <p className="mt-1">
+                {commercialQrQuery.error instanceof ApiClientError
+                  ? commercialQrQuery.error.message
+                  : 'Verifica que WhatsApp Cloud API este configurado y la sucursal este activa.'}
+              </p>
+            </div>
+          ) : commercialQrQuery.data ? (
+            <CommercialWhatsAppQr
+              displayPhoneNumber={commercialQrQuery.data.displayPhoneNumber}
+              prefilledMessage={commercialQrQuery.data.prefilledMessage}
+              waUrl={commercialQrQuery.data.waUrl}
+            />
+          ) : null}
+        </div>
+      </Modal>
     </section>
   )
 }

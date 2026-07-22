@@ -1723,3 +1723,134 @@ export type BookingSyncStatusResponse = {
   lastSyncAttemptAt: string | null
   lastSuccessfulSyncAt: string | null
 }
+
+export type MetaCloudConfig = {
+  phoneNumberId: string | null
+  businessAccountId: string | null
+  graphApiVersion: string | null
+  webhookCallbackUrl: string | null
+  webhookStatus: string | null
+  webhookLabel: string | null
+  credentialStatus: string | null
+  credentialLabel: string | null
+  tokenExpiresAt: string | null
+  active: boolean
+}
+
+export type ChannelEventItem = {
+  id: string
+  eventType: string
+  title: string
+  description: string
+  actor: string
+  tone: string
+  occurredAt: string | null
+}
+
+export type WhatsAppChannelResponse = {
+  providerType: string | null
+  providerLabel: string
+  businessName: string
+  displayPhoneNumber: string | null
+  normalizedPhoneNumber: string | null
+  registrationStatus: string | null
+  registrationLabel: string | null
+  operationalStatus: string | null
+  operationalLabel: string | null
+  webhookStatus: string | null
+  webhookLabel: string | null
+  credentialStatus: string | null
+  credentialLabel: string | null
+  active: boolean
+  lastHealthCheckAt: string | null
+  lastMessageReceivedAt: string | null
+  lastMessageSentAt: string | null
+  lastErrorCode: string | null
+  lastErrorMessage: string | null
+  updatedAt: string | null
+  metaCloudConfig: MetaCloudConfig | null
+  recentEvents: ChannelEventItem[]
+}
+
+export type WhatsAppChannelUpdateRequest = {
+  displayPhoneNumber?: string | null
+  normalizedPhoneNumber?: string | null
+  phoneNumberId?: string | null
+  businessAccountId?: string | null
+  graphApiVersion?: string | null
+  webhookCallbackUrl?: string | null
+}
+
+export type WhatsAppChannelValidateResponse = {
+  valid: boolean
+  providerType: string
+  message: string
+  warnings: string[]
+}
+
+export type WhatsAppChannelTestMessageRequest = {
+  recipientPhone: string
+  body: string
+}
+
+export type WhatsAppChannelTestMessageResponse = {
+  conversationId: string
+  messageId: string
+  externalMessageId: string | null
+  deliveryStatus: string
+  acceptedAt: string | null
+}
+
+// Meta Embedded Signup onboarding types
+export type CompleteOnboardingRequest = {
+  code: string
+  redirectUri: string
+  wabaId: string
+  phoneNumberId: string
+}
+
+export type OnboardingResult = {
+  providerType: string
+  displayPhoneNumber: string
+  operationalStatus: string
+  maskedPhoneNumberId: string
+  maskedWabaId: string
+  webhookStatus: string
+}
+
+export type CommercialQrResponse = {
+  waUrl: string
+  phoneNumber: string
+  displayPhoneNumber: string
+  prefilledMessage: string
+  locationCode: string
+  locationName: string
+}
+
+export type OnboardingStatus = {
+  providerType: string
+  displayPhoneNumber: string | null
+  normalizedPhoneNumber: string | null
+  registrationStatus: string | null
+  operationalStatus: string | null
+  webhookStatus: string | null
+  credentialStatus: string | null
+  active: boolean
+  maskedPhoneNumberId: string | null
+  maskedWabaId: string | null
+  routingMode: string | null
+  lastErrorCode: string | null
+  lastErrorMessage: string | null
+  lastHealthCheckAt: string | null
+  tokenExpiresAt: string | null
+  updatedAt: string | null
+}
+
+export type WhatsAppEntryResponse = {
+  waUrl: string
+  phoneNumber: string
+  displayPhoneNumber: string
+  prefilledMessage: string
+  locationCode: string
+  locationName: string
+}
