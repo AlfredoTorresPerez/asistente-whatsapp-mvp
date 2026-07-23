@@ -108,7 +108,7 @@ if (-not (Test-Path $EnvFile))    { Write-Warn "No existe .env.local (usando def
 
 # 1. Docker Compose Up
 Write-Status "1/8 - Levantando servicios con docker compose..."
-$composeCmd = "docker compose -f `"$ComposeFile`""
+$composeCmd = "docker compose --env-file `"$EnvFile`" -f `"$ComposeFile`""
 if ($Profile) { $composeCmd += " --profile $Profile" }
 $composeCmd += " up -d --build"
 

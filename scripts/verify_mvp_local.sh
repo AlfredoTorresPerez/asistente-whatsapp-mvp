@@ -73,7 +73,7 @@ info "Verificando archivos..."
 
 # 1. Docker Compose Up
 log "1/8 - Levantando servicios..."
-COMPOSE_CMD="docker compose -f \"$COMPOSE_FILE\""
+COMPOSE_CMD="docker compose --env-file \"$ENV_FILE\" -f \"$COMPOSE_FILE\""
 [[ -n "$PROFILE" ]] && COMPOSE_CMD+=" --profile $PROFILE"
 COMPOSE_CMD+=" up -d --build"
 eval "$COMPOSE_CMD"
