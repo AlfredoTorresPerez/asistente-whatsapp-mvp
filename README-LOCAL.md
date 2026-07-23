@@ -5,6 +5,7 @@
 | Modo | Comando | Requisitos | Auto-respuesta IA |
 |------|---------|------------|-------------------|
 | **Demo base** (sin WhatsApp real) | `docker compose -f docker-compose.local.yml up -d` | Solo Docker | Desactivada por defecto |
+| **Demo con túnel público** | `docker compose -f docker-compose.local.yml --profile public-link up -d` | + Cloudflare Tunnel automático | Desactivada por defecto |
 | **Demo con WhatsApp Web** | `docker compose -f docker-compose.local.yml --profile whatsapp up -d` | + Escanear QR en /admin/whatsapp-web | Desactivada por defecto |
 | **Debug auto-respuesta IA** | `APP_AI_AGENTS_AUTO_REPLY_ENABLED=true` + modo WhatsApp | + Sesión WhatsApp CONNECTED | Activar manualmente en `.env.local` |
 
@@ -37,6 +38,55 @@ docker compose -f docker-compose.local.yml --profile whatsapp up -d
 # Escanear QR desde la UI: http://localhost:5173/admin/whatsapp-web
 ```
 
+## Con Túnel Público (trycloudflare.com)
+
+Expone el frontend y backend local mediante Cloudflare Tunnel para acceder desde Internet.
+
+```bash
+# Iniciar con túnel público
+docker compose -f docker-compose.local.yml --profile public-link up -d
+
+# O usando el script automatizado (recomendado)
+.\scripts\start-public-link.ps1
+```
+
+El script `start-public-link.ps1`:
+1. Inicia los servicios locales (postgres + backend + frontend)
+2. Crea el túnel Cloudflare
+3. Espera la URL pública
+4. Actualiza `.env.local` con las URLs públicas
+5. Recrea backend y frontend para que usen la nueva URL
+
+### Comandos del túnel
+
+```bash
+# Regenerar enlace expirado
+docker compose -f docker-compose.local.yml --profile public-link up -d --force-recreate public-tunnel
+
+# Consultar nueva dirección
+docker compose -f docker-compose.local.yml logs --tail=200 public-tunnel
+
+# Seguir registros
+docker compose -f docker-compose.local.yml logs -f --tail=100 public-tunnel
+
+# Detener solamente el túnel (servicios locales continúan)
+.\scripts\stop-public-link.ps1
+# o
+docker compose -f docker-compose.local.yml --profile public-link stop public-tunnel
+
+# Verificar estado
+.\scripts\check-public-link.ps1
+```
+
+### ⚠️ Advertencias
+
+- **trycloudflare.com es TEMPORAL.** La dirección cambia al reiniciar el contenedor cloudflared.
+- **No usar en QA ni producción.** Solo para demos locales.
+- **No registrar como webhook permanente de WhatsApp** — la URL expira.
+- **No registrar como URL de devolución de Google Calendar** — la URL expira.
+- **No incluir en correos o enlaces persistentes.**
+- Los enlaces de confirmación de reservas generados con la URL anterior quedarán rotos.
+
 ## Puertos y Servicios
 
 | Servicio | Puerto Host | Interno | Perfil | Descripción |
@@ -45,6 +95,7 @@ docker compose -f docker-compose.local.yml --profile whatsapp up -d
 | backend-java | 8080 | 8080 | — | Spring Boot 3 |
 | frontend-react | 5173 | 5173 | — | Vite dev server |
 | whatsapp-web-service | 3001 | 3001 | `whatsapp` | whatsapp-web.js + Chromium |
+| public-tunnel | — | — | `public-link` | Cloudflare Tunnel (trycloudflare.com) |
 
 ## Comandos Útiles
 
@@ -68,12 +119,13 @@ pnpm run docker:reset             # borrar volúmenes + rebuild + up
 pnpm run docker:ps                # estado de servicios
 
 # Docker Compose directo (desde la raíz)
-docker compose -f docker-compose.local.yml up -d
-docker compose -f docker-compose.local.yml --profile whatsapp up -d
-docker compose -f docker-compose.local.yml logs -f --tail=100
-docker compose -f docker-compose.local.yml down
-docker compose -f docker-compose.local.yml down -v   # borrar volúmenes
-docker compose -f docker-compose.local.yml ps
+docker compose --env-file .env.local -f docker-compose.local.yml up -d
+docker compose --env-file .env.local -f docker-compose.local.yml --profile whatsapp up -d
+docker compose --env-file .env.local -f docker-compose.local.yml --profile public-link up -d
+docker compose --env-file .env.local -f docker-compose.local.yml logs -f --tail=100
+docker compose --env-file .env.local -f docker-compose.local.yml down
+docker compose --env-file .env.local -f docker-compose.local.yml down -v   # borrar volúmenes
+docker compose --env-file .env.local -f docker-compose.local.yml ps
 ```
 
 ## Personalización Local
@@ -117,3 +169,12 @@ En Docker Desktop (Windows/Mac) los permisos se manejan automáticamente.
 - `docs/DEBUGGING_AUTO_REPLY_LOCAL.md` — Debug del flujo auto-reply IA
 - `CHECKLIST_DEMO_LOCAL.md` — Checklist para demo funcional
 - `DEMO_GUIDE.md` — Guía de demo
+
+## Scripts del Túnel Público
+
+| Script | Función |
+|--------|---------|
+| `scripts/start-public-link.ps1` | Inicia túnel, detecta URL, actualiza `.env.local` |
+| `scripts/stop-public-link.ps1` | Detiene solo el túnel (servicios locales continúan) |
+| `scripts/check-public-link.ps1` | Verifica estado y validez del túnel |
+| `scripts/start_mvp_public_link.ps1` | (Legado) Versión anterior, migrar a start-public-link.ps1 |
