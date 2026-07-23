@@ -58,7 +58,7 @@ $C_Gray = [ConsoleColor]::Gray
 
 function Write-Status {
     param([string]$Msg, [ConsoleColor]$Color = $C_Cyan)
-    $elapsed = [math]::Round(((Get-Date) - $Global:StartTime).TotalSeconds, 0)
+    $elapsed = [math]::Round(((Get-Date) - $Global:StartTime).TotalSeconds)
     Write-Host "[$elapsed s] $Msg" -ForegroundColor $Color
 }
 
@@ -216,25 +216,35 @@ if ($Profile -eq "whatsapp") {
 }
 
 # 6. Webhook Test
-Write-Status "6/8 - Test webhook WhatsApp..."
-$webhookScript = Join-Path $ScriptDir "test-whatsapp-webhook-local.ps1"
-if (Test-Path $webhookScript) {
-    $whResult = & $webhookScript -Token $token
-    if ($LASTEXITCODE -ne 0) { Write-Fail "Webhook test falló (exit $LASTEXITCODE)"; exit 4 }
-    Write-Pass "Webhook test OK"
+if ($Profile -eq "whatsapp") {
+    Write-Status "6/8 - Test webhook WhatsApp..."
+    $webhookScript = Join-Path $ScriptDir "test-whatsapp-webhook-local.ps1"
+    if (Test-Path $webhookScript) {
+        $whResult = & $webhookScript -Token $token
+        if ($LASTEXITCODE -ne 0) { Write-Fail "Webhook test falló (exit $LASTEXITCODE)"; exit 4 }
+        Write-Pass "Webhook test OK"
+    } else {
+        Write-Warn "test-whatsapp-webhook-local.ps1 no encontrado, saltando"
+    }
 } else {
-    Write-Warn "test-whatsapp-webhook-local.ps1 no encontrado, saltando"
+    Write-Status "6/8 - Test webhook WhatsApp..."
+    Write-Info "  Saltando (usa --profile whatsapp para incluirlo)"
 }
 
 # 7. AI Auto-Reply Test
-Write-Status "7/8 - Test IA Auto-reply..."
-$aiScript = Join-Path $ScriptDir "test-ai-auto-reply-local.ps1"
-if (Test-Path $aiScript) {
-    $aiResult = & $aiScript -Token $token
-    if ($LASTEXITCODE -ne 0) { Write-Fail "AI auto-reply test falló (exit $LASTEXITCODE)"; exit 5 }
-    Write-Pass "AI auto-reply test OK"
+if ($Profile -eq "whatsapp") {
+    Write-Status "7/8 - Test IA Auto-reply..."
+    $aiScript = Join-Path $ScriptDir "test-ai-auto-reply-local.ps1"
+    if (Test-Path $aiScript) {
+        $aiResult = & $aiScript -Token $token
+        if ($LASTEXITCODE -ne 0) { Write-Fail "AI auto-reply test falló (exit $LASTEXITCODE)"; exit 5 }
+        Write-Pass "AI auto-reply test OK"
+    } else {
+        Write-Warn "test-ai-auto-reply-local.ps1 no encontrado, saltando"
+    }
 } else {
-    Write-Warn "test-ai-auto-reply-local.ps1 no encontrado, saltando"
+    Write-Status "7/8 - Test IA Auto-reply..."
+    Write-Info "  Saltando (usa --profile whatsapp para incluirlo)"
 }
 
 # 8. Cleanup
@@ -247,7 +257,7 @@ if (-not $NoCleanup) {
 }
 
 # Summary
-$totalSec = [math]::Round((Get-Date) - $Global:StartTime).TotalSeconds
+$totalSec = [math]::Round(((Get-Date) - $Global:StartTime).TotalSeconds)
 Write-Host "`n═══════════════════════════════════════════" -ForegroundColor $C_Cyan
 Write-Host "✅ VALIDACIÓN LOCAL COMPLETA: PASS ($totalSec s)" -ForegroundColor $C_Green
 Write-Host "═══════════════════════════════════════════" -ForegroundColor $C_Cyan

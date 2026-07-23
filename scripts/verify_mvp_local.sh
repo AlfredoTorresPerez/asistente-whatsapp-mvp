@@ -160,21 +160,31 @@ if [[ "$PROFILE" == "whatsapp" ]]; then
 fi
 
 # 6. Webhook Test
-log "6/8 - Test webhook WhatsApp..."
-WEBHOOK_SCRIPT="$SCRIPT_DIR/test-whatsapp-webhook-local.sh"
-if [[ -f "$WEBHOOK_SCRIPT" ]]; then
-    bash "$WEBHOOK_SCRIPT" "$TOKEN" || { fail "Webhook test falló"; exit 4; }
+if [[ "$PROFILE" == "whatsapp" ]]; then
+    log "6/8 - Test webhook WhatsApp..."
+    WEBHOOK_SCRIPT="$SCRIPT_DIR/test-whatsapp-webhook-local.sh"
+    if [[ -f "$WEBHOOK_SCRIPT" ]]; then
+        bash "$WEBHOOK_SCRIPT" "$TOKEN" || { fail "Webhook test falló"; exit 4; }
+    else
+        warn "test-whatsapp-webhook-local.sh no encontrado, saltando"
+    fi
 else
-    warn "test-whatsapp-webhook-local.sh no encontrado, saltando"
+    log "6/8 - Test webhook WhatsApp..."
+    info "Saltando (usa --profile whatsapp para incluirlo)"
 fi
 
 # 7. AI Auto-reply Test
-log "7/8 - Test IA Auto-reply..."
-AI_SCRIPT="$SCRIPT_DIR/test-ai-auto-reply-local.sh"
-if [[ -f "$AI_SCRIPT" ]]; then
-    bash "$AI_SCRIPT" "$TOKEN" || { fail "IA Auto-reply test falló"; exit 5; }
+if [[ "$PROFILE" == "whatsapp" ]]; then
+    log "7/8 - Test IA Auto-reply..."
+    AI_SCRIPT="$SCRIPT_DIR/test-ai-auto-reply-local.sh"
+    if [[ -f "$AI_SCRIPT" ]]; then
+        bash "$AI_SCRIPT" "$TOKEN" || { fail "IA Auto-reply test falló"; exit 5; }
+    else
+        warn "test-ai-auto-reply-local.sh no encontrado, saltando"
+    fi
 else
-    warn "test-ai-auto-reply-local.sh no encontrado, saltando"
+    log "7/8 - Test IA Auto-reply..."
+    info "Saltando (usa --profile whatsapp para incluirlo)"
 fi
 
 # Success
