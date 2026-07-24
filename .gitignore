@@ -8,6 +8,8 @@
 .env
 .env.*
 !.env.example
+!.env.qa.example
+!.env.production.example
 !.env.local.template
 !.env.development
 .idea/

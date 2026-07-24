@@ -26,7 +26,7 @@ public class BookingSyncEventJdbcRepository {
                         id, booking_id, business_id, event_type, event_version,
                         event_body, idempotency_key, status, attempts, max_attempts,
                         next_attempt_at, trace_id, created_at, updated_at
-                    ) values (?, ?, ?, ?, ?, ?, ?, 'PENDING', 0, ?, ?, ?, current_timestamp, current_timestamp)
+                    ) values (?, ?, ?, ?, ?, cast(? as jsonb), ?, 'PENDING', 0, ?, ?, ?, current_timestamp, current_timestamp)
                     """,
                     eventId, bookingId, businessId, eventType, eventVersion,
                     eventBody, idempotencyKey, maxAttempts, nextAttemptAt, traceId);

@@ -58,11 +58,16 @@ services:
       APP_WHATSAPP_CLOUD_API_CONNECT_TIMEOUT_SECONDS: ${APP_WHATSAPP_CLOUD_API_CONNECT_TIMEOUT_SECONDS:-5}
       APP_WHATSAPP_CLOUD_API_READ_TIMEOUT_SECONDS: ${APP_WHATSAPP_CLOUD_API_READ_TIMEOUT_SECONDS:-15}
       APP_AI_AGENTS_ENABLED: "true"
-      APP_AI_AGENTS_AUTO_REPLY_ENABLED: ${APP_AI_AGENTS_AUTO_REPLY_ENABLED:-false}
+      APP_AI_AGENTS_AUTO_REPLY_ENABLED: ${APP_AI_AGENTS_AUTO_REPLY_ENABLED:-true}
+      APP_AI_AGENTS_SAFE_MODE_ENABLED: ${APP_AI_AGENTS_SAFE_MODE_ENABLED:-false}
       APP_AI_AGENTS_AUDIT_ENABLED: "true"
       APP_OPENAI_ENABLED: ${APP_OPENAI_ENABLED:-false}
       APP_OPENAI_API_KEY: ${APP_OPENAI_API_KEY:-}
+      APP_FRONTEND_PUBLIC_BASE_URL: ${APP_FRONTEND_PUBLIC_BASE_URL:-https://qa-admin.midominio.cl}
       APP_BOOKING_CONFIRMATION_PUBLIC_BASE_URL: ${APP_BOOKING_CONFIRMATION_PUBLIC_BASE_URL:-https://qa-admin.midominio.cl/reservas/confirmar}
+      APP_BOOKING_RESCHEDULE_PUBLIC_BASE_URL: ${APP_BOOKING_RESCHEDULE_PUBLIC_BASE_URL:-https://qa-admin.midominio.cl/reservas/reprogramar}
+      APP_BOOKING_CANCELLATION_PUBLIC_BASE_URL: ${APP_BOOKING_CANCELLATION_PUBLIC_BASE_URL:-https://qa-admin.midominio.cl/reservas/cancelar}
+      APP_BOOKING_PAYMENT_CHECKOUT_PUBLIC_BASE_URL: ${APP_BOOKING_PAYMENT_CHECKOUT_PUBLIC_BASE_URL:-https://qa-admin.midominio.cl/reservas/pagar}
       APP_BOOKING_PAYMENT_PROVIDER: ${APP_BOOKING_PAYMENT_PROVIDER:-SIMULATED}
       APP_BOOKING_PAYMENT_WEBHOOK_PUBLIC_URL: ${APP_BOOKING_PAYMENT_WEBHOOK_PUBLIC_URL:-}
       APP_MERCADOPAGO_ACCESS_TOKEN: ${APP_MERCADOPAGO_ACCESS_TOKEN:-}
@@ -79,6 +84,7 @@ services:
     build:
       context: ./frontend-react
       dockerfile: Dockerfile
+      target: production
       args:
         VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api/v1}
         VITE_META_APP_ID: ${VITE_META_APP_ID:-}
@@ -90,8 +96,6 @@ services:
     depends_on:
       backend-java:
         condition: service_healthy
-    environment:
-      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api/v1}
     ports:
       - "${FRONTEND_PORT:-8081}:8080"
     healthcheck:
@@ -99,6 +103,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    restart: unless-stopped
 
   caddy:
     image: caddy:2-alpine

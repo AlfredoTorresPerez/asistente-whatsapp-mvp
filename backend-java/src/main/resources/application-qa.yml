@@ -9,15 +9,29 @@ app:
       enabled: ${APP_WHATSAPP_WEB_ENABLED:false}
       simulator-enabled: false
       demo-fallback-enabled: false
+    whatsapp-cloud-api:
+      dry-run-enabled: ${APP_WHATSAPP_CLOUD_API_DRY_RUN_ENABLED:false}
   ai:
     agents:
-      auto-reply-enabled: ${APP_AI_AGENTS_AUTO_REPLY_ENABLED:false}
+      auto-reply-enabled: ${APP_AI_AGENTS_AUTO_REPLY_ENABLED:true}
+      safe-mode-enabled: ${APP_AI_AGENTS_SAFE_MODE_ENABLED:false}
   email:
     enabled: ${APP_EMAIL_ENABLED:false}
     simulation-enabled: ${APP_EMAIL_SIMULATION_ENABLED:true}
   calendar:
     google:
       enabled: ${APP_CALENDAR_GOOGLE_ENABLED:false}
+  booking:
+    confirmation:
+      public-base-url: ${APP_BOOKING_CONFIRMATION_PUBLIC_BASE_URL:}
+    reschedule:
+      public-base-url: ${APP_BOOKING_RESCHEDULE_PUBLIC_BASE_URL:}
+    cancellation:
+      public-base-url: ${APP_BOOKING_CANCELLATION_PUBLIC_BASE_URL:}
+    payment:
+      checkout-public-base-url: ${APP_BOOKING_PAYMENT_CHECKOUT_PUBLIC_BASE_URL:}
+  frontend:
+    public-base-url: ${APP_FRONTEND_PUBLIC_BASE_URL:}
 
 springdoc:
   api-docs:

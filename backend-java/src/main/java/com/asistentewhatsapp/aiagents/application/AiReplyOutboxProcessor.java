@@ -281,7 +281,8 @@ public class AiReplyOutboxProcessor {
             return "FAILED";
         }
         return switch (status) {
-            case "QUEUED", "PROVIDER_ACCEPTED", "SENT", "DELIVERED", "READ", "FAILED" -> status;
+            case "QUEUED", "SENT", "DELIVERED", "READ", "FAILED" -> status;
+            case "PROVIDER_ACCEPTED", "ACCEPTED" -> "SENT";
             default -> "FAILED";
         };
     }
