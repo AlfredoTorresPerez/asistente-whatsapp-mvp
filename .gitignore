@@ -20,22 +20,39 @@ outputs/
 *.temp
 *.bak
 *.swp
+# Local env files (real secrets)
 .env.local
+.env.qa
 .env.production
+
+# WhatsApp sessions
 whatsapp-web-service/.wwebjs_auth/
 whatsapp-web-service/.wwebjs_cache/
 whatsapp-web-service/sessions/
 whatsapp-web-service/.sessions/
+
+# Backend logs
 backend-java/logs/
+
+# Frontend build artifacts
 frontend-react/.vite/
 frontend-react/playwright-report/
 frontend-react/test-results/
 frontend-react/e2e/screenshots/
+
+# TypeScript
 *.tsbuildinfo
 *.tsbuildinfo.*
+
+# Duplicates
 asistente-whatsapp-mvp/
+
+# Temp files
 agenda_cambios_only.zip
 CAMBIOS_AGENDA_CELDAS_CONTENIDAS_HORA_ACTUAL.md
 .docker/
-
 RESULTADOS_QA_IA_RESERVAS.md
+
+# Lock files — only pnpm allowed
+package-lock.json
+yarn.lock

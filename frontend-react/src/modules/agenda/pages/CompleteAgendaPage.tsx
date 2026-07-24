@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../../../components/ui/Button'
 import { Card } from '../../../components/ui/Card'
@@ -25,16 +25,20 @@ import {
   getBookingDetailRequest,
 } from '../../../services/api/bookingsApi'
 import type { AgendaCalendarItemResponse, BookingDetailResponse } from '../../../services/api/types'
+import { AppointmentDetailPanel } from '../components/AppointmentDetailPanel'
 import { CalendarWeekNavigation } from '../components/CalendarWeekNavigation'
 import { WeeklyCalendarView } from '../components/WeeklyCalendarView'
+import {
+  buildAppointmentWhatsAppMessage,
+  buildWhatsAppUrl,
+  normalizeWhatsAppPhone,
+  openWhatsAppUrl,
+} from '../../../lib/whatsapp'
 import {
   buildVisibleDays,
   calendarDays,
   formatAgendaTime,
-  formatLongDate,
-  formatTimeRange,
   getStatusLabel,
-  getStatusStyle,
 } from '../components/agendaUtils'
 
 const today = dayjs().format('YYYY-MM-DD')
@@ -54,35 +58,6 @@ const statusOptions = [
 
 function buildFilterLabel(name: string, detail?: string | null) {
   return detail ? `${name} · ${detail}` : name
-}
-
-function getInitials(name: string) {
-  const parts = name.trim().split(/\s+/).slice(0, 2)
-  if (parts.length === 0 || !parts[0]) {
-    return 'CL'
-  }
-  return parts.map((part) => part[0]?.toUpperCase()).join('')
-}
-
-function getWhatsAppStatus(
-  item: AgendaCalendarItemResponse | null,
-  detail?: BookingDetailResponse,
-) {
-  const lastWhatsAppReminder = (detail?.reminders ?? [])
-    .filter((reminder) => reminder.channelType === 'WHATSAPP')
-    .sort(
-      (first, second) =>
-        dayjs(second.sentAt ?? second.scheduledAt).valueOf() -
-        dayjs(first.sentAt ?? first.scheduledAt).valueOf(),
-    )[0]
-
-  if (lastWhatsAppReminder?.sentAt) {
-    return `WhatsApp enviado ${dayjs(lastWhatsAppReminder.sentAt).format('DD/MM HH:mm')}`
-  }
-  if (item?.sourceChannel?.toUpperCase().includes('WHATSAPP')) {
-    return 'Canal WhatsApp asociado'
-  }
-  return 'Sin confirmacion WhatsApp registrada'
 }
 
 function buildRecentActivity(detail?: BookingDetailResponse) {
@@ -109,7 +84,7 @@ function getAgentRows(item: AgendaCalendarItemResponse | null, detail?: BookingD
   return [
     {
       name: 'Agenda',
-      detail: item ? `${formatTimeRange(item)} sin solapamiento visual` : 'Selecciona una cita',
+      detail: item ? `${item.startTimeLocal ?? ''} sin solapamiento visual` : 'Selecciona una cita',
     },
     {
       name: 'Cliente',
@@ -125,7 +100,9 @@ function getAgentRows(item: AgendaCalendarItemResponse | null, detail?: BookingD
     },
     {
       name: 'Notificaciones',
-      detail: getWhatsAppStatus(item, detail),
+      detail: item?.sourceChannel?.toUpperCase().includes('WHATSAPP')
+        ? 'Canal WhatsApp asociado'
+        : 'Sin registro',
     },
     {
       name: 'Administracion',
@@ -134,15 +111,25 @@ function getAgentRows(item: AgendaCalendarItemResponse | null, detail?: BookingD
   ]
 }
 
-function DetailRow({ icon, label, value }: { icon: string; label: string; value: string }) {
+function SectionCard({
+  title,
+  description,
+  children,
+  className = '',
+}: {
+  title: string
+  description?: string
+  children: React.ReactNode
+  className?: string
+}) {
   return (
-    <div className="grid grid-cols-[72px_1fr] gap-3">
-      <span className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">{icon}</span>
+    <Card className={`space-y-4 ${className}`}>
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">{label}</p>
-        <p className="mt-1 font-medium text-slate-800">{value}</p>
+        <h2 className="text-base font-semibold text-slate-900">{title}</h2>
+        {description ? <p className="mt-0.5 text-xs text-slate-500">{description}</p> : null}
       </div>
-    </div>
+      {children}
+    </Card>
   )
 }
 
@@ -161,7 +148,7 @@ export function CompleteAgendaPage() {
   const [notes, setNotes] = useState('')
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null)
   const [cancelReason, setCancelReason] = useState('')
-  const [showDetailPanel, setShowDetailPanel] = useState(false)
+  const detailPanelRef = useRef<HTMLDivElement>(null)
 
   const visibleDays = useMemo(() => buildVisibleDays(date), [date])
   const weekStart = visibleDays[0]
@@ -368,24 +355,88 @@ export function CompleteAgendaPage() {
         expirationMinutes: 720,
         sendWhatsApp: true,
       }),
-    onSuccess: () => {
+  })
+
+  const handleConfirmWhatsApp = (bookingId: string) => {
+    const phone = selectedItem?.customerPhone
+    if (!phone) {
       showToast({
-        title: 'Confirmacion enviada',
-        description:
-          'Se genero y envio el enlace de confirmacion por WhatsApp cuando el canal esta disponible.',
-        tone: 'success',
-      })
-      void bookingDetailQuery.refetch()
-      void calendarQuery.refetch()
-    },
-    onError: () => {
-      showToast({
-        title: 'No se pudo confirmar por WhatsApp',
-        description: 'Revisa la conexion del canal o intenta nuevamente.',
+        title: 'No se pudo abrir WhatsApp',
+        description: 'El cliente no tiene un numero de WhatsApp valido.',
         tone: 'error',
       })
-    },
-  })
+      return
+    }
+
+    let popup: Window | null = null
+    try {
+      popup = window.open('about:blank', '_blank', 'noopener,noreferrer')
+    } catch {
+      /* popup blocked */
+    }
+
+    confirmWhatsAppMutation.mutate(bookingId, {
+      onSuccess: () => {
+        showToast({
+          title: 'Confirmacion enviada',
+          description:
+            'Se genero y envio el enlace de confirmacion por WhatsApp cuando el canal esta disponible.',
+          tone: 'success',
+        })
+        void bookingDetailQuery.refetch()
+        void calendarQuery.refetch()
+
+        try {
+          const normalizedPhone = normalizeWhatsAppPhone(phone)
+          const message = selectedItem
+            ? buildAppointmentWhatsAppMessage(selectedItem)
+            : undefined
+          const url = buildWhatsAppUrl(normalizedPhone, message)
+
+          if (popup && !popup.closed) {
+            popup.location.href = url
+          } else {
+            openWhatsAppUrl(url)
+          }
+        } catch {
+          /* URL building failed, confirmation was already sent */
+        }
+      },
+      onError: (error) => {
+        if (popup && !popup.closed) {
+          popup.close()
+        }
+        const apiError = error as ApiClientError
+        const code = apiError?.code
+        let description = apiError?.message ?? 'Revisa la conexion del canal o intenta nuevamente.'
+
+        if (apiError?.status === 409) {
+          if (code === 'BOOKING_NOT_CONFIRMABLE') {
+            description = 'La cita no puede recibir confirmacion en su estado actual. Verifica que este pendiente o solicitada.'
+          } else if (code === 'BOOKING_SLOT_NOT_AVAILABLE') {
+            description = 'El horario ya esta ocupado. Actualiza la agenda para ver la disponibilidad actual.'
+          } else if (code === 'BOOKING_PAYMENT_REQUIRED') {
+            description = 'La cita requiere un pago antes de poder confirmarse.'
+          } else {
+            description = apiError?.fieldErrors && Object.keys(apiError.fieldErrors).length > 0
+              ? Object.values(apiError.fieldErrors)[0]
+              : description
+          }
+        } else {
+          description = apiError?.fieldErrors && Object.keys(apiError.fieldErrors).length > 0
+            ? Object.values(apiError.fieldErrors)[0]
+            : description
+        }
+
+        showToast({
+          title: 'No se pudo confirmar por WhatsApp',
+          description,
+          tone: 'error',
+        })
+        void bookingDetailQuery.refetch()
+      },
+    })
+  }
 
   const cancelMutation = useMutation({
     mutationFn: (bookingId: string) =>
@@ -418,32 +469,40 @@ export function CompleteAgendaPage() {
   const canCreate = customerName.trim().length > 0 && customerPhone.trim().length >= 8
   const slots = availabilityMutation.data?.slots ?? []
   const activityItems = buildRecentActivity(bookingDetail)
-  const selectedStatusStyle = getStatusStyle(selectedItem?.status ?? bookingDetail?.status ?? '')
 
   function handleSelectBooking(bookingId: string) {
     setSelectedBookingId(bookingId)
-    setShowDetailPanel(true)
+  }
+
+  function handleClearFilters() {
+    setLocationId('')
+    setServiceId('')
+    setProfessionalId('')
+    setRoomId('')
+    setStatusFilter('')
+    setDate(today)
   }
 
   return (
-    <section className="space-y-6">
+    <div className="space-y-6">
       <PageHeader
         actions={
-          <div className="flex flex-wrap gap-2">
+          <div className="flex items-center gap-2">
             <Button onClick={() => navigate('/appointments')} variant="secondary">
-              Ver citas clasicas
+              Vista cl&aacute;sica
             </Button>
             <Button onClick={() => navigate('/appointments/new')}>Nueva cita</Button>
           </div>
         }
-        description="Vista semanal con reservas confirmadas, detalle contextual del cliente, trazabilidad y acciones de administracion."
+        description="Gestiona las reservas de tu centro est&eacute;tico: visualiza la semana, confirma, reprograma o cancela citas desde un solo lugar."
         eyebrow="Agenda digital completa"
         title="Reservas y citas WhatsApp"
       />
 
-      <Card className="space-y-5">
-        <div className="flex flex-wrap items-end gap-3">
+      <Card className="space-y-4">
+        <div className="flex flex-wrap items-end gap-2.5">
           <Select
+            id="select-location"
             label="Sucursal"
             onChange={(event) => setLocationId(event.target.value)}
             options={[
@@ -454,48 +513,63 @@ export function CompleteAgendaPage() {
               })),
             ]}
             value={locationId}
+            className="min-w-[180px]"
           />
           <Select
+            id="select-service"
             disabled={filterOptionsQuery.isLoading}
             label="Servicio"
             onChange={(event) => setServiceId(event.target.value)}
             options={serviceOptions}
             value={serviceId}
+            className="min-w-[160px]"
           />
           <Select
+            id="select-professional"
             disabled={filterOptionsQuery.isLoading}
             label="Profesional"
             onChange={(event) => setProfessionalId(event.target.value)}
             options={professionalOptions}
             value={professionalId}
+            className="min-w-[160px]"
           />
           <Select
+            id="select-room"
             disabled={filterOptionsQuery.isLoading}
             label="Cabina"
             onChange={(event) => setRoomId(event.target.value)}
             options={roomOptions}
             value={roomId}
+            className="min-w-[140px]"
           />
           <Select
+            id="select-status"
             label="Estado"
             onChange={(event) => setStatusFilter(event.target.value)}
             options={statusOptions}
             value={statusFilter}
+            className="min-w-[160px]"
           />
           <Input
             label="Semana"
             onChange={(event) => setDate(event.target.value)}
             type="date"
             value={date}
+            className="min-w-[150px]"
           />
-          <Button onClick={() => calendarQuery.refetch()} variant="secondary">
-            Actualizar
-          </Button>
+          <div className="flex gap-1.5 pb-px">
+            <Button onClick={() => calendarQuery.refetch()} variant="secondary">
+              Actualizar
+            </Button>
+            <Button onClick={handleClearFilters} variant="secondary">
+              Limpiar
+            </Button>
+          </div>
         </div>
       </Card>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
-        <div className="min-w-0">
+      <div className="flex gap-6">
+        <div className="min-w-0 flex-1">
           <CalendarWeekNavigation
             currentDate={date}
             itemsCount={calendarItems.length}
@@ -511,213 +585,98 @@ export function CompleteAgendaPage() {
           />
         </div>
 
-        {/* Detail Panel */}
-        <div className={showDetailPanel ? 'block' : 'hidden lg:block'}>
-          <Card className="h-fit space-y-5 lg:sticky lg:top-6">
-            {selectedItem ? (
-              <>
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-slate-100 to-slate-200 text-base font-bold text-slate-700">
-                      {getInitials(selectedItem.customerName)}
-                    </div>
-                    <div>
-                      <h2 className="text-lg font-bold text-slate-900">
-                        {selectedItem.customerName}
-                      </h2>
-                      <p className="text-sm text-slate-500">
-                        {bookingDetail?.customerPhone ?? selectedItem.customerPhone}
-                      </p>
-                    </div>
-                  </div>
-                  <StatusBadge
-                    label={getStatusLabel(selectedItem.status)}
-                    tone={
-                      selectedStatusStyle.hex === '#10b981'
-                        ? 'success'
-                        : selectedStatusStyle.hex === '#f59e0b'
-                          ? 'warning'
-                          : selectedStatusStyle.hex === '#f87171'
-                            ? 'danger'
-                            : 'info'
-                    }
-                  />
-                </div>
-
-                <div className="grid gap-3 rounded-3xl border border-slate-100 bg-slate-50 p-4 text-sm">
-                  <DetailRow
-                    icon="Servicio"
-                    label="Servicio"
-                    value={selectedItem.serviceName ?? selectedItem.subject}
-                  />
-                  <DetailRow
-                    icon="Fecha"
-                    label="Fecha y hora"
-                    value={`${formatLongDate(selectedItem.startsAt)} · ${formatTimeRange(selectedItem)}`}
-                  />
-                  <DetailRow
-                    icon="Equipo"
-                    label="Profesional"
-                    value={selectedItem.professionalName ?? 'Profesional por asignar'}
-                  />
-                  <DetailRow
-                    icon="Lugar"
-                    label="Ubicacion"
-                    value={selectedItem.roomName ?? selectedItem.locationName ?? 'Sin ubicacion'}
-                  />
-                  <DetailRow
-                    icon="Tiempo"
-                    label="Duracion"
-                    value={`${selectedItem.durationMinutes} minutos`}
-                  />
-                  <DetailRow
-                    icon="WA"
-                    label="Estado WhatsApp"
-                    value={getWhatsAppStatus(selectedItem, bookingDetail)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <h3 className="text-sm font-semibold text-slate-800">Notas internas</h3>
-                  <div className="rounded-2xl border border-slate-100 bg-white p-4 text-sm text-slate-600">
-                    {bookingDetailQuery.isLoading
-                      ? 'Cargando detalle...'
-                      : (bookingDetail?.notes ?? 'Sin notas registradas.')}
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <Button
-                    className="bg-emerald-600 hover:bg-emerald-700"
-                    fullWidth
-                    loading={confirmWhatsAppMutation.isPending}
-                    onClick={() => confirmWhatsAppMutation.mutate(selectedItem.bookingId)}
-                  >
-                    Confirmar por WhatsApp
-                  </Button>
-                  <Button
-                    fullWidth
-                    onClick={() => navigate(`/appointments/${selectedItem.bookingId}/reschedule`)}
-                    variant="secondary"
-                  >
-                    Reprogramar
-                  </Button>
-                  <Button
-                    fullWidth
-                    onClick={() => navigate(`/appointments/${selectedItem.bookingId}/edit`)}
-                    variant="secondary"
-                  >
-                    Editar notas
-                  </Button>
-                  <Button
-                    fullWidth
-                    onClick={() => navigate(`/appointments/${selectedItem.bookingId}`)}
-                    variant="secondary"
-                  >
-                    Ver historial del cliente
-                  </Button>
-                </div>
-
-                <div className="space-y-2 rounded-3xl border border-red-100 bg-red-50 p-4">
-                  <Textarea
-                    label="Motivo de cancelacion"
-                    onChange={(event) => setCancelReason(event.target.value)}
-                    placeholder="Indica el motivo obligatorio antes de cancelar"
-                    rows={3}
-                    value={cancelReason}
-                  />
-                  <Button
-                    disabled={cancelReason.trim().length < 5}
-                    fullWidth
-                    loading={cancelMutation.isPending}
-                    onClick={() => cancelMutation.mutate(selectedItem.bookingId)}
-                    variant="danger"
-                  >
-                    Cancelar cita
-                  </Button>
-                </div>
-              </>
-            ) : (
-              <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center">
-                <h2 className="text-base font-semibold text-slate-800">Selecciona una reserva</h2>
-                <p className="mt-2 text-sm text-slate-500">
-                  Al posicionarte sobre una cita se mostrara el cliente, el servicio, la
-                  trazabilidad y las acciones disponibles.
-                </p>
-              </div>
-            )}
-          </Card>
+        <div className="hidden w-[360px] shrink-0 xl:block" ref={detailPanelRef}>
+          <div className="space-y-5">
+            <Card className="h-fit space-y-5 lg:sticky lg:top-6">
+              <h3 className="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">
+                Detalles de la cita
+              </h3>
+              <AppointmentDetailPanel
+                bookingDetail={bookingDetail}
+                bookingDetailLoading={bookingDetailQuery.isLoading}
+                cancelPending={cancelMutation.isPending}
+                cancelReason={cancelReason}
+                confirmWhatsAppPending={confirmWhatsAppMutation.isPending}
+                selectedItem={selectedItem}
+                onCancel={(bookingId) => cancelMutation.mutate(bookingId)}
+                onCancelReasonChange={setCancelReason}
+                onConfirmWhatsApp={handleConfirmWhatsApp}
+                onEditNotes={(bookingId) => navigate(`/appointments/${bookingId}/edit`)}
+                onReschedule={(bookingId) => navigate(`/appointments/${bookingId}/reschedule`)}
+                onViewHistory={(bookingId) => navigate(`/appointments/${bookingId}`)}
+              />
+            </Card>
+          </div>
         </div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
-        <Card className="space-y-4">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-900">Agentes involucrados</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Cada cita queda conectada con agenda, cliente, profesional, servicio, notificaciones y
-              administracion.
-            </p>
-          </div>
-          <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2">
+        <SectionCard
+          description="Cada cita queda conectada con agenda, cliente, profesional, servicio, notificaciones y administracion."
+          title="Agentes involucrados"
+        >
+          <div className="grid gap-2 sm:grid-cols-2">
             {getAgentRows(selectedItem, bookingDetail).map((agent) => (
-              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4" key={agent.name}>
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-600">
+              <div
+                className="rounded-lg border border-slate-100 bg-slate-50/50 p-3 transition hover:border-slate-200"
+                key={agent.name}
+              >
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-blue-600">
                   Agente {agent.name}
                 </p>
-                <p className="mt-2 text-sm text-slate-700">{agent.detail}</p>
+                <p className="mt-1 text-xs text-slate-600">{agent.detail}</p>
               </div>
             ))}
           </div>
-        </Card>
+        </SectionCard>
 
-        <Card className="space-y-4">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900">Trazabilidad reciente</h2>
-              <p className="mt-1 text-sm text-slate-500">
-                Eventos de estado, recordatorios y acciones operativas.
-              </p>
-            </div>
-            {bookingDetailQuery.isFetching ? (
-              <StatusBadge label="Actualizando" tone="info" />
-            ) : null}
-          </div>
-          <div className="space-y-3">
+        <SectionCard
+          description="Eventos de estado, recordatorios y acciones operativas."
+          title="Trazabilidad reciente"
+        >
+          {bookingDetailQuery.isFetching ? (
+            <StatusBadge label="Actualizando" tone="info" />
+          ) : null}
+          <div className="space-y-2">
             {activityItems.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">
+              <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50/50 p-3 text-xs text-slate-500">
                 No hay eventos recientes para la reserva seleccionada.
               </div>
             ) : (
               activityItems.map((activity) => (
                 <div
-                  className="flex items-center justify-between gap-3 rounded-2xl border border-slate-100 bg-white p-4"
+                  className="flex items-center justify-between gap-3 rounded-lg border border-slate-100 bg-white p-3 transition hover:border-slate-200"
                   key={activity.id}
                 >
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm font-semibold text-slate-800">{activity.title}</p>
-                    <p className="text-xs text-slate-500">{activity.detail}</p>
+                    <p className="text-xs text-slate-500 truncate">{activity.detail}</p>
                   </div>
-                  <p className="text-xs font-semibold text-slate-400">
+                  <p className="shrink-0 text-xs font-semibold text-slate-400">
                     {dayjs(activity.at).format('DD/MM HH:mm')}
                   </p>
                 </div>
               ))
             )}
+            {selectedItem ? (
+              <button
+                className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                onClick={() => navigate(`/appointments/${selectedItem.bookingId}`)}
+                type="button"
+              >
+                Ver historial completo &rarr;
+              </button>
+            ) : null}
           </div>
-        </Card>
+        </SectionCard>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <Card className="space-y-5">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-900">Consultar disponibilidad real</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Usa este bloque cuando el orquestador detecta intencion de agendar desde WhatsApp.
-            </p>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2">
+        <SectionCard
+          description="Usa este bloque cuando el orquestador detecta intencion de agendar desde WhatsApp."
+          title="Consultar disponibilidad real"
+        >
+          <div className="grid gap-3 sm:grid-cols-2">
             <Select
               label="Sucursal"
               onChange={(event) => setLocationId(event.target.value)}
@@ -782,11 +741,11 @@ export function CompleteAgendaPage() {
             Buscar horarios disponibles
           </Button>
 
-          <div className="rounded-3xl border border-slate-100 bg-slate-50 p-4">
+          <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-4">
             <h3 className="text-sm font-semibold text-slate-800">
               Horarios sugeridos por la agenda
             </h3>
-            <div className="mt-3 grid gap-3 md:grid-cols-2">
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
               {slots.length === 0 ? (
                 <p className="text-sm text-slate-500">
                   Consulta disponibilidad para ver horarios validos.
@@ -794,26 +753,26 @@ export function CompleteAgendaPage() {
               ) : (
                 slots.map((slot) => (
                   <button
-                    className="rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-blue-300 hover:shadow-md"
+                    className="rounded-lg border border-slate-200 bg-white p-3 text-left shadow-xs transition hover:border-blue-300 hover:shadow-sm"
                     disabled={!canCreate || createMutation.isPending}
                     key={`${slot.startsAt}-${slot.professionalId}-${slot.roomId}`}
                     onClick={() => createMutation.mutate(slot.startsAt)}
                     type="button"
                   >
                     <div className="flex items-center justify-between gap-3">
-                      <strong className="text-slate-900">{formatAgendaTime(slot.startsAt)}</strong>
+                      <strong className="text-sm text-slate-900">{formatAgendaTime(slot.startsAt)}</strong>
                       <StatusBadge
                         label={slot.available ? 'Disponible' : 'Bloqueado'}
                         tone={slot.available ? 'success' : 'danger'}
                       />
                     </div>
-                    <p className="mt-2 text-sm text-slate-600">
+                    <p className="mt-1 text-xs text-slate-600">
                       {slot.professionalName ?? 'Profesional por asignar'}
                     </p>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-xs text-slate-500">
                       {slot.roomName ?? 'Sin cabina requerida'}
                     </p>
-                    <p className="mt-2 text-xs text-slate-400">
+                    <p className="mt-1 text-[10px] text-slate-400">
                       Duracion: {slot.durationMinutes} minutos
                     </p>
                   </button>
@@ -821,16 +780,12 @@ export function CompleteAgendaPage() {
               )}
             </div>
           </div>
-        </Card>
+        </SectionCard>
 
-        <Card className="space-y-5">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-900">Datos del cliente WhatsApp</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Al elegir un horario se crea reserva temporal, enlace de confirmacion y bloqueo de
-              cupo.
-            </p>
-          </div>
+        <SectionCard
+          description="Al elegir un horario se crea reserva temporal, enlace de confirmacion y bloqueo de cupo."
+          title="Datos del cliente WhatsApp"
+        >
           <Input
             label="Cliente"
             onChange={(event) => setCustomerName(event.target.value)}
@@ -850,16 +805,16 @@ export function CompleteAgendaPage() {
           <Textarea
             label="Notas de agenda"
             onChange={(event) => setNotes(event.target.value)}
-            rows={5}
+            rows={4}
             value={notes}
           />
-          <div className="rounded-3xl bg-blue-50 p-4 text-sm text-blue-900">
-            Flujo coordinado: WhatsApp registra mensaje, orquestador detecta intencion, agenda
-            calcula disponibilidad, recursos validan profesional y cabina, enlace confirma reserva y
-            auditoria registra el evento.
+          <div className="rounded-xl bg-blue-50 p-3 text-xs text-blue-900 leading-relaxed">
+            <strong className="font-semibold">Flujo coordinado:</strong> WhatsApp registra mensaje,
+            orquestador detecta intencion, agenda calcula disponibilidad, recursos validan
+            profesional y cabina, enlace confirma reserva y auditoria registra el evento.
           </div>
-        </Card>
+        </SectionCard>
       </div>
-    </section>
+    </div>
   )
 }

@@ -12,7 +12,7 @@ export function getPublicCenterWhatsAppRedirectUrl(slug: string) {
 export function submitContact(slug: string, name: string, phone: string) {
   return apiFetch<{ waUrl: string }>(`/public/centros/${slug}/contacto`, {
     method: 'POST',
-    body: { name, phone },
+    body: JSON.stringify({ name, phone }),
     auth: false,
   })
 }

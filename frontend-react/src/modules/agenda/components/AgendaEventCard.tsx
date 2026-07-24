@@ -32,31 +32,43 @@ export function AgendaEventCard({
       <button
         aria-label={`${item.serviceName ?? item.subject} ${startTime}`}
         className={[
-          'group flex h-full w-full overflow-hidden rounded-md border border-slate-200 bg-white text-left shadow-xs transition hover:-translate-y-px hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300',
-          isSelected ? 'ring-2 ring-blue-400' : '',
+          'group relative flex w-full overflow-hidden rounded-lg border text-left shadow-xs transition-all duration-150 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-1',
+          isSelected
+            ? 'border-blue-400 ring-2 ring-blue-200 shadow-md'
+            : 'border-slate-200 hover:border-slate-300',
         ].join(' ')}
         onClick={onClick}
         style={{
           ...style,
-          borderLeft: `3px solid ${statusStyle.hex}`,
+          backgroundColor: `${statusStyle.hex}08`,
         }}
         type="button"
       >
-        <div className="flex min-w-0 flex-1 flex-col justify-center gap-0 px-1.5 py-1">
+        <div
+          className="absolute inset-y-0 left-0 w-[3px] shrink-0"
+          style={{ backgroundColor: statusStyle.hex }}
+        />
+        <div className="flex min-w-0 flex-1 flex-col justify-center gap-0 pl-2 pr-1.5 py-1">
           <div className="flex items-center gap-1">
-            <span className="truncate text-[10px] font-semibold leading-tight text-slate-700">
+            <span className="truncate text-[10px] font-bold leading-tight text-slate-800">
               {startTime}
             </span>
-            {isWhatsApp ? (
-              <span className="shrink-0 rounded bg-green-100 px-1 py-[1px] text-[8px] font-bold leading-tight text-green-700">
-                WA
-              </span>
-            ) : null}
+            <span
+              className="ml-auto text-[8px] font-semibold leading-tight"
+              style={{ color: statusStyle.hex }}
+            >
+              {statusStyle.label}
+            </span>
           </div>
-          <p className="truncate text-[10px] font-semibold leading-tight text-slate-800">
+          <p className="truncate text-[10px] font-semibold leading-tight text-slate-700">
             {item.serviceName ?? item.subject}
           </p>
           <p className="truncate text-[9px] leading-tight text-slate-500">{item.customerName}</p>
+          {item.professionalName ? (
+            <p className="truncate text-[8px] leading-tight text-slate-400">
+              {item.professionalName}
+            </p>
+          ) : null}
         </div>
       </button>
     )
@@ -66,8 +78,8 @@ export function AgendaEventCard({
     <button
       aria-label={`${item.serviceName ?? item.subject} ${startTime}`}
       className={[
-        'group overflow-hidden rounded-xl border border-slate-200 bg-white text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300',
-        isSelected ? 'ring-2 ring-blue-500' : '',
+        'group overflow-hidden rounded-xl border bg-white text-left shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300',
+        isSelected ? 'border-blue-500 ring-2 ring-blue-200 shadow-md' : 'border-slate-200',
       ].join(' ')}
       onClick={onClick}
       style={style}

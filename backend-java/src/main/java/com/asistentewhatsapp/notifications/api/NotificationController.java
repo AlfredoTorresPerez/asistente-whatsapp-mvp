@@ -25,7 +25,7 @@ public class NotificationController {
         this.notificationService = notificationService;
     }
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'NOTIFICATIONS_VIEW')")
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'NOTIFICATION_VIEW')")
     @GetMapping("/api/v1/notifications")
     public PagedResponse<NotificationResponse> list(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -37,7 +37,7 @@ public class NotificationController {
         return notificationService.list(authenticatedUser, page, size, search, status, type);
     }
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'NOTIFICATIONS_VIEW')")
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'NOTIFICATION_VIEW')")
     @PatchMapping("/api/v1/notifications/{notificationId}/read")
     public NotificationReadResponse markAsRead(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
@@ -45,7 +45,7 @@ public class NotificationController {
         return notificationService.markAsRead(authenticatedUser, notificationId);
     }
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'NOTIFICATIONS_VIEW')")
+    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'NOTIFICATION_VIEW')")
     @PatchMapping("/api/v1/notifications/read-all")
     public NotificationsReadAllResponse markAllAsRead(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {

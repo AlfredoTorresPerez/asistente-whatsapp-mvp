@@ -1,0 +1,18 @@
+spring:
+  config:
+    activate:
+      on-profile: local-whatsapp-cloud
+
+app:
+  channels:
+    whatsapp:
+      provider: META_CLOUD_API
+    whatsapp-cloud-api:
+      enabled: true
+      webhook-signature-required: true
+      dry-run-enabled: false
+    whatsapp-web:
+      enabled: false
+
+  booking-confirmation:
+    dispatch-whatsapp: ${APP_BOOKING_CONFIRMATION_DISPATCH_WHATSAPP:true}

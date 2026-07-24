@@ -4,7 +4,7 @@
       "C:\\Program Files\\nodejs\\node.exe",
       "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\node_modules\\playwright\\cli.js",
       "test",
-      "--project=all-chromium"
+      "--project=local-maturity"
     ],
     "configFile": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\playwright.config.ts",
     "rootDir": "C:/mvp/asistente_impl_codex/asistente/frontend-react/e2e",
@@ -18,7 +18,7 @@
     "grepInvert": null,
     "maxFailures": 0,
     "metadata": {
-      "actualWorkers": 2
+      "actualWorkers": 1
     },
     "preserveOutput": "always",
     "projects": [
@@ -27,7 +27,23 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
+        },
+        "id": "local-maturity",
+        "name": "local-maturity",
+        "testDir": "C:/mvp/asistente_impl_codex/asistente/frontend-react/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "00-local-maturity.spec.ts"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "C:/mvp/asistente_impl_codex/asistente/frontend-react/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
         },
         "id": "smoke",
         "name": "smoke",
@@ -43,7 +59,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "auth",
         "name": "auth",
@@ -59,7 +75,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "agenda-basica",
         "name": "agenda-basica",
@@ -75,7 +91,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "agenda-visual",
         "name": "agenda-visual",
@@ -91,7 +107,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "whatsapp-reserva",
         "name": "whatsapp-reserva",
@@ -107,7 +123,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "whatsapp-cancelacion",
         "name": "whatsapp-cancelacion",
@@ -123,7 +139,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "whatsapp-reprogramacion",
         "name": "whatsapp-reprogramacion",
@@ -139,7 +155,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "confirmacion-publica",
         "name": "confirmacion-publica",
@@ -155,7 +171,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "seguridad",
         "name": "seguridad",
@@ -171,7 +187,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "smoke-firefox",
         "name": "smoke-firefox",
@@ -187,7 +203,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "smoke-webkit",
         "name": "smoke-webkit",
@@ -203,7 +219,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "confirmacion-publica-firefox",
         "name": "confirmacion-publica-firefox",
@@ -219,7 +235,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "confirmacion-publica-webkit",
         "name": "confirmacion-publica-webkit",
@@ -235,7 +251,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "seguridad-firefox",
         "name": "seguridad-firefox",
@@ -251,7 +267,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "seguridad-webkit",
         "name": "seguridad-webkit",
@@ -267,7 +283,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "reprogramacion",
         "name": "reprogramacion",
@@ -283,7 +299,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "cancelacion",
         "name": "cancelacion",
@@ -299,7 +315,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "sucursales",
         "name": "sucursales",
@@ -315,7 +331,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "profesional",
         "name": "profesional",
@@ -331,7 +347,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "base-datos",
         "name": "base-datos",
@@ -347,7 +363,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "concurrencia",
         "name": "concurrencia",
@@ -363,7 +379,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "regresion",
         "name": "regresion",
@@ -379,7 +395,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "all-chromium",
         "name": "all-chromium",
@@ -447,3255 +463,20 @@
   },
   "suites": [
     {
-      "title": "09-filtros-agenda.spec.ts",
-      "file": "09-filtros-agenda.spec.ts",
+      "title": "00-local-maturity.spec.ts",
+      "file": "00-local-maturity.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "NIVEL 4 — Filtros de agenda",
-          "file": "09-filtros-agenda.spec.ts",
-          "line": 4,
-          "column": 6,
-          "specs": [
-            {
-              "title": "QA-04-001: Select Servicio muestra opciones del filtro",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 7037,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:04:46.965Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ef62fec3c061d81ebf74-e2dbff04019a6fae5b5c",
-              "file": "09-filtros-agenda.spec.ts",
-              "line": 9,
-              "column": 3
-            },
-            {
-              "title": "QA-04-002: Select Profesional muestra opciones del filtro",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 3547,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:04:55.592Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ef62fec3c061d81ebf74-d3fedc16c089fa7be043",
-              "file": "09-filtros-agenda.spec.ts",
-              "line": 20,
-              "column": 3
-            },
-            {
-              "title": "QA-04-003: Select Cabina muestra opciones del filtro",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 3585,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:04:59.149Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ef62fec3c061d81ebf74-6d29826f55df6027ccd4",
-              "file": "09-filtros-agenda.spec.ts",
-              "line": 31,
-              "column": 3
-            },
-            {
-              "title": "QA-04-004: Select Sucursal muestra sucursales",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 3600,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:02.745Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ef62fec3c061d81ebf74-0b81fc12ff65552e426a",
-              "file": "09-filtros-agenda.spec.ts",
-              "line": 42,
-              "column": 3
-            },
-            {
-              "title": "QA-04-005: Select Estado muestra opciones",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 3816,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:06.360Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ef62fec3c061d81ebf74-b13243b6a7cd0aa3aa86",
-              "file": "09-filtros-agenda.spec.ts",
-              "line": 52,
-              "column": 3
-            },
-            {
-              "title": "QA-04-006: Seleccionar servicio cambia las reservas mostradas",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4810,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:10.192Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ef62fec3c061d81ebf74-e5828a519fc1637e2235",
-              "file": "09-filtros-agenda.spec.ts",
-              "line": 63,
-              "column": 3
-            },
-            {
-              "title": "QA-04-007: Filtro combinado profesional y estado",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5105,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:15.017Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ef62fec3c061d81ebf74-f0f71ff01b0a3613d811",
-              "file": "09-filtros-agenda.spec.ts",
-              "line": 84,
-              "column": 3
-            },
-            {
-              "title": "QA-04-008: Filtro de fecha cambia la semana visible",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5484,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:20.136Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ef62fec3c061d81ebf74-c5ed10a2926a9cd89636",
-              "file": "09-filtros-agenda.spec.ts",
-              "line": 103,
-              "column": 3
-            },
-            {
-              "title": "QA-04-009: Boton Actualizar refetches calendario",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4795,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:25.634Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ef62fec3c061d81ebf74-e90617495ad68f5274a3",
-              "file": "09-filtros-agenda.spec.ts",
-              "line": 130,
-              "column": 3
-            },
-            {
-              "title": "QA-04-010: Reset de filtros muestra vista por defecto",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5028,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:30.444Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ef62fec3c061d81ebf74-b647e077f911bea31713",
-              "file": "09-filtros-agenda.spec.ts",
-              "line": 150,
-              "column": 3
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "10-disponibilidad-horaria.spec.ts",
-      "file": "10-disponibilidad-horaria.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "NIVEL 5 — Disponibilidad horaria",
-          "file": "10-disponibilidad-horaria.spec.ts",
-          "line": 37,
-          "column": 6,
-          "specs": [
-            {
-              "title": "QA-05-001: Seccion disponibilidad real visible en la pagina",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 7365,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:04:46.983Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3e5f177777940f0b4ddb-bbbf66eb2815827948f4",
-              "file": "10-disponibilidad-horaria.spec.ts",
-              "line": 38,
-              "column": 3
-            },
-            {
-              "title": "QA-05-002: Boton buscar horarios deshabilitado sin sucursal y servicio",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 4028,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:04:55.950Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3e5f177777940f0b4ddb-592d98f3fde9b0971f26",
-              "file": "10-disponibilidad-horaria.spec.ts",
-              "line": 46,
-              "column": 3
-            },
-            {
-              "title": "QA-05-003: Seleccionar sucursal y servicio habilita boton de busqueda",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 4364,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:04:59.988Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3e5f177777940f0b4ddb-6330cef8d5328475b06c",
-              "file": "10-disponibilidad-horaria.spec.ts",
-              "line": 53,
-              "column": 3
-            },
-            {
-              "title": "QA-05-004: Busqueda retorna slots de disponibilidad",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 5389,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:04.363Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3e5f177777940f0b4ddb-c0c899f1de90dc1e4ff4",
-              "file": "10-disponibilidad-horaria.spec.ts",
-              "line": 66,
-              "column": 3
-            },
-            {
-              "title": "QA-05-005: Slots disponibles muestran etiqueta Disponible",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 5033,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:09.761Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3e5f177777940f0b4ddb-44e41182d77275a4ee33",
-              "file": "10-disponibilidad-horaria.spec.ts",
-              "line": 93,
-              "column": 3
-            },
-            {
-              "title": "QA-05-006: Slots no disponibles muestran etiqueta Bloqueado",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 5404,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:14.807Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3e5f177777940f0b4ddb-9c729b11d0eb83ef0b0c",
-              "file": "10-disponibilidad-horaria.spec.ts",
-              "line": 120,
-              "column": 3
-            },
-            {
-              "title": "QA-05-007: Filtro profesional opcional en disponibilidad",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 5349,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:20.223Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3e5f177777940f0b4ddb-518561332a6b016e1b8c",
-              "file": "10-disponibilidad-horaria.spec.ts",
-              "line": 151,
-              "column": 3
-            },
-            {
-              "title": "QA-05-008: Filtro cabina opcional en disponibilidad",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 4171,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:25.586Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3e5f177777940f0b4ddb-d636a897256e1f4c4060",
-              "file": "10-disponibilidad-horaria.spec.ts",
-              "line": 184,
-              "column": 3
-            },
-            {
-              "title": "QA-05-009: Sin disponibilidad muestra mensaje informativo",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 5174,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:29.768Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3e5f177777940f0b4ddb-71240c100e5ea52e6c30",
-              "file": "10-disponibilidad-horaria.spec.ts",
-              "line": 194,
-              "column": 3
-            },
-            {
-              "title": "QA-05-010: Cambio de fecha afecta resultados de disponibilidad",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 5328,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:34.955Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3e5f177777940f0b4ddb-6be4a5117a6eec7908e0",
-              "file": "10-disponibilidad-horaria.spec.ts",
-              "line": 220,
-              "column": 3
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "11-reservas-interfaz.spec.ts",
-      "file": "11-reservas-interfaz.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "NIVEL 6 — Reservas desde interfaz",
-          "file": "11-reservas-interfaz.spec.ts",
-          "line": 64,
-          "column": 6,
-          "specs": [
-            {
-              "title": "QA-06-001: Seccion datos del cliente WhatsApp es visible",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5227,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:35.513Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "1df7794becbb68fdf1df-1e18cef36ff7cec7eeb3",
-              "file": "11-reservas-interfaz.spec.ts",
-              "line": 65,
-              "column": 3
-            },
-            {
-              "title": "QA-06-002: Nombre de cliente requerido para crear reserva",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5174,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:40.750Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "1df7794becbb68fdf1df-91c2265fd50b4883aaff",
-              "file": "11-reservas-interfaz.spec.ts",
-              "line": 74,
-              "column": 3
-            },
-            {
-              "title": "QA-06-003: Telefono de cliente requerido para crear reserva",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5275,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:45.936Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "1df7794becbb68fdf1df-8259fb61ff5fba016d78",
-              "file": "11-reservas-interfaz.spec.ts",
-              "line": 81,
-              "column": 3
-            },
-            {
-              "title": "QA-06-004: Click en slot disponible crea reserva temporal",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 7273,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:51.225Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "1df7794becbb68fdf1df-f6aa71ef9a3151acbe75",
-              "file": "11-reservas-interfaz.spec.ts",
-              "line": 91,
-              "column": 3
-            },
-            {
-              "title": "QA-06-005: Creacion de reserva actualiza el calendario",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 6883,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:58.511Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "1df7794becbb68fdf1df-2446f8df904b07e0e63c",
-              "file": "11-reservas-interfaz.spec.ts",
-              "line": 120,
-              "column": 3
-            },
-            {
-              "title": "QA-06-006: Campo opcional de correo acepta entrada",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5156,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:05.405Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "1df7794becbb68fdf1df-a988951c32b8cb4a93d1",
-              "file": "11-reservas-interfaz.spec.ts",
-              "line": 152,
-              "column": 3
-            },
-            {
-              "title": "QA-06-007: Campo de notas acepta entrada",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5856,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:10.573Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "1df7794becbb68fdf1df-3ebd6ac2e293fcb44d21",
-              "file": "11-reservas-interfaz.spec.ts",
-              "line": 161,
-              "column": 3
-            },
-            {
-              "title": "QA-06-008: Campos vacios no permiten crear reserva",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5228,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:16.441Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "1df7794becbb68fdf1df-15dc6fd8c12d518ab33b",
-              "file": "11-reservas-interfaz.spec.ts",
-              "line": 170,
-              "column": 3
-            },
-            {
-              "title": "QA-06-009: Error 409 con slot ocupado muestra mensaje especifico",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5749,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:21.678Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "1df7794becbb68fdf1df-1f891d78a2ffae79bfb8",
-              "file": "11-reservas-interfaz.spec.ts",
-              "line": 180,
-              "column": 3
-            },
-            {
-              "title": "QA-06-011: Error 409 con fieldErrors de telefono muestra detalle especifico",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 6385,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:27.438Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "1df7794becbb68fdf1df-b1786d8530106aca1b34",
-              "file": "11-reservas-interfaz.spec.ts",
-              "line": 204,
-              "column": 3
-            },
-            {
-              "title": "QA-06-010: Todos los inputs de datos del cliente estan presentes",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5546,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:33.837Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "1df7794becbb68fdf1df-1ce581b80b41c9520ab6",
-              "file": "11-reservas-interfaz.spec.ts",
-              "line": 228,
-              "column": 3
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "13-reprogramacion-interfaz.spec.ts",
-      "file": "13-reprogramacion-interfaz.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "NIVEL 7: Reprogramación desde Interfaz (TST-084 a TST-113)",
-          "file": "13-reprogramacion-interfaz.spec.ts",
-          "line": 7,
-          "column": 6,
-          "specs": [
-            {
-              "title": "TST-084: Reprogramar reserva que no existe - BLOCKED (requiere API)",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED: requiere endpoint de reprogramación con manejo de 404",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\13-reprogramacion-interfaz.spec.ts",
-                        "line": 18,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 1670,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:40.320Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED: requiere endpoint de reprogramación con manejo de 404",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\13-reprogramacion-interfaz.spec.ts",
-                            "line": 18,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "12a7f70d1a8a10bd590c-51d0fd00ab91e8879637",
-              "file": "13-reprogramacion-interfaz.spec.ts",
-              "line": 16,
-              "column": 3
-            },
-            {
-              "title": "TST-085: Estado no reprogramable - BLOCKED (requiere API)",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED: requiere state machine endpoint",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\13-reprogramacion-interfaz.spec.ts",
-                        "line": 23,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 1748,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:42.003Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED: requiere state machine endpoint",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\13-reprogramacion-interfaz.spec.ts",
-                            "line": 23,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "12a7f70d1a8a10bd590c-ffe7d980b9be0df1d0f9",
-              "file": "13-reprogramacion-interfaz.spec.ts",
-              "line": 21,
-              "column": 3
-            },
-            {
-              "title": "TST-092: Nueva fecha pasada - BLOCKED (requiere API)",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\13-reprogramacion-interfaz.spec.ts",
-                        "line": 28,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 1722,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:43.762Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\13-reprogramacion-interfaz.spec.ts",
-                            "line": 28,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "12a7f70d1a8a10bd590c-883bdfcec967144b4334",
-              "file": "13-reprogramacion-interfaz.spec.ts",
-              "line": 26,
-              "column": 3
-            },
-            {
-              "title": "TST-094: Nuevo slot ocupado - BLOCKED (requiere API)",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\13-reprogramacion-interfaz.spec.ts",
-                        "line": 33,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 1630,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:45.496Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\13-reprogramacion-interfaz.spec.ts",
-                            "line": 33,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "12a7f70d1a8a10bd590c-81cbc48e802cd14a246a",
-              "file": "13-reprogramacion-interfaz.spec.ts",
-              "line": 31,
-              "column": 3
-            },
-            {
-              "title": "TST-107: Mantener original hasta confirmar nuevo - BLOCKED (requiere transacción)",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED: validación de atomicidad",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\13-reprogramacion-interfaz.spec.ts",
-                        "line": 38,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 1862,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:47.139Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED: validación de atomicidad",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\13-reprogramacion-interfaz.spec.ts",
-                            "line": 38,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "12a7f70d1a8a10bd590c-52aa0dd22c9d08913a33",
-              "file": "13-reprogramacion-interfaz.spec.ts",
-              "line": 36,
-              "column": 3
-            },
-            {
-              "title": "TST-108: Cambio atómico - BLOCKED (requiere transacción)",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\13-reprogramacion-interfaz.spec.ts",
-                        "line": 43,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 1666,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:49.016Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\13-reprogramacion-interfaz.spec.ts",
-                            "line": 43,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "12a7f70d1a8a10bd590c-5b6d9e9f5aaa10d7dbfc",
-              "file": "13-reprogramacion-interfaz.spec.ts",
-              "line": 41,
-              "column": 3
-            },
-            {
-              "title": "TST-088: Exceso de reprogramaciones",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED: requiere reserva real con reschedule_count",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\13-reprogramacion-interfaz.spec.ts",
-                        "line": 51,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 3338,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:50.690Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED: requiere reserva real con reschedule_count",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\13-reprogramacion-interfaz.spec.ts",
-                            "line": 51,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "12a7f70d1a8a10bd590c-84ba05eb8fe35756b6bc",
-              "file": "13-reprogramacion-interfaz.spec.ts",
-              "line": 46,
-              "column": 3
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "14-cancelacion-interfaz.spec.ts",
-      "file": "14-cancelacion-interfaz.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "NIVEL 8: Cancelación desde Interfaz (TST-114 a TST-137)",
-          "file": "14-cancelacion-interfaz.spec.ts",
-          "line": 7,
-          "column": 6,
-          "specs": [
-            {
-              "title": "TST-114: Reserva no existe",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED: requiere página de detalle con ID inválido",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\14-cancelacion-interfaz.spec.ts",
-                        "line": 22,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 8751,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:05:54.076Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED: requiere página de detalle con ID inválido",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\14-cancelacion-interfaz.spec.ts",
-                            "line": 22,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "3382b69a1c251be4dd07-addce4f8b615d0a2f7a0",
-              "file": "14-cancelacion-interfaz.spec.ts",
-              "line": 16,
-              "column": 3
-            },
-            {
-              "title": "TST-115: Estado no cancelable",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\14-cancelacion-interfaz.spec.ts",
-                        "line": 27,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 1695,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:02.838Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\14-cancelacion-interfaz.spec.ts",
-                            "line": 27,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "3382b69a1c251be4dd07-9f1fad03b36fc5784bde",
-              "file": "14-cancelacion-interfaz.spec.ts",
-              "line": 25,
-              "column": 3
-            },
-            {
-              "title": "TST-117: Fuera de plazo",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\14-cancelacion-interfaz.spec.ts",
-                        "line": 32,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 1662,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:04.559Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\14-cancelacion-interfaz.spec.ts",
-                            "line": 32,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "3382b69a1c251be4dd07-87113f9987af373e4e0d",
-              "file": "14-cancelacion-interfaz.spec.ts",
-              "line": 30,
-              "column": 3
-            },
-            {
-              "title": "TST-118: Motivo obligatorio",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED: requiere reserva real para probar cancelación",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\14-cancelacion-interfaz.spec.ts",
-                        "line": 39,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 3375,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:06.234Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED: requiere reserva real para probar cancelación",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\14-cancelacion-interfaz.spec.ts",
-                            "line": 39,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "3382b69a1c251be4dd07-3aa5ece3fa812500367d",
-              "file": "14-cancelacion-interfaz.spec.ts",
-              "line": 35,
-              "column": 3
-            },
-            {
-              "title": "TST-125: Liberar slot - BLOCKED",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\14-cancelacion-interfaz.spec.ts",
-                        "line": 44,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 1688,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:09.625Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\14-cancelacion-interfaz.spec.ts",
-                            "line": 44,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "3382b69a1c251be4dd07-bf501502edec5aaab6fd",
-              "file": "14-cancelacion-interfaz.spec.ts",
-              "line": 42,
-              "column": 3
-            },
-            {
-              "title": "TST-130: Anular recordatorios - BLOCKED",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\14-cancelacion-interfaz.spec.ts",
-                        "line": 49,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 1826,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:11.329Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\14-cancelacion-interfaz.spec.ts",
-                            "line": 49,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "3382b69a1c251be4dd07-297b5a2f566efddab138",
-              "file": "14-cancelacion-interfaz.spec.ts",
-              "line": 47,
-              "column": 3
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "15-sucursales.spec.ts",
-      "file": "15-sucursales.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "NIVEL 13: Sucursales 1 a 8 (TST-MUL-001 a TST-MUL-008)",
-          "file": "15-sucursales.spec.ts",
-          "line": 6,
-          "column": 6,
-          "specs": [
-            {
-              "title": "TST-MUL-001: 1 sucursal - auto-seleccionada",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 3368,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:13.202Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d9c4f4134f68d1aed420-93dc682ee20cc69e92fe",
-              "file": "15-sucursales.spec.ts",
-              "line": 13,
-              "column": 3
-            },
-            {
-              "title": "TST-MUL-002: 2 sucursales - selector visible",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 3267,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:16.585Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d9c4f4134f68d1aed420-14a171bcf4a87f6c95ee",
-              "file": "15-sucursales.spec.ts",
-              "line": 32,
-              "column": 3
-            },
-            {
-              "title": "TST-MUL-003 a 008: 6+ sucursales - V41 seed data",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 3544,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:19.864Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d9c4f4134f68d1aed420-204dafadf5370ac60193",
-              "file": "15-sucursales.spec.ts",
-              "line": 54,
-              "column": 3
-            },
-            {
-              "title": "Detalle-1: Horario por sucursal",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\15-sucursales.spec.ts",
-                        "line": 85,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 2136,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:23.423Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\15-sucursales.spec.ts",
-                            "line": 85,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "d9c4f4134f68d1aed420-540f650916fcfcd60107",
-              "file": "15-sucursales.spec.ts",
-              "line": 83,
-              "column": 3
-            },
-            {
-              "title": "Detalle-3: Servicios por sucursal",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\15-sucursales.spec.ts",
-                        "line": 90,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 1925,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:25.572Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\15-sucursales.spec.ts",
-                            "line": 90,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "d9c4f4134f68d1aed420-29b9d83723ba2eae7746",
-              "file": "15-sucursales.spec.ts",
-              "line": 88,
-              "column": 3
-            },
-            {
-              "title": "Detalle-4: Profesionales por sucursal",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\15-sucursales.spec.ts",
-                        "line": 95,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 2120,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:27.511Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\15-sucursales.spec.ts",
-                            "line": 95,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "d9c4f4134f68d1aed420-f75193dbf965d28cf337",
-              "file": "15-sucursales.spec.ts",
-              "line": 93,
-              "column": 3
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "16-profesional.spec.ts",
-      "file": "16-profesional.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "NIVEL 14: Profesional (PRO-001 a PRO-020)",
-          "file": "16-profesional.spec.ts",
-          "line": 6,
-          "column": 6,
-          "specs": [
-            {
-              "title": "PRO-001: Profesional activo visible en filtros",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED: professional name not visible in DOM (may be in dropdown/select)",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\16-profesional.spec.ts",
-                        "line": 33,
-                        "column": 12
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 3594,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:29.672Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED: professional name not visible in DOM (may be in dropdown/select)",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\16-profesional.spec.ts",
-                            "line": 33,
-                            "column": 12
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "93fb8b9f3510fa262d33-b72f97c02bea747c7e1a",
-              "file": "16-profesional.spec.ts",
-              "line": 13,
-              "column": 3
-            },
-            {
-              "title": "PRO-003: Servicio habilitado - BLOCKED",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\16-profesional.spec.ts",
-                        "line": 39,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 2182,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:33.279Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\16-profesional.spec.ts",
-                            "line": 39,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "93fb8b9f3510fa262d33-64fe1ee1fa7df7404ad8",
-              "file": "16-profesional.spec.ts",
-              "line": 37,
-              "column": 3
-            },
-            {
-              "title": "PRO-005: Asignación por sede - BLOCKED",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\16-profesional.spec.ts",
-                        "line": 44,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 1890,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:35.477Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\16-profesional.spec.ts",
-                            "line": 44,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "93fb8b9f3510fa262d33-b38e0329b2a4b175bb4d",
-              "file": "16-profesional.spec.ts",
-              "line": 42,
-              "column": 3
-            },
-            {
-              "title": "PRO-007: Horario laboral - validado por disponibilidad",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\16-profesional.spec.ts",
-                        "line": 49,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 1818,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:37.382Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\16-profesional.spec.ts",
-                            "line": 49,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "93fb8b9f3510fa262d33-189d4aca49386b1a69d1",
-              "file": "16-profesional.spec.ts",
-              "line": 47,
-              "column": 3
-            },
-            {
-              "title": "PRO-009: Ausencias - BLOCKED (falta endpoint)",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\16-profesional.spec.ts",
-                        "line": 54,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 1603,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:39.216Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\16-profesional.spec.ts",
-                            "line": 54,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "93fb8b9f3510fa262d33-6e948c83a7f35df8742f",
-              "file": "16-profesional.spec.ts",
-              "line": 52,
-              "column": 3
-            },
-            {
-              "title": "PRO-010: Solapamiento - validado por exclusión DB",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\16-profesional.spec.ts",
-                        "line": 59,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 1829,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:40.831Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\16-profesional.spec.ts",
-                            "line": 59,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "93fb8b9f3510fa262d33-983ed330d2719b75c182",
-              "file": "16-profesional.spec.ts",
-              "line": 57,
-              "column": 3
-            },
-            {
-              "title": "PRO-015: Máximo diario - validación backend",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\16-profesional.spec.ts",
-                        "line": 64,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "skipped",
-                      "duration": 1706,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:42.671Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\16-profesional.spec.ts",
-                            "line": 64,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "93fb8b9f3510fa262d33-0c26e4f7b5164dc7cbcf",
-              "file": "16-profesional.spec.ts",
-              "line": 62,
-              "column": 3
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "17-base-datos.spec.ts",
-      "file": "17-base-datos.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "NIVEL 15: Base de Datos",
-          "file": "17-base-datos.spec.ts",
-          "line": 5,
-          "column": 6,
-          "specs": [
-            {
-              "title": "POST-RES-001: Reserva guardada correctamente - BLOCKED",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED: sin conexión DB segura",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\17-base-datos.spec.ts",
-                        "line": 9,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "skipped",
-                      "duration": 1,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:39.422Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED: sin conexión DB segura",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\17-base-datos.spec.ts",
-                            "line": 9,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "e90cfe3a1a010d74aa47-4a18b8fb680654162c38",
-              "file": "17-base-datos.spec.ts",
-              "line": 7,
-              "column": 3
-            },
-            {
-              "title": "POST-RES-003: No duplicidad - BLOCKED",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED: sin conexión DB",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\17-base-datos.spec.ts",
-                        "line": 14,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "skipped",
-                      "duration": 0,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:39.431Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED: sin conexión DB",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\17-base-datos.spec.ts",
-                            "line": 14,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "e90cfe3a1a010d74aa47-2a9b32c92b2325b6845b",
-              "file": "17-base-datos.spec.ts",
-              "line": 12,
-              "column": 3
-            },
-            {
-              "title": "POST-RES-004: Slot ocupado después de reservar - BLOCKED",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED: sin conexión DB",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\17-base-datos.spec.ts",
-                        "line": 19,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "skipped",
-                      "duration": 0,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:39.439Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED: sin conexión DB",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\17-base-datos.spec.ts",
-                            "line": 19,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "e90cfe3a1a010d74aa47-57353ae8ae0989d623fd",
-              "file": "17-base-datos.spec.ts",
-              "line": 17,
-              "column": 3
-            },
-            {
-              "title": "TST-034: Reserva simultánea - prevención por constraint - BLOCKED",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\17-base-datos.spec.ts",
-                        "line": 24,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "skipped",
-                      "duration": 0,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:39.448Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\17-base-datos.spec.ts",
-                            "line": 24,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "e90cfe3a1a010d74aa47-7e24af1b3cfbce0e27a0",
-              "file": "17-base-datos.spec.ts",
-              "line": 22,
-              "column": 3
-            },
-            {
-              "title": "Historial de estado registrado - BLOCKED",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\17-base-datos.spec.ts",
-                        "line": 29,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "skipped",
-                      "duration": 0,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:39.454Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\17-base-datos.spec.ts",
-                            "line": 29,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "e90cfe3a1a010d74aa47-8b3ec1a6d3a57ee8989d",
-              "file": "17-base-datos.spec.ts",
-              "line": 27,
-              "column": 3
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "18-concurrencia.spec.ts",
-      "file": "18-concurrencia.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "NIVEL 16: Concurrencia (PRE-RES-034 / TST-034)",
-          "file": "18-concurrencia.spec.ts",
-          "line": 5,
-          "column": 6,
-          "specs": [
-            {
-              "title": "Dos reservas simultáneas mismo slot - BLOCKED",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED: requiere auth token real y endpoint de booking",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\18-concurrencia.spec.ts",
-                        "line": 12,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "skipped",
-                      "duration": 0,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:39.488Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED: requiere auth token real y endpoint de booking",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\18-concurrencia.spec.ts",
-                            "line": 12,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "bd1f54a79f6a63f1216c-2c9e59e5aca966aca2e7",
-              "file": "18-concurrencia.spec.ts",
-              "line": 7,
-              "column": 3
-            },
-            {
-              "title": "Lectura sucia - BLOCKED",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "BLOCKED",
-                      "location": {
-                        "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\18-concurrencia.spec.ts",
-                        "line": 17,
-                        "column": 10
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "skipped",
-                      "duration": 0,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:39.497Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "description": "BLOCKED",
-                          "location": {
-                            "file": "C:\\mvp\\asistente_impl_codex\\asistente\\frontend-react\\e2e\\18-concurrencia.spec.ts",
-                            "line": 17,
-                            "column": 10
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "bd1f54a79f6a63f1216c-a0e7157d3d23e897f3eb",
-              "file": "18-concurrencia.spec.ts",
-              "line": 15,
-              "column": 3
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "19-regresion-completa.spec.ts",
-      "file": "19-regresion-completa.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "NIVEL 17: Regresión Completa",
-          "file": "19-regresion-completa.spec.ts",
-          "line": 6,
-          "column": 6,
-          "specs": [
-            {
-              "title": "Filtros funcionan después de cambios en agenda",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4056,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:39.536Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "2556863d19bb97b6fa19-6bcc437258e0e18e59c6",
-              "file": "19-regresion-completa.spec.ts",
-              "line": 18,
-              "column": 3
-            },
-            {
-              "title": "Sin superposición visual de tarjetas",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4029,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:43.603Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "2556863d19bb97b6fa19-6abb439aa6de38438d4c",
-              "file": "19-regresion-completa.spec.ts",
-              "line": 23,
-              "column": 3
-            },
-            {
-              "title": "7 columnas de días visibles",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 3830,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:47.646Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "2556863d19bb97b6fa19-70fe811f6217db7fbc49",
-              "file": "19-regresion-completa.spec.ts",
-              "line": 27,
-              "column": 3
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "admin-locations-visual.spec.ts",
-      "file": "admin-locations-visual.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Admin Locations - Visual Layout",
-          "file": "admin-locations-visual.spec.ts",
-          "line": 64,
-          "column": 6,
-          "specs": [
-            {
-              "title": "tabla de sedes en 1920x1080",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 2854,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:44.415Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "742939b5e5b134c7ddf7-82f0fc1f046c7a68a683",
-              "file": "admin-locations-visual.spec.ts",
-              "line": 130,
-              "column": 3
-            },
-            {
-              "title": "tabla de sedes en 1440x900",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 2892,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:47.284Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "742939b5e5b134c7ddf7-6a913d9b638a2e009534",
-              "file": "admin-locations-visual.spec.ts",
-              "line": 139,
-              "column": 3
-            },
-            {
-              "title": "tabla de sedes en 1366x768",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 3706,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:50.190Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "742939b5e5b134c7ddf7-d8614e02bdb5cac517fc",
-              "file": "admin-locations-visual.spec.ts",
-              "line": 148,
-              "column": 3
-            },
-            {
-              "title": "tabla de sedes en 1280x720",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 2953,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:53.909Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "742939b5e5b134c7ddf7-d9460a00ea7163b322f6",
-              "file": "admin-locations-visual.spec.ts",
-              "line": 157,
-              "column": 3
-            },
-            {
-              "title": "tabla de sedes en 390x844 (mobile)",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 2912,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:56.879Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "742939b5e5b134c7ddf7-62080ce6dba382dcb3f5",
-              "file": "admin-locations-visual.spec.ts",
-              "line": 166,
-              "column": 3
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "booking-public-pages.spec.ts",
-      "file": "booking-public-pages.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Paginas publicas de reservas",
-          "file": "booking-public-pages.spec.ts",
+          "title": "LOCAL MATURITY — Validacion del entorno local",
+          "file": "00-local-maturity.spec.ts",
           "line": 3,
           "column": 6,
           "specs": [
             {
-              "title": "Pago - muestra checkout pendiente",
+              "title": "Frontend carga en localhost:5173",
               "ok": true,
               "tags": [],
               "tests": [
@@ -3703,19 +484,19 @@
                   "timeout": 60000,
                   "annotations": [],
                   "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
+                  "projectId": "local-maturity",
+                  "projectName": "local-maturity",
                   "results": [
                     {
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2912,
+                      "duration": 1745,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-07T01:06:51.516Z",
+                      "startTime": "2026-07-24T20:58:42.743Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -3723,13 +504,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "f7677cd1c1354798576e-e2603defe0e7ed3f0e30",
-              "file": "booking-public-pages.spec.ts",
-              "line": 5,
+              "id": "7326ef3eac4bc2fc7eb4-610acf0724ae32e1735f",
+              "file": "00-local-maturity.spec.ts",
+              "line": 4,
               "column": 3
             },
             {
-              "title": "Pago - muestra aprobado cuando el pago fue confirmado",
+              "title": "Login page con formulario",
               "ok": true,
               "tags": [],
               "tests": [
@@ -3737,19 +518,19 @@
                   "timeout": 60000,
                   "annotations": [],
                   "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
+                  "projectId": "local-maturity",
+                  "projectName": "local-maturity",
                   "results": [
                     {
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2720,
+                      "duration": 2215,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-07T01:06:54.441Z",
+                      "startTime": "2026-07-24T20:58:44.632Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -3757,146 +538,232 @@
                   "status": "expected"
                 }
               ],
-              "id": "f7677cd1c1354798576e-8add725d87746dfe7f25",
-              "file": "booking-public-pages.spec.ts",
-              "line": 45,
+              "id": "7326ef3eac4bc2fc7eb4-90317e57f336f3ea069b",
+              "file": "00-local-maturity.spec.ts",
+              "line": 10,
               "column": 3
+            }
+          ],
+          "suites": [
+            {
+              "title": "API Backend",
+              "file": "00-local-maturity.spec.ts",
+              "line": 17,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "Health endpoint UP",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "local-maturity",
+                      "projectName": "local-maturity",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 27,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-07-24T20:58:46.862Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "7326ef3eac4bc2fc7eb4-0b7b3b0fa3b085194bcd",
+                  "file": "00-local-maturity.spec.ts",
+                  "line": 30,
+                  "column": 5
+                },
+                {
+                  "title": "Login con credenciales demo",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "local-maturity",
+                      "projectName": "local-maturity",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 219,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-07-24T20:58:47.203Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "7326ef3eac4bc2fc7eb4-e75e10ba30f769a4d7fe",
+                  "file": "00-local-maturity.spec.ts",
+                  "line": 37,
+                  "column": 5
+                },
+                {
+                  "title": "Company endpoint autenticado",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "local-maturity",
+                      "projectName": "local-maturity",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 64,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-07-24T20:58:47.441Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "7326ef3eac4bc2fc7eb4-15fcd83d5f322650b7f6",
+                  "file": "00-local-maturity.spec.ts",
+                  "line": 47,
+                  "column": 5
+                },
+                {
+                  "title": "WhatsApp Web status endpoint responde",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "local-maturity",
+                      "projectName": "local-maturity",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 62,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-07-24T20:58:47.533Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "7326ef3eac4bc2fc7eb4-a103c0b1162bdc25908d",
+                  "file": "00-local-maturity.spec.ts",
+                  "line": 56,
+                  "column": 5
+                },
+                {
+                  "title": "Conversaciones lista autenticada",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "local-maturity",
+                      "projectName": "local-maturity",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 24,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-07-24T20:58:47.611Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "7326ef3eac4bc2fc7eb4-a3f573da4951aedb5f79",
+                  "file": "00-local-maturity.spec.ts",
+                  "line": 65,
+                  "column": 5
+                }
+              ]
             },
             {
-              "title": "Pago - simular aprobacion y verificar estado",
-              "ok": true,
-              "tags": [],
-              "tests": [
+              "title": "WhatsApp Public URL",
+              "file": "00-local-maturity.spec.ts",
+              "line": 73,
+              "column": 8,
+              "specs": [
                 {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
+                  "title": "Pagina publica de centros carga con contenido",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
                     {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4365,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:06:57.174Z",
+                      "timeout": 60000,
                       "annotations": [],
-                      "attachments": []
+                      "expectedStatus": "passed",
+                      "projectId": "local-maturity",
+                      "projectName": "local-maturity",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 1867,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-07-24T20:58:47.649Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
-                  "status": "expected"
+                  "id": "7326ef3eac4bc2fc7eb4-a539a50c385a2100bf38",
+                  "file": "00-local-maturity.spec.ts",
+                  "line": 74,
+                  "column": 5
                 }
-              ],
-              "id": "f7677cd1c1354798576e-916048e90a7615b6473b",
-              "file": "booking-public-pages.spec.ts",
-              "line": 85,
-              "column": 3
-            },
-            {
-              "title": "Cancelacion - muestra datos de la reserva",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2344,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:07:01.550Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "f7677cd1c1354798576e-701fc7cdc2262af42de8",
-              "file": "booking-public-pages.spec.ts",
-              "line": 157,
-              "column": 3
-            },
-            {
-              "title": "Reprogramacion - muestra opciones de fecha",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2194,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:07:03.904Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "f7677cd1c1354798576e-7d8d5683e750a3dc31ec",
-              "file": "booking-public-pages.spec.ts",
-              "line": 181,
-              "column": 3
-            },
-            {
-              "title": "Confirmacion - datos y boton de confirmar",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "all-chromium",
-                  "projectName": "all-chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2195,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-07-07T01:07:06.107Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "f7677cd1c1354798576e-2fb0e890873b931b69bc",
-              "file": "booking-public-pages.spec.ts",
-              "line": 203,
-              "column": 3
+              ]
             }
           ]
         }
@@ -3905,10 +772,10 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-07-07T01:04:44.967Z",
-    "duration": 143686.12,
-    "expected": 48,
-    "skipped": 30,
+    "startTime": "2026-07-24T20:58:41.376Z",
+    "duration": 9164.226999999999,
+    "expected": 8,
+    "skipped": 0,
     "unexpected": 0,
     "flaky": 0
   }

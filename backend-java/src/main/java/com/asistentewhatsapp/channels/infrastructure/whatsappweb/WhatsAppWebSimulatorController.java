@@ -1,6 +1,7 @@
 package com.asistentewhatsapp.channels.infrastructure.whatsappweb;
 
 import com.asistentewhatsapp.shared.api.StatusResponse;
+import com.asistentewhatsapp.shared.exception.ApiException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -69,7 +70,7 @@ public class WhatsAppWebSimulatorController {
             String signature = computeSignature(timestamp, rawBody);
 
             return whatsAppWebWebhookService.handleWebhook(rawBody, timestamp, signature, deliveryId);
-        } catch (ResponseStatusException e) {
+        } catch (ApiException | ResponseStatusException e) {
             throw e;
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,

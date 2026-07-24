@@ -607,6 +607,7 @@ public class ConversationJdbcRepository {
                             updated_at = :updatedAt
                         where business_id = :businessId
                           and id = :conversationId
+                          and unread_count > 0
                         """,
                 conversationParameters(businessId, conversationId)
                         .addValue("updatedAt", updatedAt));

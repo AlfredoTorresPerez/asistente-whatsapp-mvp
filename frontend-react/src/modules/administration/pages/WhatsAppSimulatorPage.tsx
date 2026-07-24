@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { z } from 'zod'
+import { ApiClientError } from '../../../services/api/httpClient'
 import { Button } from '../../../components/ui/Button'
 import { Card } from '../../../components/ui/Card'
 import { Input } from '../../../components/ui/Input'
@@ -49,7 +50,6 @@ export function WhatsAppSimulatorPage() {
         from: values.from,
         body: values.body,
         externalMessageId: `sim-${Date.now()}`,
-        sessionKey: 'demo-sales',
       }),
     onSuccess: () => {
       reset()
@@ -59,17 +59,21 @@ export function WhatsAppSimulatorPage() {
         tone: 'success',
       })
     },
-    onError: () => {
+    onError: (error) => {
+      const apiError = error as ApiClientError
+      const description = apiError?.status === 404
+        ? 'No hay canales activos. Configura un canal WhatsApp Web primero.'
+        : apiError?.message ?? 'No pudimos procesar la simulacion. Verifica que el backend este disponible.'
       showToast({
         title: 'Error al simular',
-        description: 'No pudimos procesar la simulacion. Verifica que el backend este disponible.',
+        description,
         tone: 'error',
       })
     },
   })
 
   const onSubmit = handleSubmit((values) => {
-    void simMutation.mutateAsync(values)
+    simMutation.mutate(values)
   })
 
   return (

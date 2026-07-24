@@ -33,6 +33,11 @@ export default defineConfig({
   },
   projects: [
     {
+      name: 'local-maturity',
+      testMatch: '00-local-maturity.spec.ts',
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
       name: 'smoke',
       testMatch: '01-smoke.spec.ts',
       use: { ...devices['Desktop Chrome'] },

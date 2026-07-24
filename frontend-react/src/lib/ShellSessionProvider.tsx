@@ -81,18 +81,24 @@ export function ShellSessionProvider({ children }: PropsWithChildren) {
 
   const signIn = async (credentials: { email: string; password: string }) => {
     const response = await loginRequest(credentials.email, credentials.password)
-    const currentProfile = await getCurrentProfileRequest().catch(() => null)
     const authenticatedUser = toShellUserFromAuthResponse(response.user)
-    const nextSession = {
+    const authSession = {
       accessToken: response.accessToken,
       expiresAt: new Date(Date.now() + response.expiresInSeconds * 1000).toISOString(),
-      user: currentProfile
-        ? mergeShellUserProfile(authenticatedUser, currentProfile)
-        : authenticatedUser,
+      user: authenticatedUser,
     }
-    writeStoredShellSessionSnapshot(nextSession)
-    setSession(nextSession)
+    writeStoredShellSessionSnapshot(authSession)
+    setSession(authSession)
     setStatus('authenticated')
+    const currentProfile = await getCurrentProfileRequest().catch(() => null)
+    if (currentProfile) {
+      const mergedSession = {
+        ...authSession,
+        user: mergeShellUserProfile(authenticatedUser, currentProfile),
+      }
+      writeStoredShellSessionSnapshot(mergedSession)
+      setSession(mergedSession)
+    }
   }
 
   const signOut = async () => {

@@ -61,7 +61,7 @@ class FrontendTraceService {
       startedAtMs: performance.now(),
     }
 
-    this.write('info', 'Inicio de ejecucion', {
+    this.write('debug', 'Inicio de ejecucion', {
       componentName: context.componentName,
       methodName: context.methodName,
       purpose: context.purpose,
@@ -73,7 +73,7 @@ class FrontendTraceService {
   }
 
   end(context: TraceContext, data?: TraceData) {
-    this.write('info', 'Fin de ejecucion', {
+    this.write('debug', 'Fin de ejecucion', {
       componentName: context.componentName,
       methodName: context.methodName,
       purpose: context.purpose,

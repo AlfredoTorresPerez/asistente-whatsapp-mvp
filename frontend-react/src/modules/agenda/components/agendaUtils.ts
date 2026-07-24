@@ -3,20 +3,12 @@ import type { AgendaCalendarItemResponse, BusinessHoursResponse } from '../../..
 
 export const agendaTimeZone = 'America/Santiago'
 export const baseHourHeight = 96
-export const eventCardEstimatedHeight = 80
-export const eventGap = 8
-export const rowVerticalPadding = 12
+export const eventCardEstimatedHeight = 72
+export const eventGap = 4
+export const rowVerticalPadding = 8
 export const calendarDays = 7
 export const weekDayLabels = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab']
 export const scheduleHoursStep = 1
-
-export type EventLayout = {
-  item: AgendaCalendarItemResponse
-  top: number
-  height: number
-  left: string
-  width: string
-}
 
 export type AgendaHourLayout = {
   byHour: Record<number, { top: number; height: number; maxItems: number }>
@@ -202,79 +194,6 @@ export function getDaysWithEvents(items: AgendaCalendarItemResponse[]) {
   return withEvents
 }
 
-export function calcProportionalHeight(
-  item: AgendaCalendarItemResponse,
-  rowHeight: number,
-): number {
-  const ratio = Math.min(item.durationMinutes / 60, 1)
-  return Math.max(36, Math.floor(ratio * (rowHeight - 4)))
-}
-
-export function layoutEventsInCell(
-  events: AgendaCalendarItemResponse[],
-  rowHeight: number,
-): EventLayout[] {
-  if (events.length === 0) return []
-  const sorted = [...events].sort((a, b) => {
-    const ma = getLocalHourMinute(a).minute
-    const mb = getLocalHourMinute(b).minute
-    return ma - mb
-  })
-
-  if (sorted.length === 1) {
-    const item = sorted[0]
-    const minute = getLocalHourMinute(item).minute
-    return [
-      {
-        item,
-        top: (minute / 60) * (rowHeight - 2) + 1,
-        height: Math.max(36, Math.min(calcProportionalHeight(item, rowHeight), rowHeight - 2)),
-        left: '2px',
-        width: 'calc(100% - 4px)',
-      },
-    ]
-  }
-
-  const groups: AgendaCalendarItemResponse[][] = []
-  for (const event of sorted) {
-    const startMin = getLocalHourMinute(event).minute
-    const endMin = startMin + event.durationMinutes
-    let added = false
-    for (const group of groups) {
-      const groupOverlaps = group.some((ge) => {
-        const gs = getLocalHourMinute(ge).minute
-        const ge2 = gs + ge.durationMinutes
-        return startMin < ge2 && endMin > gs
-      })
-      if (groupOverlaps) {
-        group.push(event)
-        added = true
-        break
-      }
-    }
-    if (!added) {
-      groups.push([event])
-    }
-  }
-
-  const result: EventLayout[] = []
-  groups.forEach((group) => {
-    const cols = group.length
-    group.forEach((item, idx) => {
-      const minute = getLocalHourMinute(item).minute
-      result.push({
-        item,
-        top: (minute / 60) * (rowHeight - 2) + 1,
-        height: Math.max(28, Math.min(calcProportionalHeight(item, rowHeight), rowHeight - 2)),
-        left: `${(idx / cols) * 100 + 0.5}%`,
-        width: `calc(${(1 / cols) * 100}% - 1px)`,
-      })
-    })
-  })
-
-  return result
-}
-
 export function buildAgendaHourLayout(
   items: AgendaCalendarItemResponse[],
   visibleDays: dayjs.Dayjs[],
@@ -284,13 +203,6 @@ export function buildAgendaHourLayout(
 ): AgendaHourLayout {
   const visibleDayKeys = new Set(visibleDays.map((day) => day.format('YYYY-MM-DD')))
   const itemsByDayHour = new Map<string, number>()
-
-  const hasBusinessDay = new Set<string>()
-  for (const da of dayAvailability) {
-    if (da.hasBusinessHours) {
-      hasBusinessDay.add(da.dateKey)
-    }
-  }
 
   items.forEach((item) => {
     const dateKey = item.dateLocal ?? getAgendaDateKey(item.startsAt)
@@ -304,6 +216,11 @@ export function buildAgendaHourLayout(
     itemsByDayHour.set(key, (itemsByDayHour.get(key) ?? 0) + 1)
   })
 
+  function computeRowHeight(maxItems: number) {
+    const required = rowVerticalPadding * 2 + maxItems * eventCardEstimatedHeight + Math.max(0, maxItems - 1) * eventGap
+    return Math.max(required, baseHourHeight)
+  }
+
   const byHour: AgendaHourLayout['byHour'] = {}
   let accumulatedTop = 0
 
@@ -312,7 +229,7 @@ export function buildAgendaHourLayout(
       0,
       ...visibleDays.map((day) => itemsByDayHour.get(`${day.format('YYYY-MM-DD')}-${hour}`) ?? 0),
     )
-    const height = baseHourHeight
+    const height = computeRowHeight(maxItems)
     byHour[hour] = { top: accumulatedTop, height, maxItems }
     accumulatedTop += height
   })

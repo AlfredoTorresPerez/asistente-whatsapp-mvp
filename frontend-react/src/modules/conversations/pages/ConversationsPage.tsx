@@ -1077,22 +1077,26 @@ export function ConversationsPage() {
     setMessageBody('')
   }
 
+  const lastMarkedRef = useRef<{ conversationId: string; unreadCount: number } | null>(null)
+
   const markReadMutation = useMutation({
     mutationFn: markConversationReadRequest,
-    onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['conversations', 'list'] }),
-        queryClient.invalidateQueries({ queryKey: ['conversations', 'metrics'] }),
-        queryClient.invalidateQueries({ queryKey: ['notifications'] }),
-      ])
+    retry: false,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['conversations', 'metrics'] })
     },
   })
 
   useEffect(() => {
-    if (conversationId && detailQuery.data?.unreadCount && detailQuery.data.unreadCount > 0) {
-      markReadMutation.mutate(conversationId)
-    }
-  }, [conversationId, detailQuery.data?.unreadCount, markReadMutation])
+    if (!conversationId) return
+    const unread = detailQuery.data?.unreadCount ?? 0
+    if (unread <= 0) return
+    if (markReadMutation.isPending) return
+    if (lastMarkedRef.current?.conversationId === conversationId && lastMarkedRef.current?.unreadCount === unread) return
+
+    lastMarkedRef.current = { conversationId, unreadCount: unread }
+    markReadMutation.mutate(conversationId)
+  }, [conversationId, detailQuery.data?.unreadCount])
 
   const sendMessageMutation = useMutation({
     mutationFn: async (payload: { body: string; aiSource?: string }) => {

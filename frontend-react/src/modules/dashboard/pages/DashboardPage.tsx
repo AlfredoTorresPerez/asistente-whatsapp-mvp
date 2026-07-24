@@ -334,7 +334,7 @@ export function DashboardPage() {
                 caption="Actividad reciente del negocio con acceso directo al detalle relacionado."
                 columns={['Actividad', 'Estado', 'Momento']}
                 rows={data.recentActivity.map((activity) => ({
-                  id: `${activity.entityType}-${activity.entityId}`,
+                  id: `${activity.entityType}-${activity.entityId}-${activity.occurredAt}`,
                   href: resolveActivityRoute(activity),
                   cells: [
                     <div key={`${activity.entityId}-title`}>

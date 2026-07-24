@@ -1,5 +1,5 @@
 import type { ReactNode, SelectHTMLAttributes } from 'react'
-import { forwardRef } from 'react'
+import { forwardRef, useMemo } from 'react'
 
 type SelectOption = {
   label: string
@@ -14,11 +14,32 @@ type SelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   options: SelectOption[]
 }
 
+const PREFIX = 'sel'
+
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
   { className, error, hint, id, label, leadingIcon, options, ...props },
   ref,
 ) {
   const selectId = id ?? props.name
+
+  const normalizedOptions = useMemo(() => {
+    const seen = new Set<string>()
+    const result: (SelectOption & { key: string })[] = []
+
+    for (const option of options) {
+      const value = String(option.value ?? '')
+      const key = `${PREFIX}-${value}`
+
+      if (seen.has(key)) {
+        continue
+      }
+      seen.add(key)
+
+      result.push({ ...option, value, key })
+    }
+
+    return result
+  }, [options])
 
   return (
     <label className="block">
@@ -54,8 +75,8 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
           id={selectId}
           {...props}
         >
-          {options.map((option) => (
-            <option key={`${selectId}-${option.value}`} value={option.value}>
+          {normalizedOptions.map((option) => (
+            <option key={option.key} value={option.value}>
               {option.label}
             </option>
           ))}

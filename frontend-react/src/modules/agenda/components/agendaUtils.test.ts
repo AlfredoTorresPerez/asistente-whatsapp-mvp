@@ -6,10 +6,12 @@ import {
   getScheduleHours,
   getLocalHourMinute,
   getEventsForDayAndHour,
-  layoutEventsInCell,
   buildAgendaHourLayout,
   getAllEventsForDay,
   baseHourHeight,
+  eventCardEstimatedHeight,
+  eventGap,
+  rowVerticalPadding,
 } from './agendaUtils'
 import dayjs from 'dayjs'
 import type { DayAvailability } from './agendaUtils'
@@ -308,41 +310,6 @@ describe('getAllEventsForDay', () => {
   })
 })
 
-describe('layoutEventsInCell', () => {
-  it('posiciona evento unico correctamente', () => {
-    const item = makeItem('2026-07-16T01:50:00.000Z', {
-      startTimeLocal: '21:50',
-      dateLocal: '2026-07-15',
-      durationMinutes: 60,
-    })
-    const layouts = layoutEventsInCell([item], baseHourHeight)
-    expect(layouts).toHaveLength(1)
-    expect(layouts[0].top).toBeGreaterThan(0)
-    expect(layouts[0].height).toBeGreaterThan(36)
-    expect(layouts[0].left).toBe('2px')
-  })
-
-  it('posiciona eventos multiples en paralelo', () => {
-    const items = [
-      makeItem('2026-07-15T10:00:00-04:00', {
-        startTimeLocal: '10:00',
-        dateLocal: '2026-07-15',
-        bookingId: 'a',
-        durationMinutes: 30,
-      }),
-      makeItem('2026-07-15T10:15:00-04:00', {
-        startTimeLocal: '10:15',
-        dateLocal: '2026-07-15',
-        bookingId: 'b',
-        durationMinutes: 30,
-      }),
-    ]
-    const layouts = layoutEventsInCell(items, baseHourHeight)
-    expect(layouts).toHaveLength(2)
-    expect(layouts[0].left).not.toBe(layouts[1].left)
-  })
-})
-
 describe('buildAgendaHourLayout', () => {
   const visibleDays = [
     dayjs('2026-07-13'),
@@ -381,5 +348,33 @@ describe('buildAgendaHourLayout', () => {
     const result = buildAgendaHourLayout([], visibleDays, [], 9, 19)
     expect(result.byHour[9].maxItems).toBe(0)
     expect(result.byHour[15].maxItems).toBe(0)
+  })
+
+  it('calcula altura dinamica segun maxItems en la fila', () => {
+    const items = [
+      makeItem('2026-07-15T10:00:00-04:00', {
+        startTimeLocal: '10:00',
+        dateLocal: '2026-07-15',
+        bookingId: 'a',
+      }),
+      makeItem('2026-07-15T10:30:00-04:00', {
+        startTimeLocal: '10:30',
+        dateLocal: '2026-07-15',
+        bookingId: 'b',
+      }),
+      makeItem('2026-07-15T11:00:00-04:00', {
+        startTimeLocal: '11:00',
+        dateLocal: '2026-07-15',
+        bookingId: 'c',
+      }),
+    ]
+    const dayAvailability = [
+      makeDayAvailability({ dateKey: '2026-07-15', dayOfWeek: 3, startHour: 9, endHour: 19 }),
+    ]
+    const result = buildAgendaHourLayout(items, visibleDays, dayAvailability, 9, 19)
+    expect(result.byHour[10].maxItems).toBe(2)
+    expect(result.byHour[10].height).toBeGreaterThan(baseHourHeight)
+    expect(result.byHour[11].maxItems).toBe(1)
+    expect(result.byHour[11].height).toBe(baseHourHeight)
   })
 })

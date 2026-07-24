@@ -58,6 +58,7 @@ import {
 } from '../modules/rules'
 import { ReportsPage } from '../modules/reports'
 import { LandingPage } from '../modules/landing/pages/LandingPage'
+import { BeautyCenterLandingPage } from '../modules/centros/pages/BeautyCenterLandingPage'
 import { CenterPublicPage } from '../modules/centros/pages/CenterPublicPage'
 import { CenterWhatsAppRedirect } from '../modules/centros/pages/CenterWhatsAppRedirect'
 
@@ -72,6 +73,7 @@ export const appRoutes: RouteObject[] = [
   { path: '/reservar', element: <CreatePublicBookingPage /> },
   { path: '/reservas/mis-reservas/:token', element: <CustomerBookingsPage /> },
 
+  { path: '/centro-estetica-bella', element: <BeautyCenterLandingPage /> },
   { path: '/centros/:slug', element: <CenterPublicPage /> },
   { path: '/centros/:slug/whatsapp', element: <CenterWhatsAppRedirect /> },
 

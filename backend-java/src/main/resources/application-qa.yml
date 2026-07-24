@@ -49,8 +49,8 @@ logging:
 
 spring:
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/asistente_qa}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:change-me-qa}
+    url: ${APP_DB_URL:jdbc:postgresql://localhost:5432/asistente_qa}
+    username: ${APP_DB_USERNAME:postgres}
+    password: ${APP_DB_PASSWORD:change-me-qa}
   flyway:
     locations: classpath:db/migration

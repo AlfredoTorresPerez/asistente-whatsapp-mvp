@@ -124,7 +124,7 @@ export type WhatsAppSimulationRequest = {
   from: string
   body: string
   externalMessageId: string
-  sessionKey: string
+  sessionKey?: string
 }
 
 export function sendWhatsAppSimulationRequest(payload: WhatsAppSimulationRequest) {

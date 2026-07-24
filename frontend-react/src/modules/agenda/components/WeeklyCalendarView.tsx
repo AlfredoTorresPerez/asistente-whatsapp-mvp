@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import { useMemo } from 'react'
 import type { AgendaCalendarItemResponse, BusinessHoursResponse } from '../../../services/api/types'
 import { AgendaEventCard } from './AgendaEventCard'
+import { CalendarLegend } from './CalendarLegend'
 import { CurrentTimeLine } from './CurrentTimeLine'
 import {
   baseHourHeight,
@@ -9,11 +10,13 @@ import {
   buildDayAvailability,
   calendarDays,
   computeScheduleRange,
+  eventGap,
   formatCalendarDay,
   getDaysWithEvents,
   getEventsForDayAndHour,
   getScheduleHours,
-  layoutEventsInCell,
+  getAllEventsForDay,
+  rowVerticalPadding,
 } from './agendaUtils'
 import type { DayAvailability } from './agendaUtils'
 
@@ -24,6 +27,83 @@ type WeeklyCalendarViewProps = {
   timeColumnWidth?: number
   businessHours?: BusinessHoursResponse[]
   onSelectBooking: (bookingId: string) => void
+}
+
+function DayHeaderCell({
+  day,
+  daysWithEvents,
+  dayAvailabilityMap,
+  allEventsForDay,
+}: {
+  day: dayjs.Dayjs
+  daysWithEvents: Set<string>
+  dayAvailabilityMap: Map<string, DayAvailability>
+  allEventsForDay: Map<string, AgendaCalendarItemResponse[]>
+}) {
+  const fd = formatCalendarDay(day)
+  const isToday = day.isSame(dayjs(), 'day')
+  const isEmptyDay = !daysWithEvents.has(fd.key)
+  const dayAvail = dayAvailabilityMap.get(fd.key)
+  const hasHours = dayAvail?.hasBusinessHours ?? false
+  const dayEvents = allEventsForDay.get(fd.key) ?? []
+  const totalSlots = hasHours ? (dayAvail!.endHour - dayAvail!.startHour) * 2 : 0
+  const usedSlots = dayEvents.length
+  const occupancyPct = totalSlots > 0 ? Math.round((usedSlots / totalSlots) * 100) : 0
+
+  return (
+    <div
+      className={`flex flex-col items-center border-r border-slate-200 px-1 pb-2 pt-2.5 last:border-r-0 ${
+        isToday ? 'bg-blue-50/40' : ''
+      }`}
+      key={fd.key}
+    >
+      <span
+        className={`text-[10px] font-bold uppercase tracking-wider ${
+          isToday ? 'text-blue-600' : 'text-slate-500'
+        }`}
+      >
+        {fd.label}
+      </span>
+      <div className="mt-0.5 flex items-center gap-0.5">
+        <span
+          className={`inline-flex items-center justify-center text-sm font-bold leading-none ${
+            isToday ? 'h-7 w-7 rounded-full bg-blue-600 text-white shadow-sm' : 'text-slate-900'
+          }`}
+        >
+          {fd.dayNumber}
+        </span>
+        <span className={`text-[10px] font-semibold ${isToday ? 'text-blue-500' : 'text-slate-400'}`}>
+          /{fd.month}
+        </span>
+      </div>
+      {hasHours ? (
+        <div className="mt-1 flex items-center gap-1">
+          <span className="text-[10px] font-semibold text-slate-700">
+            {usedSlots}
+          </span>
+          <span className="text-[9px] text-slate-400">/ {totalSlots}</span>
+          <div className="ml-1 h-1.5 w-10 overflow-hidden rounded-full bg-slate-200">
+            <div
+              className="h-full rounded-full transition-all duration-300"
+              style={{
+                width: `${Math.min(occupancyPct, 100)}%`,
+                backgroundColor:
+                  occupancyPct >= 80 ? '#ef4444' : occupancyPct >= 50 ? '#f59e0b' : '#10b981',
+              }}
+            />
+          </div>
+        </div>
+      ) : isEmptyDay ? (
+        <span className="mt-1 text-[9px] font-semibold uppercase tracking-wider text-slate-300">
+          Sin reservas
+        </span>
+      ) : (
+        <span className="mt-1 text-[9px] font-semibold uppercase tracking-wider text-amber-500">
+          Sin atencion
+        </span>
+      )}
+    </div>
+  )
 }
 
 export function WeeklyCalendarView({
@@ -70,69 +150,40 @@ export function WeeklyCalendarView({
     return map
   }, [dayAvailability])
 
+  const allEventsForDay = useMemo(() => {
+    const map = new Map<string, AgendaCalendarItemResponse[]>()
+    for (const key of visibleDayKeys) {
+      map.set(key, getAllEventsForDay(calendarItems, key))
+    }
+    return map
+  }, [calendarItems, visibleDayKeys])
+
   const scheduleHours = getScheduleHours(scheduleStartHour, scheduleEndHour)
 
   return (
     <div className="w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs">
-      {/* Header row */}
       <div
         className="grid border-b border-slate-200 bg-slate-50"
         style={{
           gridTemplateColumns: `${timeColumnWidth}px repeat(${calendarDays}, minmax(0, 1fr))`,
         }}
       >
-        <div className="flex items-end justify-center border-r border-slate-200 pb-2 pt-3">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+        <div className="flex items-end justify-center border-r border-slate-200 pb-2 pt-2.5">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
             Hora
           </span>
         </div>
-        {visibleDays.map((day) => {
-          const fd = formatCalendarDay(day)
-          const isToday = day.isSame(dayjs(), 'day')
-          const isEmptyDay = !daysWithEvents.has(fd.key)
-          const dayAvail = dayAvailabilityMap.get(fd.key)
-          const hasHours = dayAvail?.hasBusinessHours ?? false
-          return (
-            <div
-              className="flex flex-col items-center border-r border-slate-200 px-1 pb-2 pt-3 last:border-r-0"
-              key={fd.key}
-            >
-              <span
-                className={`text-[10px] font-semibold uppercase tracking-wider ${
-                  isToday ? 'text-emerald-600' : 'text-slate-500'
-                }`}
-              >
-                {fd.label}
-              </span>
-              <div className="mt-1 flex items-center gap-0.5">
-                <span
-                  className={`inline-flex items-center justify-center text-sm font-bold leading-none ${
-                    isToday ? 'h-7 w-7 rounded-full bg-emerald-500 text-white' : 'text-slate-900'
-                  }`}
-                >
-                  {fd.dayNumber}
-                </span>
-                <span
-                  className={`text-[10px] font-semibold ${isToday ? 'text-emerald-500' : 'text-slate-400'}`}
-                >
-                  /{fd.month}
-                </span>
-              </div>
-              {!hasHours ? (
-                <span className="mt-1 text-[9px] font-semibold uppercase tracking-wider text-amber-500">
-                  Sin disponibilidad
-                </span>
-              ) : isEmptyDay ? (
-                <span className="mt-1 text-[9px] font-semibold uppercase tracking-wider text-slate-300">
-                  Sin reservas
-                </span>
-              ) : null}
-            </div>
-          )
-        })}
+        {visibleDays.map((day) => (
+          <DayHeaderCell
+            allEventsForDay={allEventsForDay}
+            day={day}
+            dayAvailabilityMap={dayAvailabilityMap}
+            daysWithEvents={daysWithEvents}
+            key={day.format('YYYY-MM-DD')}
+          />
+        ))}
       </div>
 
-      {/* Grid body */}
       <div className="relative">
         <CurrentTimeLine
           hourLayout={hourLayout.byHour}
@@ -156,7 +207,7 @@ export function WeeklyCalendarView({
               >
                 <div className="flex items-start justify-center border-r border-slate-100 pt-1.5">
                   <span className="text-[10px] font-semibold leading-none text-slate-400">
-                    {String(hour).padStart(2, '0')}
+                    {String(hour).padStart(2, '0')}:00
                   </span>
                 </div>
 
@@ -165,38 +216,23 @@ export function WeeklyCalendarView({
                   const da = dayAvailabilityMap.get(dayKey)
                   const isDayActive = da?.hasBusinessHours ?? false
                   const eventsForHour = getEventsForDayAndHour(calendarItems, dayKey, hour)
-                  const eventLayouts = layoutEventsInCell(eventsForHour, rowHeight)
                   return (
                     <div
-                      className={`relative border-r border-slate-100 last:border-r-0 ${
+                      className={`flex flex-col border-r border-slate-100 last:border-r-0 ${
                         !isDayActive ? 'bg-slate-50/50' : ''
                       }`}
                       key={`${dayKey}-${hour}`}
-                      style={{ height: rowHeight }}
+                      style={{ gap: `${eventGap}px`, padding: `${rowVerticalPadding}px` }}
                     >
-                      {eventLayouts.length > 0
-                        ? eventLayouts.map(({ item, top, height, left, width }) => (
-                            <div
-                              key={item.bookingId}
-                              className="absolute"
-                              style={{
-                                left,
-                                width,
-                                top: `${top}px`,
-                                height: `${height}px`,
-                                padding: '1px',
-                                boxSizing: 'border-box',
-                              }}
-                            >
-                              <AgendaEventCard
-                                compact
-                                isSelected={selectedBookingId === item.bookingId}
-                                item={item}
-                                onClick={() => onSelectBooking(item.bookingId)}
-                              />
-                            </div>
-                          ))
-                        : null}
+                      {eventsForHour.map((item) => (
+                        <AgendaEventCard
+                          compact
+                          key={item.bookingId}
+                          isSelected={selectedBookingId === item.bookingId}
+                          item={item}
+                          onClick={() => onSelectBooking(item.bookingId)}
+                        />
+                      ))}
                     </div>
                   )
                 })}
@@ -205,9 +241,13 @@ export function WeeklyCalendarView({
           })
         ) : (
           <div className="flex items-center justify-center py-12 text-sm text-slate-400">
-            No hay horarios de atención configurados para esta sucursal
+            No hay horarios de atenci&oacute;n configurados para esta sucursal
           </div>
         )}
+      </div>
+
+      <div className="border-t border-slate-100 px-4 py-2.5">
+        <CalendarLegend />
       </div>
     </div>
   )

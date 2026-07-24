@@ -86,14 +86,23 @@ export async function apiFetch<T>(path: string, init?: ApiFetchOptions) {
         ...(payload as ApiErrorPayload | null),
       })
 
-      traceService.error(traceContext, apiError, {
-        path: safePath,
-        method,
-        status: response.status,
-        responseCorrelationId,
-        errorCode: apiError.code,
-        fieldErrors: apiError.fieldErrors,
-      })
+      if (response.status === 429) {
+        console.warn('[Frontend - capa de interfaz] Demasiadas solicitudes', {
+          method,
+          path: safePath,
+          status: 429,
+          correlationId: responseCorrelationId,
+        })
+      } else {
+        traceService.error(traceContext, apiError, {
+          path: safePath,
+          method,
+          status: response.status,
+          responseCorrelationId,
+          errorCode: apiError.code,
+          fieldErrors: apiError.fieldErrors,
+        })
+      }
 
       throw apiError
     }
