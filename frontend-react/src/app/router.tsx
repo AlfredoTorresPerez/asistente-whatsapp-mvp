@@ -57,6 +57,9 @@ import {
   AutomationRulesPage,
 } from '../modules/rules'
 import { ReportsPage } from '../modules/reports'
+import { LandingPage } from '../modules/landing/pages/LandingPage'
+import { CenterPublicPage } from '../modules/centros/pages/CenterPublicPage'
+import { CenterWhatsAppRedirect } from '../modules/centros/pages/CenterWhatsAppRedirect'
 
 import { PrivateRouteShell, PublicRouteShell } from './RouteShells'
 import { useShellSession } from '../lib/shellSession'
@@ -68,11 +71,15 @@ export const appRoutes: RouteObject[] = [
 
   { path: '/reservar', element: <CreatePublicBookingPage /> },
   { path: '/reservas/mis-reservas/:token', element: <CustomerBookingsPage /> },
+
+  { path: '/centros/:slug', element: <CenterPublicPage /> },
+  { path: '/centros/:slug/whatsapp', element: <CenterWhatsAppRedirect /> },
+
+  { path: '/', element: <LandingPage /> },
+
   {
-    path: '/',
     element: <PublicRouteShell />,
     children: [
-      { index: true, element: <Navigate replace to="/login" /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'forgot-password', element: <ForgotPasswordPage /> },
       { path: 'forgot-password/sent', element: <ForgotPasswordSentPage /> },

@@ -32,6 +32,7 @@ public final class SecurityPublicPaths {
         "/api/v1/public/booking-payments/**",
         "/api/v1/public/customer-bookings/**",
         "/api/v1/public/landing/**",
+        "/api/v1/public/centros/**",
         "/api/v1/calendar-integrations/google/callback",
         "/api/v1/calendar-integrations/outlook/callback",
     };

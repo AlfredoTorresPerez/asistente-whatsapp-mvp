@@ -11,4 +11,6 @@ public interface BusinessRepository extends JpaRepository<BusinessEntity, UUID> 
     List<BusinessEntity> findByActiveTrueOrderByCreatedAtAsc();
 
     Optional<BusinessEntity> findFirstByActiveTrueOrderByCreatedAtAsc();
+
+    Optional<BusinessEntity> findByCode(String code);
 }

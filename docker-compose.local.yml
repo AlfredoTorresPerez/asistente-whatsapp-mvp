@@ -10,7 +10,7 @@
 #   postgres         5433:5432
 #   backend-java     8080:8080
 #   frontend-react   5173:5173
-#   whatsapp-web     3001:3001    (solo con --profile whatsapp)
+#   whatsapp-web     (deshabilitado - solo META_CLOUD_API)
 # =============================================================================
 
 networks:
@@ -95,13 +95,7 @@ services:
       APP_WHATSAPP_CLOUD_API_DRY_RUN_ENABLED: ${APP_WHATSAPP_CLOUD_API_DRY_RUN_ENABLED:-true}
       APP_WHATSAPP_CLOUD_API_CONNECT_TIMEOUT_SECONDS: ${APP_WHATSAPP_CLOUD_API_CONNECT_TIMEOUT_SECONDS:-5}
       APP_WHATSAPP_CLOUD_API_READ_TIMEOUT_SECONDS: ${APP_WHATSAPP_CLOUD_API_READ_TIMEOUT_SECONDS:-15}
-      APP_WHATSAPP_WEB_BASE_URL: ${APP_WHATSAPP_WEB_BASE_URL:-http://whatsapp-web-service:3001}
-      APP_WHATSAPP_WEB_API_KEY: ${APP_WHATSAPP_WEB_API_KEY:-dev-whatsapp-web-key}
-      APP_WHATSAPP_WEB_DEFAULT_PHONE_NUMBER: ${APP_WHATSAPP_CLOUD_API_DEFAULT_PHONE_NUMBER:-56927305158}
-      APP_WHATSAPP_WEB_WEBHOOK_SECRET: ${APP_WHATSAPP_WEB_WEBHOOK_SECRET:-dev-whatsapp-web-webhook-secret}
-      APP_WHATSAPP_WEB_WEBHOOK_TOLERANCE_SECONDS: ${APP_WHATSAPP_WEB_WEBHOOK_TOLERANCE_SECONDS:-600}
-      APP_WHATSAPP_WEB_DEMO_FALLBACK_ENABLED: ${APP_WHATSAPP_WEB_DEMO_FALLBACK_ENABLED:-false}
-      APP_WHATSAPP_WEB_QR_TIMEOUT_SECONDS: ${APP_WHATSAPP_WEB_QR_TIMEOUT_SECONDS:-120}
+
       APP_LOGGING_INCLUDE_MESSAGE_BODY: ${APP_LOGGING_INCLUDE_MESSAGE_BODY:-false}
 
       # AI Agents
@@ -181,66 +175,7 @@ services:
     networks:
       - asistente-local
 
-  # ---------------------------------------------------------------------------
-  # WHATSAPP WEB SERVICE (opcional: requiere --profile whatsapp)
-  # ---------------------------------------------------------------------------
-  whatsapp-web-service:
-    profiles:
-      - whatsapp
-    build:
-      context: ./whatsapp-web-service
-      dockerfile: Dockerfile
-    container_name: asistente-whatsapp-web
-    restart: unless-stopped
-    depends_on:
-      backend-java:
-        condition: service_healthy
-    shm_size: "4gb"
-    security_opt:
-      - seccomp=unconfined
-    environment:
-      TZ: ${TZ:-America/Santiago}
-      WHATSAPP_WEB_PORT: 3001
-      WHATSAPP_WEB_API_KEY: ${WHATSAPP_WEB_API_KEY:-dev-whatsapp-web-key}
-      WHATSAPP_WEB_SESSION_ID: demo-sales
-      WHATSAPP_WEB_REAL_ENABLED: "true"
-      WHATSAPP_WEB_AUTO_CONNECT: ${WHATSAPP_WEB_AUTO_CONNECT:-true}
-      WHATSAPP_WEB_DEFAULT_PHONE_NUMBER: ${WHATSAPP_WEB_COMPANY_PHONE_NUMBER:-56927305158}
-      WHATSAPP_WEB_COMPANY_PHONE_NUMBER: ${WHATSAPP_WEB_COMPANY_PHONE_NUMBER:-56927305158}
-      WHATSAPP_WEB_TEST_CUSTOMER_PHONE_NUMBER: ${WHATSAPP_WEB_TEST_CUSTOMER_PHONE_NUMBER:-56950954580}
-      WHATSAPP_WEB_BACKEND_WEBHOOK_URL: http://backend-java:8080/api/v1/integrations/whatsapp-web/webhook
-      WHATSAPP_WEB_WEBHOOK_SECRET: ${WHATSAPP_WEB_WEBHOOK_SECRET:-dev-whatsapp-web-webhook-secret}
-      WHATSAPP_WEB_SESSION_DATA_PATH: /app/.wwebjs_auth
-      WHATSAPP_WEB_CACHE_PATH: /app/.wwebjs_cache
-      WHATSAPP_WEB_HEADLESS: ${WHATSAPP_WEB_HEADLESS:-false}
-      WHATSAPP_WEB_VISUAL_MODE: ${WHATSAPP_WEB_VISUAL_MODE:-true}
-      WHATSAPP_WEB_BROWSER_VIEWER_URL: ${WHATSAPP_WEB_BROWSER_VIEWER_URL:-http://localhost:6080/vnc.html?autoconnect=true&resize=scale}
-      WHATSAPP_WEB_CHROME_EXECUTABLE: /usr/bin/chromium
-      PUPPETEER_EXECUTABLE_PATH: /usr/bin/chromium
-      WHATSAPP_WEB_CLEAN_PROFILE_LOCKS_ON_START: "true"
-      WHATSAPP_WEB_KILL_ORPHAN_CHROMIUM_ON_START: "true"
-      WHATSAPP_WEB_WEB_VERSION_CACHE: "none"
-      WHATSAPP_WEB_INIT_RETRIES: ${WHATSAPP_WEB_INIT_RETRIES:-5}
-      WHATSAPP_WEB_INIT_RETRY_DELAY_MS: ${WHATSAPP_WEB_INIT_RETRY_DELAY_MS:-10000}
-      WHATSAPP_WEB_PUPPETEER_PROTOCOL_TIMEOUT_MS: ${WHATSAPP_WEB_PUPPETEER_PROTOCOL_TIMEOUT_MS:-180000}
-      WHATSAPP_WEB_PUPPETEER_TIMEOUT_MS: ${WHATSAPP_WEB_PUPPETEER_TIMEOUT_MS:-180000}
-      WHATSAPP_WEB_RUNTIME_RECOVERY_DELAY_MS: ${WHATSAPP_WEB_RUNTIME_RECOVERY_DELAY_MS:-5000}
-      WHATSAPP_WEB_QR_TIMEOUT_SECONDS: ${WHATSAPP_WEB_QR_TIMEOUT_SECONDS:-120}
-      WHATSAPP_WEB_CHROME_EXTRA_ARGS: "--disable-features=Translate,BackForwardCache,AcceptCHFrame,MediaRouter,OptimizationHints|--disable-background-timer-throttling|--disable-backgrounding-occluded-windows|--disable-renderer-backgrounding"
-    ports:
-      - "3001:3001"
-      - "6080:6080"
-    volumes:
-      - whatsapp-webjs-session-data:/app/.wwebjs_auth
-      - whatsapp-webjs-cache-data:/app/.wwebjs_cache
-    healthcheck:
-      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:3001/health').then((r) => { if (!r.ok) process.exit(1); return r.json(); }).then((j) => { if (j.runtimeReady !== true) process.exit(1); }).catch(() => process.exit(1))\""]
-      start_period: 60s
-      interval: 15s
-      timeout: 10s
-      retries: 5
-    networks:
-      - asistente-local
+
 
   # ---------------------------------------------------------------------------
   # PUBLIC HTTPS TUNNEL (opcional: requiere --profile public-link)
@@ -333,16 +268,4 @@ volumes:
 
   caddy-data:
 
-  whatsapp-webjs-session-data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${PWD}/.docker/volumes/whatsapp-session
 
-  whatsapp-webjs-cache-data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${PWD}/.docker/volumes/whatsapp-cache

@@ -96,13 +96,13 @@ public class WhatsAppCloudWebhookParser {
 
                 if (value.messages() != null) {
                     for (Message message : value.messages()) {
-                        processMessageIdempotent(message, value, channelAccount, businessId, channelAccountId);
+                        processMessageIdempotent(message, value, channelAccount, businessId, channelAccountId, rawBody);
                     }
                 }
 
                 if (value.statuses() != null) {
                     for (Status status : value.statuses()) {
-                        processStatusIdempotent(status, channelAccount, businessId, channelAccountId);
+                        processStatusIdempotent(status, channelAccount, businessId, channelAccountId, rawBody);
                     }
                 }
             }
@@ -114,12 +114,13 @@ public class WhatsAppCloudWebhookParser {
             Value value,
             WhatsAppWebChannelJdbcRepository.ChannelAccountRecord channelAccount,
             UUID businessId,
-            UUID channelAccountId) {
+            UUID channelAccountId,
+            String rawBody) {
         String idempotencyKey = message.id() != null ? message.id() : computeHash(message);
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
 
         boolean inserted = repository.insertChannelEventLog(
-                businessId, channelAccountId, idempotencyKey, "WHATSAPP_CLOUD_MESSAGE", "",
+                businessId, channelAccountId, idempotencyKey, "WHATSAPP_CLOUD_MESSAGE", rawBody,
                 now);
 
         if (!inserted) {
@@ -134,13 +135,14 @@ public class WhatsAppCloudWebhookParser {
             Status status,
             WhatsAppWebChannelJdbcRepository.ChannelAccountRecord channelAccount,
             UUID businessId,
-            UUID channelAccountId) {
+            UUID channelAccountId,
+            String rawBody) {
         String stableKey = status.id() + "-" + status.status() + "-" + (status.timestamp() != null ? status.timestamp() : "0");
         String idempotencyKey = "STATUS_" + computeHash(stableKey);
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
 
         boolean inserted = repository.insertChannelEventLog(
-                businessId, channelAccountId, idempotencyKey, "WHATSAPP_CLOUD_STATUS", "",
+                businessId, channelAccountId, idempotencyKey, "WHATSAPP_CLOUD_STATUS", rawBody,
                 now);
 
         if (!inserted) {

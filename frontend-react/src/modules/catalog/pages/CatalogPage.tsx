@@ -1,6 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { EmptyState } from '../../../components/feedback/EmptyState'
 import { ErrorState } from '../../../components/feedback/ErrorState'
 import { LoadingState } from '../../../components/feedback/LoadingState'
@@ -113,7 +113,6 @@ function buildServiceStatusRequest(service: AestheticServiceResponse, active: bo
 }
 
 export function CatalogPage() {
-  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const isOnline = useOnlineStatus()
   const [tab, setTab] = useState<CatalogTab>('services')
@@ -153,6 +152,7 @@ export function CatalogPage() {
         search: filters.search || undefined,
         size: PAGE_SIZE,
       }),
+    enabled: tab === 'products',
     placeholderData: keepPreviousData,
     refetchInterval: isOnline ? 30_000 : false,
   })
@@ -165,6 +165,7 @@ export function CatalogPage() {
   const productCategoriesQuery = useQuery({
     queryKey: ['catalog', 'categories'],
     queryFn: () => listCatalogCategories({ active: true, size: 100 }),
+    enabled: tab === 'products',
   })
 
   const statusMutation = useMutation({
@@ -239,7 +240,6 @@ export function CatalogPage() {
             <Link className={buttonClassName({ variant: 'secondary' })} to="/catalog/services/new">
               Crear servicio
             </Link>
-            <Button onClick={() => navigate('/catalog/products/new')}>Crear producto</Button>
           </>
         }
         description="Catálogo real del centro estético conectado al servidor, con servicios, productos, precios, stock, categorías y estados editables."
@@ -254,19 +254,9 @@ export function CatalogPage() {
           tone="success"
         />
         <MetricCard
-          label="Productos activos"
-          value={String(metrics.activeProducts)}
-          tone="success"
-        />
-        <MetricCard
           label="Categorías visibles"
           value={String(metrics.totalCategories)}
           tone="info"
-        />
-        <MetricCard
-          label="Stock bajo"
-          value={String(metrics.lowStock)}
-          tone={metrics.lowStock > 0 ? 'warning' : 'success'}
         />
       </div>
 
@@ -284,18 +274,10 @@ export function CatalogPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex rounded-[18px] border border-[var(--color-border)] bg-slate-50 p-1">
             <button
-              className={`rounded-[14px] px-4 py-2 text-sm font-semibold ${tab === 'services' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-600'}`}
-              onClick={() => changeTab('services')}
+              className="rounded-[14px] bg-white px-4 py-2 text-sm font-semibold text-blue-700 shadow-sm"
               type="button"
             >
               Servicios
-            </button>
-            <button
-              className={`rounded-[14px] px-4 py-2 text-sm font-semibold ${tab === 'products' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-600'}`}
-              onClick={() => changeTab('products')}
-              type="button"
-            >
-              Productos
             </button>
           </div>
           <StatusBadge label={`${currentQuery.data?.totalItems ?? 0} registro(s)`} tone="info" />

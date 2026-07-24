@@ -138,6 +138,27 @@ public class WhatsAppWebChannelJdbcRepository {
             String qrCode,
             OffsetDateTime lastEventAt) {
         boolean hasQrCode = qrCode != null && !qrCode.isBlank();
+        
+        // Check if the new phone_number already exists for another channel_account of the same business
+        if (phoneNumber != null && !phoneNumber.isBlank()) {
+            String existingId = jdbcTemplate.queryForObject(
+                    """
+                            select id::text from channel_account
+                            where business_id = (select business_id from channel_account where id = ?)
+                              and phone_number = ?
+                              and id <> ?
+                            limit 1
+                            """,
+                    String.class,
+                    channelAccountId, phoneNumber, channelAccountId);
+            if (existingId != null) {
+                // Clear the phone_number from the conflicting record first
+                jdbcTemplate.update(
+                        "update channel_account set phone_number = null, updated_at = current_timestamp where id = ?",
+                        UUID.fromString(existingId));
+            }
+        }
+
         jdbcTemplate.update(
                 """
                         update channel_account
@@ -171,6 +192,7 @@ public class WhatsAppWebChannelJdbcRepository {
             String eventType,
             String payloadJson,
             OffsetDateTime receivedAt) {
+        String safePayload = (payloadJson == null || payloadJson.isBlank()) ? "{}" : payloadJson;
         try {
             int inserted = jdbcTemplate.update(
                     """
@@ -183,7 +205,7 @@ public class WhatsAppWebChannelJdbcRepository {
                                 payload,
                                 received_at,
                                 processing_status
-                            ) values (?, ?, ?, ?, ?, cast(? as jsonb), ?, 'RECEIVED')
+                            ) values (?, ?, ?, ?, ?, cast(coalesce(nullif(?, ''), '{}') as jsonb), ?, 'RECEIVED')
                             on conflict do nothing
                             """,
                     UUID.randomUUID(),
@@ -191,7 +213,7 @@ public class WhatsAppWebChannelJdbcRepository {
                     channelAccountId,
                     deliveryId,
                     eventType,
-                    payloadJson,
+                    safePayload,
                     receivedAt);
             return inserted > 0;
         } catch (DuplicateKeyException exception) {

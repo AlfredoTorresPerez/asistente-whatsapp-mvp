@@ -3,7 +3,6 @@ import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { CommercialWhatsAppQr } from '../../../components/whatsapp/CommercialWhatsAppQr'
 import { Button } from '../../../components/ui/Button'
 import { Card } from '../../../components/ui/Card'
 import { Input } from '../../../components/ui/Input'
@@ -216,28 +215,6 @@ export function CreatePublicBookingPage() {
             </div>
           ) : null}
         </div>
-
-        {whatsappEntryQuery.isLoading ? (
-          <Card>
-            <div className="flex animate-pulse items-center gap-4">
-              <div className="h-32 w-32 flex-shrink-0 rounded-xl bg-slate-200" />
-              <div className="flex-1 space-y-3">
-                <div className="h-4 w-24 rounded bg-slate-200" />
-                <div className="h-3 w-48 rounded bg-slate-200" />
-                <div className="h-10 w-36 rounded-xl bg-slate-200" />
-              </div>
-            </div>
-          </Card>
-        ) : whatsappEntryQuery.data ? (
-          <Card>
-            <CommercialWhatsAppQr
-              displayPhoneNumber={whatsappEntryQuery.data.displayPhoneNumber}
-              locationName={whatsappEntryQuery.data.locationName}
-              prefilledMessage={whatsappEntryQuery.data.prefilledMessage}
-              waUrl={whatsappEntryQuery.data.waUrl}
-            />
-          </Card>
-        ) : null}
 
         {step < 6 && (
           <div className="flex items-center justify-center gap-1 sm:gap-2">

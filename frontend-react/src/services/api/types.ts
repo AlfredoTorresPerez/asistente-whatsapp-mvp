@@ -1854,3 +1854,62 @@ export type WhatsAppEntryResponse = {
   locationCode: string
   locationName: string
 }
+
+export type PublicCenterResponse = {
+  company: {
+    name: string
+    businessName: string
+    description: string | null
+    email: string
+    phone: string | null
+    address: string | null
+  }
+  services: Array<{
+    id: string
+    name: string
+    description: string | null
+    categoryCode: string | null
+    categoryName: string | null
+    durationMinutes: number | null
+    priceBase: number | null
+  }>
+  promotions: Array<{
+    id: string
+    name: string
+    description: string
+    discountType: string
+    discountValue: number
+    startsOn: string | null
+    endsOn: string | null
+  }>
+  locations: Array<{
+    id: string
+    name: string
+    address: string | null
+    city: string | null
+    commune: string | null
+    phone: string | null
+    timezone: string
+  }>
+  whatsapp: {
+    waUrl: string
+    phoneNumber: string
+    displayPhoneNumber: string
+    prefilledMessage: string
+  } | null
+  page: {
+    primaryColor: string
+    secondaryColor: string
+    welcomeTitle: string | null
+    welcomeSubtitle: string | null
+    aboutTitle: string | null
+    aboutText: string | null
+    benefits: Array<{ icon: string; title: string; text: string }>
+    testimonials: Array<{ name: string; text: string; rating: number | null }>
+    headerLogoUrl: string | null
+    heroImageUrl: string | null
+    showServices: boolean
+    showPromotions: boolean
+    showTestimonials: boolean
+  }
+}
