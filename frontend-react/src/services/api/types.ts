@@ -1913,3 +1913,85 @@ export type PublicCenterResponse = {
     showTestimonials: boolean
   }
 }
+
+// Content Items
+export type ContentItemType = 'CATEGORY' | 'SERVICE' | 'LANDING_PAGE'
+
+export type ContentItemStatus = 'ACTIVE' | 'INACTIVE'
+
+export type ContentItemSummaryResponse = {
+  id: string
+  typeLabel: string
+  textPreview: string
+  status: string
+  imageUrl: string | null
+  updatedAt: string
+}
+
+export type ContentItemDetailResponse = {
+  id: string
+  type: string
+  typeLabel: string
+  imagePath: string | null
+  imageUrl: string | null
+  text: string
+  status: string
+  createdAt: string
+  updatedAt: string
+  createdBy: string | null
+  updatedBy: string | null
+  version: number
+}
+
+export type ContentItemListResponse = {
+  items: ContentItemSummaryResponse[]
+  page: number
+  size: number
+  totalItems: number
+  totalPages: number
+  stats: ContentStatsResponse
+}
+
+export type ContentStatsResponse = {
+  total: number
+  active: number
+  inactive: number
+  withoutImage: number
+}
+
+export type ContentItemListRequest = {
+  page?: number
+  size?: number
+  search?: string
+  type?: string
+  status?: string
+}
+
+export type CreateContentItemRequest = {
+  type: string
+  text: string
+  status: string
+}
+
+export type UpdateContentItemRequest = {
+  type?: string
+  text?: string
+  status?: string
+}
+
+export type UpdateContentItemStatusRequest = {
+  status: string
+}
+
+export type PublicContentItemResponse = {
+  id: string
+  type: string
+  text: string
+  imageUrl: string | null
+  status: string
+}
+
+export type ContentItemImageUploadResponse = {
+  imagePath: string
+  imageUrl: string
+}

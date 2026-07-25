@@ -11,8 +11,9 @@ import { PageHeader } from '../../../components/ui/PageHeader'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { getAdminSummaryRequest } from '../../../services/api/administrationApi'
 import type { AdminSummaryResponse } from '../../../services/api/types'
+import { AdminContentPage } from './AdminContentPage'
 
-type AdminArea = 'company' | 'locations' | 'multisite' | 'whatsapp-web' | 'users' | 'security'
+type AdminArea = 'company' | 'locations' | 'multisite' | 'whatsapp-web' | 'users' | 'security' | 'content'
 
 function getWhatsAppWebTone(status: string) {
   switch (status) {
@@ -71,8 +72,8 @@ export function AdministrationPage() {
           </>
         }
         description="Centro de configuracion inicial del negocio, con resumen de empresa, acceso a WhatsApp Web experimental y atajos a seguridad y usuarios."
-        eyebrow="Administracion"
-        title="Administracion"
+        eyebrow="Administración"
+        title="Administración"
       />
 
       {adminSummaryQuery.isPending && !summary ? (
@@ -136,6 +137,9 @@ export function AdministrationPage() {
           ) : null}
           {activeArea === 'security' ? (
             <SecurityAdminPanel sessionTimeoutMinutes={summary.security.sessionTimeoutMinutes} />
+          ) : null}
+          {activeArea === 'content' ? (
+            <AdminContentPage />
           ) : null}
         </>
       ) : null}
@@ -215,9 +219,14 @@ function AdminAreaTabs({
     },
     {
       badge: <StatusBadge label={`${summary.security.sessionTimeoutMinutes} min`} tone="neutral" />,
-      description: 'Politicas, sesiones y auditoria administrativa',
+      description: 'Políticas, sesiones y auditoría administrativa',
       label: 'Seguridad',
       value: 'security',
+    },
+    {
+      description: 'Imágenes y textos para categorías, servicios y landing page',
+      label: 'Contenido visual',
+      value: 'content',
     },
   ]
 

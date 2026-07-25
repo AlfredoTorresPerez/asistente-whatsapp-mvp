@@ -621,9 +621,9 @@ export function WhatsAppWebConnectionPage() {
             </Button>
           </>
         }
-        description="Controla el estado del adaptador desacoplado, revisa el QR de sesion y ejecuta un envio de prueba sin acoplar el backend al runtime Node."
-        eyebrow="Administracion"
-        title="Conexion WhatsApp Web"
+        description="Controla el estado del adaptador desacoplado, revisa el QR de sesión y ejecuta un envío de prueba sin acoplar el backend al runtime Node."
+        eyebrow="Administración"
+        title="Conexión WhatsApp Web"
       />
 
       <Card className="border-amber-200 bg-amber-50">

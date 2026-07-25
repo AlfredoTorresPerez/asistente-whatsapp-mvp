@@ -80,7 +80,7 @@ export function WhatsAppSimulatorPage() {
     <section className="space-y-6">
       <PageHeader
         description="Simula mensajes entrantes de WhatsApp sin usar Postman. Los mensajes se procesan como si llegaran desde un cliente real."
-        eyebrow="Administracion"
+        eyebrow="Administración"
         title="Simulador WhatsApp"
       />
 

@@ -40,9 +40,9 @@ export const PRIMARY_NAV_ITEMS: NavigationItem[] = [
     description: 'Citas pendientes y reprogramaciones.',
   },
   {
-    label: 'Catalogo',
+    label: 'Catálogo',
     path: '/catalog',
-    description: 'Productos y servicios del catalogo comercial.',
+    description: 'Productos y servicios del catálogo comercial.',
   },
   {
     label: 'Reglas',
@@ -63,25 +63,25 @@ export const PRIMARY_NAV_ITEMS: NavigationItem[] = [
   {
     label: 'Sedes del negocio',
     path: '/admin/locations',
-    description: 'Administra sucursales, direccion, telefono, WhatsApp y operacion multisede.',
+    description: 'Administra sucursales, dirección, teléfono, WhatsApp y operación multisede.',
     allowedRoles: ['OWNER', 'ADMIN'],
   },
   {
-    label: 'Operacion multisede',
+    label: 'Operación multisede',
     path: '/admin/multisite',
     description: 'Disponibilidad, stock, profesionales, permisos y canales por sede.',
     allowedRoles: ['OWNER', 'ADMIN'],
   },
   {
-    label: 'Administracion',
+    label: 'Administración',
     path: '/admin',
     description: 'Empresa, usuarios, seguridad y WhatsApp Web.',
     allowedRoles: ['OWNER', 'ADMIN'],
   },
   {
-    label: 'Configuracion',
+    label: 'Configuración',
     path: '/configuration',
-    description: 'Conexion, dispositivos, QR y preferencias de WhatsApp Web.',
+    description: 'Conexión, dispositivos, QR y preferencias de WhatsApp Web.',
     allowedRoles: ['OWNER', 'ADMIN', 'SUPERVISOR'],
   },
   {
@@ -112,18 +112,18 @@ const ROUTE_METADATA: RouteMeta[] = [
   },
   {
     path: '/profile/change-password',
-    title: 'Cambiar contrasena',
-    description: 'Pantalla reservada para la actualizacion de credenciales del usuario.',
+    title: 'Cambiar contraseña',
+    description: 'Pantalla reservada para la actualización de credenciales del usuario.',
   },
   {
     path: '/profile',
     title: 'Perfil de usuario',
-    description: 'Datos personales, zona horaria y configuracion base del usuario.',
+    description: 'Datos personales, zona horaria y configuración base del usuario.',
   },
   {
     path: '/conversations/new',
     title: 'Nueva conversacion',
-    description: 'Alta manual para iniciar una conversacion desde el shell privado.',
+    description: 'Alta manual para iniciar una conversación desde el shell privado.',
   },
   {
     matcher: /^\/conversations\/[^/]+\/prospects\/new$/,
@@ -173,13 +173,13 @@ const ROUTE_METADATA: RouteMeta[] = [
   {
     path: '/prospects',
     title: 'Prospectos',
-    description: 'Embudo comercial con filtros, busqueda y navegacion a detalle.',
+    description: 'Embudo comercial con filtros, búsqueda y navegación a detalle.',
   },
   {
     path: '/agenda',
     title: 'Agenda digital completa',
     description:
-      'Disponibilidad por sucursal, profesional, cabina, reserva temporal y enlace de confirmacion.',
+      'Disponibilidad por sucursal, profesional, cabina, reserva temporal y enlace de confirmación.',
   },
   {
     path: '/appointments/new',
@@ -189,12 +189,12 @@ const ROUTE_METADATA: RouteMeta[] = [
   {
     matcher: /^\/appointments\/[^/]+\/edit$/,
     title: 'Editar cita',
-    description: 'Actualizacion de estado, horario, ubicación y notas de la cita.',
+    description: 'Actualización de estado, horario, ubicación y notas de la cita.',
   },
   {
     matcher: /^\/appointments\/[^/]+\/reschedule$/,
     title: 'Reprogramar cita',
-    description: 'Actualizacion puntual de fecha, duracion y motivo del cambio.',
+    description: 'Actualización puntual de fecha, duración y motivo del cambio.',
   },
   {
     matcher: /^\/appointments\/[^/]+$/,
@@ -214,16 +214,16 @@ const ROUTE_METADATA: RouteMeta[] = [
   {
     path: '/catalog/products/new',
     title: 'Crear producto',
-    description: 'Formulario para cargar productos o servicios del catalogo.',
+    description: 'Formulario para cargar productos o servicios del catálogo.',
   },
   {
     matcher: /^\/catalog\/products\/[^/]+\/edit$/,
     title: 'Editar producto',
-    description: 'Formulario reservado para actualizar datos del catalogo.',
+    description: 'Formulario reservado para actualizar datos del catálogo.',
   },
   {
     path: '/catalog',
-    title: 'Catalogo',
+    title: 'Catálogo',
     description: 'Listado de productos y servicios con filtros y estado.',
   },
   {
@@ -234,7 +234,7 @@ const ROUTE_METADATA: RouteMeta[] = [
   {
     matcher: /^\/automation-rules\/[^/]+\/edit$/,
     title: 'Editar regla',
-    description: 'Edicion reservada para la configuracion de automatizaciones.',
+    description: 'Edición reservada para la configuración de automatizaciones.',
   },
   {
     matcher: /^\/automation-rules\/[^/]+\/test$/,
@@ -243,13 +243,13 @@ const ROUTE_METADATA: RouteMeta[] = [
   },
   {
     path: '/automation-rules',
-    title: 'Reglas de automatizacion',
+    title: 'Reglas de automatización',
     description: 'Listado de reglas simples con filtros por trigger y estado.',
   },
   {
     path: '/business-ai',
     title: 'IA del Negocio',
-    description: 'Panel de orquestacion multiagente, conocimiento, auditoria y escalamiento.',
+    description: 'Panel de orquestación multiagente, conocimiento, auditoría y escalamiento.',
   },
   {
     path: '/reports',
@@ -259,24 +259,24 @@ const ROUTE_METADATA: RouteMeta[] = [
   },
   {
     path: '/configuration',
-    title: 'Configuracion',
-    description: 'Conexion, dispositivos, QR y preferencias de WhatsApp Web.',
+    title: 'Configuración',
+    description: 'Conexión, dispositivos, QR y preferencias de WhatsApp Web.',
   },
   {
     path: '/admin/company',
-    title: 'Configuracion de empresa',
+    title: 'Configuración de empresa',
     description: 'Datos corporativos base del negocio y su contexto operativo.',
   },
   {
     path: '/admin/locations',
     title: 'Sedes del negocio',
-    description: 'Administracion de sedes para agenda, conversaciones y operacion multisede.',
+    description: 'Administración de sedes para agenda, conversaciones y operación multisede.',
   },
   {
     path: '/admin/multisite',
-    title: 'Operacion multisede',
+    title: 'Operación multisede',
     description:
-      'Control operativo de catalogo, stock, profesionales, permisos y canales por sede.',
+      'Control operativo de catálogo, stock, profesionales, permisos y canales por sede.',
   },
   {
     path: '/admin/users/new',
@@ -295,13 +295,13 @@ const ROUTE_METADATA: RouteMeta[] = [
   },
   {
     path: '/admin/whatsapp-web',
-    title: 'Conexion WhatsApp Web',
+    title: 'Conexión WhatsApp Web',
     description: 'Vista del estado del adaptador experimental desacoplado.',
   },
   {
     path: '/admin/security',
     title: 'Seguridad',
-    description: 'Politicas de contrasena, sesion y bloqueo del negocio.',
+    description: 'Políticas de contraseña, sesión y bloqueo del negocio.',
   },
   {
     path: '/admin/whatsapp-simulator',
@@ -310,7 +310,7 @@ const ROUTE_METADATA: RouteMeta[] = [
   },
   {
     path: '/admin',
-    title: 'Administracion',
+    title: 'Administración',
     description: 'Resumen de empresa, usuarios, seguridad y estado del canal.',
   },
 ]

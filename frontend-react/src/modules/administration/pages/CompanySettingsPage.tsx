@@ -142,7 +142,7 @@ export function CompanySettingsPage() {
           </>
         }
         description="Actualiza la razon social, el nombre comercial y los datos operativos base que usa el shell privado."
-        eyebrow="Administracion"
+        eyebrow="Administración"
         title="Configuracion de empresa"
       />
 

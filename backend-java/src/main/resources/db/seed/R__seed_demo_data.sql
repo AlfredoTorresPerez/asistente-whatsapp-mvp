@@ -123,3 +123,5 @@ insert into audit_log (id, business_id, actor_user_id, action_type, entity_type,
 values ('69900000-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', '40000000-0000-0000-0000-000000000001', 'USER_CREATED', 'USER_ACCOUNT', '40000000-0000-0000-0000-000000000001', 'Usuario administrador demo creado.', '{"email":"admin@demo.cl"}'::jsonb, '2026-06-25T17:50:00Z'),
        ('69900000-0000-0000-0000-000000000002', '11111111-1111-1111-1111-111111111111', '40000000-0000-0000-0000-000000000001', 'RULE_TESTED', 'AUTOMATION_RULE', '69300000-0000-0000-0000-000000000001', 'Regla demo probada con coincidencia positiva.', '{"matched":true}'::jsonb, '2026-06-25T19:20:01Z')
 on conflict (id) do nothing;
+
+

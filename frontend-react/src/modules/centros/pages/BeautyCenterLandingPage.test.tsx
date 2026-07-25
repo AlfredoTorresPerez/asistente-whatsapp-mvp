@@ -6,6 +6,12 @@ import { AppProviders } from '../../../app/providers/AppProviders'
 import { BeautyCenterLandingPage } from './BeautyCenterLandingPage'
 import { IMAGES } from '../../../lib/landingImages'
 
+vi.mock('../hooks/usePublicContent', () => ({
+  usePublicLandingContent: () => ({ items: [], isLoading: false, error: null, refetch: vi.fn() }),
+  usePublicServicesContent: () => ({ items: [], isLoading: false, error: null, refetch: vi.fn() }),
+  usePublicCategoriesContent: () => ({ items: [], isLoading: false, error: null, refetch: vi.fn() }),
+}))
+
 function renderPage() {
   return render(
     <AppProviders>

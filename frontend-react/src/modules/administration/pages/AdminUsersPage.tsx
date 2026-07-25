@@ -95,7 +95,7 @@ export function AdminUsersPage() {
           </>
         }
         description="Gestiona usuarios del negocio, roles operativos y estado de acceso para la demo administrativa."
-        eyebrow="Administracion"
+        eyebrow="Administración"
         title="Usuarios y roles"
       />
 

@@ -511,7 +511,7 @@ export function CenterPublicPage() {
         <section className="py-16 md:py-24" style={{ backgroundColor: '#fdfaf7' }}>
           <div className="mx-auto max-w-3xl px-4 text-center">
             <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">
-              {`${'\u00bf'}Tienes dudas o quieres reservar ahora?`}
+              {`¿Tienes dudas o quieres reservar ahora?`}
             </h2>
             <p className="mt-4 text-lg text-gray-600">
               Escrbenos por WhatsApp y te atenderemos a la brevedad.

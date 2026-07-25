@@ -1,18 +1,25 @@
 import type { ReactNode, TextareaHTMLAttributes } from 'react'
-import { forwardRef } from 'react'
+import { forwardRef, useState } from 'react'
 
 type TextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   label?: string
   error?: string
   hint?: string
   leadingIcon?: ReactNode
+  counter?: number
 }
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function Textarea(
-  { className, error, hint, id, label, leadingIcon, rows = 5, ...props },
+  { className, counter, error, hint, id, label, leadingIcon, maxLength, rows = 5, ...props },
   ref,
 ) {
   const textareaId = id ?? props.name
+  const [length, setLength] = useState(0)
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setLength(e.target.value.length)
+    props.onChange?.(e)
+  }
 
   return (
     <label className="block">
@@ -46,12 +53,21 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
             .join(' ')
             .trim()}
           id={textareaId}
+          maxLength={maxLength}
+          onChange={handleChange}
           rows={rows}
           {...props}
         />
       </span>
 
-      {error ? (
+      {counter !== undefined ? (
+        <div className="flex justify-between mt-1">
+          {hint && <span className="text-xs leading-5 text-slate-500">{hint}</span>}
+          <span className="text-xs text-slate-500">
+            {length} / {counter}
+          </span>
+        </div>
+      ) : error ? (
         <span className="mt-2 block text-sm text-red-700">{error}</span>
       ) : hint ? (
         <span className="mt-2 block text-xs leading-5 text-slate-500">{hint}</span>

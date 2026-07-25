@@ -1,11 +1,13 @@
 import { useCallback } from 'react'
 import { LandingImage } from '../../../components/ui/LandingImage'
 import { buildPublicWhatsAppUrl } from '../../../lib/whatsapp'
-import { IMAGES, DEFAULT_LANDING_IMAGE, resolveServiceImage } from '../../../lib/landingImages'
+import { IMAGES, DEFAULT_LANDING_IMAGE } from '../../../lib/landingImages'
+import { usePublicLandingContent, usePublicServicesContent, usePublicCategoriesContent } from '../hooks/usePublicContent'
+import type { PublicContentItemResponse } from '../../../services/api/types'
 
 const WHATSAPP_MESSAGE_DEFAULT = 'Hola, quiero solicitar información y agendar una hora en Centro Estética Bella.'
 
-const SERVICES = [
+const FALLBACK_SERVICES = [
   {
     name: 'Limpiezas faciales',
     slug: 'limpiezas-faciales',
@@ -113,7 +115,77 @@ function ScrollLink({ targetId, children, className }: { targetId: string; child
   )
 }
 
+function ServiceCard({ imageUrl, text, message }: { imageUrl: string | null; text: string; message: string }) {
+  return (
+    <article className="group flex flex-col rounded-2xl border border-rose-100/60 bg-white shadow-sm transition hover:shadow-md">
+      <div className="aspect-[4/3] overflow-hidden rounded-t-2xl">
+        <LandingImage
+          src={imageUrl}
+          fallbackSrc={IMAGES.HERO_SECONDARY}
+          alt={text}
+          className="h-full w-full transition duration-300 group-hover:scale-105"
+          width={340}
+          height={255}
+          objectFit="cover"
+        />
+      </div>
+      <div className="flex flex-1 flex-col p-5">
+        <p className="mt-0 flex-1 text-sm leading-relaxed text-gray-600">{text}</p>
+        <button
+          onClick={() => openWhatsApp(message)}
+          className="mt-4 w-full rounded-xl bg-gray-50 py-2.5 text-xs font-semibold text-gray-600 transition hover:bg-[#25D366] hover:text-white"
+        >
+          Consultar por WhatsApp
+        </button>
+      </div>
+    </article>
+  )
+}
+
+function ContentCard({ item }: { item: PublicContentItemResponse }) {
+  return (
+    <article className="group flex flex-col rounded-2xl border border-rose-100/60 bg-white shadow-sm transition hover:shadow-md">
+      {item.imageUrl && (
+        <div className="aspect-[4/3] overflow-hidden rounded-t-2xl">
+          <LandingImage
+            src={item.imageUrl}
+            fallbackSrc={DEFAULT_LANDING_IMAGE}
+            alt={item.text}
+            className="h-full w-full transition duration-300 group-hover:scale-105"
+            width={340}
+            height={255}
+            objectFit="cover"
+          />
+        </div>
+      )}
+      <div className="flex flex-1 flex-col p-5">
+        <p className="flex-1 text-sm leading-relaxed text-gray-600">{item.text}</p>
+      </div>
+    </article>
+  )
+}
+
+function LandingSectionHeader({ label, title, description }: { label?: string; title: string; description?: string }) {
+  return (
+    <div className="mx-auto max-w-2xl text-center">
+      {label && <p className="text-sm font-semibold uppercase tracking-[0.2em] text-rose-400">{label}</p>}
+      <h2 className="mt-3 text-3xl font-bold text-gray-900 md:text-4xl">{title}</h2>
+      {description && <p className="mt-3 text-gray-600">{description}</p>}
+    </div>
+  )
+}
+
 export function BeautyCenterLandingPage() {
+  const { items: landingItems, isLoading: landingLoading } = usePublicLandingContent()
+  const { items: serviceItems, isLoading: servicesLoading } = usePublicServicesContent()
+  const { items: categoryItems, isLoading: categoriesLoading } = usePublicCategoriesContent()
+
+  const hasLandingData = !landingLoading && landingItems.length > 0
+  const hasServiceData = !servicesLoading && serviceItems.length > 0
+
+  const heroLandingItem = landingItems.find(i => i.imageUrl) ?? landingItems[0]
+  const heroImageUrl = heroLandingItem?.imageUrl ?? IMAGES.HERO
+
   return (
     <div className="min-h-screen bg-[#fefcfb] font-sans text-gray-800">
       <a href="#inicio" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-rose-600 focus:shadow-lg">
@@ -159,10 +231,10 @@ export function BeautyCenterLandingPage() {
                 Centro Estética Bella
               </p>
               <h1 className="mt-4 text-4xl font-bold leading-tight tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
-                Realza tu belleza y disfruta una experiencia pensada para ti
+                {hasLandingData ? landingItems[0].text : 'Realza tu belleza y disfruta una experiencia pensada para ti'}
               </h1>
               <p className="mt-4 max-w-xl text-base leading-relaxed text-gray-600 md:text-lg">
-                En Centro Estética Bella ofrecemos tratamientos faciales, hidratación, depilación y cuidado estético personalizado, en un ambiente profesional, cálido y seguro.
+                {hasLandingData && landingItems.length > 1 ? landingItems[1].text : 'En Centro Estética Bella ofrecemos tratamientos faciales, hidratación, depilación y cuidado estético personalizado, en un ambiente profesional, cálido y seguro.'}
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-4">
                 <button
@@ -185,7 +257,7 @@ export function BeautyCenterLandingPage() {
                 <picture>
                   <source srcSet={IMAGES.HERO_WEBP} type="image/webp" />
                   <LandingImage
-                    src={IMAGES.HERO}
+                    src={heroImageUrl}
                     fallbackSrc={DEFAULT_LANDING_IMAGE}
                     alt="Centro Estética Bella, servicios de belleza, bienestar y cuidado profesional"
                     className="w-full"
@@ -201,50 +273,81 @@ export function BeautyCenterLandingPage() {
           </div>
         </section>
 
+        {hasLandingData && landingItems.length > 1 && (
+          <section className="bg-white py-16 md:py-24">
+            <div className="mx-auto max-w-7xl px-4">
+              <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {landingItems.slice(1).map(item => (
+                  <ContentCard key={item.id} item={item} />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
         <section id="servicios" className="scroll-mt-16 bg-[#fdf8f6] py-16 md:py-24">
           <div className="mx-auto max-w-7xl px-4">
-            <div className="mx-auto max-w-2xl text-center">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-rose-400">Servicios</p>
-              <h2 className="mt-3 text-3xl font-bold text-gray-900 md:text-4xl">Nuestros tratamientos</h2>
-              <p className="mt-3 text-gray-600">
-                Descubre nuestra amplia gama de servicios diseñados para realzar tu belleza natural.
-              </p>
-            </div>
+            <LandingSectionHeader
+              label="Servicios"
+              title="Nuestros tratamientos"
+              description="Descubre nuestra amplia gama de servicios diseñados para realzar tu belleza natural."
+            />
             <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {SERVICES.map((service) => {
-                const serviceImg = resolveServiceImage({ slug: service.slug })
-                return (
-                  <article
-                    key={service.name}
-                    className="group flex flex-col rounded-2xl border border-rose-100/60 bg-white shadow-sm transition hover:shadow-md"
-                  >
-                    <div className="aspect-[4/3] overflow-hidden rounded-t-2xl">
-                      <LandingImage
-                        src={serviceImg !== DEFAULT_LANDING_IMAGE ? serviceImg : null}
-                        fallbackSrc={IMAGES.HERO_SECONDARY}
-                        alt={`${service.name} en Centro Estética Bella`}
-                        className="h-full w-full transition duration-300 group-hover:scale-105"
-                        width={340}
-                        height={255}
-                        objectFit="cover"
-                      />
-                    </div>
-                    <div className="flex flex-1 flex-col p-5">
-                      <h3 className="text-lg font-semibold text-gray-900">{service.name}</h3>
-                      <p className="mt-2 flex-1 text-sm leading-relaxed text-gray-500">{service.description}</p>
-                      <button
-                        onClick={() => openWhatsApp(service.message)}
-                        className="mt-4 w-full rounded-xl bg-gray-50 py-2.5 text-xs font-semibold text-gray-600 transition hover:bg-[#25D366] hover:text-white"
-                      >
-                        Consultar por WhatsApp
-                      </button>
-                    </div>
-                  </article>
-                )
-              })}
+              {hasServiceData ? serviceItems.map(item => (
+                <ServiceCard
+                  key={item.id}
+                  imageUrl={item.imageUrl}
+                  text={item.text}
+                  message={`Hola, quiero información sobre este servicio de Centro Estética Bella.`}
+                />
+              )) : FALLBACK_SERVICES.map((service) => (
+                <article
+                  key={service.name}
+                  className="group flex flex-col rounded-2xl border border-rose-100/60 bg-white shadow-sm transition hover:shadow-md"
+                >
+                  <div className="aspect-[4/3] overflow-hidden rounded-t-2xl">
+                    <LandingImage
+                      src={null}
+                      fallbackSrc={IMAGES.HERO_SECONDARY}
+                      alt={`${service.name} en Centro Estética Bella`}
+                      className="h-full w-full transition duration-300 group-hover:scale-105"
+                      width={340}
+                      height={255}
+                      objectFit="cover"
+                    />
+                  </div>
+                  <div className="flex flex-1 flex-col p-5">
+                    <h3 className="text-lg font-semibold text-gray-900">{service.name}</h3>
+                    <p className="mt-2 flex-1 text-sm leading-relaxed text-gray-500">{service.description}</p>
+                    <button
+                      onClick={() => openWhatsApp(service.message)}
+                      className="mt-4 w-full rounded-xl bg-gray-50 py-2.5 text-xs font-semibold text-gray-600 transition hover:bg-[#25D366] hover:text-white"
+                    >
+                      Consultar por WhatsApp
+                    </button>
+                  </div>
+                </article>
+              ))}
             </div>
           </div>
         </section>
+
+        {!categoriesLoading && categoryItems.length > 0 && (
+          <section id="categorias" className="scroll-mt-16 bg-white py-16 md:py-24">
+            <div className="mx-auto max-w-7xl px-4">
+              <LandingSectionHeader
+                label="Categorías"
+                title="Explora por categoría"
+                description="Encuentra el tratamiento perfecto para ti."
+              />
+              <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                {categoryItems.map(item => (
+                  <ContentCard key={item.id} item={item} />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         <section id="sobre-nosotros" className="scroll-mt-16 bg-white py-16 md:py-24">
           <div className="mx-auto max-w-7xl px-4">
@@ -278,10 +381,10 @@ export function BeautyCenterLandingPage() {
 
         <section id="beneficios" className="scroll-mt-16 bg-white py-16 md:py-24">
           <div className="mx-auto max-w-7xl px-4">
-            <div className="mx-auto max-w-2xl text-center">
-              <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">¿Por qué elegirnos?</h2>
-              <p className="mt-3 text-gray-600">Nos esforzamos por ofrecer la mejor experiencia de cuidado personal.</p>
-            </div>
+            <LandingSectionHeader
+              title="¿Por qué elegirnos?"
+              description="Nos esforzamos por ofrecer la mejor experiencia de cuidado personal."
+            />
             <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
               {BENEFITS.map((benefit) => (
                 <div key={benefit.title} className="rounded-2xl border border-rose-50 bg-white p-6 text-center shadow-sm">
@@ -298,11 +401,11 @@ export function BeautyCenterLandingPage() {
 
         <section id="promociones" className="scroll-mt-16 bg-[#fdf8f6] py-16 md:py-24">
           <div className="mx-auto max-w-7xl px-4">
-            <div className="mx-auto max-w-2xl text-center">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-rose-400">Promociones</p>
-              <h2 className="mt-3 text-3xl font-bold text-gray-900 md:text-4xl">Ofertas especiales</h2>
-              <p className="mt-3 text-gray-600">Aprovecha nuestros precios promocionales por tiempo limitado.</p>
-            </div>
+            <LandingSectionHeader
+              label="Promociones"
+              title="Ofertas especiales"
+              description="Aprovecha nuestros precios promocionales por tiempo limitado."
+            />
             <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {PROMOTIONS.map((promo) => (
                 <article
@@ -359,10 +462,10 @@ export function BeautyCenterLandingPage() {
 
         <section id="contacto" className="scroll-mt-16 bg-white py-16 md:py-24">
           <div className="mx-auto max-w-7xl px-4">
-            <div className="mx-auto max-w-2xl text-center">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-rose-400">Contacto</p>
-              <h2 className="mt-3 text-3xl font-bold text-gray-900 md:text-4xl">Visítanos</h2>
-            </div>
+            <LandingSectionHeader
+              label="Contacto"
+              title="Visítanos"
+            />
             <div className="mt-12 grid items-start gap-10 md:grid-cols-2 md:gap-16">
               <div>
                 <div className="space-y-4 text-base text-gray-600">

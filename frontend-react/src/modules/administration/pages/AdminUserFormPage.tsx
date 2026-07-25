@@ -175,7 +175,7 @@ function AdminUserForm({
           </Link>
         }
         description="Define datos de acceso, rol operativo y estado del usuario."
-        eyebrow="Administracion"
+        eyebrow="Administración"
         title={isEdit ? 'Editar usuario' : 'Crear usuario'}
       />
 

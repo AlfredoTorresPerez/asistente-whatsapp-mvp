@@ -18,6 +18,7 @@ spring:
           time_zone: UTC
   flyway:
     enabled: true
+    locations: classpath:db/migration
   jackson:
     time-zone: UTC
   mail:
@@ -39,6 +40,12 @@ spring:
 server:
   port: ${SERVER_PORT:8080}
   forward-headers-strategy: framework
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+    locale: es_CL
   error:
     include-message: never
     include-stacktrace: never

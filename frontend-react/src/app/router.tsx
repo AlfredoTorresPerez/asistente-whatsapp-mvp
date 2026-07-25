@@ -2,6 +2,7 @@ import type { RouteObject } from 'react-router-dom'
 import { Navigate, createBrowserRouter } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import {
+  AdminContentPage,
   AdminLocationsPage,
   AdminSecurityPage,
   AdminUserFormPage,
@@ -359,6 +360,14 @@ export const appRoutes: RouteObject[] = [
         element: (
           <RequirePermission permission="LOCATIONS_MANAGE">
             <AdminLocationsPage />
+          </RequirePermission>
+        ),
+      },
+      {
+        path: 'admin/content',
+        element: (
+          <RequirePermission permission="CONTENT_VIEW">
+            <AdminContentPage />
           </RequirePermission>
         ),
       },
