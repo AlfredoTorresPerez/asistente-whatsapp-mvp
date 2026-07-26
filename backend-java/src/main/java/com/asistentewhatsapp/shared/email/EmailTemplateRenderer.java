@@ -35,7 +35,7 @@ public class EmailTemplateRenderer {
         this.mailSender = mailSender;
     }
 
-    public String render(String templateName, AppointmentConfirmationEmailDTO data) {
+    public String render(String templateName, Object data) {
         String raw = loadTemplate(templateName);
         String withoutOptionals = removeEmptyOptionalBlocks(raw, data);
         String withPlaceholders = replacePlaceholders(withoutOptionals, data);
@@ -78,7 +78,7 @@ public class EmailTemplateRenderer {
         });
     }
 
-    private String removeEmptyOptionalBlocks(String template, AppointmentConfirmationEmailDTO data) {
+    private String removeEmptyOptionalBlocks(String template, Object data) {
         try {
             return OPTIONAL_BLOCK_PATTERN.matcher(template).replaceAll(match -> {
                 String varName = match.group(1);
@@ -94,7 +94,7 @@ public class EmailTemplateRenderer {
         }
     }
 
-    private String replacePlaceholders(String template, AppointmentConfirmationEmailDTO data) {
+    private String replacePlaceholders(String template, Object data) {
         try {
             return PLACEHOLDER_PATTERN.matcher(template).replaceAll(match -> {
                 String varName = match.group(1);
@@ -111,7 +111,7 @@ public class EmailTemplateRenderer {
         return CLOSING_TAG_PATTERN.matcher(template).replaceAll("");
     }
 
-    private String getFieldValue(String fieldName, AppointmentConfirmationEmailDTO data) {
+    private String getFieldValue(String fieldName, Object data) {
         String camelName = snakeToCamel(fieldName);
         String methodSuffix = Character.toUpperCase(camelName.charAt(0)) + camelName.substring(1);
         try {

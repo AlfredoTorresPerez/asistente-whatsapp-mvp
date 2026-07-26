@@ -306,7 +306,12 @@ export function MultisiteOperationsPage() {
           />
           <TabBar activeTab={activeTab} onChange={setActiveTab} />
 
-          {activeTab === 'summary' ? <SummaryPanel locations={locations} /> : null}
+          {activeTab === 'summary' ? (
+            <SummaryPanel
+              locations={locations}
+              selectedLocationId={selectedLocationId}
+            />
+          ) : null}
           {activeTab === 'catalog' ? (
             <CatalogPanel
               catalogForm={catalogForm}
@@ -423,43 +428,86 @@ function TabBar({
   )
 }
 
-function SummaryPanel({ locations }: { locations: MultisiteLocationSummaryResponse[] }) {
-  return (
-    <div className="grid gap-4 xl:grid-cols-3">
-      {locations.map((location) => (
-        <Card key={location.locationId} className="space-y-4">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                {location.locationCode}
-              </p>
-              <h3 className="mt-1 text-xl font-semibold text-slate-950">{location.locationName}</h3>
-            </div>
-            <StatusBadge
-              label={location.active ? 'Activa' : 'Inactiva'}
-              tone={location.active ? 'success' : 'neutral'}
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <Metric label="Conversaciones" value={location.conversations} />
-            <Metric label="Prospectos" value={location.leads} />
-            <Metric label="Citas" value={location.bookings} />
-            <Metric label="Pedidos" value={location.orders} />
-            <Metric label="Productos stock" value={location.productsWithStock} />
-            <Metric label="Profesionales" value={location.professionals} />
-          </div>
-        </Card>
-      ))}
-    </div>
-  )
-}
+function SummaryPanel({
+  locations,
+  selectedLocationId,
+}: {
+  locations: MultisiteLocationSummaryResponse[]
+  selectedLocationId: string
+}) {
+  const filtered = useMemo(() => {
+    if (!selectedLocationId) return locations
+    return locations.filter((l) => l.locationId === selectedLocationId)
+  }, [locations, selectedLocationId])
 
-function Metric({ label, value }: { label: string; value: number }) {
+  if (filtered.length === 0) {
+    return (
+      <Card className="flex flex-col items-center justify-center py-16 text-center">
+        <p className="text-lg font-semibold text-slate-950">No existen sedes para el filtro seleccionado</p>
+        <p className="mt-2 text-sm text-slate-500">
+          {selectedLocationId
+            ? 'Intenta seleccionar otra sede o vuelve a "Todas las sedes".'
+            : 'No hay sedes registradas para esta empresa.'}
+        </p>
+      </Card>
+    )
+  }
+
   return (
-    <div className="rounded-[16px] border border-[var(--color-border)] bg-slate-50 p-3">
-      <p className="text-xs text-slate-500">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-slate-950">{value}</p>
-    </div>
+    <Card className="overflow-hidden p-0">
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-[var(--color-border)] text-sm">
+          <thead className="bg-slate-50 text-left text-xs uppercase tracking-[0.16em] text-slate-500">
+            <tr>
+              <th scope="col" className="sticky left-0 z-10 bg-slate-50 px-5 py-4">Sede</th>
+              <th scope="col" className="px-5 py-4">Estado</th>
+              <th scope="col" className="px-5 py-4 text-right">Conversaciones</th>
+              <th scope="col" className="px-5 py-4 text-right">Prospectos</th>
+              <th scope="col" className="px-5 py-4 text-right">Citas</th>
+              <th scope="col" className="px-5 py-4 text-right">Pedidos</th>
+              <th scope="col" className="px-5 py-4 text-right">Productos stock</th>
+              <th scope="col" className="px-5 py-4 text-right">Profesionales</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-[var(--color-border)]">
+            {filtered.map((location) => (
+              <tr key={location.locationId} className="group hover:bg-slate-50/50">
+                <td className="sticky left-0 z-10 bg-white px-5 py-4 group-hover:bg-slate-50/50">
+                  <p className="font-semibold text-slate-950">{location.locationName}</p>
+                  <p className="mt-0.5 text-xs uppercase tracking-[0.12em] text-slate-500">
+                    {location.locationCode}
+                  </p>
+                </td>
+                <td className="px-5 py-4">
+                  <StatusBadge
+                    label={location.active ? 'Activa' : 'Inactiva'}
+                    tone={location.active ? 'success' : 'neutral'}
+                  />
+                </td>
+                <td className="px-5 py-4 text-right font-semibold tabular-nums text-slate-950">
+                  {location.conversations}
+                </td>
+                <td className="px-5 py-4 text-right font-semibold tabular-nums text-slate-950">
+                  {location.leads}
+                </td>
+                <td className="px-5 py-4 text-right font-semibold tabular-nums text-slate-950">
+                  {location.bookings}
+                </td>
+                <td className="px-5 py-4 text-right font-semibold tabular-nums text-slate-950">
+                  {location.orders}
+                </td>
+                <td className="px-5 py-4 text-right font-semibold tabular-nums text-slate-950">
+                  {location.productsWithStock}
+                </td>
+                <td className="px-5 py-4 text-right font-semibold tabular-nums text-slate-950">
+                  {location.professionals}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Card>
   )
 }
 

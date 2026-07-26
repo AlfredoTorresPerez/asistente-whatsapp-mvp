@@ -2,6 +2,7 @@ package com.asistentewhatsapp;
 
 import com.asistentewhatsapp.bookings.application.BookingConfirmationProperties;
 import com.asistentewhatsapp.bookings.application.BookingPaymentProperties;
+import com.asistentewhatsapp.bookings.application.BookingReminderProperties;
 import com.asistentewhatsapp.bookings.application.BookingSyncProperties;
 import com.asistentewhatsapp.channels.application.WhatsAppChannelProperties;
 import com.asistentewhatsapp.security.AppSecurityProperties;
@@ -13,7 +14,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-@EnableConfigurationProperties({AppSecurityProperties.class, JwtProperties.class, WhatsAppChannelProperties.class, BookingConfirmationProperties.class, BookingPaymentProperties.class, BookingSyncProperties.class})
+@EnableConfigurationProperties({AppSecurityProperties.class, JwtProperties.class, WhatsAppChannelProperties.class, BookingConfirmationProperties.class, BookingPaymentProperties.class, BookingReminderProperties.class, BookingSyncProperties.class})
 public class AsistenteWhatsappApplication {
 
     public static void main(String[] args) {

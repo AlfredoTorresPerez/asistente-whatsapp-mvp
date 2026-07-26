@@ -27,6 +27,8 @@ import com.asistentewhatsapp.security.application.AuditMetadata;
 import com.asistentewhatsapp.security.application.TokenHashService;
 import com.asistentewhatsapp.security.domain.AuthenticatedUser;
 import com.asistentewhatsapp.shared.exception.ApiException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.security.SecureRandom;
 import java.time.DateTimeException;
 import java.time.LocalDate;
@@ -49,6 +51,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class BookingPublicActionService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(BookingPublicActionService.class);
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private static final int SLOT_STEP_MINUTES = 15;
@@ -63,6 +66,7 @@ public class BookingPublicActionService {
     private final ChannelDispatchService channelDispatchService;
     private final BookingEmailService bookingEmailService;
     private final AvailabilityService availabilityService;
+    private final ReminderSchedulingService reminderSchedulingService;
     private final String reschedulePublicBaseUrl;
     private final String cancellationPublicBaseUrl;
 
@@ -77,6 +81,7 @@ public class BookingPublicActionService {
             ChannelDispatchService channelDispatchService,
             BookingEmailService bookingEmailService,
             AvailabilityService availabilityService,
+            ReminderSchedulingService reminderSchedulingService,
             @Value("${app.booking-reschedule.public-base-url}") String reschedulePublicBaseUrl,
             @Value("${app.booking-cancellation.public-base-url}") String cancellationPublicBaseUrl) {
         this.repository = repository;
@@ -89,6 +94,7 @@ public class BookingPublicActionService {
         this.channelDispatchService = channelDispatchService;
         this.bookingEmailService = bookingEmailService;
         this.availabilityService = availabilityService;
+        this.reminderSchedulingService = reminderSchedulingService;
         this.reschedulePublicBaseUrl = reschedulePublicBaseUrl;
         this.cancellationPublicBaseUrl = cancellationPublicBaseUrl;
     }
@@ -307,6 +313,9 @@ public class BookingPublicActionService {
                 startsAt, endsAt, service.durationMinutes(), reason, "PUBLIC_LINK");
         repository.markRescheduleUsed(link.linkId());
         try { calendarSyncService.syncRescheduled(bookingId, link.businessId()); } catch (Exception ignored) {}
+        try { reminderSchedulingService.scheduleDefaultReminders(link.businessId(), bookingId, startsAt); } catch (Exception e) {
+            LOGGER.warn("RESCHEDULE_REMINDER_FAILED bookingId={} reason={}", bookingId, e.getMessage());
+        }
         return toCustomerBookingResponse(agendaRepository.findActiveBookingsByPhone(link.businessId(), link.customerPhone()).stream()
                 .filter(item -> item.bookingId().equals(bookingId))
                 .findFirst()
@@ -375,11 +384,7 @@ public class BookingPublicActionService {
     }
 
     private void scheduleConfirmedBookingReminders(UUID businessId, UUID bookingId, OffsetDateTime startsAt) {
-        agendaRepository.cancelPendingReminders(businessId, bookingId);
-        agendaRepository.insertReminder(businessId, bookingId, "TWENTY_FOUR_HOURS_BEFORE", "WHATSAPP", startsAt.minusHours(24));
-        agendaRepository.insertReminder(businessId, bookingId, "TWENTY_FOUR_HOURS_BEFORE", "EMAIL", startsAt.minusHours(24));
-        agendaRepository.insertReminder(businessId, bookingId, "TWO_HOURS_BEFORE", "WHATSAPP", startsAt.minusHours(2));
-        agendaRepository.insertReminder(businessId, bookingId, "TWO_HOURS_BEFORE", "EMAIL", startsAt.minusHours(2));
+        reminderSchedulingService.scheduleDefaultReminders(businessId, bookingId, startsAt);
         auditService.record(businessId, null, "BOOKING_REMINDER_SCHEDULED", "BOOKING", bookingId,
                 "Recordatorios WhatsApp y correo recalculados para la cita confirmada.");
     }

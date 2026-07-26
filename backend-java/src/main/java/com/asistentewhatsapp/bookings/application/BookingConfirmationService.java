@@ -78,6 +78,7 @@ public class BookingConfirmationService {
     private final BookingPaymentService bookingPaymentService;
     private final CalendarSyncService calendarSyncService;
     private final BookingConfirmationNotificationsService notificationsService;
+    private final ReminderSchedulingService reminderSchedulingService;
     private final TransactionTemplate transactionTemplate;
     private final SincronizadorReservaMotorReglas sincronizadorReservaMotorReglas;
 
@@ -93,6 +94,7 @@ public class BookingConfirmationService {
             BookingPaymentService bookingPaymentService,
             CalendarSyncService calendarSyncService,
             BookingConfirmationNotificationsService notificationsService,
+            ReminderSchedulingService reminderSchedulingService,
             SincronizadorReservaMotorReglas sincronizadorReservaMotorReglas,
             PlatformTransactionManager transactionManager) {
         this.repository = repository;
@@ -106,6 +108,7 @@ public class BookingConfirmationService {
         this.bookingPaymentService = bookingPaymentService;
         this.calendarSyncService = calendarSyncService;
         this.notificationsService = notificationsService;
+        this.reminderSchedulingService = reminderSchedulingService;
         this.sincronizadorReservaMotorReglas = sincronizadorReservaMotorReglas;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
         this.transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
@@ -603,11 +606,7 @@ public class BookingConfirmationService {
     }
 
     private void scheduleConfirmedBookingReminders(ConfirmationLinkRecord link) {
-        completeAgendaJdbcRepository.cancelPendingReminders(link.businessId(), link.bookingId());
-        completeAgendaJdbcRepository.insertReminder(link.businessId(), link.bookingId(), "TWENTY_FOUR_HOURS_BEFORE", "WHATSAPP", link.startsAt().minusHours(24));
-        completeAgendaJdbcRepository.insertReminder(link.businessId(), link.bookingId(), "TWENTY_FOUR_HOURS_BEFORE", "EMAIL", link.startsAt().minusHours(24));
-        completeAgendaJdbcRepository.insertReminder(link.businessId(), link.bookingId(), "TWO_HOURS_BEFORE", "WHATSAPP", link.startsAt().minusHours(2));
-        completeAgendaJdbcRepository.insertReminder(link.businessId(), link.bookingId(), "TWO_HOURS_BEFORE", "EMAIL", link.startsAt().minusHours(2));
+        reminderSchedulingService.scheduleDefaultReminders(link.businessId(), link.bookingId(), link.startsAt());
         auditService.record(link.businessId(), null, "BOOKING_REMINDER_SCHEDULED", "BOOKING", link.bookingId(),
                 "Recordatorios automaticos WhatsApp y correo programados.");
     }

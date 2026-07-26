@@ -27,6 +27,7 @@ import com.asistentewhatsapp.bookings.api.CreateBookingConfirmationLinkRequest;
 import com.asistentewhatsapp.bookings.application.BookingStateMachine;
 import com.asistentewhatsapp.bookings.application.BookingConfirmationService;
 import com.asistentewhatsapp.bookings.application.AvailabilityService;
+import com.asistentewhatsapp.bookings.application.ReminderSchedulingService;
 import com.asistentewhatsapp.bookings.infrastructure.BookingJdbcRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import com.asistentewhatsapp.calendar.application.CalendarSyncService;
@@ -67,6 +68,7 @@ public class CompleteDigitalAgendaService {
     private final AuditService auditService;
     private final ChannelDispatchService channelDispatchService;
     private final AvailabilityService availabilityService;
+    private final ReminderSchedulingService reminderSchedulingService;
 
     public CompleteDigitalAgendaService(
             CompleteAgendaJdbcRepository repository,
@@ -75,7 +77,8 @@ public class CompleteDigitalAgendaService {
             CalendarSyncService calendarSyncService,
             AuditService auditService,
             ChannelDispatchService channelDispatchService,
-            AvailabilityService availabilityService) {
+            AvailabilityService availabilityService,
+            ReminderSchedulingService reminderSchedulingService) {
         this.repository = repository;
         this.bookingJdbcRepository = bookingJdbcRepository;
         this.bookingConfirmationService = bookingConfirmationService;
@@ -83,6 +86,7 @@ public class CompleteDigitalAgendaService {
         this.auditService = auditService;
         this.channelDispatchService = channelDispatchService;
         this.availabilityService = availabilityService;
+        this.reminderSchedulingService = reminderSchedulingService;
     }
 
     @Transactional(readOnly = true)
@@ -471,12 +475,8 @@ public class CompleteDigitalAgendaService {
     }
 
     private void scheduleDefaultReminders(UUID businessId, UUID bookingId, OffsetDateTime startsAt) {
-        repository.cancelPendingReminders(businessId, bookingId);
+        reminderSchedulingService.scheduleDefaultReminders(businessId, bookingId, startsAt);
         repository.insertReminder(businessId, bookingId, "CONFIRMATION", OffsetDateTime.now(ZoneOffset.UTC).plusMinutes(1));
-        repository.insertReminder(businessId, bookingId, "TWENTY_FOUR_HOURS_BEFORE", "WHATSAPP", startsAt.minusHours(24));
-        repository.insertReminder(businessId, bookingId, "TWENTY_FOUR_HOURS_BEFORE", "EMAIL", startsAt.minusHours(24));
-        repository.insertReminder(businessId, bookingId, "TWO_HOURS_BEFORE", "WHATSAPP", startsAt.minusHours(2));
-        repository.insertReminder(businessId, bookingId, "TWO_HOURS_BEFORE", "EMAIL", startsAt.minusHours(2));
     }
 
     private ZoneId resolveLocationZone(LocationRecord location) {

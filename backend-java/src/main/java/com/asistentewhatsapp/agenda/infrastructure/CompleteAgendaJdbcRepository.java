@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -892,7 +893,7 @@ public class CompleteAgendaJdbcRepository {
             throw new ResourceNotFoundException("No se encontro una reserva activa para cancelar.");
         }
         insertStatusHistory(businessId, bookingId, previousStatus, targetStatus, reason, actorUserId, source == null || source.isBlank() ? "ADMIN" : source);
-        cancelPendingReminders(businessId, bookingId);
+        cancelReminderByBooking(businessId, bookingId);
     }
 
     public void insertStatusHistory(UUID businessId, UUID bookingId, String previousStatus, String newStatus, String reason, UUID actorUserId, String source) {
@@ -1947,6 +1948,246 @@ public class CompleteAgendaJdbcRepository {
                     batch);
         }
         logOutput("replaceProfessionalHours", "done");
+    }
+
+    public List<DueReminderRecord> claimDueReminders(OffsetDateTime now, int limit, String instanceId) {
+        logInput("claimDueReminders", now, limit, instanceId);
+        List<DueReminderRecord> result = jdbcTemplate.query(
+                """
+                        select
+                            br.id,
+                            br.business_id,
+                            br.booking_id,
+                            br.reminder_type,
+                            br.channel_type,
+                            br.scheduled_at,
+                            b.subject,
+                            b.status as booking_status,
+                            b.starts_at,
+                            coalesce(b.ends_at, b.starts_at + (b.duration_minutes || ' minutes')::interval) as ends_at,
+                            coalesce(bl.name, b.location) as location_name,
+                            s.name as service_name,
+                            p.full_name as professional_name,
+                            r.name as room_name,
+                            c.display_name as customer_name,
+                            c.phone as customer_phone,
+                            c.email as customer_email
+                        from booking_reminder br
+                        join booking b on b.id = br.booking_id and b.business_id = br.business_id
+                        join customer c on c.id = b.customer_id and c.business_id = b.business_id
+                        left join business_location bl on bl.id = b.location_id and bl.business_id = b.business_id
+                        left join aesthetic_service s on s.id = b.service_id and s.business_id = b.business_id
+                        left join aesthetic_professional p on p.id = b.professional_id and p.business_id = b.business_id
+                        left join agenda_room r on r.id = b.room_id and r.business_id = b.business_id
+                        where br.id in (
+                            select id from booking_reminder
+                            where status in ('PENDING', 'RETRY')
+                              and scheduled_at <= :now
+                              and (next_attempt_at is null or next_attempt_at <= :now)
+                            order by scheduled_at asc
+                            limit :limit
+                            for update skip locked
+                        )
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("now", now)
+                        .addValue("limit", limit),
+                (rs, rowNum) -> new DueReminderRecord(
+                        rs.getObject("id", UUID.class),
+                        rs.getObject("business_id", UUID.class),
+                        rs.getObject("booking_id", UUID.class),
+                        rs.getString("reminder_type"),
+                        rs.getString("channel_type"),
+                        rs.getObject("scheduled_at", OffsetDateTime.class),
+                        rs.getString("subject"),
+                        rs.getString("booking_status"),
+                        rs.getObject("starts_at", OffsetDateTime.class),
+                        rs.getObject("ends_at", OffsetDateTime.class),
+                        rs.getString("location_name"),
+                        rs.getString("service_name"),
+                        rs.getString("professional_name"),
+                        rs.getString("room_name"),
+                        rs.getString("customer_name"),
+                        rs.getString("customer_phone"),
+                        rs.getString("customer_email")));
+        if (!result.isEmpty()) {
+            markRemindersProcessing(result, instanceId);
+        }
+        logOutput("claimDueReminders", result);
+        return result;
+    }
+
+    private void markRemindersProcessing(List<DueReminderRecord> reminders, String instanceId) {
+        SqlParameterSource[] batch = reminders.stream()
+                .map(r -> new MapSqlParameterSource()
+                        .addValue("id", UUID.randomUUID())
+                        .addValue("processingStartedAt", OffsetDateTime.now(ZoneOffset.UTC))
+                        .addValue("instanceId", instanceId)
+                        .addValue("reminderId", r.id()))
+                .toArray(SqlParameterSource[]::new);
+        jdbcTemplate.batchUpdate(
+                """
+                        update booking_reminder
+                        set status = 'PROCESSING',
+                            processing_started_at = :processingStartedAt,
+                            processing_instance = :instanceId,
+                            updated_at = current_timestamp
+                        where id = :reminderId and status in ('PENDING', 'RETRY')
+                        """,
+                batch);
+    }
+
+    public void markReminderProcessing(UUID reminderId, String instanceId) {
+        logInput("markReminderProcessing", reminderId, instanceId);
+        jdbcTemplate.update(
+                """
+                        update booking_reminder
+                        set status = 'PROCESSING',
+                            processing_started_at = current_timestamp,
+                            processing_instance = :instanceId,
+                            attempt_count = attempt_count + 1,
+                            updated_at = current_timestamp
+                        where id = :reminderId and status in ('PENDING', 'RETRY')
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("reminderId", reminderId)
+                        .addValue("instanceId", instanceId));
+        logOutput("markReminderProcessing", "done");
+    }
+
+    public void markReminderRetry(UUID reminderId, OffsetDateTime nextAttemptAt, String errorCode, String errorMessage) {
+        logInput("markReminderRetry", reminderId, nextAttemptAt, errorCode, errorMessage);
+        String truncated = errorMessage != null && errorMessage.length() > 500
+                ? errorMessage.substring(0, 500)
+                : errorMessage;
+        jdbcTemplate.update(
+                """
+                        update booking_reminder
+                        set status = 'RETRY',
+                            next_attempt_at = :nextAttemptAt,
+                            last_error_code = :errorCode,
+                            error_message = :errorMessage,
+                            failure_reason = :errorMessage,
+                            processing_started_at = null,
+                            processing_instance = null,
+                            updated_at = current_timestamp
+                        where id = :reminderId and status = 'PROCESSING'
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("reminderId", reminderId)
+                        .addValue("nextAttemptAt", nextAttemptAt)
+                        .addValue("errorCode", errorCode)
+                        .addValue("errorMessage", truncated));
+        logOutput("markReminderRetry", "done");
+    }
+
+    public void markReminderSentWithProvider(UUID reminderId, OffsetDateTime sentAt, String providerMessageId) {
+        logInput("markReminderSentWithProvider", reminderId, sentAt, providerMessageId);
+        jdbcTemplate.update(
+                """
+                        update booking_reminder
+                        set status = 'SENT',
+                            sent_at = :sentAt,
+                            provider_message_id = :providerMessageId,
+                            processing_started_at = null,
+                            processing_instance = null,
+                            updated_at = current_timestamp
+                        where id = :reminderId and status = 'PROCESSING'
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("reminderId", reminderId)
+                        .addValue("sentAt", sentAt)
+                        .addValue("providerMessageId", providerMessageId));
+        logOutput("markReminderSentWithProvider", "done");
+    }
+
+    public int recoverStaleProcessingReminders(OffsetDateTime timeoutThreshold, String instanceId) {
+        logInput("recoverStaleProcessingReminders", timeoutThreshold, instanceId);
+        int updated = jdbcTemplate.update(
+                """
+                        update booking_reminder
+                        set status = 'RETRY',
+                            last_error_code = 'RECOVERY_TIMEOUT',
+                            error_message = 'Processing timeout exceeded, recovered by ' || :instanceId,
+                            failure_reason = 'Processing timeout exceeded',
+                            processing_started_at = null,
+                            processing_instance = null,
+                            updated_at = current_timestamp
+                        where status = 'PROCESSING'
+                          and processing_started_at < :timeoutThreshold
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("timeoutThreshold", timeoutThreshold)
+                        .addValue("instanceId", instanceId));
+        if (updated > 0) {
+            logOutput("recoverStaleProcessingReminders", "recovered=" + updated);
+        }
+        return updated;
+    }
+
+    public void cancelReminderByBooking(UUID businessId, UUID bookingId) {
+        logInput("cancelReminderByBooking", businessId, bookingId);
+        jdbcTemplate.update(
+                """
+                        update booking_reminder
+                        set status = 'CANCELLED', updated_at = current_timestamp
+                        where business_id = :businessId
+                          and booking_id = :bookingId
+                          and status in ('PENDING', 'RETRY', 'SCHEDULED')
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("businessId", businessId)
+                        .addValue("bookingId", bookingId));
+        logOutput("cancelReminderByBooking", "done");
+    }
+
+    public Integer findMaxReminderRevision(UUID businessId, UUID bookingId, String reminderType, String channelType) {
+        try {
+            return jdbcTemplate.queryForObject(
+                    """
+                            select max(appointment_revision) from booking_reminder
+                            where business_id = :businessId
+                              and booking_id = :bookingId
+                              and reminder_type = :reminderType
+                              and channel_type = :channelType
+                            """,
+                    new MapSqlParameterSource()
+                            .addValue("businessId", businessId)
+                            .addValue("bookingId", bookingId)
+                            .addValue("reminderType", reminderType)
+                            .addValue("channelType", channelType),
+                    Integer.class);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public void insertReminderWithRevision(UUID businessId, UUID bookingId, String type, String channelType,
+            OffsetDateTime scheduledAt, int revision) {
+        logInput("insertReminderWithRevision", businessId, bookingId, type, channelType, scheduledAt, revision);
+        if (scheduledAt == null) {
+            logOutput("insertReminderWithRevision", "skipped null scheduledAt");
+            return;
+        }
+        jdbcTemplate.update(
+                """
+                        insert into booking_reminder (id, business_id, booking_id, reminder_type, channel_type,
+                            scheduled_at, status, template_key, appointment_revision)
+                        values (:id, :businessId, :bookingId, :type, :channelType,
+                            :scheduledAt, 'PENDING', :templateKey, :revision)
+                        on conflict (business_id, booking_id, reminder_type, channel_type, appointment_revision)
+                        do nothing
+                        """,
+                new MapSqlParameterSource()
+                        .addValue("id", UUID.randomUUID())
+                        .addValue("businessId", businessId)
+                        .addValue("bookingId", bookingId)
+                        .addValue("type", type)
+                        .addValue("channelType", channelType)
+                        .addValue("scheduledAt", scheduledAt)
+                        .addValue("templateKey", "BOOKING_REMINDER_" + channelType)
+                        .addValue("revision", revision));
+        logOutput("insertReminderWithRevision", "done");
     }
 
     public record DueReminderRecord(UUID id, UUID businessId, UUID bookingId, String reminderType, String channelType,

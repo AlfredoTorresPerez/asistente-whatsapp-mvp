@@ -240,10 +240,11 @@ class BookingPublicActionServiceTest {
         private final ChannelDispatchService channelDispatchService = mock(ChannelDispatchService.class);
         private final BookingEmailService bookingEmailService = mock(BookingEmailService.class);
         private final AvailabilityService availabilityService = mock(AvailabilityService.class);
+        private final ReminderSchedulingService reminderSchedulingService = mock(ReminderSchedulingService.class);
         private final BookingPublicActionService service = new BookingPublicActionService(
                 repository, agendaRepository, locationRepository, aestheticRepository,
                 tokenHashService, calendarSyncService, auditService, channelDispatchService,
-                bookingEmailService, availabilityService,
+                bookingEmailService, availabilityService, reminderSchedulingService,
                 "http://localhost:5173/reservas/reprogramar",
                 "http://localhost:5173/reservas/cancelar");
     }

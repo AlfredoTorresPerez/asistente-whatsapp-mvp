@@ -3,97 +3,236 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <title>Recordatorio - Manana - {{business_name}}</title>
 </head>
-<body style="margin:0;padding:0;background-color:#F8F6F3;font-family:Arial,Helvetica,'Segoe UI',sans-serif;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F8F6F3;">
+<body style="margin:0;padding:0;background-color:#E7F4F1;font-family:Helvetica,Arial,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#E7F4F1;">
 <tr>
-<td align="center" style="padding:24px 16px;">
+<td align="center" style="padding:32px 16px;">
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+
+<!-- HEADER -->
 <tr>
-<td style="background:linear-gradient(135deg,#C8A97E,#B8956A);padding:32px 24px;border-radius:16px 16px 0 0;text-align:center;">
-{{business_logo}}
-<h1 style="margin:12px 0 4px;font-size:24px;color:#FFFFFF;font-weight:700;">{{business_name}}</h1>
-<p style="margin:0;font-size:13px;color:rgba(255,255,255,0.85);letter-spacing:2px;text-transform:uppercase;">Belleza &bull; Bienestar &bull; Estetica Avanzada</p>
-</td>
-</tr>
-<tr>
-<td style="background-color:#FFFFFF;padding:0;">
+<td style="background-color:#087F78;padding:36px 32px 28px;text-align:center;border-radius:12px 12px 0 0;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 <tr>
-<td style="background:linear-gradient(135deg,#FFF8E7,#FFEECC);padding:40px 24px 32px;text-align:center;">
-<div style="font-size:48px;margin-bottom:12px;">⏰</div>
-<h2 style="margin:0 0 8px;font-size:26px;color:#B8860B;font-weight:700;">Recuerda tu cita manana</h2>
-<p style="margin:0;font-size:16px;color:#666666;">Tu reserva esta agendada para manana. No faltes!</p>
-</td>
+<td align="center" style="padding-bottom:12px;">
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+<tr>
+<td style="width:56px;height:56px;background-color:#FFFFFF;border-radius:50%;text-align:center;vertical-align:middle;font-size:26px;line-height:56px;">&#x23F0;</td>
 </tr>
 </table>
 </td>
 </tr>
 <tr>
-<td style="background-color:#FFFFFF;padding:0 24px;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FFFFFF;border:1px solid #E8E8E8;border-radius:12px;margin-bottom:24px;box-shadow:0 4px 16px rgba(0,0,0,0.06);">
+<td style="font-size:22px;color:#FFFFFF;font-weight:700;letter-spacing:0.3px;">{{business_name}}</td>
+</tr>
 <tr>
-<td style="padding:32px 24px;text-align:center;">
-<div style="font-size:40px;line-height:1;margin-bottom:16px;">📅</div>
+<td style="font-size:13px;color:rgba(255,255,255,0.7);padding-top:4px;letter-spacing:1px;text-transform:uppercase;">Recordatorio de cita - Manana</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- GREETING -->
+<tr>
+<td style="background-color:#FFFFFF;padding:32px 32px 24px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-<tr><td style="padding:8px 0;font-size:16px;color:#333333;"><strong style="color:#C8A97E;">Fecha:</strong> {{appointment_date}}</td></tr>
-<tr><td style="padding:8px 0;font-size:16px;color:#333333;"><strong style="color:#C8A97E;">Hora:</strong> {{appointment_time}}</td></tr>
-<tr><td style="padding:8px 0;font-size:16px;color:#333333;"><strong style="color:#C8A97E;">Sucursal:</strong> {{branch_name}}</td></tr>
-<tr><td style="padding:8px 0;font-size:16px;color:#333333;"><strong style="color:#C8A97E;">Direccion:</strong> {{address}}</td></tr>
-</table>
-<div style="margin:20px 0 0;padding:10px 20px;background:#F0F8F0;border-radius:8px;display:inline-block;font-size:14px;color:#2D6A2D;">🟢 Confirmada</div>
-</td>
-</tr>
-</table>
-</td>
-</tr>
-{{google_maps_url}}
 <tr>
-<td style="background-color:#FFFFFF;padding:0 24px;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+<td style="font-size:24px;color:#17343D;font-weight:700;padding-bottom:8px;">Hola {{customer_name}},</td>
+</tr>
+<tr>
+<td style="font-size:15px;color:#4A6470;line-height:1.6;">
+Te recordamos que manana tienes una atencion agendada en <strong style="color:#087F78;">{{business_name}}</strong>. Revisa los detalles a continuacion.
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- REMINDER BADGE -->
+<tr>
+<td style="background-color:#FFFFFF;padding:0 32px 20px;">
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+<tr>
+<td style="background-color:#FFF8E1;border:1px solid #FFE082;border-radius:20px;padding:8px 20px;font-size:13px;color:#B8860B;font-weight:600;text-align:center;">&#x23F0; Tu cita es manana - No faltes!</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- APPOINTMENT CARD -->
+<tr>
+<td style="background-color:#FFFFFF;padding:0 32px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#E7F4F1;border-radius:12px;">
+<tr>
+<td style="padding:24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td style="font-size:16px;color:#087F78;font-weight:700;padding-bottom:16px;border-bottom:2px solid #55A979;">Detalles de tu cita</td>
+</tr>
+</table>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px;">
+<!-- Service -->
+<tr>
+<td style="width:40px;vertical-align:top;font-size:18px;line-height:1;padding:6px 0;">&#x2728;</td>
+<td style="padding:6px 0 6px 8px;font-size:14px;color:#4A6470;width:35%;">Servicio</td>
+<td style="padding:6px 0;font-size:14px;color:#17343D;font-weight:600;">{{service_name}}</td>
+</tr>
+<!-- Date -->
+<tr>
+<td style="width:40px;vertical-align:top;font-size:18px;line-height:1;padding:6px 0;">&#x1F4C5;</td>
+<td style="padding:6px 0 6px 8px;font-size:14px;color:#4A6470;width:35%;">Fecha</td>
+<td style="padding:6px 0;font-size:14px;color:#17343D;font-weight:600;">{{appointment_date}}</td>
+</tr>
+<!-- Time -->
+<tr>
+<td style="width:40px;vertical-align:top;font-size:18px;line-height:1;padding:6px 0;">&#x23F0;</td>
+<td style="padding:6px 0 6px 8px;font-size:14px;color:#4A6470;width:35%;">Hora</td>
+<td style="padding:6px 0;font-size:14px;color:#17343D;font-weight:600;">{{appointment_time}}</td>
+</tr>
+<!-- Professional -->
+{{professional_name}}
+<tr>
+<td style="width:40px;vertical-align:top;font-size:18px;line-height:1;padding:6px 0;">&#x1F9D1;&#x200D;&#x1F3EB;</td>
+<td style="padding:6px 0 6px 8px;font-size:14px;color:#4A6470;width:35%;">Profesional</td>
+<td style="padding:6px 0;font-size:14px;color:#17343D;font-weight:600;">{{professional_name}}</td>
+</tr>
+{{/professional_name}}
+<!-- Branch -->
+{{branch_name}}
+<tr>
+<td style="width:40px;vertical-align:top;font-size:18px;line-height:1;padding:6px 0;">&#x1F3E0;</td>
+<td style="padding:6px 0 6px 8px;font-size:14px;color:#4A6470;width:35%;">Sucursal</td>
+<td style="padding:6px 0;font-size:14px;color:#17343D;font-weight:600;">{{branch_name}}</td>
+</tr>
+{{/branch_name}}
+<!-- Address -->
+{{address}}
+<tr>
+<td style="width:40px;vertical-align:top;font-size:18px;line-height:1;padding:6px 0;">&#x1F4CD;</td>
+<td style="padding:6px 0 6px 8px;font-size:14px;color:#4A6470;width:35%;">Direccion</td>
+<td style="padding:6px 0;font-size:14px;color:#17343D;font-weight:600;">{{address}}</td>
+</tr>
+{{/address}}
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- BEFORE VISITING -->
+<tr>
+<td style="background-color:#FFFFFF;padding:24px 32px 0;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#FFF8E1;border-radius:12px;border:1px solid #FFE082;">
+<tr>
+<td style="padding:20px 24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td style="font-size:15px;color:#B8860B;font-weight:700;padding-bottom:12px;">Antes de venir</td>
+</tr>
+<tr>
+<td style="font-size:13px;color:#6B5B1E;line-height:1.8;padding-left:4px;">
+&#x2022; Llega 10 minutos antes de tu hora agendada.<br>
+&#x2022; Si necesitas reprogramar, hazlo antes de {{minimum_notice_hours}} horas.<br>
+&#x2022; Si tienes dudas, utiliza el canal de ayuda.
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- ACTION BUTTONS -->
+<tr>
+<td style="background-color:#FFFFFF;padding:24px 32px 12px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 <tr>
 <td align="center">
-<a href="{{google_maps_url}}" target="_blank" style="display:inline-block;background:#FFFFFF;color:#A67C52;padding:14px 40px;border:2px solid #A67C52;border-radius:10px;text-decoration:none;font-size:16px;font-weight:700;">Ver ubicacion</a>
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+<tr>
+{{location_url}}
+<td style="padding:4px;">
+<table role="presentation" cellpadding="0" cellspacing="0" style="border-radius:8px;background-color:#55A979;">
+<tr>
+<td align="center" style="border-radius:8px;">
+<a href="{{location_url}}" target="_blank" style="display:inline-block;padding:12px 24px;background-color:#55A979;color:#FFFFFF;font-size:14px;font-weight:700;text-decoration:none;border-radius:8px;white-space:nowrap;">&#x1F4CD; Ver ubicacion</a>
+</td>
+</tr>
+</table>
+</td>
+{{/location_url}}
+{{help_url}}
+<td style="padding:4px;">
+<table role="presentation" cellpadding="0" cellspacing="0" style="border-radius:8px;border:2px solid #087F78;">
+<tr>
+<td align="center" style="border-radius:8px;">
+<a href="{{help_url}}" target="_blank" style="display:inline-block;padding:12px 24px;color:#087F78;font-size:14px;font-weight:600;text-decoration:none;border-radius:8px;white-space:nowrap;">&#x1F4AC; Necesito ayuda</a>
+</td>
+</tr>
+</table>
+</td>
+{{/help_url}}
+</tr>
+</table>
 </td>
 </tr>
 </table>
 </td>
 </tr>
-{{cancel_url}}
+
+<!-- SPACER -->
+<tr><td style="background-color:#FFFFFF;padding:0;font-size:1px;line-height:1px;" height="24">&nbsp;</td></tr>
+
+<!-- DETAILS LINK -->
 <tr>
-<td style="background-color:#FFFFFF;padding:0 24px;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+<td style="background-color:#FFFFFF;padding:0 32px 24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 <tr>
-<td align="center">
-<a href="{{cancel_url}}" target="_blank" style="display:inline-block;background:#FFF0F0;color:#CC4444;padding:12px 36px;border:2px solid #CC4444;border-radius:8px;text-decoration:none;font-size:15px;font-weight:600;">Cancelar reserva</a>
+<td align="center" style="font-size:13px;color:#4A6470;">
+Puedes ver el detalle completo de tu reserva en la seccion de citas de nuestro sitio web.
 </td>
 </tr>
 </table>
 </td>
 </tr>
-{{whatsapp_url}}
+
+<!-- FOOTER -->
 <tr>
-<td style="background-color:#FFFFFF;padding:0 24px;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F8F6F3;border:1px solid #E8E8E8;border-radius:12px;margin-bottom:24px;">
+<td style="background-color:#0D2B33;padding:28px 32px;text-align:center;border-radius:0 0 12px 12px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 <tr>
-<td style="padding:24px;text-align:center;">
-<p style="margin:0 0 12px;font-size:16px;color:#333333;font-weight:600;">Tienes dudas?</p>
-<a href="{{whatsapp_url}}" target="_blank" style="display:inline-block;background:#25D366;color:#FFFFFF;padding:14px 40px;border-radius:10px;text-decoration:none;font-size:16px;font-weight:700;">Hablar por WhatsApp</a>
+<td style="font-size:15px;color:#FFFFFF;font-weight:600;padding-bottom:8px;">{{business_name}}</td>
+</tr>
+{{address}}
+<tr>
+<td style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.8;">{{address}}</td>
+</tr>
+{{/address}}
+{{phone}}
+<tr>
+<td style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.8;">{{phone}}</td>
+</tr>
+{{/phone}}
+{{email}}
+<tr>
+<td style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.8;">{{email}}</td>
+</tr>
+{{/email}}
+<tr>
+<td style="padding-top:16px;font-size:11px;color:rgba(255,255,255,0.35);line-height:1.5;">
+Este correo fue generado automaticamente. No responder este mensaje.<br>
+Si tienes dudas, contactanos a traves de nuestro canal de WhatsApp.
 </td>
 </tr>
 </table>
 </td>
 </tr>
-<tr>
-<td style="background:linear-gradient(135deg,#1a1a2e,#0f172a);padding:32px 24px;border-radius:0 0 16px 16px;text-align:center;">
-<p style="margin:0 0 4px;font-size:15px;color:rgba(255,255,255,0.9);font-weight:600;">Centro de Estetica {{business_name}}</p>
-<p style="margin:0 0 2px;font-size:14px;color:rgba(255,255,255,0.6);">{{address}}</p>
-<p style="margin:0 0 2px;font-size:14px;color:rgba(255,255,255,0.6);">{{phone}}</p>
-<p style="margin:0 0 16px;font-size:14px;color:rgba(255,255,255,0.6);">{{email}}</p>
-<p style="margin:0;font-size:12px;color:rgba(255,255,255,0.4);">Este correo fue generado automaticamente. No responder este mensaje.</p>
-</td>
-</tr>
+
 </table>
 </td>
 </tr>

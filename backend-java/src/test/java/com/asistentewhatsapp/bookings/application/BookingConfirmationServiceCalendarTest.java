@@ -42,6 +42,7 @@ class BookingConfirmationServiceCalendarTest {
     private final BookingConfirmationNotificationsService notificationsService = mock(BookingConfirmationNotificationsService.class);
     private final SincronizadorReservaMotorReglas sincronizadorReservaMotorReglas = mock(SincronizadorReservaMotorReglas.class);
     private final PlatformTransactionManager transactionManager = mock(PlatformTransactionManager.class);
+    private final ReminderSchedulingService reminderSchedulingService = mock(ReminderSchedulingService.class);
     private final BookingConfirmationService service;
     private final ConfirmationLinkRecord link;
 
@@ -52,8 +53,8 @@ class BookingConfirmationServiceCalendarTest {
                 channelDispatchService, completeAgendaJdbcRepository,
                 whatsAppWebChannelJdbcRepository, bookingEmailService,
                 bookingPaymentService, calendarSyncService,
-                notificationsService, sincronizadorReservaMotorReglas,
-                transactionManager);
+                notificationsService, reminderSchedulingService,
+                sincronizadorReservaMotorReglas, transactionManager);
         link = confirmationLink();
     }
 

@@ -10,6 +10,7 @@
 #   postgres         5433:5432
 #   backend-java     8080:8080
 #   frontend-react   5173:5173
+#   mailpit          1025:1025 (SMTP), 8025:8025 (Web UI)
 #   whatsapp-web     (deshabilitado - solo META_CLOUD_API)
 # =============================================================================
 
@@ -122,22 +123,21 @@ services:
       APP_BOOKING_CANCELLATION_PUBLIC_BASE_URL: ${APP_BOOKING_CANCELLATION_PUBLIC_BASE_URL:-http://localhost:5173/reservas/cancelar}
       APP_BOOKING_PAYMENT_CHECKOUT_PUBLIC_BASE_URL: ${APP_BOOKING_PAYMENT_CHECKOUT_PUBLIC_BASE_URL:-http://localhost:5173/reservas/pagar}
 
-      # Email
-      APP_EMAIL_ENABLED: ${APP_EMAIL_ENABLED:-false}
-      APP_EMAIL_SIMULATION_ENABLED: ${APP_EMAIL_SIMULATION_ENABLED:-true}
-      APP_EMAIL_HEALTH_ENABLED: ${APP_EMAIL_HEALTH_ENABLED:-false}
-      APP_EMAIL_FROM: ${APP_EMAIL_FROM:-no-reply@demo.cl}
+      # Email (Mailpit - SMTP local sin credenciales; web UI en http://localhost:8025)
+      APP_EMAIL_ENABLED: "true"
+      APP_EMAIL_SIMULATION_ENABLED: "false"
+      APP_EMAIL_HEALTH_ENABLED: "false"
+      APP_EMAIL_FROM: ${APP_EMAIL_FROM:-notificacionesasistente@demo.cl}
       APP_EMAIL_FROM_NAME: ${APP_EMAIL_FROM_NAME:-Centro Estetico Bella}
-      SPRING_MAIL_HOST: ${SPRING_MAIL_HOST:-smtp.gmail.com}
-      SPRING_MAIL_PORT: ${SPRING_MAIL_PORT:-587}
-      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME:-}
-      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD:-}
-      SPRING_MAIL_SMTP_AUTH: ${SPRING_MAIL_SMTP_AUTH:-true}
-      SPRING_MAIL_SMTP_STARTTLS_ENABLE: ${SPRING_MAIL_SMTP_STARTTLS_ENABLE:-true}
-      SPRING_MAIL_SMTP_STARTTLS_REQUIRED: ${SPRING_MAIL_SMTP_STARTTLS_REQUIRED:-false}
+      SPRING_MAIL_HOST: mailpit
+      SPRING_MAIL_PORT: "1025"
+      SPRING_MAIL_USERNAME: ""
+      SPRING_MAIL_PASSWORD: ""
+      SPRING_MAIL_SMTP_AUTH: "false"
+      SPRING_MAIL_SMTP_STARTTLS_ENABLE: "false"
+      SPRING_MAIL_SMTP_STARTTLS_REQUIRED: "false"
 
       # Calendar
-      APP_CALENDAR_GOOGLE_ENABLED: ${APP_CALENDAR_GOOGLE_ENABLED:-false}
     ports:
       - "8080:8080"
     healthcheck:
@@ -184,6 +184,22 @@ services:
       - asistente-local
 
 
+
+  # ---------------------------------------------------------------------------
+  # MAILPIT (SMTP testing server - local email capture)
+  # http://localhost:8025 to view captured emails
+  # ---------------------------------------------------------------------------
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: asistente-mailpit
+    restart: unless-stopped
+    mem_limit: 128m
+    cpus: 0.2
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    networks:
+      - asistente-local
 
   # ---------------------------------------------------------------------------
   # PUBLIC HTTPS TUNNEL (opcional: requiere --profile public-link)

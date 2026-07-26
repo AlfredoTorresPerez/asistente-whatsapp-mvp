@@ -144,6 +144,7 @@ class BookingConfirmationServiceTest {
         private final BookingConfirmationNotificationsService notificationsService = mock(BookingConfirmationNotificationsService.class);
         private final SincronizadorReservaMotorReglas sincronizadorReservaMotorReglas = mock(SincronizadorReservaMotorReglas.class);
         private final PlatformTransactionManager transactionManager = mock(PlatformTransactionManager.class);
+        private final ReminderSchedulingService reminderSchedulingService = mock(ReminderSchedulingService.class);
         private final BookingConfirmationService service = new BookingConfirmationService(
                 repository,
                 properties,
@@ -156,6 +157,7 @@ class BookingConfirmationServiceTest {
                 bookingPaymentService,
                 calendarSyncService,
                 notificationsService,
+                reminderSchedulingService,
                 sincronizadorReservaMotorReglas,
                 transactionManager);
     }

@@ -15,6 +15,7 @@ import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository.
 import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository.TimeWindowRecord;
 import com.asistentewhatsapp.bookings.application.AvailabilityService;
 import com.asistentewhatsapp.bookings.application.BookingConfirmationService;
+import com.asistentewhatsapp.bookings.application.ReminderSchedulingService;
 import com.asistentewhatsapp.bookings.infrastructure.BookingJdbcRepository;
 import com.asistentewhatsapp.calendar.application.CalendarSyncService;
 import com.asistentewhatsapp.channels.application.ChannelDispatchService;
@@ -65,7 +66,7 @@ class CompleteDigitalAgendaServiceTest {
         service = new CompleteDigitalAgendaService(
                 repository, bookingJdbcRepository, bookingConfirmationService,
                 mock(CalendarSyncService.class), auditService, channelDispatchService,
-                availabilityService);
+                availabilityService, mock(ReminderSchedulingService.class));
     }
 
     private OffsetDateTime futureStartsAt() {

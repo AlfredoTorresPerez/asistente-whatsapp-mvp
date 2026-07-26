@@ -40,6 +40,7 @@ import com.asistentewhatsapp.security.domain.BusinessEntity;
 import com.asistentewhatsapp.security.infrastructure.BusinessRepository;
 import com.asistentewhatsapp.bookings.application.BookingReceiptService;
 import com.asistentewhatsapp.bookings.application.BookingValidationService;
+import com.asistentewhatsapp.bookings.application.ReminderSchedulingService;
 import com.asistentewhatsapp.bookings.application.BookingValidationService.CreateBookingCustomerData;
 import com.asistentewhatsapp.bookings.application.BookingValidationService.ValidateBookingRequest;
 import com.asistentewhatsapp.bookings.application.BookingValidationService.ValidationContext;
@@ -93,6 +94,7 @@ public class PublicLandingService {
     private final BookingValidationService bookingValidationService;
     private final BookingReceiptService bookingReceiptService;
     private final CustomerBookingService customerBookingService;
+    private final ReminderSchedulingService reminderSchedulingService;
     private final String frontendPublicBaseUrl;
 
     public PublicLandingService(
@@ -111,6 +113,7 @@ public class PublicLandingService {
             BookingValidationService bookingValidationService,
             BookingReceiptService bookingReceiptService,
             CustomerBookingService customerBookingService,
+            ReminderSchedulingService reminderSchedulingService,
             @Value("${app.frontend.public-base-url:http://localhost:5173}") String frontendPublicBaseUrl) {
         this.businessRepository = businessRepository;
         this.aestheticRepository = aestheticRepository;
@@ -127,6 +130,7 @@ public class PublicLandingService {
         this.bookingValidationService = bookingValidationService;
         this.bookingReceiptService = bookingReceiptService;
         this.customerBookingService = customerBookingService;
+        this.reminderSchedulingService = reminderSchedulingService;
         this.frontendPublicBaseUrl = frontendPublicBaseUrl;
     }
 
@@ -362,14 +366,7 @@ public class PublicLandingService {
         try {
             OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
             agendaRepository.insertReminder(businessId, bookingId, "CONFIRMATION", now.plusMinutes(1));
-            if (startsAt.isAfter(now.plusHours(24))) {
-                agendaRepository.insertReminder(businessId, bookingId, "TWENTY_FOUR_HOURS_BEFORE", "WHATSAPP", startsAt.minusHours(24));
-                agendaRepository.insertReminder(businessId, bookingId, "TWENTY_FOUR_HOURS_BEFORE", "EMAIL", startsAt.minusHours(24));
-            }
-            if (startsAt.isAfter(now.plusHours(2))) {
-                agendaRepository.insertReminder(businessId, bookingId, "TWO_HOURS_BEFORE", "WHATSAPP", startsAt.minusHours(2));
-                agendaRepository.insertReminder(businessId, bookingId, "TWO_HOURS_BEFORE", "EMAIL", startsAt.minusHours(2));
-            }
+            reminderSchedulingService.scheduleDefaultReminders(businessId, bookingId, startsAt);
         } catch (RuntimeException e) {
             LOGGER.warn("Could not schedule post-creation reminders", e);
         }

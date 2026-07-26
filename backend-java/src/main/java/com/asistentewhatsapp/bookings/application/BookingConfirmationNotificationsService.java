@@ -1,6 +1,5 @@
 package com.asistentewhatsapp.bookings.application;
 
-import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository;
 import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository.ConfirmationLinkRecord;
 import com.asistentewhatsapp.calendar.application.CalendarSyncService;
 import com.asistentewhatsapp.channels.application.ChannelDispatchRequest;
@@ -22,19 +21,19 @@ public class BookingConfirmationNotificationsService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BookingConfirmationNotificationsService.class);
 
-    private final CompleteAgendaJdbcRepository completeAgendaJdbcRepository;
+    private final ReminderSchedulingService reminderSchedulingService;
     private final BookingEmailService bookingEmailService;
     private final AuditService auditService;
     private final CalendarSyncService calendarSyncService;
     private final ChannelDispatchService channelDispatchService;
 
     public BookingConfirmationNotificationsService(
-            CompleteAgendaJdbcRepository completeAgendaJdbcRepository,
+            ReminderSchedulingService reminderSchedulingService,
             BookingEmailService bookingEmailService,
             AuditService auditService,
             CalendarSyncService calendarSyncService,
             ChannelDispatchService channelDispatchService) {
-        this.completeAgendaJdbcRepository = completeAgendaJdbcRepository;
+        this.reminderSchedulingService = reminderSchedulingService;
         this.bookingEmailService = bookingEmailService;
         this.auditService = auditService;
         this.calendarSyncService = calendarSyncService;
@@ -43,11 +42,7 @@ public class BookingConfirmationNotificationsService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void scheduleReminders(UUID businessId, UUID bookingId, OffsetDateTime startsAt) {
-        completeAgendaJdbcRepository.cancelPendingReminders(businessId, bookingId);
-        completeAgendaJdbcRepository.insertReminder(businessId, bookingId, "TWENTY_FOUR_HOURS_BEFORE", "WHATSAPP", startsAt.minusHours(24));
-        completeAgendaJdbcRepository.insertReminder(businessId, bookingId, "TWENTY_FOUR_HOURS_BEFORE", "EMAIL", startsAt.minusHours(24));
-        completeAgendaJdbcRepository.insertReminder(businessId, bookingId, "TWO_HOURS_BEFORE", "WHATSAPP", startsAt.minusHours(2));
-        completeAgendaJdbcRepository.insertReminder(businessId, bookingId, "TWO_HOURS_BEFORE", "EMAIL", startsAt.minusHours(2));
+        reminderSchedulingService.scheduleDefaultReminders(businessId, bookingId, startsAt);
         auditService.record(businessId, null, "BOOKING_REMINDER_SCHEDULED", "BOOKING", bookingId,
                 "Recordatorios automaticos programados.");
     }
