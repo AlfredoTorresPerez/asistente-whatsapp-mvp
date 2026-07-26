@@ -12,14 +12,30 @@
 > **Importante:** La auto-respuesta IA (`APP_AI_AGENTS_AUTO_REPLY_ENABLED`) está desactivada por defecto en entorno local.
 > Para probarla, ver `docs/DEBUGGING_AUTO_REPLY_LOCAL.md`.
 
+## Gestión de Secretos (Windows Credential Manager)
+
+Los secretos reales (WhatsApp App Secret, Access Token, Gmail App Password) **no están en ningún archivo**.
+Se almacenan cifrados con DPAPI en Windows Credential Manager.
+
+```powershell
+# 1. Guardar/actualizar secretos (solo la primera vez)
+.\scripts\store-local-secrets.ps1
+
+# 2. Se restauran automáticamente al usar local-start.ps1
+.\scripts\local-start.ps1
+```
+
+Si necesitas levantar con `docker compose` directo, los secretos deben estar
+como variables de entorno en la shell o escritos directamente en `.env.local`.
+
 ## Levantar en 3 Comandos
 
-```bash
-# 1. Clonar y configurar
-cp .env.local.template .env.local
+```powershell
+# 1. Guardar secretos en Windows Credential Manager (solicita los valores)
+.\scripts\store-local-secrets.ps1
 
-# 2. Iniciar servicios base (postgres + backend + frontend)
-docker compose -f docker-compose.local.yml up -d
+# 2. Iniciar servicios (restaura secretos automáticamente)
+.\scripts\local-start.ps1
 
 # 3. Ver logs
 docker compose logs -f --tail=100
@@ -99,9 +115,15 @@ docker compose -f docker-compose.local.yml --profile public-link stop public-tun
 
 ## Comandos Útiles
 
-```bash
+```powershell
 # PowerShell (recomendado)
-.\scripts\dev.ps1 up              # levantar servicios base
+.\scripts\store-local-secrets.ps1  # guardar/actualizar secretos en Credential Manager
+.\scripts\local-start.ps1           # levantar servicios base (restaura secretos)
+.\scripts\local-start.ps1 -Profile whatsapp   # levantar con WhatsApp Web
+.\scripts\local-start.ps1 -Build    # reconstruir imágenes y levantar
+# Nota: local-start.ps1 restaura automáticamente los secretos desde Credential Manager
+
+.\scripts\dev.ps1 up              # levantar servicios base (sin restaurar secretos)
 .\scripts\dev.ps1 up:whatsapp     # levantar con WhatsApp Web
 .\scripts\dev.ps1 logs            # seguir logs
 .\scripts\dev.ps1 down            # detener (preserva volúmenes)
@@ -119,6 +141,9 @@ pnpm run docker:reset             # borrar volúmenes + rebuild + up
 pnpm run docker:ps                # estado de servicios
 
 # Docker Compose directo (desde la raíz)
+# NOTA: si usas docker compose directo, primero restaura secretos manualmente:
+#   .\scripts\restore-local-secrets.ps1
+# (setea las variables de entorno que docker compose heredará)
 docker compose --env-file .env.local -f docker-compose.local.yml up -d
 docker compose --env-file .env.local -f docker-compose.local.yml --profile whatsapp up -d
 docker compose --env-file .env.local -f docker-compose.local.yml --profile public-link up -d

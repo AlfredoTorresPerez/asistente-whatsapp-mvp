@@ -29,6 +29,22 @@ $ComposeFile = Join-Path $ROOT "docker-compose.local.yml"
 $EnvFile = Join-Path $ROOT ".env.local"
 $ErrorActionPreference = 'Stop'
 
+# ------------------------------------------------------------------------
+# Restaurar secretos desde Windows Credential Manager
+# ------------------------------------------------------------------------
+$RestoreScript = Join-Path $PSScriptRoot "restore-local-secrets.ps1"
+if (Test-Path $RestoreScript) {
+  Write-Host "=== Restaurando secretos desde Windows Credential Manager ===" -ForegroundColor Cyan
+  & $RestoreScript
+  if ($LASTEXITCODE -ne 0) {
+    Write-Warn "Algunos secretos no estan en Credential Manager."
+    Write-Host "Ejecuta .\scripts\store-local-secrets.ps1 para guardarlos" -ForegroundColor Yellow
+  }
+} else {
+  Write-Warn "restore-local-secrets.ps1 no encontrado, secretos no seran restaurados"
+}
+# ------------------------------------------------------------------------
+
 if (-not (Test-Path $ComposeFile)) {
   Write-Error "No se encuentra $ComposeFile"
   exit 1
