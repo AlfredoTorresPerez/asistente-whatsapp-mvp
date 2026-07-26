@@ -8,6 +8,7 @@
   No escribe ningun archivo en disco.
 
   Secretos que gestiona:
+    - JWT_SECRET           : Secreto JWT (generado automaticamente la primera vez)
     - WHATSAPP_APP_SECRET  : App Secret de Meta (para webhook)
     - WHATSAPP_ACCESS_TOKEN : Token persistente de WhatsApp Cloud API
     - GMAIL_PASSWORD       : App Password de Gmail para envio SMTP local
@@ -33,6 +34,7 @@ $ROOT = Split-Path -Parent $PSScriptRoot
 . (Join-Path $PSScriptRoot "lib\CredentialManager.ps1")
 
 $secretDefs = @(
+  @{ Name = "JWT_SECRET"; Prompt = "Secreto JWT (64 chars hex, 256 bits)" }
   @{ Name = "WHATSAPP_APP_SECRET"; Prompt = "App Secret de Meta (webhook signature)" }
   @{ Name = "WHATSAPP_ACCESS_TOKEN"; Prompt = "Access Token de WhatsApp Cloud API" }
   @{ Name = "GMAIL_PASSWORD"; Prompt = "App Password de Gmail (notificacionesassistentelocale@gmail.com)" }

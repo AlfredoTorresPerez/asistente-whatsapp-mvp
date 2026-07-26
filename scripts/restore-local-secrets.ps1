@@ -8,6 +8,7 @@
   No escribe ningun archivo en disco con los secretos.
 
   Secretos que restaura:
+    - JWT_SECRET
     - WHATSAPP_APP_SECRET
     - WHATSAPP_ACCESS_TOKEN
     - GMAIL_PASSWORD
@@ -27,6 +28,7 @@ $ROOT = Split-Path -Parent $PSScriptRoot
 . (Join-Path $PSScriptRoot "lib\CredentialManager.ps1")
 
 $secrets = @{
+  APP_JWT_SECRET = "asistente-local/JWT_SECRET"
   APP_WHATSAPP_CLOUD_API_APP_SECRET = "asistente-local/WHATSAPP_APP_SECRET"
   APP_WHATSAPP_CLOUD_API_ACCESS_TOKEN = "asistente-local/WHATSAPP_ACCESS_TOKEN"
   SPRING_MAIL_PASSWORD = "asistente-local/GMAIL_PASSWORD"
