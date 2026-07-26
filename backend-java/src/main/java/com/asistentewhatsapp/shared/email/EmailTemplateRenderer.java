@@ -79,22 +79,32 @@ public class EmailTemplateRenderer {
     }
 
     private String removeEmptyOptionalBlocks(String template, AppointmentConfirmationEmailDTO data) {
-        return OPTIONAL_BLOCK_PATTERN.matcher(template).replaceAll(match -> {
-            String varName = match.group(1);
-            String value = getFieldValue(varName, data);
-            if (value == null || value.isBlank() || "{{".equals(value)) {
-                return "";
-            }
-            return match.group(0);
-        });
+        try {
+            return OPTIONAL_BLOCK_PATTERN.matcher(template).replaceAll(match -> {
+                String varName = match.group(1);
+                String value = getFieldValue(varName, data);
+                if (value == null || value.isBlank() || "{{".equals(value)) {
+                    return "";
+                }
+                return match.group(2);
+            });
+        } catch (Exception e) {
+            LOGGER.warn("Error processing optional blocks in email template: {}", e.getMessage());
+            return template;
+        }
     }
 
     private String replacePlaceholders(String template, AppointmentConfirmationEmailDTO data) {
-        return PLACEHOLDER_PATTERN.matcher(template).replaceAll(match -> {
-            String varName = match.group(1);
-            String value = getFieldValue(varName, data);
-            return value != null ? escapeHtml(value) : "";
-        });
+        try {
+            return PLACEHOLDER_PATTERN.matcher(template).replaceAll(match -> {
+                String varName = match.group(1);
+                String value = getFieldValue(varName, data);
+                return value != null ? Matcher.quoteReplacement(escapeHtml(value)) : "";
+            });
+        } catch (Exception e) {
+            LOGGER.warn("Error replacing placeholders in email template: {}", e.getMessage());
+            return template;
+        }
     }
 
     private String stripClosingTags(String template) {

@@ -58,6 +58,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -335,6 +336,10 @@ public class PublicLandingService {
 
         String confirmationUrl = generateConfirmationLink(businessId, bookingId, service.requiresDeposit());
 
+        String token = confirmationUrl.substring(confirmationUrl.lastIndexOf('/') + 1);
+        String rescheduleUrl = frontendPublicBaseUrl + "/reservas/reprogramar/" + token;
+        String cancelUrl = frontendPublicBaseUrl + "/reservas/cancelar/" + token;
+
         notifyCenter(businessId, location, service, professionalName, customer, startsAt, bookingId);
 
         if (request.customerPhone() != null && !request.customerPhone().isBlank()) {
@@ -345,7 +350,8 @@ public class PublicLandingService {
 
         if (request.customerEmail() != null && !request.customerEmail().isBlank()) {
             sendPostCreationEmail(business, location, service, professionalName, startsAt, bookingId,
-                    confirmationUrl, request.customerName(), request.customerEmail(), businessId);
+                    confirmationUrl, rescheduleUrl, cancelUrl,
+                    request.customerName(), request.customerEmail(), businessId);
         }
 
         return bookingId;
@@ -389,6 +395,7 @@ public class PublicLandingService {
     private void sendPostCreationEmail(BusinessEntity business, LocationRecord location,
             CompleteAgendaJdbcRepository.ServiceRecord service, String professionalName,
             OffsetDateTime startsAt, UUID bookingId, String confirmationUrl,
+            String rescheduleUrl, String cancelUrl,
             String customerName, String customerEmail, UUID businessId) {
         String startsAtText = startsAt.toLocalDate() + " " + startsAt.toLocalTime();
         String businessName = business.getBusinessName();
@@ -411,12 +418,14 @@ public class PublicLandingService {
         emailDto.setBusinessName(businessName);
         emailDto.setServiceName(service.name());
         emailDto.setBranchName(location.name());
-        emailDto.setAppointmentDate(startsAt.toLocalDate().toString());
+        emailDto.setAppointmentDate(startsAt.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
         emailDto.setAppointmentTime(startsAt.toLocalTime().toString());
         emailDto.setDuration(formatDuration(service.durationMinutes()));
         emailDto.setProfessionalName(professionalName);
         emailDto.setBookingStatus("Pendiente de confirmacion");
         emailDto.setConfirmationUrl(confirmationUrl);
+        emailDto.setRescheduleUrl(rescheduleUrl);
+        emailDto.setCancelUrl(cancelUrl);
         emailDto.setReservationCode(bookingId.toString().substring(0, 8).toUpperCase());
 
         BusinessLocationRecord locationRecord = locationRepository.findActiveById(businessId, location.id());
@@ -426,14 +435,25 @@ public class PublicLandingService {
             if (addr != null && !addr.isBlank()) {
                 emailDto.setGoogleMapsUrl("https://maps.google.com/?q=" + URLEncoder.encode(addr, StandardCharsets.UTF_8));
             }
-            String phone = locationRecord.phone() != null ? locationRecord.phone() : business.getSupportPhone();
-            emailDto.setPhone(phone);
-            if (phone != null && !phone.isBlank()) {
-                emailDto.setWhatsappUrl("https://wa.me/" + phone.replaceAll("[^0-9]", ""));
-            }
+        }
+
+        String channelPhone = metaOnboardingRepository.findCloudApiChannel(businessId)
+                .map(ChannelAccountRecord::phoneNumber)
+                .orElse(null);
+        String displayPhone = channelPhone != null ? channelPhone
+                : (locationRecord != null && locationRecord.phone() != null ? locationRecord.phone()
+                        : business.getSupportPhone());
+        emailDto.setPhone(displayPhone);
+        if (displayPhone != null && !displayPhone.isBlank()) {
+            emailDto.setWhatsappUrl("https://wa.me/" + displayPhone.replaceAll("[^0-9]", ""));
         }
 
         emailDto.setReservationDetailsUrl(frontendPublicBaseUrl + "/reservas/" + bookingId);
+
+        NumberFormat clpFormat = NumberFormat.getIntegerInstance(new java.util.Locale("es", "CL"));
+        if (service.priceBase() != null) {
+            emailDto.setPrice("$" + clpFormat.format(service.priceBase()));
+        }
 
         try {
             var aestheticService = aestheticRepository.findService(businessId, service.id());
@@ -441,10 +461,6 @@ public class PublicLandingService {
                 emailDto.setServiceCategory(aestheticService.categoryName());
                 emailDto.setServiceDescription(aestheticService.description());
                 emailDto.setAftercareInstructions(aestheticService.aftercareRecommendations());
-                if (aestheticService.priceBase() != null) {
-                    NumberFormat clpFormat = NumberFormat.getIntegerInstance(new java.util.Locale("es", "CL"));
-                    emailDto.setPrice("$" + clpFormat.format(aestheticService.priceBase()));
-                }
             }
         } catch (RuntimeException e) {
             LOGGER.warn("Could not fetch aesthetic service details for email", e);

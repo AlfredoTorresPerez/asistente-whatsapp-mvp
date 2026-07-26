@@ -172,7 +172,7 @@ export function AdminContentPage() {
       queryClient.invalidateQueries({ queryKey: ['content-items'] })
       if (form.id) {
         getContentItemRequest(form.id).then((data) => {
-          setForm((prev) => ({ ...prev, imagePath: data.imagePath, imageUrl: data.imageUrl }))
+          setForm((prev) => ({ ...prev, imagePreview: data.imageUrl }))
         })
       }
     },
@@ -531,7 +531,7 @@ export function AdminContentPage() {
                   label="Tipo"
                   onChange={(e) => updateField('type', e.target.value as ContentType)}
                   options={[{ value: '', label: 'Selecciona un tipo' }, ...TYPE_OPTIONS]}
-                  value={form.type}
+                  value={form.type || ''}
                 />
                 <Select
                   error={formErrors.status}

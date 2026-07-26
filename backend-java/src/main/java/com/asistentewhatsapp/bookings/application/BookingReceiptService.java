@@ -4,6 +4,7 @@ import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository;
 import com.asistentewhatsapp.shared.exception.ApiException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
@@ -43,17 +44,20 @@ public class BookingReceiptService {
                         where b.business_id = :businessId and b.id = :bookingId
                         """,
                 params,
-                (rs, rowNum) -> Map.of(
-                        "subject", rs.getString("subject"),
-                        "customerName", rs.getString("customer_name"),
-                        "customerEmail", rs.getString("customer_email"),
-                        "customerPhone", rs.getString("customer_phone"),
-                        "startsAt", rs.getObject("starts_at", OffsetDateTime.class),
-                        "durationMinutes", rs.getInt("duration_minutes"),
-                        "locationName", rs.getString("location_name"),
-                        "serviceName", rs.getString("service_name"),
-                        "professionalName", rs.getString("professional_name"),
-                        "roomName", rs.getString("room_name")));
+                (rs, rowNum) -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("subject", rs.getString("subject"));
+                    map.put("customerName", rs.getString("customer_name"));
+                    map.put("customerEmail", rs.getString("customer_email"));
+                    map.put("customerPhone", rs.getString("customer_phone"));
+                    map.put("startsAt", rs.getObject("starts_at", OffsetDateTime.class));
+                    map.put("durationMinutes", rs.getInt("duration_minutes"));
+                    map.put("locationName", rs.getString("location_name"));
+                    map.put("serviceName", rs.getString("service_name"));
+                    map.put("professionalName", rs.getString("professional_name"));
+                    map.put("roomName", rs.getString("room_name"));
+                    return map;
+                });
         if (booking.isEmpty()) {
             throw new ApiException(HttpStatus.NOT_FOUND, "BOOKING_NOT_FOUND",
                     "No se encontro la reserva para generar el comprobante.", Map.of());

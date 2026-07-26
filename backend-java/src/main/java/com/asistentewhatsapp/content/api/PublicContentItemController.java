@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/api/public/v1/content-items", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/public/v1/content-items", produces = MediaType.APPLICATION_JSON_VALUE)
 public class PublicContentItemController {
 
     private final ContentItemService service;

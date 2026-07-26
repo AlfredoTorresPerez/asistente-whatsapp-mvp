@@ -177,7 +177,14 @@ public class TransactionalEmailService {
         String businessName = dto.getBusinessName() != null ? dto.getBusinessName() : fromName;
         String subject = "Confirma tu reserva - " + businessName;
 
-        String htmlBody = templateRenderer.render("appointment-confirmation", dto);
+        String htmlBody;
+        try {
+            htmlBody = templateRenderer.render("appointment-confirmation", dto);
+            LOGGER.info("PRICE_VERIFY price=[{}] htmlHasDollar=[{}]", dto.getPrice(), htmlBody.contains("$"));
+        } catch (RuntimeException e) {
+            LOGGER.warn("BOOKING_CONFIRMATION_HTML_RENDER_FAILED reason={}", e.getMessage());
+            htmlBody = null;
+        }
         String textBody = buildFallbackText(
                 dto.getPatientName(),
                 dto.getServiceName(),
