@@ -11,6 +11,7 @@
     - WHATSAPP_APP_SECRET  : App Secret de Meta (para webhook)
     - WHATSAPP_ACCESS_TOKEN : Token persistente de WhatsApp Cloud API
     - GMAIL_PASSWORD       : App Password de Gmail para envio SMTP local
+    - OPENAI_API_KEY       : API Key de OpenAI para respuestas automaticas
 
 .PARAMETER Batch
   Permite pasar los valores como parametros (solo para automatizacion).
@@ -35,6 +36,7 @@ $secretDefs = @(
   @{ Name = "WHATSAPP_APP_SECRET"; Prompt = "App Secret de Meta (webhook signature)" }
   @{ Name = "WHATSAPP_ACCESS_TOKEN"; Prompt = "Access Token de WhatsApp Cloud API" }
   @{ Name = "GMAIL_PASSWORD"; Prompt = "App Password de Gmail (notificacionesassistentelocale@gmail.com)" }
+  @{ Name = "OPENAI_API_KEY"; Prompt = "API Key de OpenAI (platform.openai.com/api-keys)" }
 )
 
 Write-Host "=== Almacenar secretos locales en Windows Credential Manager ===" -ForegroundColor Cyan

@@ -11,6 +11,7 @@
     - WHATSAPP_APP_SECRET
     - WHATSAPP_ACCESS_TOKEN
     - GMAIL_PASSWORD
+    - OPENAI_API_KEY
 
 .PARAMETER WhatIf
   Muestra que se restauraria sin modificar variables de entorno.
@@ -29,6 +30,7 @@ $secrets = @{
   APP_WHATSAPP_CLOUD_API_APP_SECRET = "asistente-local/WHATSAPP_APP_SECRET"
   APP_WHATSAPP_CLOUD_API_ACCESS_TOKEN = "asistente-local/WHATSAPP_ACCESS_TOKEN"
   SPRING_MAIL_PASSWORD = "asistente-local/GMAIL_PASSWORD"
+  APP_OPENAI_API_KEY = "asistente-local/OPENAI_API_KEY"
 }
 
 $allFound = $true
