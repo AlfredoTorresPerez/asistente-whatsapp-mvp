@@ -528,22 +528,31 @@ function CatalogPanel({
   onSubmit: (event: FormEvent<HTMLFormElement>) => void
   saving: boolean
 }) {
+  const services = useMemo(
+    () => catalogItems.filter((item) => item.type === 'SERVICE'),
+    [catalogItems],
+  )
+  const serviceOptions = useMemo(
+    () => catalogOptions.filter((item) => item.type === 'SERVICE'),
+    [catalogOptions],
+  )
+
   return (
     <div className="grid gap-4 xl:grid-cols-[380px_minmax(0,1fr)]">
       <Card>
         <h2 className="text-lg font-semibold text-slate-950">Disponibilidad por sede</h2>
         <p className="mt-1 text-sm text-slate-500">
-          Activa servicios/productos por sucursal y registra stock por ubicacion fisica.
+          Activa servicios por sucursal y registra precios especificos por ubicacion fisica.
         </p>
         <form className="mt-5 space-y-4" onSubmit={onSubmit}>
-          <label className="block text-sm font-medium text-[#23385F]">Producto o servicio</label>
+          <label className="block text-sm font-medium text-[#23385F]">Servicio</label>
           <select
             className="h-12 w-full rounded-[14px] border border-[var(--color-border)] bg-white px-4 text-sm"
             value={catalogForm.productServiceId}
             onChange={(event) => onChange({ ...catalogForm, productServiceId: event.target.value })}
           >
-            <option value="">Seleccionar item</option>
-            {catalogOptions.map((item) => (
+            <option value="">Seleccionar servicio</option>
+            {serviceOptions.map((item) => (
               <option key={item.itemId} value={item.itemId}>
                 {item.name}
               </option>
@@ -569,20 +578,6 @@ function CatalogPanel({
             onChange={(event) => onChange({ ...catalogForm, priceOverride: event.target.value })}
             placeholder="Opcional"
           />
-          <div className="grid grid-cols-2 gap-3">
-            <Input
-              label="Stock"
-              type="number"
-              value={catalogForm.stockQuantity}
-              onChange={(event) => onChange({ ...catalogForm, stockQuantity: event.target.value })}
-            />
-            <Input
-              label="Stock minimo"
-              type="number"
-              value={catalogForm.stockMinimum}
-              onChange={(event) => onChange({ ...catalogForm, stockMinimum: event.target.value })}
-            />
-          </div>
           <Button loading={saving} type="submit" fullWidth>
             Guardar disponibilidad
           </Button>
@@ -590,44 +585,45 @@ function CatalogPanel({
       </Card>
       <Card className="overflow-hidden p-0">
         <TableHeader
-          title="Catalogo por sede"
-          description="Servicios/productos disponibles, precio por sucursal y stock operativo."
+          title="Servicios por sede"
+          description="Servicios disponibles, precios y estado operativo por sede."
         />
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-[var(--color-border)] text-sm">
-            <thead className="bg-slate-50 text-left text-xs uppercase tracking-[0.16em] text-slate-500">
-              <tr>
-                <th className="px-4 py-3">Item</th>
-                <th className="px-4 py-3">Sede</th>
-                <th className="px-4 py-3">Estado</th>
-                <th className="px-4 py-3">Precio</th>
-                <th className="px-4 py-3">Stock</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[var(--color-border)]">
-              {catalogItems.map((item) => (
-                <tr key={`${item.itemId}-${item.locationId}`}>
-                  <td className="px-4 py-3 font-semibold text-slate-900">
-                    {item.name}
-                    <p className="text-xs font-normal text-slate-500">{item.type}</p>
-                  </td>
-                  <td className="px-4 py-3">{item.locationName}</td>
-                  <td className="px-4 py-3">
-                    <StatusBadge
-                      label={item.available ? 'Disponible' : 'No disponible'}
-                      tone={item.available ? 'success' : 'neutral'}
-                    />
-                  </td>
-                  <td className="px-4 py-3">
-                    ${Number(item.priceOverride ?? item.basePrice).toLocaleString('es-CL')}
-                  </td>
-                  <td className="px-4 py-3">
-                    {item.stockQuantity ?? '—'} / min {item.stockMinimum ?? '—'}
-                  </td>
+          {services.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <p className="text-lg font-semibold text-slate-950">
+                No existen servicios configurados para la sede seleccionada.
+              </p>
+            </div>
+          ) : (
+            <table className="min-w-full divide-y divide-[var(--color-border)] text-sm">
+              <thead className="bg-slate-50 text-left text-xs uppercase tracking-[0.16em] text-slate-500">
+                <tr>
+                  <th className="px-4 py-3">Servicio</th>
+                  <th className="px-4 py-3">Sede</th>
+                  <th className="px-4 py-3">Estado</th>
+                  <th className="px-4 py-3">Precio</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-[var(--color-border)]">
+                {services.map((item) => (
+                  <tr key={`${item.itemId}-${item.locationId}`}>
+                    <td className="px-4 py-3 font-semibold text-slate-900">{item.name}</td>
+                    <td className="px-4 py-3">{item.locationName}</td>
+                    <td className="px-4 py-3">
+                      <StatusBadge
+                        label={item.available ? 'Disponible' : 'No disponible'}
+                        tone={item.available ? 'success' : 'neutral'}
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      ${Number(item.priceOverride ?? item.basePrice).toLocaleString('es-CL')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </Card>
     </div>

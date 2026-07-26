@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -299,6 +299,260 @@ describe('MultisiteOperationsPage - Summary (Resumen)', () => {
       expect(
         screen.getByText('No fue posible cargar operacion multisede'),
       ).toBeInTheDocument()
+    })
+  })
+})
+
+describe('MultisiteOperationsPage - Catalog (Servicios por sede)', () => {
+  const serviceItem = {
+    itemId: '20000000-0000-0000-0000-000000000001',
+    type: 'SERVICE',
+    name: 'Limpieza facial',
+    sku: null,
+    basePrice: 25000,
+    locationId: '11111111-1111-1111-1111-111111111111',
+    locationName: 'Centro Estetico Bella - Sede Principal',
+    available: true,
+    priceOverride: null,
+    durationOverrideMinutes: 60,
+    stockEnabled: false,
+    stockQuantity: null,
+    stockMinimum: null,
+  }
+
+  const productItem = {
+    itemId: '20000000-0000-0000-0000-000000000002',
+    type: 'PRODUCT',
+    name: 'Crema hidratante',
+    sku: 'CH-001',
+    basePrice: 15000,
+    locationId: '11111111-1111-1111-1111-111111111111',
+    locationName: 'Centro Estetico Bella - Sede Principal',
+    available: true,
+    priceOverride: null,
+    durationOverrideMinutes: null,
+    stockEnabled: true,
+    stockQuantity: 10,
+    stockMinimum: 2,
+  }
+
+  const inactiveService = {
+    ...serviceItem,
+    itemId: '20000000-0000-0000-0000-000000000003',
+    name: 'Depilacion laser',
+    available: false,
+  }
+
+  beforeEach(() => {
+    window.sessionStorage.clear()
+    setupSessionStorage()
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('shows only services when API returns both products and services', async () => {
+    const mockFetch = vi.fn()
+    vi.stubGlobal('fetch', mockFetch)
+    mockFetch.mockImplementation((url: string) => {
+      if (url.includes('/multisite/summary')) return Promise.resolve(jsonResponse(mockLocations))
+      if (url.includes('/multisite/catalog-availability')) {
+        return Promise.resolve(jsonResponse([serviceItem, productItem, inactiveService]))
+      }
+      if (url.includes('/multisite/professionals')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/professional-schedules')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/user-access')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/channels')) return Promise.resolve(jsonResponse([]))
+      return Promise.resolve(jsonResponse({}))
+    })
+
+    renderPage()
+
+    await waitFor(() => {
+      expect(screen.getByRole('table')).toBeInTheDocument()
+    })
+
+    await userEvent.click(screen.getByText('Catalogo y stock'))
+
+    await waitFor(() => {
+      expect(screen.getByText('Servicios por sede')).toBeInTheDocument()
+      const tables = screen.getAllByRole('table')
+      const catalogTable = tables[tables.length - 1]
+      expect(catalogTable.textContent).toContain('Limpieza facial')
+      expect(catalogTable.textContent).toContain('Depilacion laser')
+      expect(catalogTable.textContent).not.toContain('Crema hidratante')
+    })
+  })
+
+  it('shows only services when multiple locations are selected', async () => {
+    const mockFetch = vi.fn()
+    vi.stubGlobal('fetch', mockFetch)
+    const productInOtherLocation = {
+      ...productItem,
+      locationId: '11111111-1111-1111-1111-111111111112',
+      locationName: 'Las Condes',
+    }
+    const serviceInOtherLocation = {
+      ...serviceItem,
+      itemId: '20000000-0000-0000-0000-000000000004',
+      locationId: '11111111-1111-1111-1111-111111111112',
+      locationName: 'Las Condes',
+      name: 'Manicure',
+    }
+    mockFetch.mockImplementation((url: string) => {
+      if (url.includes('/multisite/summary')) return Promise.resolve(jsonResponse(mockLocations))
+      if (url.includes('/multisite/catalog-availability')) {
+        return Promise.resolve(jsonResponse([
+          serviceItem, productItem, inactiveService,
+          serviceInOtherLocation, productInOtherLocation,
+        ]))
+      }
+      if (url.includes('/multisite/professionals')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/professional-schedules')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/user-access')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/channels')) return Promise.resolve(jsonResponse([]))
+      return Promise.resolve(jsonResponse({}))
+    })
+
+    renderPage()
+
+    await waitFor(() => {
+      expect(screen.getByRole('table')).toBeInTheDocument()
+    })
+
+    await userEvent.click(screen.getByText('Catalogo y stock'))
+
+    await waitFor(() => {
+      const tables = screen.getAllByRole('table')
+      const catalogTable = tables[tables.length - 1]
+      expect(catalogTable.textContent).toContain('Limpieza facial')
+      expect(catalogTable.textContent).toContain('Manicure')
+      expect(catalogTable.textContent).toContain('Depilacion laser')
+      expect(catalogTable.textContent).not.toContain('Crema hidratante')
+    })
+  })
+
+  it('shows empty state when location has only products', async () => {
+    const mockFetch = vi.fn()
+    vi.stubGlobal('fetch', mockFetch)
+    mockFetch.mockImplementation((url: string) => {
+      if (url.includes('/multisite/summary')) return Promise.resolve(jsonResponse(mockLocations))
+      if (url.includes('/multisite/catalog-availability')) {
+        return Promise.resolve(jsonResponse([productItem]))
+      }
+      if (url.includes('/multisite/professionals')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/professional-schedules')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/user-access')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/channels')) return Promise.resolve(jsonResponse([]))
+      return Promise.resolve(jsonResponse({}))
+    })
+
+    renderPage()
+
+    await waitFor(() => {
+      expect(screen.getByRole('table')).toBeInTheDocument()
+    })
+
+    await userEvent.click(screen.getByText('Catalogo y stock'))
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('No existen servicios configurados para la sede seleccionada.'),
+      ).toBeInTheDocument()
+    })
+  })
+
+  it('shows inactive service with its status', async () => {
+    const mockFetch = vi.fn()
+    vi.stubGlobal('fetch', mockFetch)
+    mockFetch.mockImplementation((url: string) => {
+      if (url.includes('/multisite/summary')) return Promise.resolve(jsonResponse(mockLocations))
+      if (url.includes('/multisite/catalog-availability')) {
+        return Promise.resolve(jsonResponse([serviceItem, inactiveService]))
+      }
+      if (url.includes('/multisite/professionals')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/professional-schedules')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/user-access')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/channels')) return Promise.resolve(jsonResponse([]))
+      return Promise.resolve(jsonResponse({}))
+    })
+
+    renderPage()
+
+    await waitFor(() => {
+      expect(screen.getByRole('table')).toBeInTheDocument()
+    })
+
+    await userEvent.click(screen.getByText('Catalogo y stock'))
+
+    await waitFor(() => {
+      const tables = screen.getAllByRole('table')
+      const catalogTable = tables[tables.length - 1]
+      expect(within(catalogTable).getByText('Depilacion laser')).toBeInTheDocument()
+      expect(within(catalogTable).getByText('No disponible')).toBeInTheDocument()
+    })
+  })
+
+  it('shows "Servicios por sede" as title', async () => {
+    const mockFetch = vi.fn()
+    vi.stubGlobal('fetch', mockFetch)
+    mockFetch.mockImplementation((url: string) => {
+      if (url.includes('/multisite/summary')) return Promise.resolve(jsonResponse(mockLocations))
+      if (url.includes('/multisite/catalog-availability')) {
+        return Promise.resolve(jsonResponse([serviceItem]))
+      }
+      if (url.includes('/multisite/professionals')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/professional-schedules')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/user-access')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/channels')) return Promise.resolve(jsonResponse([]))
+      return Promise.resolve(jsonResponse({}))
+    })
+
+    renderPage()
+
+    await waitFor(() => {
+      expect(screen.getByRole('table')).toBeInTheDocument()
+    })
+
+    await userEvent.click(screen.getByText('Catalogo y stock'))
+
+    await waitFor(() => {
+      expect(screen.getByText('Servicios por sede')).toBeInTheDocument()
+      expect(screen.getByText('Servicios disponibles, precios y estado operativo por sede.')).toBeInTheDocument()
+    })
+  })
+
+  it('does not show stock column for services', async () => {
+    const mockFetch = vi.fn()
+    vi.stubGlobal('fetch', mockFetch)
+    mockFetch.mockImplementation((url: string) => {
+      if (url.includes('/multisite/summary')) return Promise.resolve(jsonResponse(mockLocations))
+      if (url.includes('/multisite/catalog-availability')) {
+        return Promise.resolve(jsonResponse([serviceItem]))
+      }
+      if (url.includes('/multisite/professionals')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/professional-schedules')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/user-access')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/channels')) return Promise.resolve(jsonResponse([]))
+      return Promise.resolve(jsonResponse({}))
+    })
+
+    renderPage()
+
+    await waitFor(() => {
+      expect(screen.getByRole('table')).toBeInTheDocument()
+    })
+
+    await userEvent.click(screen.getByText('Catalogo y stock'))
+
+    await waitFor(() => {
+      const tables = screen.getAllByRole('table')
+      const catalogTable = tables[tables.length - 1]
+      const headers = within(catalogTable).getAllByRole('columnheader')
+      const labels = headers.map((h) => h.textContent)
+      expect(labels).toEqual(['Servicio', 'Sede', 'Estado', 'Precio'])
+      expect(catalogTable.textContent).not.toContain('10 / min 2')
     })
   })
 })

@@ -101,8 +101,9 @@ public class MultisiteJdbcRepository {
                          and pls.product_service_id = ps.id
                          and pls.location_id = bl.id
                         where ps.business_id = :businessId
+                          and ps.type = 'SERVICE'
                           and (cast(:locationId as uuid) is null or bl.id = :locationId)
-                        order by bl.name asc, ps.type asc, ps.name asc
+                        order by bl.name asc, ps.name asc
                         """,
                 parameters,
                 (rs, rowNum) -> new MultisiteCatalogAvailabilityResponse(
