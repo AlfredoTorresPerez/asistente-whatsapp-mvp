@@ -7,6 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SecurityPolicyRepository extends JpaRepository<SecurityPolicyEntity, UUID> {
 
-    Optional<SecurityPolicyEntity> findByBusinessId(UUID businessId);
+	Optional<SecurityPolicyEntity> findByBusinessId(UUID businessId);
 }
-

@@ -19,33 +19,27 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class BookingPublicActionLinkController {
 
-    private final BookingPublicActionService bookingPublicActionService;
+	private final BookingPublicActionService bookingPublicActionService;
 
-    public BookingPublicActionLinkController(BookingPublicActionService bookingPublicActionService) {
-        this.bookingPublicActionService = bookingPublicActionService;
-    }
+	public BookingPublicActionLinkController(BookingPublicActionService bookingPublicActionService) {
+		this.bookingPublicActionService = bookingPublicActionService;
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_RESCHEDULE')")
-    @PostMapping(
-            value = "/api/v1/bookings/{bookingId}/reschedule-link",
-            consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    public BookingPublicActionLinkResponse createRescheduleLink(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @PathVariable UUID bookingId,
-            @Valid @RequestBody CreateBookingRescheduleLinkRequest request) {
-        return bookingPublicActionService.createRescheduleLink(authenticatedUser, bookingId, request);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_RESCHEDULE')")
+	@PostMapping(value = "/api/v1/bookings/{bookingId}/reschedule-link", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.CREATED)
+	public BookingPublicActionLinkResponse createRescheduleLink(
+			@AuthenticationPrincipal AuthenticatedUser authenticatedUser, @PathVariable UUID bookingId,
+			@Valid @RequestBody CreateBookingRescheduleLinkRequest request) {
+		return bookingPublicActionService.createRescheduleLink(authenticatedUser, bookingId, request);
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_CANCEL')")
-    @PostMapping(
-            value = "/api/v1/bookings/{bookingId}/cancellation-link",
-            consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    public BookingPublicActionLinkResponse createCancellationLink(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @PathVariable UUID bookingId,
-            @RequestBody(required = false) CreateBookingCancellationLinkRequest request) {
-        return bookingPublicActionService.createCancellationLink(authenticatedUser, bookingId, request);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_CANCEL')")
+	@PostMapping(value = "/api/v1/bookings/{bookingId}/cancellation-link", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.CREATED)
+	public BookingPublicActionLinkResponse createCancellationLink(
+			@AuthenticationPrincipal AuthenticatedUser authenticatedUser, @PathVariable UUID bookingId,
+			@RequestBody(required = false) CreateBookingCancellationLinkRequest request) {
+		return bookingPublicActionService.createCancellationLink(authenticatedUser, bookingId, request);
+	}
 }

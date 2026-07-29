@@ -27,37 +27,43 @@ export function ImageUpload({
   const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const validateFile = useCallback((file: File): boolean => {
-    if (file.size > maxSizeMB * 1024 * 1024) {
-      showToast({
-        title: 'Archivo demasiado grande',
-        description: `El archivo no debe superar ${maxSizeMB} MB`,
-        tone: 'error',
-      })
-      return false
-    }
-    if (!acceptedTypes.includes(file.type)) {
-      showToast({
-        title: 'Tipo de archivo no permitido',
-        description: `Formatos aceptados: ${acceptedTypes.map(t => t.split('/')[1].toUpperCase()).join(', ')}`,
-        tone: 'error',
-      })
-      return false
-    }
-    return true
-  }, [maxSizeMB, acceptedTypes, showToast])
+  const validateFile = useCallback(
+    (file: File): boolean => {
+      if (file.size > maxSizeMB * 1024 * 1024) {
+        showToast({
+          title: 'Archivo demasiado grande',
+          description: `El archivo no debe superar ${maxSizeMB} MB`,
+          tone: 'error',
+        })
+        return false
+      }
+      if (!acceptedTypes.includes(file.type)) {
+        showToast({
+          title: 'Tipo de archivo no permitido',
+          description: `Formatos aceptados: ${acceptedTypes.map((t) => t.split('/')[1].toUpperCase()).join(', ')}`,
+          tone: 'error',
+        })
+        return false
+      }
+      return true
+    },
+    [maxSizeMB, acceptedTypes, showToast],
+  )
 
-  const handleFileSelect = useCallback((file: File | null) => {
-    if (!file) {
-      onChange(null)
-      setPreview(null)
-      return
-    }
-    if (!validateFile(file)) return
-    onChange(file)
-    const objectUrl = URL.createObjectURL(file)
-    setPreview(objectUrl)
-  }, [onChange, validateFile])
+  const handleFileSelect = useCallback(
+    (file: File | null) => {
+      if (!file) {
+        onChange(null)
+        setPreview(null)
+        return
+      }
+      if (!validateFile(file)) return
+      onChange(file)
+      const objectUrl = URL.createObjectURL(file)
+      setPreview(objectUrl)
+    },
+    [onChange, validateFile],
+  )
 
   const handleRemove = useCallback(() => {
     onRemove()
@@ -65,11 +71,14 @@ export function ImageUpload({
     setPreview(null)
   }, [onRemove, onChange])
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (!disabled) setIsDragging(true)
-  }, [disabled])
+  const handleDragOver = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+      if (!disabled) setIsDragging(true)
+    },
+    [disabled],
+  )
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -77,19 +86,25 @@ export function ImageUpload({
     setIsDragging(false)
   }, [])
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragging(false)
-    if (disabled) return
-    const file = e.dataTransfer.files[0]
-    if (file) handleFileSelect(file)
-  }, [disabled, handleFileSelect])
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+      setIsDragging(false)
+      if (disabled) return
+      const file = e.dataTransfer.files[0]
+      if (file) handleFileSelect(file)
+    },
+    [disabled, handleFileSelect],
+  )
 
-  const handleInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] ?? null
-    handleFileSelect(file)
-  }, [handleFileSelect])
+  const handleInputChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0] ?? null
+      handleFileSelect(file)
+    },
+    [handleFileSelect],
+  )
 
   const openFileDialog = useCallback(() => {
     fileInputRef.current?.click()
@@ -113,7 +128,9 @@ export function ImageUpload({
         onClick={!disabled ? openFileDialog : undefined}
         role={!disabled ? 'button' : undefined}
         tabIndex={!disabled ? 0 : undefined}
-        onKeyDown={!disabled ? (e) => (e.key === 'Enter' || e.key === ' ') && openFileDialog() : undefined}
+        onKeyDown={
+          !disabled ? (e) => (e.key === 'Enter' || e.key === ' ') && openFileDialog() : undefined
+        }
       >
         <input
           ref={fileInputRef}
@@ -123,7 +140,7 @@ export function ImageUpload({
           className="sr-only"
           disabled={disabled}
         />
-        {(value || preview) ? (
+        {value || preview ? (
           <div className="relative max-w-xs mx-auto">
             <img
               src={preview || displayImage!}
@@ -143,8 +160,18 @@ export function ImageUpload({
                   aria-label="Cambiar imagen"
                 >
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
                   </svg>
                 </Button>
                 <Button
@@ -157,8 +184,18 @@ export function ImageUpload({
                   }}
                   aria-label="Eliminar imagen"
                 >
-                  <svg className="h-4 w-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="h-4 w-4 text-red-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </Button>
               </div>
@@ -179,7 +216,12 @@ export function ImageUpload({
                 strokeWidth={1.5}
                 d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
               />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+              />
             </svg>
             <p className="text-sm font-medium text-slate-700">
               {disabled ? 'Imagen actual' : 'Arrastra una imagen o haz clic para seleccionar'}
@@ -191,9 +233,7 @@ export function ImageUpload({
         )}
       </div>
       {value && !disabled && (
-        <p className="text-xs text-slate-500 text-center">
-          Haz clic en la imagen para cambiarla
-        </p>
+        <p className="text-xs text-slate-500 text-center">Haz clic en la imagen para cambiarla</p>
       )}
     </div>
   )

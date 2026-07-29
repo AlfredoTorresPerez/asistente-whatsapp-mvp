@@ -1,0 +1,329 @@
+{
+  "errors": [],
+  "warnings": [],
+  "sheet_counts": {
+    "Resumen": 10,
+    "Reservar": 73,
+    "Reprogramar": 67,
+    "Cancelar": 67,
+    "Taxonomia_Intenciones": 42,
+    "Ejemplos_Ampliados": 168,
+    "Escenarios_Multiturno": 36,
+    "Conversaciones_Multiturno": 118,
+    "Entidades_Estructuradas": 60,
+    "Casos_Negativos": 60,
+    "Contexto_Referencias": 45,
+    "Cambios_Intencion": 30,
+    "Multiples_Reservas": 25,
+    "Respuestas_Acciones": 47,
+    "Estados_Conversacion": 24,
+    "Transiciones_Conversacion": 30,
+    "Evaluacion_Dataset": 104,
+    "Cobertura_Dataset": 42,
+    "Ambiguas_Contexto": 10,
+    "Reglas_Modelo": 10,
+    "Fuentes": 18,
+    "Metodologia": 12
+  },
+  "evaluation_splits": {
+    "entrenamiento": 60,
+    "validación": 21,
+    "prueba": 23
+  },
+  "coverage_recalculated": {
+    "agradecer": {
+      "examples": 4,
+      "turns": 1,
+      "negative": 6,
+      "evaluation": 6,
+      "total": 17
+    },
+    "cambiar_intencion": {
+      "examples": 4,
+      "turns": 1,
+      "negative": 0,
+      "evaluation": 0,
+      "total": 5
+    },
+    "cancelar": {
+      "examples": 71,
+      "turns": 4,
+      "negative": 0,
+      "evaluation": 0,
+      "total": 75
+    },
+    "confirmar_asistencia": {
+      "examples": 4,
+      "turns": 1,
+      "negative": 3,
+      "evaluation": 1,
+      "total": 9
+    },
+    "confirmar_cancelacion": {
+      "examples": 4,
+      "turns": 2,
+      "negative": 0,
+      "evaluation": 0,
+      "total": 6
+    },
+    "confirmar_reprogramacion": {
+      "examples": 4,
+      "turns": 3,
+      "negative": 0,
+      "evaluation": 1,
+      "total": 8
+    },
+    "confirmar_reserva": {
+      "examples": 4,
+      "turns": 6,
+      "negative": 0,
+      "evaluation": 4,
+      "total": 14
+    },
+    "consultar_abono": {
+      "examples": 4,
+      "turns": 0,
+      "negative": 0,
+      "evaluation": 0,
+      "total": 4
+    },
+    "consultar_direccion": {
+      "examples": 4,
+      "turns": 0,
+      "negative": 0,
+      "evaluation": 4,
+      "total": 8
+    },
+    "consultar_disponibilidad": {
+      "examples": 4,
+      "turns": 1,
+      "negative": 3,
+      "evaluation": 5,
+      "total": 13
+    },
+    "consultar_duracion": {
+      "examples": 4,
+      "turns": 0,
+      "negative": 0,
+      "evaluation": 4,
+      "total": 8
+    },
+    "consultar_horario_empresa": {
+      "examples": 4,
+      "turns": 0,
+      "negative": 3,
+      "evaluation": 5,
+      "total": 12
+    },
+    "consultar_medio_pago": {
+      "examples": 4,
+      "turns": 0,
+      "negative": 0,
+      "evaluation": 0,
+      "total": 4
+    },
+    "consultar_politica_cancelacion": {
+      "examples": 4,
+      "turns": 1,
+      "negative": 0,
+      "evaluation": 2,
+      "total": 7
+    },
+    "consultar_precio": {
+      "examples": 4,
+      "turns": 1,
+      "negative": 3,
+      "evaluation": 5,
+      "total": 13
+    },
+    "consultar_profesionales": {
+      "examples": 4,
+      "turns": 0,
+      "negative": 0,
+      "evaluation": 4,
+      "total": 8
+    },
+    "consultar_promocion": {
+      "examples": 4,
+      "turns": 0,
+      "negative": 0,
+      "evaluation": 4,
+      "total": 8
+    },
+    "consultar_reserva": {
+      "examples": 4,
+      "turns": 0,
+      "negative": 3,
+      "evaluation": 1,
+      "total": 8
+    },
+    "consultar_servicios": {
+      "examples": 4,
+      "turns": 0,
+      "negative": 0,
+      "evaluation": 4,
+      "total": 8
+    },
+    "consultar_sucursales": {
+      "examples": 4,
+      "turns": 0,
+      "negative": 3,
+      "evaluation": 5,
+      "total": 12
+    },
+    "corregir_dato": {
+      "examples": 4,
+      "turns": 0,
+      "negative": 0,
+      "evaluation": 0,
+      "total": 4
+    },
+    "despedirse": {
+      "examples": 4,
+      "turns": 0,
+      "negative": 0,
+      "evaluation": 4,
+      "total": 8
+    },
+    "enviar_datos_cliente": {
+      "examples": 4,
+      "turns": 0,
+      "negative": 0,
+      "evaluation": 0,
+      "total": 4
+    },
+    "hablar_con_persona": {
+      "examples": 4,
+      "turns": 2,
+      "negative": 3,
+      "evaluation": 1,
+      "total": 10
+    },
+    "listar_reservas": {
+      "examples": 4,
+      "turns": 0,
+      "negative": 0,
+      "evaluation": 0,
+      "total": 4
+    },
+    "mensaje_fuera_de_contexto": {
+      "examples": 4,
+      "turns": 0,
+      "negative": 3,
+      "evaluation": 1,
+      "total": 8
+    },
+    "mensaje_incomprensible": {
+      "examples": 4,
+      "turns": 0,
+      "negative": 21,
+      "evaluation": 7,
+      "total": 32
+    },
+    "presentar_reclamo": {
+      "examples": 4,
+      "turns": 1,
+      "negative": 3,
+      "evaluation": 1,
+      "total": 9
+    },
+    "rechazar_cancelacion": {
+      "examples": 4,
+      "turns": 1,
+      "negative": 3,
+      "evaluation": 1,
+      "total": 9
+    },
+    "rechazar_horario": {
+      "examples": 4,
+      "turns": 0,
+      "negative": 0,
+      "evaluation": 4,
+      "total": 8
+    },
+    "rechazar_reprogramacion": {
+      "examples": 4,
+      "turns": 0,
+      "negative": 0,
+      "evaluation": 1,
+      "total": 5
+    },
+    "reprogramar": {
+      "examples": 71,
+      "turns": 3,
+      "negative": 3,
+      "evaluation": 1,
+      "total": 78
+    },
+    "reservar": {
+      "examples": 77,
+      "turns": 15,
+      "negative": 0,
+      "evaluation": 4,
+      "total": 96
+    },
+    "saludar": {
+      "examples": 4,
+      "turns": 0,
+      "negative": 0,
+      "evaluation": 4,
+      "total": 8
+    },
+    "seleccionar_horario": {
+      "examples": 4,
+      "turns": 14,
+      "negative": 0,
+      "evaluation": 4,
+      "total": 22
+    },
+    "seleccionar_profesional": {
+      "examples": 4,
+      "turns": 3,
+      "negative": 0,
+      "evaluation": 4,
+      "total": 11
+    },
+    "seleccionar_reserva": {
+      "examples": 4,
+      "turns": 2,
+      "negative": 0,
+      "evaluation": 0,
+      "total": 6
+    },
+    "seleccionar_servicio": {
+      "examples": 4,
+      "turns": 2,
+      "negative": 0,
+      "evaluation": 4,
+      "total": 10
+    },
+    "seleccionar_sucursal": {
+      "examples": 4,
+      "turns": 4,
+      "negative": 0,
+      "evaluation": 4,
+      "total": 12
+    },
+    "solicitar_ayuda": {
+      "examples": 4,
+      "turns": 0,
+      "negative": 0,
+      "evaluation": 4,
+      "total": 8
+    },
+    "solicitar_comprobante": {
+      "examples": 4,
+      "turns": 0,
+      "negative": 0,
+      "evaluation": 0,
+      "total": 4
+    },
+    "solicitar_devolucion": {
+      "examples": 4,
+      "turns": 0,
+      "negative": 0,
+      "evaluation": 0,
+      "total": 4
+    }
+  }
+}

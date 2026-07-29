@@ -21,18 +21,18 @@ type ServiceImageParams = {
 }
 
 const serviceImageMap: Record<string, string> = {
-  'alisado': IMAGES.SERVICIO_ALISADO,
+  alisado: IMAGES.SERVICIO_ALISADO,
   'asesoria-estetica': IMAGES.SERVICIO_ASESORIA,
-  'asesoria_estetica': IMAGES.SERVICIO_ASESORIA,
-  'babyface': IMAGES.SERVICIO_BABYFACE,
+  asesoria_estetica: IMAGES.SERVICIO_ASESORIA,
+  babyface: IMAGES.SERVICIO_BABYFACE,
   'baby-face': IMAGES.SERVICIO_BABYFACE,
-  'bushing': IMAGES.SERVICIO_BUSHING,
+  bushing: IMAGES.SERVICIO_BUSHING,
   'limpieza-facial': IMAGES.SERVICIO_BABYFACE,
   'limpiezas-faciales': IMAGES.SERVICIO_BABYFACE,
-  'hidratacion': IMAGES.SERVICIO_ALISADO,
-  'hidratación': IMAGES.SERVICIO_ALISADO,
-  'depilacion': IMAGES.SERVICIO_BUSHING,
-  'depilación': IMAGES.SERVICIO_BUSHING,
+  hidratacion: IMAGES.SERVICIO_ALISADO,
+  hidratación: IMAGES.SERVICIO_ALISADO,
+  depilacion: IMAGES.SERVICIO_BUSHING,
+  depilación: IMAGES.SERVICIO_BUSHING,
   'tratamientos-esteticos': IMAGES.SERVICIO_ASESORIA,
   'tratamientos-estéticos': IMAGES.SERVICIO_ASESORIA,
 }

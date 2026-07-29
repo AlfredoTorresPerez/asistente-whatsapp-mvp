@@ -29,7 +29,7 @@ export const PRIMARY_NAV_ITEMS: NavigationItem[] = [
     description: 'Embudo comercial y seguimiento de leads.',
   },
   {
-    label: 'Agenda completa',
+    label: 'Agenda semanal',
     path: '/agenda',
     description:
       'Disponibilidad real, reservas temporales, cabinas, profesionales y confirmacion por WhatsApp.',

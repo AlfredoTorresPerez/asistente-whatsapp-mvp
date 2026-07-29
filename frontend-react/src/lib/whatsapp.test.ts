@@ -5,6 +5,7 @@ import {
   buildPublicWhatsAppUrl,
   buildAppointmentWhatsAppMessage,
   openWhatsAppUrl,
+  openWhatsAppInNewTab,
 } from './whatsapp'
 import type { AgendaCalendarItemResponse } from '../services/api/types'
 
@@ -164,7 +165,11 @@ describe('openWhatsAppUrl', () => {
     const openSpy = vi.spyOn(window, 'open')
     const result = openWhatsAppUrl('https://wa.me/56927305158')
     expect(result).toBe(true)
-    expect(openSpy).toHaveBeenCalledWith('https://wa.me/56927305158', '_blank', 'noopener,noreferrer')
+    expect(openSpy).toHaveBeenCalledWith(
+      'https://wa.me/56927305158',
+      '_blank',
+      'noopener,noreferrer',
+    )
   })
 
   it('retorna false si no es URL wa.me', () => {
@@ -176,5 +181,46 @@ describe('openWhatsAppUrl', () => {
     vi.spyOn(window, 'open').mockReturnValue(null)
     const result = openWhatsAppUrl('https://wa.me/56927305158')
     expect(result).toBe(false)
+  })
+})
+
+describe('openWhatsAppInNewTab', () => {
+  beforeEach(() => {
+    vi.spyOn(window, 'open').mockReturnValue({ opener: null } as unknown as Window)
+  })
+
+  it('abre URL de WhatsApp en nueva pestana con _blank', () => {
+    const openSpy = vi.spyOn(window, 'open')
+    openWhatsAppInNewTab('https://wa.me/56927305158')
+
+    expect(openSpy).toHaveBeenCalledWith(
+      'https://wa.me/56927305158',
+      '_blank',
+      'noopener,noreferrer',
+    )
+  })
+
+  it('establece opener a null en la ventana abierta', () => {
+    const mockWindow = { opener: 'original' } as unknown as Window
+    vi.spyOn(window, 'open').mockReturnValue(mockWindow)
+
+    openWhatsAppInNewTab('https://wa.me/56927305158?text=Hola')
+
+    expect(mockWindow.opener).toBeNull()
+  })
+
+  it('no lanza error si window.open retorna null', () => {
+    vi.spyOn(window, 'open').mockReturnValue(null)
+
+    expect(() => openWhatsAppInNewTab('https://wa.me/56927305158')).not.toThrow()
+  })
+
+  it('funciona con URL que contiene numero y mensaje', () => {
+    const openSpy = vi.spyOn(window, 'open')
+    const url = 'https://wa.me/56927305158?text=Hola%20quiero%20agendar'
+
+    openWhatsAppInNewTab(url)
+
+    expect(openSpy).toHaveBeenCalledWith(url, '_blank', 'noopener,noreferrer')
   })
 })

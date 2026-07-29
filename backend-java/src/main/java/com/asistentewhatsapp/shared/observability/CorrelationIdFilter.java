@@ -16,43 +16,41 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class CorrelationIdFilter extends OncePerRequestFilter {
 
-    public static final String CORRELATION_ID_HEADER = "X-Correlation-Id";
-    public static final String MDC_KEY = "correlationId";
+	public static final String CORRELATION_ID_HEADER = "X-Correlation-Id";
+	public static final String MDC_KEY = "correlationId";
 
-    @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain) throws ServletException, IOException {
-        String correlationId = resolveCorrelationId(request.getHeader(CORRELATION_ID_HEADER));
-        MDC.put(MDC_KEY, correlationId);
-        response.setHeader(CORRELATION_ID_HEADER, correlationId);
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
+		String correlationId = resolveCorrelationId(request.getHeader(CORRELATION_ID_HEADER));
+		MDC.put(MDC_KEY, correlationId);
+		response.setHeader(CORRELATION_ID_HEADER, correlationId);
 
-        try {
-            filterChain.doFilter(request, response);
-        } finally {
-            MDC.remove(MDC_KEY);
-        }
-    }
+		try {
+			filterChain.doFilter(request, response);
+		} finally {
+			MDC.remove(MDC_KEY);
+		}
+	}
 
-    public static String currentCorrelationId() {
-        String correlationId = MDC.get(MDC_KEY);
-        return correlationId == null || correlationId.isBlank() ? "sin-correlacion" : correlationId;
-    }
+	public static String currentCorrelationId() {
+		String correlationId = MDC.get(MDC_KEY);
+		return correlationId == null || correlationId.isBlank() ? "sin-correlacion" : correlationId;
+	}
 
-    private String resolveCorrelationId(String headerValue) {
-        if (headerValue == null || headerValue.isBlank()) {
-            return generateCorrelationId();
-        }
+	private String resolveCorrelationId(String headerValue) {
+		if (headerValue == null || headerValue.isBlank()) {
+			return generateCorrelationId();
+		}
 
-        String sanitized = headerValue.trim();
-        if (sanitized.length() > 80 || !sanitized.matches("[A-Za-z0-9._:-]+")) {
-            return generateCorrelationId();
-        }
-        return sanitized;
-    }
+		String sanitized = headerValue.trim();
+		if (sanitized.length() > 80 || !sanitized.matches("[A-Za-z0-9._:-]+")) {
+			return generateCorrelationId();
+		}
+		return sanitized;
+	}
 
-    private String generateCorrelationId() {
-        return "REQ-" + UUID.randomUUID();
-    }
+	private String generateCorrelationId() {
+		return "REQ-" + UUID.randomUUID();
+	}
 }

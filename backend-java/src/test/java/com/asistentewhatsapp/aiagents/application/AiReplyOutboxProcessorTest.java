@@ -15,32 +15,24 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 class AiReplyOutboxProcessorTest {
 
-    @Test
-    void processDueJobsDoesNotProcessAnythingWhenNoJobsAreClaimed() {
-        AiReplyOutboxJdbcRepository outboxRepository = mock(AiReplyOutboxJdbcRepository.class);
-        WhatsAppWebChannelJdbcRepository channelRepository = mock(WhatsAppWebChannelJdbcRepository.class);
-        AestheticCenterService aestheticCenterService = mock(AestheticCenterService.class);
-        AgentCoordinatorService agentCoordinatorService = mock(AgentCoordinatorService.class);
-        ChannelDispatchService channelDispatchService = mock(ChannelDispatchService.class);
-        AiAgentProperties properties = new AiAgentProperties();
-        JdbcTemplate jdbcTemplate = mock(JdbcTemplate.class);
-        AiReplyOutboxProcessor processor = new AiReplyOutboxProcessor(
-                outboxRepository,
-                channelRepository,
-                aestheticCenterService,
-                agentCoordinatorService,
-                channelDispatchService,
-                properties,
-                jdbcTemplate,
-                10,
-                120000L,
-                30000L,
-                900000L);
-        when(outboxRepository.claimDueJobs(10, 120000)).thenReturn(List.of());
+	@Test
+	void processDueJobsDoesNotProcessAnythingWhenNoJobsAreClaimed() {
+		AiReplyOutboxJdbcRepository outboxRepository = mock(AiReplyOutboxJdbcRepository.class);
+		WhatsAppWebChannelJdbcRepository channelRepository = mock(WhatsAppWebChannelJdbcRepository.class);
+		AestheticCenterService aestheticCenterService = mock(AestheticCenterService.class);
+		AgentCoordinatorService agentCoordinatorService = mock(AgentCoordinatorService.class);
+		ChannelDispatchService channelDispatchService = mock(ChannelDispatchService.class);
+		AiAgentProperties properties = new AiAgentProperties();
+		JdbcTemplate jdbcTemplate = mock(JdbcTemplate.class);
+		AiReplyOutboxProcessor processor = new AiReplyOutboxProcessor(outboxRepository, channelRepository,
+				aestheticCenterService, agentCoordinatorService, channelDispatchService, properties, jdbcTemplate, 10,
+				120000L, 30000L, 900000L);
+		when(outboxRepository.claimDueJobs(10, 120000)).thenReturn(List.of());
 
-        processor.processDueJobs();
+		processor.processDueJobs();
 
-        verify(outboxRepository).claimDueJobs(10, 120000);
-        verifyNoInteractions(channelRepository, aestheticCenterService, agentCoordinatorService, channelDispatchService);
-    }
+		verify(outboxRepository).claimDueJobs(10, 120000);
+		verifyNoInteractions(channelRepository, aestheticCenterService, agentCoordinatorService,
+				channelDispatchService);
+	}
 }

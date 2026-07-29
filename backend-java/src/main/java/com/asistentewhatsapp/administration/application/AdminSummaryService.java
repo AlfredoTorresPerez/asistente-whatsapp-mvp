@@ -9,15 +9,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AdminSummaryService {
 
-    private final AdministrationJdbcRepository administrationJdbcRepository;
+	private final AdministrationJdbcRepository administrationJdbcRepository;
 
-    public AdminSummaryService(AdministrationJdbcRepository administrationJdbcRepository) {
-        this.administrationJdbcRepository = administrationJdbcRepository;
-    }
+	public AdminSummaryService(AdministrationJdbcRepository administrationJdbcRepository) {
+		this.administrationJdbcRepository = administrationJdbcRepository;
+	}
 
-    @Transactional(readOnly = true)
-    public AdminSummaryResponse getSummary(AuthenticatedUser authenticatedUser) {
-        AdminAccessGuard.requireOwnerAdminOrSupervisor(authenticatedUser);
-        return administrationJdbcRepository.findSummary(authenticatedUser.businessId());
-    }
+	@Transactional(readOnly = true)
+	public AdminSummaryResponse getSummary(AuthenticatedUser authenticatedUser) {
+		AdminAccessGuard.requireOwnerAdminOrSupervisor(authenticatedUser);
+		return administrationJdbcRepository.findSummary(authenticatedUser.businessId());
+	}
 }

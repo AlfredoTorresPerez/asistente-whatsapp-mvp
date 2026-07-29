@@ -29,10 +29,7 @@ export function getContentItemRequest(id: string) {
   return apiFetch<ContentItemDetailResponse>(`/content-items/${id}`)
 }
 
-export function createContentItemRequest(
-  payload: CreateContentItemRequest,
-  image?: File
-) {
+export function createContentItemRequest(payload: CreateContentItemRequest, image?: File) {
   const formData = new FormData()
   formData.append('request', new Blob([JSON.stringify(payload)], { type: 'application/json' }))
   if (image) {
@@ -44,17 +41,17 @@ export function createContentItemRequest(
   })
 }
 
-export function updateContentItemRequest(
-  id: string,
-  payload: UpdateContentItemRequest
-) {
+export function updateContentItemRequest(id: string, payload: UpdateContentItemRequest) {
   return apiFetch<ContentItemDetailResponse>(`/content-items/${id}`, {
     method: 'PUT',
     body: JSON.stringify(payload),
   })
 }
 
-export function updateContentItemStatusRequest(id: string, payload: UpdateContentItemStatusRequest) {
+export function updateContentItemStatusRequest(
+  id: string,
+  payload: UpdateContentItemStatusRequest,
+) {
   return apiFetch<ContentItemDetailResponse>(`/content-items/${id}/status`, {
     method: 'PATCH',
     body: JSON.stringify(payload),

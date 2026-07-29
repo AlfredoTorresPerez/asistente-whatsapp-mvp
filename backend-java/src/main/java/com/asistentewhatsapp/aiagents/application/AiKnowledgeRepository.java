@@ -8,30 +8,19 @@ import java.util.UUID;
 
 public interface AiKnowledgeRepository {
 
-    List<ServiceCatalogItem> findActiveServices(UUID businessId);
+	List<ServiceCatalogItem> findActiveServices(UUID businessId);
 
-    Optional<ResponseRule> findActiveRule(UUID businessId, String code);
+	Optional<ResponseRule> findActiveRule(UUID businessId, String code);
 
-    List<EntityAlias> findActiveEntityAliases(UUID businessId);
+	List<EntityAlias> findActiveEntityAliases(UUID businessId);
 
-    record ServiceCatalogItem(
-            String code,
-            String name,
-            String categoryCode,
-            Integer durationMinutes,
-            BigDecimal priceBase) {
-    }
+	record ServiceCatalogItem(String code, String name, String categoryCode, Integer durationMinutes,
+			BigDecimal priceBase) {
+	}
 
-    record ResponseRule(
-            String code,
-            String template,
-            Map<String, Object> payload) {
-    }
+	record ResponseRule(String code, String template, Map<String, Object> payload) {
+	}
 
-    record EntityAlias(
-            String alias,
-            String entityKey,
-            String entityValue,
-            Integer priority) {
-    }
+	record EntityAlias(String alias, String entityKey, String entityValue, Integer priority) {
+	}
 }

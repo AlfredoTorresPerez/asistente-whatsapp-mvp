@@ -12,21 +12,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class WhatsAppWebWebhookController {
 
-    private final WhatsAppWebWebhookService whatsAppWebWebhookService;
+	private final WhatsAppWebWebhookService whatsAppWebWebhookService;
 
-    public WhatsAppWebWebhookController(WhatsAppWebWebhookService whatsAppWebWebhookService) {
-        this.whatsAppWebWebhookService = whatsAppWebWebhookService;
-    }
+	public WhatsAppWebWebhookController(WhatsAppWebWebhookService whatsAppWebWebhookService) {
+		this.whatsAppWebWebhookService = whatsAppWebWebhookService;
+	}
 
-    @PostMapping({
-            "/api/v1/integrations/whatsapp-web/webhook",
-            "/api/webhooks/whatsapp-web/messages"
-    })
-    public StatusResponse receive(
-            @RequestHeader("X-WhatsApp-Web-Timestamp") String timestamp,
-            @RequestHeader("X-WhatsApp-Web-Signature") String signature,
-            @RequestHeader("X-WhatsApp-Web-Delivery-Id") String deliveryId,
-            @RequestBody String rawBody) {
-        return whatsAppWebWebhookService.handleWebhook(rawBody, timestamp, signature, deliveryId);
-    }
+	@PostMapping({"/api/v1/integrations/whatsapp-web/webhook", "/api/webhooks/whatsapp-web/messages"})
+	public StatusResponse receive(@RequestHeader("X-WhatsApp-Web-Timestamp") String timestamp,
+			@RequestHeader("X-WhatsApp-Web-Signature") String signature,
+			@RequestHeader("X-WhatsApp-Web-Delivery-Id") String deliveryId, @RequestBody String rawBody) {
+		return whatsAppWebWebhookService.handleWebhook(rawBody, timestamp, signature, deliveryId);
+	}
 }

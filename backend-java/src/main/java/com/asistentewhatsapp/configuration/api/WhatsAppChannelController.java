@@ -19,53 +19,50 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(path = "/api/v1/whatsapp/channel", produces = MediaType.APPLICATION_JSON_VALUE)
 public class WhatsAppChannelController {
 
-    private final WhatsAppChannelService whatsAppChannelService;
+	private final WhatsAppChannelService whatsAppChannelService;
 
-    public WhatsAppChannelController(WhatsAppChannelService whatsAppChannelService) {
-        this.whatsAppChannelService = whatsAppChannelService;
-    }
+	public WhatsAppChannelController(WhatsAppChannelService whatsAppChannelService) {
+		this.whatsAppChannelService = whatsAppChannelService;
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_VIEW')")
-    @GetMapping
-    public WhatsAppChannelResponse getChannel(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        return whatsAppChannelService.getChannel(authenticatedUser);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_VIEW')")
+	@GetMapping
+	public WhatsAppChannelResponse getChannel(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+		return whatsAppChannelService.getChannel(authenticatedUser);
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
-    @PutMapping
-    public WhatsAppChannelResponse updateChannel(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @Valid @RequestBody WhatsAppChannelUpdateRequest request) {
-        return whatsAppChannelService.updateChannel(authenticatedUser, request);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
+	@PutMapping
+	public WhatsAppChannelResponse updateChannel(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@Valid @RequestBody WhatsAppChannelUpdateRequest request) {
+		return whatsAppChannelService.updateChannel(authenticatedUser, request);
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
-    @PostMapping("/validate")
-    @ResponseStatus(HttpStatus.OK)
-    public WhatsAppChannelValidateResponse validateConfiguration(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        return whatsAppChannelService.validateConfiguration(authenticatedUser);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
+	@PostMapping("/validate")
+	@ResponseStatus(HttpStatus.OK)
+	public WhatsAppChannelValidateResponse validateConfiguration(
+			@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+		return whatsAppChannelService.validateConfiguration(authenticatedUser);
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
-    @PostMapping("/test-message")
-    public WhatsAppChannelTestMessageResponse sendTestMessage(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @Valid @RequestBody WhatsAppChannelTestMessageRequest request) {
-        return whatsAppChannelService.sendTestMessage(authenticatedUser, request);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
+	@PostMapping("/test-message")
+	public WhatsAppChannelTestMessageResponse sendTestMessage(
+			@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@Valid @RequestBody WhatsAppChannelTestMessageRequest request) {
+		return whatsAppChannelService.sendTestMessage(authenticatedUser, request);
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
-    @PostMapping("/activate")
-    public WhatsAppChannelResponse activateChannel(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        return whatsAppChannelService.activateChannel(authenticatedUser);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
+	@PostMapping("/activate")
+	public WhatsAppChannelResponse activateChannel(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+		return whatsAppChannelService.activateChannel(authenticatedUser);
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
-    @PostMapping("/deactivate")
-    public WhatsAppChannelResponse deactivateChannel(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        return whatsAppChannelService.deactivateChannel(authenticatedUser);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
+	@PostMapping("/deactivate")
+	public WhatsAppChannelResponse deactivateChannel(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+		return whatsAppChannelService.deactivateChannel(authenticatedUser);
+	}
 }

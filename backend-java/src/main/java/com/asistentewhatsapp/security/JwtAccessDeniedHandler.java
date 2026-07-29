@@ -16,29 +16,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtAccessDeniedHandler implements AccessDeniedHandler {
 
-    private final ObjectMapper objectMapper;
+	private final ObjectMapper objectMapper;
 
-    public JwtAccessDeniedHandler(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
+	public JwtAccessDeniedHandler(ObjectMapper objectMapper) {
+		this.objectMapper = objectMapper;
+	}
 
-    @Override
-    public void handle(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            AccessDeniedException accessDeniedException) throws IOException {
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        objectMapper.writeValue(
-                response.getWriter(),
-                new ApiErrorResponse(
-                        Instant.now(),
-                        HttpServletResponse.SC_FORBIDDEN,
-                        "FORBIDDEN",
-                        "No tienes permisos para realizar esta accion.",
-                        request.getRequestURI(),
-                        CorrelationIdFilter.currentCorrelationId(),
-                        Map.of()));
-    }
+	@Override
+	public void handle(HttpServletRequest request, HttpServletResponse response,
+			AccessDeniedException accessDeniedException) throws IOException {
+		response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+		objectMapper.writeValue(response.getWriter(),
+				new ApiErrorResponse(Instant.now(), HttpServletResponse.SC_FORBIDDEN, "FORBIDDEN",
+						"No tienes permisos para realizar esta accion.", request.getRequestURI(),
+						CorrelationIdFilter.currentCorrelationId(), Map.of()));
+	}
 }
-

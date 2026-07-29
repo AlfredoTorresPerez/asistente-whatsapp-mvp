@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/health")
 public class HealthController {
 
-    @GetMapping
-    public HealthResponse health() {
-        return new HealthResponse("UP", "backend-java", Instant.now());
-    }
+	@GetMapping
+	public HealthResponse health() {
+		return new HealthResponse("UP", "backend-java", Instant.now());
+	}
 
-    public record HealthResponse(String status, String service, Instant timestamp) {
-    }
+	public record HealthResponse(String status, String service, Instant timestamp) {
+	}
 }

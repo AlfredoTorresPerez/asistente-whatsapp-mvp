@@ -7,18 +7,9 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 public record UpdateBookingRequest(
-        @NotBlank(message = "subject es obligatorio")
-        @Size(max = 160, message = "subject no puede superar 160 caracteres")
-        String subject,
-        @Size(max = 30, message = "status no puede superar 30 caracteres")
-        String status,
-        UUID assignedUserId,
-        @NotNull(message = "startsAt es obligatorio")
-        OffsetDateTime startsAt,
-        Integer durationMinutes,
-        UUID locationId,
-        @Size(max = 160, message = "location no puede superar 160 caracteres")
-        String location,
-        @Size(max = 2000, message = "notes no puede superar 2000 caracteres")
-        String notes) {
+		@NotBlank(message = "subject es obligatorio") @Size(max = 160, message = "subject no puede superar 160 caracteres") String subject,
+		@Size(max = 30, message = "status no puede superar 30 caracteres") String status, UUID assignedUserId,
+		@NotNull(message = "startsAt es obligatorio") OffsetDateTime startsAt, Integer durationMinutes, UUID locationId,
+		@Size(max = 160, message = "location no puede superar 160 caracteres") String location,
+		@Size(max = 2000, message = "notes no puede superar 2000 caracteres") String notes) {
 }

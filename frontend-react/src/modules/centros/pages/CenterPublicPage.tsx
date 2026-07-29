@@ -14,11 +14,15 @@ const SECTIONS = ['inicio', 'servicios', 'promociones', 'testimonios', 'contacto
 
 const BENEFIT_ICONS: Record<string, string> = {
   certificate: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
-  heart: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',
-  device: 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
-  location: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z',
+  heart:
+    'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',
+  device:
+    'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
+  location:
+    'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z',
   star: 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z',
-  sparkles: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z',
+  sparkles:
+    'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z',
 }
 
 function resolveBenefitIcon(icon: string): string {
@@ -76,7 +80,11 @@ export function CenterPublicPage() {
       const params = new URLSearchParams({ origen: origin })
       if (serviceId) params.set('servicioId', serviceId)
       if (promotionId) params.set('promocionId', promotionId)
-      window.location.href = `/centros/${slug}/whatsapp?${params.toString()}`
+      const url = `/centros/${slug}/whatsapp?${params.toString()}`
+      const newWindow = window.open(url, '_blank', 'noopener,noreferrer')
+      if (newWindow) {
+        newWindow.opener = null
+      }
     },
     [slug],
   )
@@ -92,10 +100,16 @@ export function CenterPublicPage() {
 
   if (state.status === 'error') {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4" role="alert">
+      <div
+        className="flex min-h-screen flex-col items-center justify-center gap-4 px-4"
+        role="alert"
+      >
         <h1 className="text-2xl font-bold text-gray-800">{state.message}</h1>
         <p className="text-gray-500">Verifica que la direccion sea correcta o vuelve al inicio.</p>
-        <Link to="/" className="rounded-2xl bg-pink-500 px-6 py-3 font-semibold text-white transition hover:bg-pink-600">
+        <Link
+          to="/"
+          className="rounded-2xl bg-pink-500 px-6 py-3 font-semibold text-white transition hover:bg-pink-600"
+        >
           Volver al inicio
         </Link>
       </div>
@@ -143,7 +157,9 @@ export function CenterPublicPage() {
                 {company.name ? company.name.charAt(0).toUpperCase() : '?'}
               </div>
             )}
-            <span className="hidden text-lg font-bold text-gray-800 sm:inline">{company.businessName || company.name}</span>
+            <span className="hidden text-lg font-bold text-gray-800 sm:inline">
+              {company.businessName || company.name}
+            </span>
           </button>
 
           <nav className="hidden items-center gap-6 md:flex" aria-label="Navegacion principal">
@@ -175,22 +191,43 @@ export function CenterPublicPage() {
             aria-expanded={menuOpen}
           >
             {menuOpen ? (
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
             ) : (
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
+              </svg>
             )}
           </button>
         </div>
 
         {menuOpen && (
-          <nav className="border-t border-gray-100 bg-white px-4 pb-4 pt-2 md:hidden" aria-label="Navegacion movil">
+          <nav
+            className="border-t border-gray-100 bg-white px-4 pb-4 pt-2 md:hidden"
+            aria-label="Navegacion movil"
+          >
             <div className="flex flex-col gap-3">
               {SECTIONS.map((sec) => (
                 <button
                   key={sec}
                   onClick={() => scrollToSection(sec)}
                   className={`rounded-xl px-4 py-2.5 text-left text-sm font-medium transition ${
-                    activeSection === sec ? 'bg-pink-50 text-pink-600' : 'text-gray-600 hover:bg-gray-50'
+                    activeSection === sec
+                      ? 'bg-pink-50 text-pink-600'
+                      : 'text-gray-600 hover:bg-gray-50'
                   }`}
                 >
                   {sec === 'inicio' ? 'Inicio' : sec}
@@ -211,7 +248,9 @@ export function CenterPublicPage() {
       <main>
         <section
           id="inicio"
-          ref={(el) => { sectionRefs.current.inicio = el }}
+          ref={(el) => {
+            sectionRefs.current.inicio = el
+          }}
           className="relative min-h-[80vh] overflow-hidden pt-20"
           style={{ backgroundColor: '#fefcfd' }}
         >
@@ -224,16 +263,18 @@ export function CenterPublicPage() {
                 {cfg.welcomeTitle || 'Tu centro de estetica de confianza'}
               </h1>
               <p className="mt-4 max-w-xl text-base leading-relaxed text-gray-600 md:text-lg">
-                {cfg.welcomeSubtitle || company.description || 'Expertos en belleza y bienestar con atencion personalizada.'}
+                {cfg.welcomeSubtitle ||
+                  company.description ||
+                  'Expertos en belleza y bienestar con atencion personalizada.'}
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-4">
-                <button
-                  onClick={() => handleWhatsAppRedirect('principal')}
-                  className="inline-flex items-center gap-2.5 rounded-2xl bg-[#25D366] px-8 py-4 text-base font-bold text-white shadow-lg transition hover:bg-[#20BD5A] hover:shadow-xl"
+                <Link
+                  to="/reservar"
+                  className="inline-flex items-center gap-2.5 rounded-2xl bg-[#2563EB] px-8 py-4 text-base font-bold text-white shadow-lg transition hover:bg-[#1D4ED8] hover:shadow-xl"
                 >
-                  <WhatsAppIcon className="h-5 w-5" />
-                  Agenda por WhatsApp
-                </button>
+                  <CalendarIcon className="h-5 w-5" />
+                  Agenda en línea
+                </Link>
                 <button
                   onClick={() => scrollToSection('servicios')}
                   className="inline-flex items-center gap-2 rounded-2xl border-2 border-gray-200 bg-white px-8 py-4 text-base font-semibold text-gray-700 shadow-sm transition hover:border-pink-200 hover:text-pink-600"
@@ -271,13 +312,17 @@ export function CenterPublicPage() {
 
         <section
           id="servicios"
-          ref={(el) => { sectionRefs.current.servicios = el }}
+          ref={(el) => {
+            sectionRefs.current.servicios = el
+          }}
           className="scroll-mt-20 py-16 md:py-24"
           style={{ backgroundColor: '#fefcfd' }}
         >
           <div className="mx-auto max-w-6xl px-4">
             <div className="mx-auto max-w-2xl text-center">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-pink-500">Servicios</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-pink-500">
+                Servicios
+              </p>
               <h2 className="mt-3 text-3xl font-bold text-gray-900 md:text-4xl">
                 {cfg.showServices ? 'Nuestros tratamientos' : 'Conoce nuestros tratamientos'}
               </h2>
@@ -290,7 +335,10 @@ export function CenterPublicPage() {
               <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {displayServices.map((s) => {
                   const serviceImg = resolveServiceImage({
-                    slug: s.name.toLowerCase().replace(/\s+/g, '-').replace(/[áéíóú]/g, (c) => 'aeiou'['áéíóú'.indexOf(c)]),
+                    slug: s.name
+                      .toLowerCase()
+                      .replace(/\s+/g, '-')
+                      .replace(/[áéíóú]/g, (c) => 'aeiou'['áéíóú'.indexOf(c)]),
                   })
                   return (
                     <article
@@ -311,7 +359,9 @@ export function CenterPublicPage() {
                       <div className="flex flex-1 flex-col p-5">
                         <h3 className="text-lg font-semibold text-gray-900">{s.name}</h3>
                         {s.description && (
-                          <p className="mt-2 flex-1 text-sm leading-relaxed text-gray-500">{s.description}</p>
+                          <p className="mt-2 flex-1 text-sm leading-relaxed text-gray-500">
+                            {s.description}
+                          </p>
                         )}
                         <div className="mt-4 flex items-center justify-between text-sm">
                           {s.durationMinutes && (
@@ -337,7 +387,10 @@ export function CenterPublicPage() {
             ) : (
               <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {services.slice(0, 4).map((s) => (
-                  <article key={s.id} className="flex flex-col rounded-2xl border border-gray-100 bg-white shadow-sm">
+                  <article
+                    key={s.id}
+                    className="flex flex-col rounded-2xl border border-gray-100 bg-white shadow-sm"
+                  >
                     <div className="aspect-[4/3] overflow-hidden rounded-t-2xl">
                       <LandingImage
                         src={null}
@@ -351,7 +404,9 @@ export function CenterPublicPage() {
                     </div>
                     <div className="flex flex-1 flex-col p-5">
                       <h3 className="text-lg font-semibold text-gray-900">{s.name}</h3>
-                      {s.description && <p className="mt-2 flex-1 text-sm text-gray-500">{s.description}</p>}
+                      {s.description && (
+                        <p className="mt-2 flex-1 text-sm text-gray-500">{s.description}</p>
+                      )}
                       <button
                         onClick={() => handleWhatsAppRedirect('servicio', s.id)}
                         className="mt-4 w-full rounded-xl bg-gray-50 py-2.5 text-xs font-semibold text-gray-600 transition hover:bg-[#25D366] hover:text-white"
@@ -403,19 +458,36 @@ export function CenterPublicPage() {
           <section className="scroll-mt-20 py-16 md:py-24">
             <div className="mx-auto max-w-6xl px-4">
               <div className="mx-auto max-w-2xl text-center">
-                <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">¿Por que elegirnos?</h2>
-                <p className="mt-3 text-gray-600">Nos esforzamos por ofrecer la mejor experiencia.</p>
+                <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">
+                  ¿Por que elegirnos?
+                </h2>
+                <p className="mt-3 text-gray-600">
+                  Nos esforzamos por ofrecer la mejor experiencia.
+                </p>
               </div>
               <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {cfg.benefits.map((b, i) => (
-                  <div key={i} className="rounded-2xl border border-gray-100 bg-white p-6 text-center shadow-sm">
+                  <div
+                    key={i}
+                    className="rounded-2xl border border-gray-100 bg-white p-6 text-center shadow-sm"
+                  >
                     <div
                       className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl text-white"
                       style={{ background: `linear-gradient(135deg, ${primary}, ${secondary})` }}
                       aria-hidden="true"
                     >
-                      <svg className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d={resolveBenefitIcon(b.icon)} />
+                      <svg
+                        className="h-7 w-7"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={1.5}
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d={resolveBenefitIcon(b.icon)}
+                        />
                       </svg>
                     </div>
                     <h3 className="mt-4 text-base font-semibold text-gray-900">{b.title}</h3>
@@ -430,23 +502,33 @@ export function CenterPublicPage() {
         {cfg.showPromotions && featuredPromotion && (
           <section
             id="promociones"
-            ref={(el) => { sectionRefs.current.promociones = el }}
+            ref={(el) => {
+              sectionRefs.current.promociones = el
+            }}
             className="scroll-mt-20 py-16 md:py-24"
             style={{ backgroundColor: '#fdfaf7' }}
           >
             <div className="mx-auto max-w-6xl px-4">
               <div className="mx-auto max-w-2xl text-center">
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-pink-500">Promocion</p>
-                <h2 className="mt-3 text-3xl font-bold text-gray-900 md:text-4xl">Promocion destacada</h2>
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-pink-500">
+                  Promocion
+                </p>
+                <h2 className="mt-3 text-3xl font-bold text-gray-900 md:text-4xl">
+                  Promocion destacada
+                </h2>
               </div>
               <div className="mx-auto mt-10 max-w-2xl">
                 <div
                   className="overflow-hidden rounded-[2rem] p-8 text-white shadow-xl md:p-10"
                   style={{ background: `linear-gradient(135deg, ${primary}, ${secondary})` }}
                 >
-                  <p className="text-sm font-semibold uppercase tracking-[0.15em] opacity-80">Oferta especial</p>
+                  <p className="text-sm font-semibold uppercase tracking-[0.15em] opacity-80">
+                    Oferta especial
+                  </p>
                   <h3 className="mt-2 text-2xl font-bold md:text-3xl">{featuredPromotion.name}</h3>
-                  <p className="mt-3 text-base leading-relaxed opacity-90">{featuredPromotion.description}</p>
+                  <p className="mt-3 text-base leading-relaxed opacity-90">
+                    {featuredPromotion.description}
+                  </p>
                   <div className="mt-6 flex flex-wrap items-center gap-4">
                     <span className="rounded-xl bg-white/20 px-4 py-2 text-lg font-bold backdrop-blur-sm">
                       {featuredPromotion.discountType === 'PERCENTAGE'
@@ -455,12 +537,15 @@ export function CenterPublicPage() {
                     </span>
                     {featuredPromotion.endsOn && (
                       <span className="text-sm opacity-80">
-                        Valido hasta {new Date(featuredPromotion.endsOn).toLocaleDateString('es-CL')}
+                        Valido hasta{' '}
+                        {new Date(featuredPromotion.endsOn).toLocaleDateString('es-CL')}
                       </span>
                     )}
                   </div>
                   <button
-                    onClick={() => handleWhatsAppRedirect('promocion', undefined, featuredPromotion.id)}
+                    onClick={() =>
+                      handleWhatsAppRedirect('promocion', undefined, featuredPromotion.id)
+                    }
                     className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-white px-6 py-3 text-sm font-bold text-gray-900 shadow transition hover:bg-gray-100"
                   >
                     <WhatsAppIcon className="h-4 w-4 text-[#25D366]" />
@@ -475,19 +560,31 @@ export function CenterPublicPage() {
         {cfg.showTestimonials && cfg.testimonials && cfg.testimonials.length > 0 && (
           <section
             id="testimonios"
-            ref={(el) => { sectionRefs.current.testimonios = el }}
+            ref={(el) => {
+              sectionRefs.current.testimonios = el
+            }}
             className="scroll-mt-20 py-16 md:py-24"
             style={{ backgroundColor: '#fefcfd' }}
           >
             <div className="mx-auto max-w-6xl px-4">
               <div className="mx-auto max-w-2xl text-center">
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-pink-500">Testimonios</p>
-                <h2 className="mt-3 text-3xl font-bold text-gray-900 md:text-4xl">Lo que dicen nuestros clientes</h2>
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-pink-500">
+                  Testimonios
+                </p>
+                <h2 className="mt-3 text-3xl font-bold text-gray-900 md:text-4xl">
+                  Lo que dicen nuestros clientes
+                </h2>
               </div>
               <div className="mt-12 grid gap-6 md:grid-cols-3">
                 {cfg.testimonials.slice(0, 3).map((t, i) => (
-                  <div key={i} className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-                    <div className="flex items-center gap-1" aria-label={`${t.rating ?? 5} de 5 estrellas`}>
+                  <div
+                    key={i}
+                    className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
+                  >
+                    <div
+                      className="flex items-center gap-1"
+                      aria-label={`${t.rating ?? 5} de 5 estrellas`}
+                    >
                       {Array.from({ length: 5 }, (_, j) => (
                         <svg
                           key={j}
@@ -499,8 +596,12 @@ export function CenterPublicPage() {
                         </svg>
                       ))}
                     </div>
-                    <p className="mt-3 text-sm leading-relaxed text-gray-600 italic">&ldquo;{t.text}&rdquo;</p>
-                    <p className="mt-3 text-sm font-semibold text-gray-800">{t.name || 'Cliente'}</p>
+                    <p className="mt-3 text-sm leading-relaxed text-gray-600 italic">
+                      &ldquo;{t.text}&rdquo;
+                    </p>
+                    <p className="mt-3 text-sm font-semibold text-gray-800">
+                      {t.name || 'Cliente'}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -528,13 +629,19 @@ export function CenterPublicPage() {
 
         <section
           id="contacto"
-          ref={(el) => { sectionRefs.current.contacto = el }}
+          ref={(el) => {
+            sectionRefs.current.contacto = el
+          }}
           className="scroll-mt-20 py-16 md:py-24"
         >
           <div className="mx-auto max-w-6xl px-4">
             <div className="mx-auto max-w-2xl text-center">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-pink-500">Contacto</p>
-              <h2 className="mt-3 text-3xl font-bold text-gray-900 md:text-4xl">Visitanos o escribenos</h2>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-pink-500">
+                Contacto
+              </p>
+              <h2 className="mt-3 text-3xl font-bold text-gray-900 md:text-4xl">
+                Visitanos o escribenos
+              </h2>
             </div>
             <div className="mt-12 grid gap-8 md:grid-cols-2">
               <div className="space-y-6">
@@ -544,24 +651,81 @@ export function CenterPublicPage() {
                     <div className="mt-4 space-y-3 text-sm text-gray-600">
                       {firstLocation.address && (
                         <p className="flex items-start gap-2">
-                          <svg className="mt-0.5 h-4 w-4 shrink-0 text-pink-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                          <span>{firstLocation.address}{firstLocation.commune ? `, ${firstLocation.commune}` : ''}{firstLocation.city ? `, ${firstLocation.city}` : ''}</span>
+                          <svg
+                            className="mt-0.5 h-4 w-4 shrink-0 text-pink-500"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                            />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                            />
+                          </svg>
+                          <span>
+                            {firstLocation.address}
+                            {firstLocation.commune ? `, ${firstLocation.commune}` : ''}
+                            {firstLocation.city ? `, ${firstLocation.city}` : ''}
+                          </span>
                         </p>
                       )}
                       {company.phone && (
                         <p className="flex items-center gap-2">
-                          <svg className="h-4 w-4 shrink-0 text-pink-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                          <svg
+                            className="h-4 w-4 shrink-0 text-pink-500"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                            />
+                          </svg>
                           <span>{company.phone}</span>
                         </p>
                       )}
                       {company.email && (
                         <p className="flex items-center gap-2">
-                          <svg className="h-4 w-4 shrink-0 text-pink-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                          <svg
+                            className="h-4 w-4 shrink-0 text-pink-500"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                            />
+                          </svg>
                           <span>{company.email}</span>
                         </p>
                       )}
                       <p className="flex items-center gap-2 text-gray-400">
-                        <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <svg
+                          className="h-4 w-4 shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
                         <span>{firstLocation.timezone || 'America/Santiago'}</span>
                       </p>
                     </div>
@@ -608,14 +772,18 @@ export function CenterPublicPage() {
                     {company.name ? company.name.charAt(0).toUpperCase() : '?'}
                   </div>
                 )}
-                <span className="text-base font-bold text-white">{company.businessName || company.name}</span>
+                <span className="text-base font-bold text-white">
+                  {company.businessName || company.name}
+                </span>
               </div>
               <p className="mt-4 text-sm leading-relaxed text-gray-400">
                 {cfg.aboutText || 'Expertos en belleza y bienestar.'}
               </p>
             </div>
             <div>
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-300">Enlaces</h3>
+              <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-300">
+                Enlaces
+              </h3>
               <ul className="mt-4 space-y-2">
                 {SECTIONS.map((sec) => (
                   <li key={sec}>
@@ -630,7 +798,9 @@ export function CenterPublicPage() {
               </ul>
             </div>
             <div>
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-300">Contacto</h3>
+              <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-300">
+                Contacto
+              </h3>
               <ul className="mt-4 space-y-2 text-sm text-gray-400">
                 {company.phone && <li>{company.phone}</li>}
                 {company.email && <li className="break-all">{company.email}</li>}
@@ -649,12 +819,17 @@ export function CenterPublicPage() {
           </div>
           <div className="mt-10 border-t border-gray-700/50 pt-6 text-center text-sm text-gray-500">
             <p>
-              &copy; {new Date().getFullYear()} {company.name || 'Centro Estetico'} &mdash; Todos los derechos reservados.
+              &copy; {new Date().getFullYear()} {company.name || 'Centro Estetico'} &mdash; Todos
+              los derechos reservados.
             </p>
             <p className="mt-1">
-              <Link to="/terminos" className="hover:text-gray-300">Terminos y condiciones</Link>
+              <Link to="/terminos" className="hover:text-gray-300">
+                Terminos y condiciones
+              </Link>
               {' | '}
-              <Link to="/privacidad" className="hover:text-gray-300">Politica de privacidad</Link>
+              <Link to="/privacidad" className="hover:text-gray-300">
+                Politica de privacidad
+              </Link>
             </p>
           </div>
         </div>
@@ -669,6 +844,23 @@ export function CenterPublicPage() {
         <WhatsAppIcon className="h-7 w-7" />
       </button>
     </div>
+  )
+}
+
+function CalendarIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <rect height="14" rx="3" strokeWidth="2" width="14" x="5" y="6" />
+      <path d="M8 4V8" strokeLinecap="round" strokeWidth="2" />
+      <path d="M16 4V8" strokeLinecap="round" strokeWidth="2" />
+      <path d="M3 10h18" strokeLinecap="round" strokeWidth="2" />
+    </svg>
   )
 }
 

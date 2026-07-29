@@ -182,7 +182,9 @@ describe('MultisiteOperationsPage - Summary (Resumen)', () => {
     renderPage()
 
     await waitFor(() => {
-      expect(screen.getAllByText('Centro Estetico Bella - Sede Principal').length).toBeGreaterThanOrEqual(1)
+      expect(
+        screen.getAllByText('Centro Estetico Bella - Sede Principal').length,
+      ).toBeGreaterThanOrEqual(1)
       expect(screen.getByText('PRINCIPAL')).toBeInTheDocument()
     })
   })
@@ -268,9 +270,7 @@ describe('MultisiteOperationsPage - Summary (Resumen)', () => {
     renderPage()
 
     await waitFor(() => {
-      expect(
-        screen.getByText('No existen sedes para el filtro seleccionado'),
-      ).toBeInTheDocument()
+      expect(screen.getByText('No existen sedes para el filtro seleccionado')).toBeInTheDocument()
     })
   })
 
@@ -296,9 +296,7 @@ describe('MultisiteOperationsPage - Summary (Resumen)', () => {
     renderPage()
 
     await waitFor(() => {
-      expect(
-        screen.getByText('No fue posible cargar operacion multisede'),
-      ).toBeInTheDocument()
+      expect(screen.getByText('No fue posible cargar operacion multisede')).toBeInTheDocument()
     })
   })
 })
@@ -361,7 +359,8 @@ describe('MultisiteOperationsPage - Catalog (Servicios por sede)', () => {
         return Promise.resolve(jsonResponse([serviceItem, productItem, inactiveService]))
       }
       if (url.includes('/multisite/professionals')) return Promise.resolve(jsonResponse([]))
-      if (url.includes('/multisite/professional-schedules')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/professional-schedules'))
+        return Promise.resolve(jsonResponse([]))
       if (url.includes('/multisite/user-access')) return Promise.resolve(jsonResponse([]))
       if (url.includes('/multisite/channels')) return Promise.resolve(jsonResponse([]))
       return Promise.resolve(jsonResponse({}))
@@ -403,13 +402,19 @@ describe('MultisiteOperationsPage - Catalog (Servicios por sede)', () => {
     mockFetch.mockImplementation((url: string) => {
       if (url.includes('/multisite/summary')) return Promise.resolve(jsonResponse(mockLocations))
       if (url.includes('/multisite/catalog-availability')) {
-        return Promise.resolve(jsonResponse([
-          serviceItem, productItem, inactiveService,
-          serviceInOtherLocation, productInOtherLocation,
-        ]))
+        return Promise.resolve(
+          jsonResponse([
+            serviceItem,
+            productItem,
+            inactiveService,
+            serviceInOtherLocation,
+            productInOtherLocation,
+          ]),
+        )
       }
       if (url.includes('/multisite/professionals')) return Promise.resolve(jsonResponse([]))
-      if (url.includes('/multisite/professional-schedules')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/professional-schedules'))
+        return Promise.resolve(jsonResponse([]))
       if (url.includes('/multisite/user-access')) return Promise.resolve(jsonResponse([]))
       if (url.includes('/multisite/channels')) return Promise.resolve(jsonResponse([]))
       return Promise.resolve(jsonResponse({}))
@@ -442,7 +447,8 @@ describe('MultisiteOperationsPage - Catalog (Servicios por sede)', () => {
         return Promise.resolve(jsonResponse([productItem]))
       }
       if (url.includes('/multisite/professionals')) return Promise.resolve(jsonResponse([]))
-      if (url.includes('/multisite/professional-schedules')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/professional-schedules'))
+        return Promise.resolve(jsonResponse([]))
       if (url.includes('/multisite/user-access')) return Promise.resolve(jsonResponse([]))
       if (url.includes('/multisite/channels')) return Promise.resolve(jsonResponse([]))
       return Promise.resolve(jsonResponse({}))
@@ -472,7 +478,8 @@ describe('MultisiteOperationsPage - Catalog (Servicios por sede)', () => {
         return Promise.resolve(jsonResponse([serviceItem, inactiveService]))
       }
       if (url.includes('/multisite/professionals')) return Promise.resolve(jsonResponse([]))
-      if (url.includes('/multisite/professional-schedules')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/professional-schedules'))
+        return Promise.resolve(jsonResponse([]))
       if (url.includes('/multisite/user-access')) return Promise.resolve(jsonResponse([]))
       if (url.includes('/multisite/channels')) return Promise.resolve(jsonResponse([]))
       return Promise.resolve(jsonResponse({}))
@@ -503,7 +510,8 @@ describe('MultisiteOperationsPage - Catalog (Servicios por sede)', () => {
         return Promise.resolve(jsonResponse([serviceItem]))
       }
       if (url.includes('/multisite/professionals')) return Promise.resolve(jsonResponse([]))
-      if (url.includes('/multisite/professional-schedules')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/professional-schedules'))
+        return Promise.resolve(jsonResponse([]))
       if (url.includes('/multisite/user-access')) return Promise.resolve(jsonResponse([]))
       if (url.includes('/multisite/channels')) return Promise.resolve(jsonResponse([]))
       return Promise.resolve(jsonResponse({}))
@@ -519,7 +527,9 @@ describe('MultisiteOperationsPage - Catalog (Servicios por sede)', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Servicios por sede')).toBeInTheDocument()
-      expect(screen.getByText('Servicios disponibles, precios y estado operativo por sede.')).toBeInTheDocument()
+      expect(
+        screen.getByText('Servicios disponibles, precios y estado operativo por sede.'),
+      ).toBeInTheDocument()
     })
   })
 
@@ -532,7 +542,8 @@ describe('MultisiteOperationsPage - Catalog (Servicios por sede)', () => {
         return Promise.resolve(jsonResponse([serviceItem]))
       }
       if (url.includes('/multisite/professionals')) return Promise.resolve(jsonResponse([]))
-      if (url.includes('/multisite/professional-schedules')) return Promise.resolve(jsonResponse([]))
+      if (url.includes('/multisite/professional-schedules'))
+        return Promise.resolve(jsonResponse([]))
       if (url.includes('/multisite/user-access')) return Promise.resolve(jsonResponse([]))
       if (url.includes('/multisite/channels')) return Promise.resolve(jsonResponse([]))
       return Promise.resolve(jsonResponse({}))

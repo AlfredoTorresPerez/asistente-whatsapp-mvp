@@ -1,0 +1,122 @@
+{
+  "metadata": {
+    "source": "documentacion\\conversacion\\intenciones_agenda_whatsapp_es419_actualizada.xlsx",
+    "sheet_counts": {
+      "Resumen": 10,
+      "Reservar": 73,
+      "Reprogramar": 67,
+      "Cancelar": 67,
+      "Taxonomia_Intenciones": 42,
+      "Ejemplos_Ampliados": 168,
+      "Escenarios_Multiturno": 36,
+      "Conversaciones_Multiturno": 118,
+      "Entidades_Estructuradas": 60,
+      "Casos_Negativos": 60,
+      "Contexto_Referencias": 45,
+      "Cambios_Intencion": 30,
+      "Multiples_Reservas": 25,
+      "Respuestas_Acciones": 47,
+      "Estados_Conversacion": 24,
+      "Transiciones_Conversacion": 30,
+      "Evaluacion_Dataset": 104,
+      "Cobertura_Dataset": 42,
+      "Ambiguas_Contexto": 10,
+      "Reglas_Modelo": 10,
+      "Fuentes": 18,
+      "Metodologia": 12
+    },
+    "warnings": []
+  },
+  "items": [
+    {
+      "fuente": "Calendly",
+      "url": "https://help.calendly.com/hc/es/articles/14079031268375-C%C3%B3mo-cancelar-reprogramar-y-realizar-cambios-en-un-evento",
+      "uso_dentro_de_la_planilla": "Términos cancelar, reprogramar y cambios de evento"
+    },
+    {
+      "fuente": "Wix Bookings",
+      "url": "https://support.wix.com/es/article/wix-bookings-permitir-a-los-clientes-cancelar-o-reprogramar-sesiones",
+      "uso_dentro_de_la_planilla": "Cancelar, reprogramar, administrar reserva"
+    },
+    {
+      "fuente": "Acuity Scheduling clientes",
+      "url": "https://help.acuityscheduling.com/hc/es/articles/16676869573645-C%C3%B3mo-reservan-citas-los-clientes",
+      "uso_dentro_de_la_planilla": "Reservar citas, cambiar/cancelar cita"
+    },
+    {
+      "fuente": "Acuity Scheduling administración",
+      "url": "https://help.acuityscheduling.com/hc/es/articles/16676870828685-Reservar-citas-para-los-clientes",
+      "uso_dentro_de_la_planilla": "Programar, cambiar o cancelar citas"
+    },
+    {
+      "fuente": "Reservio crear reservas",
+      "url": "https://help.reservio.com/es/articles/5113656-como-crear-reservas-para-citas-individuales",
+      "uso_dentro_de_la_planilla": "Crear reservas para citas individuales"
+    },
+    {
+      "fuente": "Reservio cancelar reservas",
+      "url": "https://help.reservio.com/es/articles/5113819-cancelar-una-reserva-citas-individuales",
+      "uso_dentro_de_la_planilla": "Cancelar y eliminar reservas"
+    },
+    {
+      "fuente": "HuliPractice",
+      "url": "https://help.hulipractice.com/es/articles/1349432-reprogramar-una-cita",
+      "uso_dentro_de_la_planilla": "Reprogramar/reagendar una cita"
+    },
+    {
+      "fuente": "Encuadrado",
+      "url": "https://ayuda.encuadrado.com/es/articles/5539645-como-reagendar-a-un-consultante",
+      "uso_dentro_de_la_planilla": "Reagendar consultantes y sesiones"
+    },
+    {
+      "fuente": "Doctoralia",
+      "url": "https://www.doctoralia.es/faq/consulta-online",
+      "uso_dentro_de_la_planilla": "Reservar, cancelar y reprogramar visitas"
+    },
+    {
+      "fuente": "ASISA",
+      "url": "https://www.asisa.es/preguntas-frecuentes/area-privada/pedir-cita/puedo-pedir-cita-on-line",
+      "uso_dentro_de_la_planilla": "Pedir cita, agendar y modificar cita"
+    },
+    {
+      "fuente": "DGT",
+      "url": "https://sede.dgt.gob.es/es/otros-tramites/cita-previa/index.html",
+      "uso_dentro_de_la_planilla": "Solicitar, consultar y anular cita previa"
+    },
+    {
+      "fuente": "AgendaPro WhatsApp",
+      "url": "https://agendapro.com/blog/transformar-conversaciones-de-whatsapp-en-reservas/",
+      "uso_dentro_de_la_planilla": "Reservas, reprogramación y cancelación por WhatsApp"
+    },
+    {
+      "fuente": "AgendaPro recordatorios",
+      "url": "https://agendapro.com/blog/confirmaciones-automaticas-por-whatsapp/",
+      "uso_dentro_de_la_planilla": "Confirmación, recordatorios y reducción de ausencias"
+    },
+    {
+      "fuente": "respond.io",
+      "url": "https://respond.io/es/blog/whatsapp-appointment-booking",
+      "uso_dentro_de_la_planilla": "Reserva de citas por WhatsApp y automatización conversacional"
+    },
+    {
+      "fuente": "TuCalendi",
+      "url": "https://www.tucalendi.com/es/blog/frases-clave-para-mejorar-la-comunicacion-en-la-programacion-de-citas-441",
+      "uso_dentro_de_la_planilla": "Frases y comunicación para programación de citas"
+    },
+    {
+      "fuente": "Booksy",
+      "url": "https://biz.booksy.com/es-es/blog/politica-de-cancelacion-y-no-show-para-salones",
+      "uso_dentro_de_la_planilla": "Política de cancelación, no asistencia y reprogramación"
+    },
+    {
+      "fuente": "Diseño conversacional ampliado",
+      "url": "https://respond.io/es/blog/whatsapp-appointment-booking",
+      "uso_dentro_de_la_planilla": "Conversaciones de varios turnos, selección de opciones y derivación humana"
+    },
+    {
+      "fuente": "Confirmaciones y recordatorios",
+      "url": "https://agendapro.com/blog/confirmaciones-automaticas-por-whatsapp/",
+      "uso_dentro_de_la_planilla": "Confirmación de reserva, asistencia y mensajes posteriores"
+    }
+  ]
+}

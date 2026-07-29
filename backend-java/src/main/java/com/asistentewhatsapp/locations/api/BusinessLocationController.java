@@ -23,62 +23,54 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class BusinessLocationController {
 
-    private final BusinessLocationService businessLocationService;
+	private final BusinessLocationService businessLocationService;
 
-    public BusinessLocationController(BusinessLocationService businessLocationService) {
-        this.businessLocationService = businessLocationService;
-    }
+	public BusinessLocationController(BusinessLocationService businessLocationService) {
+		this.businessLocationService = businessLocationService;
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_VIEW')")
-    @GetMapping({"/api/business-locations", "/api/v1/business-locations"})
-    public List<BusinessLocationResponse> list(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @RequestParam(defaultValue = "false") boolean activeOnly) {
-        return businessLocationService.list(authenticatedUser, activeOnly);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_VIEW')")
+	@GetMapping({"/api/business-locations", "/api/v1/business-locations"})
+	public List<BusinessLocationResponse> list(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@RequestParam(defaultValue = "false") boolean activeOnly) {
+		return businessLocationService.list(authenticatedUser, activeOnly);
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_VIEW')")
-    @GetMapping({"/api/business-locations/{locationId}", "/api/v1/business-locations/{locationId}"})
-    public BusinessLocationResponse detail(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @PathVariable UUID locationId) {
-        return businessLocationService.getDetail(authenticatedUser, locationId);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_VIEW')")
+	@GetMapping({"/api/business-locations/{locationId}", "/api/v1/business-locations/{locationId}"})
+	public BusinessLocationResponse detail(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@PathVariable UUID locationId) {
+		return businessLocationService.getDetail(authenticatedUser, locationId);
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_MANAGE')")
-    @PostMapping(
-            value = {"/api/business-locations", "/api/v1/business-locations"},
-            consumes = MediaType.APPLICATION_JSON_VALUE)
-    public BusinessLocationResponse create(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @Valid @RequestBody UpsertBusinessLocationRequest request) {
-        return businessLocationService.create(authenticatedUser, request);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_MANAGE')")
+	@PostMapping(value = {"/api/business-locations",
+			"/api/v1/business-locations"}, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public BusinessLocationResponse create(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@Valid @RequestBody UpsertBusinessLocationRequest request) {
+		return businessLocationService.create(authenticatedUser, request);
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_MANAGE')")
-    @PutMapping(
-            value = {"/api/business-locations/{locationId}", "/api/v1/business-locations/{locationId}"},
-            consumes = MediaType.APPLICATION_JSON_VALUE)
-    public BusinessLocationResponse update(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @PathVariable UUID locationId,
-            @Valid @RequestBody UpsertBusinessLocationRequest request) {
-        return businessLocationService.update(authenticatedUser, locationId, request);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_MANAGE')")
+	@PutMapping(value = {"/api/business-locations/{locationId}",
+			"/api/v1/business-locations/{locationId}"}, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public BusinessLocationResponse update(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@PathVariable UUID locationId, @Valid @RequestBody UpsertBusinessLocationRequest request) {
+		return businessLocationService.update(authenticatedUser, locationId, request);
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_MANAGE')")
-    @DeleteMapping({"/api/business-locations/{locationId}", "/api/v1/business-locations/{locationId}"})
-    public BusinessLocationResponse deactivate(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @PathVariable UUID locationId) {
-        return businessLocationService.deactivate(authenticatedUser, locationId);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_MANAGE')")
+	@DeleteMapping({"/api/business-locations/{locationId}", "/api/v1/business-locations/{locationId}"})
+	public BusinessLocationResponse deactivate(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@PathVariable UUID locationId) {
+		return businessLocationService.deactivate(authenticatedUser, locationId);
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_VIEW')")
-    @GetMapping({"/api/business-locations/{locationId}/commercial-qr", "/api/v1/business-locations/{locationId}/commercial-qr"})
-    public Map<String, String> commercialQr(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @PathVariable UUID locationId) {
-        return businessLocationService.commercialQr(authenticatedUser, locationId);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LOCATIONS_VIEW')")
+	@GetMapping({"/api/business-locations/{locationId}/commercial-qr",
+			"/api/v1/business-locations/{locationId}/commercial-qr"})
+	public Map<String, String> commercialQr(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@PathVariable UUID locationId) {
+		return businessLocationService.commercialQr(authenticatedUser, locationId);
+	}
 }

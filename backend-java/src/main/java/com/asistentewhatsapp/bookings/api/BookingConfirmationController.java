@@ -18,19 +18,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/bookings/{bookingId}/confirmation-link")
 public class BookingConfirmationController {
 
-    private final BookingConfirmationService bookingConfirmationService;
+	private final BookingConfirmationService bookingConfirmationService;
 
-    public BookingConfirmationController(BookingConfirmationService bookingConfirmationService) {
-        this.bookingConfirmationService = bookingConfirmationService;
-    }
+	public BookingConfirmationController(BookingConfirmationService bookingConfirmationService) {
+		this.bookingConfirmationService = bookingConfirmationService;
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_UPDATE')")
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public BookingConfirmationLinkResponse create(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @PathVariable UUID bookingId,
-            @Valid @RequestBody(required = false) CreateBookingConfirmationLinkRequest request) {
-        return bookingConfirmationService.createConfirmationLink(authenticatedUser, bookingId, request);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_UPDATE')")
+	@PostMapping
+	@ResponseStatus(HttpStatus.CREATED)
+	public BookingConfirmationLinkResponse create(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@PathVariable UUID bookingId,
+			@Valid @RequestBody(required = false) CreateBookingConfirmationLinkRequest request) {
+		return bookingConfirmationService.createConfirmationLink(authenticatedUser, bookingId, request);
+	}
 }

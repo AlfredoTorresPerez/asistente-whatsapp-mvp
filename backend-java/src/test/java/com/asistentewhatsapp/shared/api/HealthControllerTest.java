@@ -20,23 +20,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({SecurityConfig.class, GlobalExceptionHandler.class})
 class HealthControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+	@Autowired
+	private MockMvc mockMvc;
 
-    @MockitoBean
-    private JwtService jwtService;
+	@MockitoBean
+	private JwtService jwtService;
 
-    @MockitoBean
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+	@MockitoBean
+	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-    @MockitoBean
-    private JwtAccessDeniedHandler jwtAccessDeniedHandler;
+	@MockitoBean
+	private JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
-    @Test
-    void shouldReturnHealthStatusWithoutAuthentication() throws Exception {
-        mockMvc.perform(get("/api/v1/health"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("UP"))
-                .andExpect(jsonPath("$.service").value("backend-java"));
-    }
+	@Test
+	void shouldReturnHealthStatusWithoutAuthentication() throws Exception {
+		mockMvc.perform(get("/api/v1/health")).andExpect(status().isOk()).andExpect(jsonPath("$.status").value("UP"))
+				.andExpect(jsonPath("$.service").value("backend-java"));
+	}
 }

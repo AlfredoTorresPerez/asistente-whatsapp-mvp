@@ -70,6 +70,7 @@ function Update-EnvValue {
         $newLines += "$Key=$Value"
     }
     Set-Content -Path $FilePath -Value $newLines -Encoding ASCII
+    Set-Item -Path "env:$Key" -Value $Value
 }
 
 Assert-Command "docker"
@@ -97,6 +98,7 @@ if ([string]::IsNullOrWhiteSpace($publicUrl)) {
 }
 
 Write-Step "Paso 4/5: Actualizando .env.local con URL publica: $publicUrl"
+Update-EnvValue -Key "APP_WHATSAPP_CLOUD_API_WEBHOOK_PUBLIC_URL" -Value "$publicUrl" -FilePath $EnvFile
 Update-EnvValue -Key "APP_FRONTEND_PUBLIC_BASE_URL" -Value "$publicUrl" -FilePath $EnvFile
 Update-EnvValue -Key "APP_BOOKING_CONFIRMATION_PUBLIC_BASE_URL" -Value "$publicUrl/reservas/confirmar" -FilePath $EnvFile
 Update-EnvValue -Key "APP_BOOKING_RESCHEDULE_PUBLIC_BASE_URL" -Value "$publicUrl/reservas/reprogramar" -FilePath $EnvFile
@@ -115,6 +117,7 @@ Write-Host "  URL:     $publicUrl" -ForegroundColor Green
 Write-Host "  Frontend: $publicUrl" -ForegroundColor Green
 Write-Host "  API:     $publicUrl/api/v1/..." -ForegroundColor Green
 Write-Host "  Health:  $publicUrl/api/v1/health" -ForegroundColor Green
+Write-Host "  Webhook: $publicUrl/api/v1/integrations/whatsapp-cloud/webhook" -ForegroundColor Green
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "ADVERTENCIA: Esta URL es TEMPORAL." -ForegroundColor Yellow

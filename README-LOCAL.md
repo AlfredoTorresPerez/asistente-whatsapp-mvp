@@ -14,8 +14,10 @@
 
 ## Gestión de Secretos (Windows Credential Manager)
 
-Los secretos reales (WhatsApp App Secret, Access Token, Gmail App Password) **no están en ningún archivo**.
+Los secretos reales (JWT, WhatsApp App Secret, Access Token, Gmail App Password y OpenAI API Key) **no están en ningún archivo**.
 Se almacenan cifrados con DPAPI en Windows Credential Manager.
+Sentry es opcional: si existe `SENTRY_DSN` en Credential Manager, `restore-local-secrets.ps1` lo restaura y activa `SENTRY_ENABLED=true`; si no existe, queda desactivado sin romper el arranque.
+El email local usa doble entrega: Mailpit captura todos los correos en `http://localhost:8025` y, si `APP_EMAIL_MIRROR_ENABLED=true`, también se envían por Gmail usando el password guardado como `GMAIL_PASSWORD`.
 
 ```powershell
 # 1. Guardar/actualizar secretos (solo la primera vez)

@@ -2,7 +2,7 @@ package com.asistentewhatsapp.channels.domain;
 
 public interface MessagingChannel {
 
-    MessageChannelType type();
+	MessageChannelType type();
 
-    ChannelDelivery send(OutboundMessage outboundMessage);
+	ChannelDelivery send(OutboundMessage outboundMessage);
 }

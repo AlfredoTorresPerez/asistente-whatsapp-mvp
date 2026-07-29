@@ -5,7 +5,6 @@ import com.asistentewhatsapp.security.domain.AuthenticatedUser;
 import com.asistentewhatsapp.shared.api.StatusResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,55 +21,48 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class AuthController {
 
-    private final AuthService authService;
+	private final AuthService authService;
 
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
+	public AuthController(AuthService authService) {
+		this.authService = authService;
+	}
 
-    @PostMapping({"/api/v1/auth/login", "/api/auth/login"})
-    public LoginResponse login(
-            @Valid @RequestBody LoginRequest request,
-            HttpServletRequest httpServletRequest) {
-        return authService.login(request, httpServletRequest.getRemoteAddr());
-    }
+	@PostMapping({"/api/v1/auth/login", "/api/auth/login"})
+	public LoginResponse login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpServletRequest) {
+		return authService.login(request, httpServletRequest.getRemoteAddr());
+	}
 
-    @GetMapping({"/api/v1/auth/me", "/api/auth/me"})
-    public AuthUserResponse me(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        return authService.me(authenticatedUser);
-    }
+	@GetMapping({"/api/v1/auth/me", "/api/auth/me"})
+	public AuthUserResponse me(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+		return authService.me(authenticatedUser);
+	}
 
-    @PostMapping({"/api/v1/auth/logout", "/api/auth/logout"})
-    public StatusResponse logout(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @RequestHeader(value = "X-Refresh-Token", required = false) String refreshToken) {
-        return authService.logout(authenticatedUser, refreshToken);
-    }
+	@PostMapping({"/api/v1/auth/logout", "/api/auth/logout"})
+	public StatusResponse logout(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@RequestHeader(value = "X-Refresh-Token", required = false) String refreshToken) {
+		return authService.logout(authenticatedUser, refreshToken);
+	}
 
-    @PostMapping({"/api/v1/auth/refresh", "/api/auth/refresh"})
-    public LoginResponse refresh(
-            @Valid @RequestBody RefreshTokenRequest request,
-            HttpServletRequest httpServletRequest) {
-        return authService.refresh(
-            request.refreshToken(),
-            httpServletRequest.getHeader("User-Agent"),
-            httpServletRequest.getRemoteAddr());
-    }
+	@PostMapping({"/api/v1/auth/refresh", "/api/auth/refresh"})
+	public LoginResponse refresh(@Valid @RequestBody RefreshTokenRequest request,
+			HttpServletRequest httpServletRequest) {
+		return authService.refresh(request.refreshToken(), httpServletRequest.getHeader("User-Agent"),
+				httpServletRequest.getRemoteAddr());
+	}
 
-    @PostMapping({"/api/v1/auth/forgot-password", "/api/auth/forgot-password"})
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public ForgotPasswordResponse forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
-        return authService.forgotPassword(request);
-    }
+	@PostMapping({"/api/v1/auth/forgot-password", "/api/auth/forgot-password"})
+	@ResponseStatus(HttpStatus.ACCEPTED)
+	public ForgotPasswordResponse forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+		return authService.forgotPassword(request);
+	}
 
-    @GetMapping({"/api/v1/auth/reset-password/validate", "/api/auth/reset-password/validate"})
-    public ResetPasswordValidationResponse validateResetPasswordToken(@RequestParam("token") String token) {
-        return authService.validateResetPasswordToken(token);
-    }
+	@GetMapping({"/api/v1/auth/reset-password/validate", "/api/auth/reset-password/validate"})
+	public ResetPasswordValidationResponse validateResetPasswordToken(@RequestParam("token") String token) {
+		return authService.validateResetPasswordToken(token);
+	}
 
-    @PostMapping({"/api/v1/auth/reset-password", "/api/auth/reset-password"})
-    public StatusResponse resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
-        return authService.resetPassword(request);
-    }
+	@PostMapping({"/api/v1/auth/reset-password", "/api/auth/reset-password"})
+	public StatusResponse resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+		return authService.resetPassword(request);
+	}
 }
-

@@ -4,7 +4,6 @@ import com.asistentewhatsapp.content.api.dto.ContentItemDetailResponse;
 import com.asistentewhatsapp.content.api.dto.ContentItemImageUploadResponse;
 import com.asistentewhatsapp.content.api.dto.ContentItemListRequest;
 import com.asistentewhatsapp.content.api.dto.ContentItemListResponse;
-import com.asistentewhatsapp.content.api.dto.ContentItemSummaryResponse;
 import com.asistentewhatsapp.content.api.dto.CreateContentItemRequest;
 import com.asistentewhatsapp.content.api.dto.UpdateContentItemRequest;
 import com.asistentewhatsapp.content.api.dto.UpdateContentItemStatusRequest;
@@ -33,81 +32,65 @@ import java.util.UUID;
 @RequestMapping(value = "/api/v1/content-items", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AdminContentItemController {
 
-    private final ContentItemService service;
+	private final ContentItemService service;
 
-    public AdminContentItemController(ContentItemService service) {
-        this.service = service;
-    }
+	public AdminContentItemController(ContentItemService service) {
+		this.service = service;
+	}
 
-@PreAuthorize("hasPermission(#user.businessId(), 'CONTENT_VIEW')")
-    @GetMapping
-    public ContentItemListResponse list(
-            @AuthenticationPrincipal AuthenticatedUser user,
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) String status,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        ContentItemListRequest request = new ContentItemListRequest(page, size, null, type, status);
-        return service.list(user, request);
-    }
+	@PreAuthorize("hasPermission(#user.businessId(), 'CONTENT_VIEW')")
+	@GetMapping
+	public ContentItemListResponse list(@AuthenticationPrincipal AuthenticatedUser user,
+			@RequestParam(required = false) String type, @RequestParam(required = false) String status,
+			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
+		ContentItemListRequest request = new ContentItemListRequest(page, size, null, type, status);
+		return service.list(user, request);
+	}
 
-    @PreAuthorize("hasPermission(#user.businessId(), 'CONTENT_VIEW')")
-    @GetMapping("/{id}")
-    public ContentItemDetailResponse get(
-            @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable UUID id) {
-        return service.get(user, id);
-    }
+	@PreAuthorize("hasPermission(#user.businessId(), 'CONTENT_VIEW')")
+	@GetMapping("/{id}")
+	public ContentItemDetailResponse get(@AuthenticationPrincipal AuthenticatedUser user, @PathVariable UUID id) {
+		return service.get(user, id);
+	}
 
-    @PreAuthorize("hasPermission(#user.businessId(), 'CONTENT_MANAGE')")
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ContentItemDetailResponse create(
-            @AuthenticationPrincipal AuthenticatedUser user,
-            @Valid @RequestPart("request") CreateContentItemRequest request,
-            @RequestPart(value = "image", required = false) MultipartFile image) {
-        return service.create(user, request, image);
-    }
+	@PreAuthorize("hasPermission(#user.businessId(), 'CONTENT_MANAGE')")
+	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ContentItemDetailResponse create(@AuthenticationPrincipal AuthenticatedUser user,
+			@Valid @RequestPart("request") CreateContentItemRequest request,
+			@RequestPart(value = "image", required = false) MultipartFile image) {
+		return service.create(user, request, image);
+	}
 
-    @PreAuthorize("hasPermission(#user.businessId(), 'CONTENT_MANAGE')")
-    @PutMapping("/{id}")
-    public ContentItemDetailResponse update(
-            @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable UUID id,
-            @Valid @RequestBody UpdateContentItemRequest request) {
-        return service.update(user, id, request, null);
-    }
+	@PreAuthorize("hasPermission(#user.businessId(), 'CONTENT_MANAGE')")
+	@PutMapping("/{id}")
+	public ContentItemDetailResponse update(@AuthenticationPrincipal AuthenticatedUser user, @PathVariable UUID id,
+			@Valid @RequestBody UpdateContentItemRequest request) {
+		return service.update(user, id, request, null);
+	}
 
-    @PreAuthorize("hasPermission(#user.businessId(), 'CONTENT_MANAGE')")
-    @PatchMapping("/{id}/status")
-    public ContentItemDetailResponse updateStatus(
-            @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable UUID id,
-            @Valid @RequestBody UpdateContentItemStatusRequest request) {
-        return service.updateStatus(user, id, request.status());
-    }
+	@PreAuthorize("hasPermission(#user.businessId(), 'CONTENT_MANAGE')")
+	@PatchMapping("/{id}/status")
+	public ContentItemDetailResponse updateStatus(@AuthenticationPrincipal AuthenticatedUser user,
+			@PathVariable UUID id, @Valid @RequestBody UpdateContentItemStatusRequest request) {
+		return service.updateStatus(user, id, request.status());
+	}
 
-@PreAuthorize("hasPermission(#user.businessId(), 'CONTENT_MANAGE')")
-    @PostMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ContentItemImageUploadResponse uploadImage(
-            @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable UUID id,
-            @RequestPart("image") MultipartFile image) {
-        return service.uploadImage(user, id, image);
-    }
+	@PreAuthorize("hasPermission(#user.businessId(), 'CONTENT_MANAGE')")
+	@PostMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ContentItemImageUploadResponse uploadImage(@AuthenticationPrincipal AuthenticatedUser user,
+			@PathVariable UUID id, @RequestPart("image") MultipartFile image) {
+		return service.uploadImage(user, id, image);
+	}
 
-    @PreAuthorize("hasPermission(#user.businessId(), 'CONTENT_MANAGE')")
-    @DeleteMapping("/{id}/image")
-    public void deleteImage(
-            @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable UUID id) {
-        service.deleteImage(user, id);
-    }
+	@PreAuthorize("hasPermission(#user.businessId(), 'CONTENT_MANAGE')")
+	@DeleteMapping("/{id}/image")
+	public void deleteImage(@AuthenticationPrincipal AuthenticatedUser user, @PathVariable UUID id) {
+		service.deleteImage(user, id);
+	}
 
-    @PreAuthorize("hasPermission(#user.businessId(), 'CONTENT_MANAGE')")
-    @DeleteMapping("/{id}")
-    public void delete(
-            @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable UUID id) {
-        service.delete(user, id);
-    }
+	@PreAuthorize("hasPermission(#user.businessId(), 'CONTENT_MANAGE')")
+	@DeleteMapping("/{id}")
+	public void delete(@AuthenticationPrincipal AuthenticatedUser user, @PathVariable UUID id) {
+		service.delete(user, id);
+	}
 }

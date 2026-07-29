@@ -14,26 +14,19 @@ import org.mockito.ArgumentCaptor;
 
 class AuditServiceTest {
 
-    @Test
-    void recordSerializesStructuredMetadata() {
-        AuditLogRepository repository = mock(AuditLogRepository.class);
-        AuditService auditService = new AuditService(repository, new ObjectMapper());
-        UUID businessId = UUID.randomUUID();
-        UUID entityId = UUID.randomUUID();
+	@Test
+	void recordSerializesStructuredMetadata() {
+		AuditLogRepository repository = mock(AuditLogRepository.class);
+		AuditService auditService = new AuditService(repository, new ObjectMapper());
+		UUID businessId = UUID.randomUUID();
+		UUID entityId = UUID.randomUUID();
 
-        auditService.record(
-                businessId,
-                null,
-                "BOOKING_CONFIRMED",
-                "BOOKING",
-                entityId,
-                "Reserva confirmada.",
-                Map.of("previousStatus", "PENDIENTE_CONFIRMACION", "newStatus", "CONFIRMADA"));
+		auditService.record(businessId, null, "BOOKING_CONFIRMED", "BOOKING", entityId, "Reserva confirmada.",
+				Map.of("previousStatus", "PENDIENTE_CONFIRMACION", "newStatus", "CONFIRMADA"));
 
-        ArgumentCaptor<AuditLog> auditLog = ArgumentCaptor.forClass(AuditLog.class);
-        verify(repository).save(auditLog.capture());
-        assertThat(auditLog.getValue().getMetadata())
-                .contains("\"previousStatus\":\"PENDIENTE_CONFIRMACION\"")
-                .contains("\"newStatus\":\"CONFIRMADA\"");
-    }
+		ArgumentCaptor<AuditLog> auditLog = ArgumentCaptor.forClass(AuditLog.class);
+		verify(repository).save(auditLog.capture());
+		assertThat(auditLog.getValue().getMetadata()).contains("\"previousStatus\":\"PENDIENTE_CONFIRMACION\"")
+				.contains("\"newStatus\":\"CONFIRMADA\"");
+	}
 }

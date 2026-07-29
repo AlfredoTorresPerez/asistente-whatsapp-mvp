@@ -16,47 +16,42 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/public/booking-confirmations/{token}")
 public class PublicBookingConfirmationController {
 
-    private final BookingConfirmationService bookingConfirmationService;
+	private final BookingConfirmationService bookingConfirmationService;
 
-    public PublicBookingConfirmationController(BookingConfirmationService bookingConfirmationService) {
-        this.bookingConfirmationService = bookingConfirmationService;
-    }
+	public PublicBookingConfirmationController(BookingConfirmationService bookingConfirmationService) {
+		this.bookingConfirmationService = bookingConfirmationService;
+	}
 
-    @GetMapping
-    public PublicBookingConfirmationResponse preview(@PathVariable String token) {
-        return bookingConfirmationService.preview(token);
-    }
+	@GetMapping
+	public PublicBookingConfirmationResponse preview(@PathVariable String token) {
+		return bookingConfirmationService.preview(token);
+	}
 
-    @PostMapping("/confirm")
-    public PublicBookingConfirmationResponse confirm(@PathVariable String token) {
-        return bookingConfirmationService.confirm(token);
-    }
+	@PostMapping("/confirm")
+	public PublicBookingConfirmationResponse confirm(@PathVariable String token) {
+		return bookingConfirmationService.confirm(token);
+	}
 
-    @GetMapping("/confirm")
-    public PublicBookingConfirmationResponse confirmViaPublicGetFallback(@PathVariable String token) {
-        return bookingConfirmationService.confirm(token);
-    }
+	@GetMapping("/confirm")
+	public PublicBookingConfirmationResponse confirmViaPublicGetFallback(@PathVariable String token) {
+		return bookingConfirmationService.confirm(token);
+	}
 
-    @GetMapping("/availability")
-    public AgendaAvailabilityResponse availability(
-            @PathVariable String token,
-            @RequestParam LocalDate date,
-            @RequestParam(required = false) Integer maxSlots) {
-        return bookingConfirmationService.publicAvailability(token, date, maxSlots);
-    }
+	@GetMapping("/availability")
+	public AgendaAvailabilityResponse availability(@PathVariable String token, @RequestParam LocalDate date,
+			@RequestParam(required = false) Integer maxSlots) {
+		return bookingConfirmationService.publicAvailability(token, date, maxSlots);
+	}
 
-    @PostMapping("/reschedule")
-    public PublicBookingConfirmationResponse reschedule(
-            @PathVariable String token,
-            @Valid @RequestBody PublicBookingConfirmationRescheduleRequest request) {
-        return bookingConfirmationService.rescheduleFromConfirmation(token, request);
-    }
+	@PostMapping("/reschedule")
+	public PublicBookingConfirmationResponse reschedule(@PathVariable String token,
+			@Valid @RequestBody PublicBookingConfirmationRescheduleRequest request) {
+		return bookingConfirmationService.rescheduleFromConfirmation(token, request);
+	}
 
-    @PostMapping("/cancel")
-    public PublicBookingConfirmationResponse cancel(
-            @PathVariable String token,
-            @RequestBody PublicBookingCancellationRequest request) {
-        return bookingConfirmationService.cancelFromConfirmation(token, request);
-    }
+	@PostMapping("/cancel")
+	public PublicBookingConfirmationResponse cancel(@PathVariable String token,
+			@RequestBody PublicBookingCancellationRequest request) {
+		return bookingConfirmationService.cancelFromConfirmation(token, request);
+	}
 }
-

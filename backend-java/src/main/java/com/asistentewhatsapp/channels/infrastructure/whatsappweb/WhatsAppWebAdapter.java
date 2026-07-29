@@ -22,96 +22,74 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(prefix = "app.channels.whatsapp-web", name = "enabled", havingValue = "true")
 public class WhatsAppWebAdapter implements CanalWhatsApp {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WhatsAppWebAdapter.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(WhatsAppWebAdapter.class);
 
-    private final WhatsAppWebSessionGatewayClient sessionGatewayClient;
-    private final WhatsAppWebClientProperties properties;
+	private final WhatsAppWebSessionGatewayClient sessionGatewayClient;
+	private final WhatsAppWebClientProperties properties;
 
-    public WhatsAppWebAdapter(
-            WhatsAppWebSessionGatewayClient sessionGatewayClient,
-            WhatsAppWebClientProperties properties,
-            Environment environment) {
-        this.sessionGatewayClient = sessionGatewayClient;
-        this.properties = properties;
-        if (properties.demoFallbackEnabled() && !isLocalLikeEnvironment(environment)) {
-            LOGGER.warn("APP_WHATSAPP_WEB_DEMO_FALLBACK_ENABLED esta activo fuera de un ambiente local/demo.");
-        }
-    }
+	public WhatsAppWebAdapter(WhatsAppWebSessionGatewayClient sessionGatewayClient,
+			WhatsAppWebClientProperties properties, Environment environment) {
+		this.sessionGatewayClient = sessionGatewayClient;
+		this.properties = properties;
+		if (properties.demoFallbackEnabled() && !isLocalLikeEnvironment(environment)) {
+			LOGGER.warn("APP_WHATSAPP_WEB_DEMO_FALLBACK_ENABLED esta activo fuera de un ambiente local/demo.");
+		}
+	}
 
-    @Override
-    public WhatsAppChannelProvider provider() {
-        return WhatsAppChannelProvider.WHATSAPP_WEB;
-    }
+	@Override
+	public WhatsAppChannelProvider provider() {
+		return WhatsAppChannelProvider.WHATSAPP_WEB;
+	}
 
-    @Override
-    public WhatsAppSessionStatus getStatus() {
-        WhatsAppWebSessionGatewayClient.SessionStatusResponse response = sessionGatewayClient.getStatus();
-        return new WhatsAppSessionStatus(
-                response.sessionId(),
-                response.connectionStatus(),
-                response.phoneNumber(),
-                response.qrCode(),
-                response.adapterMode(),
-                response.lastEventAt());
-    }
+	@Override
+	public WhatsAppSessionStatus getStatus() {
+		WhatsAppWebSessionGatewayClient.SessionStatusResponse response = sessionGatewayClient.getStatus();
+		return new WhatsAppSessionStatus(response.sessionId(), response.connectionStatus(), response.phoneNumber(),
+				response.qrCode(), response.adapterMode(), response.lastEventAt());
+	}
 
-    @Override
-    public WhatsAppSessionAction connect() {
-        return toSessionAction(sessionGatewayClient.connect());
-    }
+	@Override
+	public WhatsAppSessionAction connect() {
+		return toSessionAction(sessionGatewayClient.connect());
+	}
 
-    @Override
-    public WhatsAppSessionAction refreshQr() {
-        return toSessionAction(sessionGatewayClient.refreshQr());
-    }
+	@Override
+	public WhatsAppSessionAction refreshQr() {
+		return toSessionAction(sessionGatewayClient.refreshQr());
+	}
 
-    @Override
-    public WhatsAppSessionAction disconnect() {
-        return toSessionAction(sessionGatewayClient.disconnect());
-    }
+	@Override
+	public WhatsAppSessionAction disconnect() {
+		return toSessionAction(sessionGatewayClient.disconnect());
+	}
 
-    @Override
-    public ChannelDelivery send(OutboundMessage outboundMessage) {
-        try {
-            WhatsAppWebSessionGatewayClient.SendTextResponse response = sessionGatewayClient.sendText(
-                    outboundMessage.businessId().toString(),
-                    outboundMessage.recipientPhone(),
-                    outboundMessage.body());
+	@Override
+	public ChannelDelivery send(OutboundMessage outboundMessage) {
+		try {
+			WhatsAppWebSessionGatewayClient.SendTextResponse response = sessionGatewayClient.sendText(
+					outboundMessage.businessId().toString(), outboundMessage.recipientPhone(), outboundMessage.body());
 
-            return new ChannelDelivery(
-                    MessageChannelType.WHATSAPP,
-                    response.messageId(),
-                    response.status(),
-                    response.acceptedAt() == null ? Instant.now() : response.acceptedAt().toInstant());
-        } catch (MessagingChannelUnavailableException exception) {
-            if (properties.demoFallbackEnabled()) {
-                return new ChannelDelivery(
-                        MessageChannelType.WHATSAPP,
-                        "demo-whatsapp-web-" + UUID.randomUUID(),
-                        "SIMULATED",
-                        Instant.now());
-            }
+			return new ChannelDelivery(MessageChannelType.WHATSAPP, response.messageId(), response.status(),
+					response.acceptedAt() == null ? Instant.now() : response.acceptedAt().toInstant());
+		} catch (MessagingChannelUnavailableException exception) {
+			if (properties.demoFallbackEnabled()) {
+				return new ChannelDelivery(MessageChannelType.WHATSAPP, "demo-whatsapp-web-" + UUID.randomUUID(),
+						"SIMULATED", Instant.now());
+			}
 
-            throw exception;
-        }
-    }
+			throw exception;
+		}
+	}
 
-    private WhatsAppSessionAction toSessionAction(WhatsAppWebSessionGatewayClient.SessionActionResponse response) {
-        OffsetDateTime acceptedAt = response.acceptedAt() == null ? OffsetDateTime.now() : response.acceptedAt();
-        return new WhatsAppSessionAction(
-                response.sessionId(),
-                response.connectionStatus(),
-                response.phoneNumber(),
-                response.qrCode(),
-                acceptedAt);
-    }
+	private WhatsAppSessionAction toSessionAction(WhatsAppWebSessionGatewayClient.SessionActionResponse response) {
+		OffsetDateTime acceptedAt = response.acceptedAt() == null ? OffsetDateTime.now() : response.acceptedAt();
+		return new WhatsAppSessionAction(response.sessionId(), response.connectionStatus(), response.phoneNumber(),
+				response.qrCode(), acceptedAt);
+	}
 
-    private boolean isLocalLikeEnvironment(Environment environment) {
-        String appEnvironment = environment.getProperty("app.environment", "local").toLowerCase(Locale.ROOT);
-        return appEnvironment.equals("local")
-                || appEnvironment.equals("dev")
-                || appEnvironment.equals("development")
-                || appEnvironment.equals("demo")
-                || appEnvironment.equals("test");
-    }
+	private boolean isLocalLikeEnvironment(Environment environment) {
+		String appEnvironment = environment.getProperty("app.environment", "local").toLowerCase(Locale.ROOT);
+		return appEnvironment.equals("local") || appEnvironment.equals("dev") || appEnvironment.equals("development")
+				|| appEnvironment.equals("demo") || appEnvironment.equals("test");
+	}
 }

@@ -17,67 +17,60 @@ import org.springframework.stereotype.Service;
 @Service
 public class ChannelDispatchService {
 
-    private final Map<MessageChannelType, MessagingChannel> channels;
-    private final Map<WhatsAppChannelProvider, CanalWhatsApp> whatsAppChannels;
-    private final WhatsAppChannelProperties whatsAppChannelProperties;
+	private final Map<MessageChannelType, MessagingChannel> channels;
+	private final Map<WhatsAppChannelProvider, CanalWhatsApp> whatsAppChannels;
+	private final WhatsAppChannelProperties whatsAppChannelProperties;
 
-    public ChannelDispatchService(
-            List<MessagingChannel> channels,
-            List<CanalWhatsApp> whatsAppChannels,
-            WhatsAppChannelProperties whatsAppChannelProperties) {
-        this.channels = new EnumMap<>(MessageChannelType.class);
-        for (MessagingChannel channel : channels) {
-            this.channels.put(channel.type(), channel);
-        }
-        this.whatsAppChannels = whatsAppChannels.stream()
-                .collect(Collectors.toMap(CanalWhatsApp::provider, Function.identity(), (left, right) -> left));
-        this.whatsAppChannelProperties = whatsAppChannelProperties;
-    }
+	public ChannelDispatchService(List<MessagingChannel> channels, List<CanalWhatsApp> whatsAppChannels,
+			WhatsAppChannelProperties whatsAppChannelProperties) {
+		this.channels = new EnumMap<>(MessageChannelType.class);
+		for (MessagingChannel channel : channels) {
+			this.channels.put(channel.type(), channel);
+		}
+		this.whatsAppChannels = whatsAppChannels.stream()
+				.collect(Collectors.toMap(CanalWhatsApp::provider, Function.identity(), (left, right) -> left));
+		this.whatsAppChannelProperties = whatsAppChannelProperties;
+	}
 
-    public ChannelDispatchResponse dispatch(ChannelDispatchRequest request) {
-        MessagingChannel channel = resolveChannel(request.channelType());
-        if (channel == null) {
-            throw new UnsupportedMessagingChannelException(
-                    "El canal solicitado no esta configurado para este entorno.");
-        }
+	public ChannelDispatchResponse dispatch(ChannelDispatchRequest request) {
+		MessagingChannel channel = resolveChannel(request.channelType());
+		if (channel == null) {
+			throw new UnsupportedMessagingChannelException(
+					"El canal solicitado no esta configurado para este entorno.");
+		}
 
-        ChannelDelivery delivery = channel.send(new OutboundMessage(
-                request.businessId(),
-                request.recipientPhone(),
-                request.body()));
+		ChannelDelivery delivery = channel
+				.send(new OutboundMessage(request.businessId(), request.recipientPhone(), request.body()));
 
-        return new ChannelDispatchResponse(
-                delivery.channelType(),
-                delivery.externalMessageId(),
-                delivery.status(),
-                delivery.acceptedAt());
-    }
+		return new ChannelDispatchResponse(delivery.channelType(), delivery.externalMessageId(), delivery.status(),
+				delivery.acceptedAt());
+	}
 
-    private MessagingChannel resolveChannel(MessageChannelType channelType) {
-        if (channelType == MessageChannelType.WHATSAPP) {
-            return resolveWhatsAppChannel();
-        }
-        return channels.get(channelType);
-    }
+	private MessagingChannel resolveChannel(MessageChannelType channelType) {
+		if (channelType == MessageChannelType.WHATSAPP) {
+			return resolveWhatsAppChannel();
+		}
+		return channels.get(channelType);
+	}
 
-    private CanalWhatsApp resolveWhatsAppChannel() {
-        WhatsAppChannelProperties.Provider provider = whatsAppChannelProperties.getProvider();
-        if (provider == WhatsAppChannelProperties.Provider.DISABLED) {
-            throw new UnsupportedMessagingChannelException("El canal WhatsApp esta deshabilitado por configuracion.");
-        }
+	private CanalWhatsApp resolveWhatsAppChannel() {
+		WhatsAppChannelProperties.Provider provider = whatsAppChannelProperties.getProvider();
+		if (provider == WhatsAppChannelProperties.Provider.DISABLED) {
+			throw new UnsupportedMessagingChannelException("El canal WhatsApp esta deshabilitado por configuracion.");
+		}
 
-        WhatsAppChannelProvider domainProvider = switch (provider) {
-            case WEB, WHATSAPP_WEB -> WhatsAppChannelProvider.WHATSAPP_WEB;
-            case CLOUD_API, META_CLOUD_API -> WhatsAppChannelProvider.META_CLOUD_API;
-            case DISABLED -> throw new UnsupportedMessagingChannelException(
-                    "El canal WhatsApp esta deshabilitado por configuracion.");
-        };
+		WhatsAppChannelProvider domainProvider = switch (provider) {
+			case WEB, WHATSAPP_WEB -> WhatsAppChannelProvider.WHATSAPP_WEB;
+			case CLOUD_API, META_CLOUD_API -> WhatsAppChannelProvider.META_CLOUD_API;
+			case DISABLED -> throw new UnsupportedMessagingChannelException(
+					"El canal WhatsApp esta deshabilitado por configuracion.");
+		};
 
-        CanalWhatsApp channel = whatsAppChannels.get(domainProvider);
-        if (channel == null) {
-            throw new UnsupportedMessagingChannelException(
-                    "El proveedor WhatsApp configurado no esta habilitado: " + provider + ".");
-        }
-        return channel;
-    }
+		CanalWhatsApp channel = whatsAppChannels.get(domainProvider);
+		if (channel == null) {
+			throw new UnsupportedMessagingChannelException(
+					"El proveedor WhatsApp configurado no esta habilitado: " + provider + ".");
+		}
+		return channel;
+	}
 }

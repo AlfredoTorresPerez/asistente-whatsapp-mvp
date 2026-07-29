@@ -1,0 +1,332 @@
+{
+  "metadata": {
+    "source": "documentacion\\conversacion\\intenciones_agenda_whatsapp_es419_actualizada.xlsx",
+    "sheet_counts": {
+      "Resumen": 10,
+      "Reservar": 73,
+      "Reprogramar": 67,
+      "Cancelar": 67,
+      "Taxonomia_Intenciones": 42,
+      "Ejemplos_Ampliados": 168,
+      "Escenarios_Multiturno": 36,
+      "Conversaciones_Multiturno": 118,
+      "Entidades_Estructuradas": 60,
+      "Casos_Negativos": 60,
+      "Contexto_Referencias": 45,
+      "Cambios_Intencion": 30,
+      "Multiples_Reservas": 25,
+      "Respuestas_Acciones": 47,
+      "Estados_Conversacion": 24,
+      "Transiciones_Conversacion": 30,
+      "Evaluacion_Dataset": 104,
+      "Cobertura_Dataset": 42,
+      "Ambiguas_Contexto": 10,
+      "Reglas_Modelo": 10,
+      "Fuentes": 18,
+      "Metodologia": 12
+    },
+    "warnings": []
+  },
+  "items": [
+    {
+      "id": "TRN-001",
+      "estado_origen": "INICIO",
+      "estado_destino": "ESPERANDO_SERVICIO",
+      "evento_o_intencion": "reservar sin servicio",
+      "accion": "Preguntar servicio",
+      "permitida": "Sí",
+      "prioridad": "Alta",
+      "condicion_o_motivo": "No ejecutar si faltan precondiciones"
+    },
+    {
+      "id": "TRN-002",
+      "estado_origen": "INICIO",
+      "estado_destino": "ESPERANDO_SUCURSAL",
+      "evento_o_intencion": "reservar con servicio y sin sede",
+      "accion": "Preguntar sede",
+      "permitida": "Sí",
+      "prioridad": "Alta",
+      "condicion_o_motivo": "No ejecutar si faltan precondiciones"
+    },
+    {
+      "id": "TRN-003",
+      "estado_origen": "INICIO",
+      "estado_destino": "ESPERANDO_HORARIO",
+      "evento_o_intencion": "consultar disponibilidad con datos suficientes",
+      "accion": "Consultar y mostrar slots",
+      "permitida": "Sí",
+      "prioridad": "Alta",
+      "condicion_o_motivo": "No ejecutar si faltan precondiciones"
+    },
+    {
+      "id": "TRN-004",
+      "estado_origen": "ESPERANDO_SERVICIO",
+      "estado_destino": "ESPERANDO_SUCURSAL",
+      "evento_o_intencion": "servicio válido seleccionado",
+      "accion": "Consultar sedes compatibles",
+      "permitida": "Sí",
+      "prioridad": "Alta",
+      "condicion_o_motivo": "No ejecutar si faltan precondiciones"
+    },
+    {
+      "id": "TRN-005",
+      "estado_origen": "ESPERANDO_SUCURSAL",
+      "estado_destino": "ESPERANDO_PROFESIONAL",
+      "evento_o_intencion": "sede válida seleccionada",
+      "accion": "Consultar profesionales",
+      "permitida": "Sí",
+      "prioridad": "Alta",
+      "condicion_o_motivo": "No ejecutar si faltan precondiciones"
+    },
+    {
+      "id": "TRN-006",
+      "estado_origen": "ESPERANDO_PROFESIONAL",
+      "estado_destino": "ESPERANDO_FECHA",
+      "evento_o_intencion": "profesional o cualquiera seleccionado",
+      "accion": "Solicitar fecha",
+      "permitida": "Sí",
+      "prioridad": "Alta",
+      "condicion_o_motivo": "No ejecutar si faltan precondiciones"
+    },
+    {
+      "id": "TRN-007",
+      "estado_origen": "ESPERANDO_FECHA",
+      "estado_destino": "ESPERANDO_HORARIO",
+      "evento_o_intencion": "fecha válida",
+      "accion": "Consultar slots",
+      "permitida": "Sí",
+      "prioridad": "Alta",
+      "condicion_o_motivo": "No ejecutar si faltan precondiciones"
+    },
+    {
+      "id": "TRN-008",
+      "estado_origen": "ESPERANDO_HORARIO",
+      "estado_destino": "ESPERANDO_CONFIRMACION_RESERVA",
+      "evento_o_intencion": "slot vigente seleccionado",
+      "accion": "Crear retención",
+      "permitida": "Sí",
+      "prioridad": "Alta",
+      "condicion_o_motivo": "No ejecutar si faltan precondiciones"
+    },
+    {
+      "id": "TRN-009",
+      "estado_origen": "ESPERANDO_CONFIRMACION_RESERVA",
+      "estado_destino": "RESERVA_CONFIRMADA",
+      "evento_o_intencion": "confirmación explícita y retención vigente",
+      "accion": "Crear reserva",
+      "permitida": "Sí",
+      "prioridad": "Crítica",
+      "condicion_o_motivo": "No ejecutar si faltan precondiciones"
+    },
+    {
+      "id": "TRN-010",
+      "estado_origen": "ESPERANDO_CONFIRMACION_RESERVA",
+      "estado_destino": "CERRADO",
+      "evento_o_intencion": "rechazo o consulta solamente",
+      "accion": "Liberar retención",
+      "permitida": "Sí",
+      "prioridad": "Alta",
+      "condicion_o_motivo": "No ejecutar si faltan precondiciones"
+    },
+    {
+      "id": "TRN-011",
+      "estado_origen": "INICIO",
+      "estado_destino": "ESPERANDO_SELECCION_RESERVA",
+      "evento_o_intencion": "reprogramar o cancelar con varias citas",
+      "accion": "Listar citas propias",
+      "permitida": "Sí",
+      "prioridad": "Alta",
+      "condicion_o_motivo": "No ejecutar si faltan precondiciones"
+    },
+    {
+      "id": "TRN-012",
+      "estado_origen": "ESPERANDO_SELECCION_RESERVA",
+      "estado_destino": "ESPERANDO_FECHA_REPROGRAMACION",
+      "evento_o_intencion": "cita seleccionada para cambiar",
+      "accion": "Solicitar fecha nueva",
+      "permitida": "Sí",
+      "prioridad": "Alta",
+      "condicion_o_motivo": "No ejecutar si faltan precondiciones"
+    },
+    {
+      "id": "TRN-013",
+      "estado_origen": "ESPERANDO_HORARIO_REPROGRAMACION",
+      "estado_destino": "ESPERANDO_CONFIRMACION_REPROGRAMACION",
+      "evento_o_intencion": "nuevo slot seleccionado",
+      "accion": "Retener nuevo slot",
+      "permitida": "Sí",
+      "prioridad": "Alta",
+      "condicion_o_motivo": "No ejecutar si faltan precondiciones"
+    },
+    {
+      "id": "TRN-014",
+      "estado_origen": "ESPERANDO_CONFIRMACION_REPROGRAMACION",
+      "estado_destino": "RESERVA_REPROGRAMADA",
+      "evento_o_intencion": "confirmación explícita",
+      "accion": "Aplicar cambio transaccional",
+      "permitida": "Sí",
+      "prioridad": "Crítica",
+      "condicion_o_motivo": "No ejecutar si faltan precondiciones"
+    },
+    {
+      "id": "TRN-015",
+      "estado_origen": "INICIO",
+      "estado_destino": "ESPERANDO_CONFIRMACION_CANCELACION",
+      "evento_o_intencion": "cancelar con cita inequívoca",
+      "accion": "Mostrar resumen y política",
+      "permitida": "Sí",
+      "prioridad": "Alta",
+      "condicion_o_motivo": "No ejecutar si faltan precondiciones"
+    },
+    {
+      "id": "TRN-016",
+      "estado_origen": "ESPERANDO_SELECCION_RESERVA",
+      "estado_destino": "ESPERANDO_CONFIRMACION_CANCELACION",
+      "evento_o_intencion": "cita seleccionada para cancelar",
+      "accion": "Mostrar resumen y política",
+      "permitida": "Sí",
+      "prioridad": "Alta",
+      "condicion_o_motivo": "No ejecutar si faltan precondiciones"
+    },
+    {
+      "id": "TRN-017",
+      "estado_origen": "ESPERANDO_CONFIRMACION_CANCELACION",
+      "estado_destino": "RESERVA_CANCELADA",
+      "evento_o_intencion": "confirmación explícita",
+      "accion": "Cancelar cita",
+      "permitida": "Sí",
+      "prioridad": "Crítica",
+      "condicion_o_motivo": "No ejecutar si faltan precondiciones"
+    },
+    {
+      "id": "TRN-018",
+      "estado_origen": "ESPERANDO_CONFIRMACION_CANCELACION",
+      "estado_destino": "RESERVA_MANTENIDA",
+      "evento_o_intencion": "rechazo explícito",
+      "accion": "No modificar cita",
+      "permitida": "Sí",
+      "prioridad": "Alta",
+      "condicion_o_motivo": "No ejecutar si faltan precondiciones"
+    },
+    {
+      "id": "TRN-019",
+      "estado_origen": "RECORDATORIO_ENVIADO",
+      "estado_destino": "ASISTENCIA_CONFIRMADA",
+      "evento_o_intencion": "confirmación de asistencia",
+      "accion": "Registrar asistencia prevista",
+      "permitida": "Sí",
+      "prioridad": "Alta",
+      "condicion_o_motivo": "No ejecutar si faltan precondiciones"
+    },
+    {
+      "id": "TRN-020",
+      "estado_origen": "CUALQUIERA",
+      "estado_destino": "DERIVADO_HUMANO",
+      "evento_o_intencion": "solicitud humana o error crítico",
+      "accion": "Crear derivación con contexto",
+      "permitida": "Sí",
+      "prioridad": "Alta",
+      "condicion_o_motivo": "No ejecutar si faltan precondiciones"
+    },
+    {
+      "id": "TRN-021",
+      "estado_origen": "CUALQUIERA",
+      "estado_destino": "ESPERANDO_REFORMULACION",
+      "evento_o_intencion": "mensaje incomprensible",
+      "accion": "Pedir reformulación",
+      "permitida": "Sí",
+      "prioridad": "Alta",
+      "condicion_o_motivo": "No ejecutar si faltan precondiciones"
+    },
+    {
+      "id": "TRN-022",
+      "estado_origen": "ERROR_CANAL",
+      "estado_destino": "INICIO",
+      "evento_o_intencion": "canal corregido y nuevo mensaje",
+      "accion": "Resolver empresa",
+      "permitida": "Sí",
+      "prioridad": "Alta",
+      "condicion_o_motivo": "No ejecutar si faltan precondiciones"
+    },
+    {
+      "id": "TRN-023",
+      "estado_origen": "INICIO",
+      "estado_destino": "RESERVA_CONFIRMADA",
+      "evento_o_intencion": "“sí” aislado",
+      "accion": "Bloquear: No existe retención ni resumen",
+      "permitida": "No",
+      "prioridad": "Crítica",
+      "condicion_o_motivo": "No existe retención ni resumen"
+    },
+    {
+      "id": "TRN-024",
+      "estado_origen": "INICIO",
+      "estado_destino": "RESERVA_CANCELADA",
+      "evento_o_intencion": "“cancela” sin cita identificada",
+      "accion": "Bloquear: Falta objeto y confirmación",
+      "permitida": "No",
+      "prioridad": "Crítica",
+      "condicion_o_motivo": "Falta objeto y confirmación"
+    },
+    {
+      "id": "TRN-025",
+      "estado_origen": "ESPERANDO_HORARIO",
+      "estado_destino": "RESERVA_CONFIRMADA",
+      "evento_o_intencion": "selección de hora",
+      "accion": "Bloquear: Falta confirmación final",
+      "permitida": "No",
+      "prioridad": "Crítica",
+      "condicion_o_motivo": "Falta confirmación final"
+    },
+    {
+      "id": "TRN-026",
+      "estado_origen": "ESPERANDO_CONFIRMACION_REPROGRAMACION",
+      "estado_destino": "RESERVA_CANCELADA",
+      "evento_o_intencion": "respuesta ambigua",
+      "accion": "Bloquear: No confundir cambio con cancelación",
+      "permitida": "No",
+      "prioridad": "Crítica",
+      "condicion_o_motivo": "No confundir cambio con cancelación"
+    },
+    {
+      "id": "TRN-027",
+      "estado_origen": "ERROR_CANAL",
+      "estado_destino": "RESERVA_CONFIRMADA",
+      "evento_o_intencion": "cualquier mensaje",
+      "accion": "Bloquear: No existe empresa resuelta",
+      "permitida": "No",
+      "prioridad": "Crítica",
+      "condicion_o_motivo": "No existe empresa resuelta"
+    },
+    {
+      "id": "TRN-028",
+      "estado_origen": "DERIVADO_HUMANO",
+      "estado_destino": "RESERVA_CONFIRMADA",
+      "evento_o_intencion": "mensaje del cliente",
+      "accion": "Bloquear: Automatización pausada",
+      "permitida": "No",
+      "prioridad": "Crítica",
+      "condicion_o_motivo": "Automatización pausada"
+    },
+    {
+      "id": "TRN-029",
+      "estado_origen": "ESPERANDO_CONFIRMACION_REPROGRAMACION",
+      "estado_destino": "RESERVA_REPROGRAMADA",
+      "evento_o_intencion": "confirmar_reprogramacion",
+      "accion": "Aplicar cambio transaccional",
+      "permitida": "Sí",
+      "prioridad": "Crítica",
+      "condicion_o_motivo": "Retención vigente y cita original activa"
+    },
+    {
+      "id": "TRN-030",
+      "estado_origen": "ESPERANDO_CONFIRMACION_REPROGRAMACION",
+      "estado_destino": "RESERVA_MANTENIDA",
+      "evento_o_intencion": "rechazar_reprogramacion",
+      "accion": "Liberar nueva retención; mantener original",
+      "permitida": "Sí",
+      "prioridad": "Crítica",
+      "condicion_o_motivo": "No modificar cita original"
+    }
+  ]
+}

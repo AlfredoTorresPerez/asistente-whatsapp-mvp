@@ -8,18 +8,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class KnowledgeAgent extends AbstractAgentHandler {
 
-    @Override
-    public AgentType type() {
-        return AgentType.KNOWLEDGE;
-    }
+	@Override
+	public AgentType type() {
+		return AgentType.KNOWLEDGE;
+	}
 
-    @Override
-    public AgentRoutingResult handle(
-            AgentConversationRequest request,
-            IntentDetectionResult intent,
-            Map<String, String> entities,
-            List<String> missingData) {
-        String response = "Puedo revisar la información autorizada. ¿Sobre qué política, documento o servicio necesitas información?";
-        return result(request, intent, type(), entities, missing("tema_documental"), response, false, null);
-    }
+	@Override
+	public AgentRoutingResult handle(AgentConversationRequest request, IntentDetectionResult intent,
+			Map<String, String> entities, List<String> missingData) {
+		String response = "Puedo revisar la información autorizada. ¿Sobre qué política, documento o servicio necesitas información?";
+		return result(request, intent, type(), entities, missing("tema_documental"), response, false, null);
+	}
 }

@@ -10,31 +10,31 @@ import java.util.UUID;
 @Table(name = "business")
 public class Business {
 
-    @Id
-    private UUID id;
+	@Id
+	private UUID id;
 
-    @Column(name = "business_name", nullable = false)
-    private String businessName;
+	@Column(name = "business_name", nullable = false)
+	private String businessName;
 
-    @Column(name = "timezone", nullable = false)
-    private String timezone;
+	@Column(name = "timezone", nullable = false)
+	private String timezone;
 
-    @Column(name = "active", nullable = false)
-    private boolean active;
+	@Column(name = "active", nullable = false)
+	private boolean active;
 
-    public UUID getId() {
-        return id;
-    }
+	public UUID getId() {
+		return id;
+	}
 
-    public String getBusinessName() {
-        return businessName;
-    }
+	public String getBusinessName() {
+		return businessName;
+	}
 
-    public String getTimezone() {
-        return timezone;
-    }
+	public String getTimezone() {
+		return timezone;
+	}
 
-    public boolean isActive() {
-        return active;
-    }
+	public boolean isActive() {
+		return active;
+	}
 }

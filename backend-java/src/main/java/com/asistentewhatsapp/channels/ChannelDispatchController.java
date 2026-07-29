@@ -18,21 +18,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/channels/messages")
 public class ChannelDispatchController {
 
-    private final ChannelDispatchService channelDispatchService;
+	private final ChannelDispatchService channelDispatchService;
 
-    public ChannelDispatchController(ChannelDispatchService channelDispatchService) {
-        this.channelDispatchService = channelDispatchService;
-    }
+	public ChannelDispatchController(ChannelDispatchService channelDispatchService) {
+		this.channelDispatchService = channelDispatchService;
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CHANNEL_MANAGE')")
-    @PostMapping("/dispatch")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public ChannelDispatchResponse dispatch(@AuthenticationPrincipal AuthenticatedUser authenticatedUser, @Valid @RequestBody ChannelDispatchRequest request) {
-        ChannelDispatchRequest secureRequest = new ChannelDispatchRequest(
-                authenticatedUser.businessId(),
-                request.channelType(),
-                request.recipientPhone(),
-                request.body());
-        return channelDispatchService.dispatch(secureRequest);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CHANNEL_MANAGE')")
+	@PostMapping("/dispatch")
+	@ResponseStatus(HttpStatus.ACCEPTED)
+	public ChannelDispatchResponse dispatch(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@Valid @RequestBody ChannelDispatchRequest request) {
+		ChannelDispatchRequest secureRequest = new ChannelDispatchRequest(authenticatedUser.businessId(),
+				request.channelType(), request.recipientPhone(), request.body());
+		return channelDispatchService.dispatch(secureRequest);
+	}
 }

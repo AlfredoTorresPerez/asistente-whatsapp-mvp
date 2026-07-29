@@ -6,11 +6,8 @@ import java.util.Map;
 
 public interface AgentHandler {
 
-    AgentType type();
+	AgentType type();
 
-    AgentRoutingResult handle(
-            AgentConversationRequest request,
-            IntentDetectionResult intent,
-            Map<String, String> entities,
-            List<String> missingData);
+	AgentRoutingResult handle(AgentConversationRequest request, IntentDetectionResult intent,
+			Map<String, String> entities, List<String> missingData);
 }

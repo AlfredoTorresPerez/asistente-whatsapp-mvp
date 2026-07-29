@@ -1,0 +1,2 @@
+FROM Qwen3-Coder:latest
+PARAMETER num_ctx 32768

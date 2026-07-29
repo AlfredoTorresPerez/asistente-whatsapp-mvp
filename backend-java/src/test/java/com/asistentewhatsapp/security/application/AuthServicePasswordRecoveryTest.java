@@ -14,7 +14,6 @@ import com.asistentewhatsapp.security.infrastructure.UserAccountRepository;
 import com.asistentewhatsapp.security.infrastructure.UserPermissionJdbcRepository;
 import com.asistentewhatsapp.security.infrastructure.UserRoleJdbcRepository;
 import com.asistentewhatsapp.security.infrastructure.UserSessionJdbcRepository;
-import com.asistentewhatsapp.security.application.RefreshTokenService;
 import com.asistentewhatsapp.shared.email.TransactionalEmailService;
 import com.asistentewhatsapp.shared.email.TransactionalEmailService.DeliveryStatus;
 import java.time.OffsetDateTime;
@@ -39,102 +38,79 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class AuthServicePasswordRecoveryTest {
 
-    private final UserAccountRepository userAccountRepository = mock(UserAccountRepository.class);
-    private final SecurityPolicyRepository securityPolicyRepository = mock(SecurityPolicyRepository.class);
-    private final BusinessRepository businessRepository = mock(BusinessRepository.class);
-    private final UserRoleJdbcRepository userRoleJdbcRepository = mock(UserRoleJdbcRepository.class);
-    private final UserPermissionJdbcRepository userPermissionJdbcRepository = mock(UserPermissionJdbcRepository.class);
-    private final PasswordResetTokenRepository passwordResetTokenRepository = mock(PasswordResetTokenRepository.class);
-    private final AuditLogJdbcRepository auditLogJdbcRepository = mock(AuditLogJdbcRepository.class);
-    private final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
-    private final JwtService jwtService = mock(JwtService.class);
-    private final PasswordPolicyService passwordPolicyService = mock(PasswordPolicyService.class);
-    private final SecurityUserMapper securityUserMapper = new SecurityUserMapper();
-    private final JwtProperties jwtProperties = new JwtProperties();
-    private final TransactionalEmailService transactionalEmailService = mock(TransactionalEmailService.class);
-    private final UserSessionJdbcRepository userSessionJdbcRepository = mock(UserSessionJdbcRepository.class);
-    private final RefreshTokenService refreshTokenService = mock(RefreshTokenService.class);
+	private final UserAccountRepository userAccountRepository = mock(UserAccountRepository.class);
+	private final SecurityPolicyRepository securityPolicyRepository = mock(SecurityPolicyRepository.class);
+	private final BusinessRepository businessRepository = mock(BusinessRepository.class);
+	private final UserRoleJdbcRepository userRoleJdbcRepository = mock(UserRoleJdbcRepository.class);
+	private final UserPermissionJdbcRepository userPermissionJdbcRepository = mock(UserPermissionJdbcRepository.class);
+	private final PasswordResetTokenRepository passwordResetTokenRepository = mock(PasswordResetTokenRepository.class);
+	private final AuditLogJdbcRepository auditLogJdbcRepository = mock(AuditLogJdbcRepository.class);
+	private final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
+	private final JwtService jwtService = mock(JwtService.class);
+	private final PasswordPolicyService passwordPolicyService = mock(PasswordPolicyService.class);
+	private final SecurityUserMapper securityUserMapper = new SecurityUserMapper();
+	private final JwtProperties jwtProperties = new JwtProperties();
+	private final TransactionalEmailService transactionalEmailService = mock(TransactionalEmailService.class);
+	private final UserSessionJdbcRepository userSessionJdbcRepository = mock(UserSessionJdbcRepository.class);
+	private final RefreshTokenService refreshTokenService = mock(RefreshTokenService.class);
 
-    @Test
-    void forgotPasswordStoresHashAndDoesNotAuditRawToken() {
-        UUID businessId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
-        UserAccountEntity user = userAccount(businessId, userId);
-        SecurityPolicyEntity policy = securityPolicy(businessId);
-        jwtProperties.setResetTokenExpiresInMinutes(30);
-        AuthService authService = new AuthService(
-                userAccountRepository,
-                securityPolicyRepository,
-                businessRepository,
-                userRoleJdbcRepository,
-                userPermissionJdbcRepository,
-                passwordResetTokenRepository,
-                auditLogJdbcRepository,
-                userSessionJdbcRepository,
-                passwordEncoder,
-                jwtService,
-                passwordPolicyService,
-                securityUserMapper,
-                jwtProperties,
-                refreshTokenService,
-                transactionalEmailService,
-                "http://localhost:5173");
+	@Test
+	void forgotPasswordStoresHashAndDoesNotAuditRawToken() {
+		UUID businessId = UUID.randomUUID();
+		UUID userId = UUID.randomUUID();
+		UserAccountEntity user = userAccount(businessId, userId);
+		SecurityPolicyEntity policy = securityPolicy(businessId);
+		jwtProperties.setResetTokenExpiresInMinutes(30);
+		AuthService authService = new AuthService(userAccountRepository, securityPolicyRepository, businessRepository,
+				userRoleJdbcRepository, userPermissionJdbcRepository, passwordResetTokenRepository,
+				auditLogJdbcRepository, userSessionJdbcRepository, passwordEncoder, jwtService, passwordPolicyService,
+				securityUserMapper, jwtProperties, refreshTokenService, transactionalEmailService,
+				"http://localhost:5173");
 
-        when(userAccountRepository.findByEmailIgnoreCase("admin@example.com")).thenReturn(Optional.of(user));
-        when(securityPolicyRepository.findByBusinessId(businessId)).thenReturn(Optional.of(policy));
-        when(passwordResetTokenRepository.findAllByUserIdAndConsumedAtIsNullAndExpiresAtAfter(eq(userId), any()))
-                .thenReturn(List.of());
-        when(transactionalEmailService.sendPasswordResetEmail(eq("admin@example.com"), eq("Admin Demo"), any(), any(), any()))
-                .thenReturn(DeliveryStatus.SIMULATED);
+		when(userAccountRepository.findByEmailIgnoreCase("admin@example.com")).thenReturn(Optional.of(user));
+		when(securityPolicyRepository.findByBusinessId(businessId)).thenReturn(Optional.of(policy));
+		when(passwordResetTokenRepository.findAllByUserIdAndConsumedAtIsNullAndExpiresAtAfter(eq(userId), any()))
+				.thenReturn(List.of());
+		when(transactionalEmailService.sendPasswordResetEmail(eq("admin@example.com"), eq("Admin Demo"), any(), any(),
+				any())).thenReturn(DeliveryStatus.SIMULATED);
 
-        authService.forgotPassword(new ForgotPasswordRequest("admin@example.com"));
+		authService.forgotPassword(new ForgotPasswordRequest("admin@example.com"));
 
-        ArgumentCaptor<PasswordResetTokenEntity> tokenCaptor = ArgumentCaptor.forClass(PasswordResetTokenEntity.class);
-        verify(passwordResetTokenRepository).save(tokenCaptor.capture());
-        assertThat(tokenCaptor.getValue().getTokenHash()).hasSize(64);
+		ArgumentCaptor<PasswordResetTokenEntity> tokenCaptor = ArgumentCaptor.forClass(PasswordResetTokenEntity.class);
+		verify(passwordResetTokenRepository).save(tokenCaptor.capture());
+		assertThat(tokenCaptor.getValue().getTokenHash()).hasSize(64);
 
-        @SuppressWarnings("unchecked")
-        ArgumentCaptor<Map<String, Object>> metadataCaptor = ArgumentCaptor.forClass(Map.class);
-        verify(auditLogJdbcRepository).insert(
-                eq(businessId),
-                eq(userId),
-                eq("PASSWORD_RECOVERY_REQUESTED"),
-                eq("USER_ACCOUNT"),
-                eq(userId),
-                any(),
-                metadataCaptor.capture(),
-                any(OffsetDateTime.class));
+		@SuppressWarnings("unchecked")
+		ArgumentCaptor<Map<String, Object>> metadataCaptor = ArgumentCaptor.forClass(Map.class);
+		verify(auditLogJdbcRepository).insert(eq(businessId), eq(userId), eq("PASSWORD_RECOVERY_REQUESTED"),
+				eq("USER_ACCOUNT"), eq(userId), any(), metadataCaptor.capture(), any(OffsetDateTime.class));
 
-        Map<String, Object> metadata = metadataCaptor.getValue();
-        assertThat(metadata).doesNotContainKey("resetTokenPreview");
-        assertThat(metadata.values()).allSatisfy(value -> assertThat(String.valueOf(value).length()).isNotEqualTo(48));
-        assertThat(metadata).containsEntry("status", "ACCEPTED");
-        verify(transactionalEmailService).sendPasswordResetEmail(
-                eq("admin@example.com"),
-                eq("Admin Demo"),
-                org.mockito.ArgumentMatchers.contains("/reset-password?token="),
-                any(),
-                any());
-    }
+		Map<String, Object> metadata = metadataCaptor.getValue();
+		assertThat(metadata).doesNotContainKey("resetTokenPreview");
+		assertThat(metadata.values()).allSatisfy(value -> assertThat(String.valueOf(value).length()).isNotEqualTo(48));
+		assertThat(metadata).containsEntry("status", "ACCEPTED");
+		verify(transactionalEmailService).sendPasswordResetEmail(eq("admin@example.com"), eq("Admin Demo"),
+				org.mockito.ArgumentMatchers.contains("/reset-password?token="), any(), any());
+	}
 
-    private UserAccountEntity userAccount(UUID businessId, UUID userId) {
-        UserAccountEntity user = new UserAccountEntity();
-        ReflectionTestUtils.setField(user, "id", userId);
-        ReflectionTestUtils.setField(user, "businessId", businessId);
-        ReflectionTestUtils.setField(user, "email", "admin@example.com");
-        ReflectionTestUtils.setField(user, "firstName", "Admin");
-        ReflectionTestUtils.setField(user, "lastName", "Demo");
-        user.setPasswordHash("hash");
-        user.setStatus(UserAccountStatus.ACTIVE);
-        user.setTimezone("America/Santiago");
-        return user;
-    }
+	private UserAccountEntity userAccount(UUID businessId, UUID userId) {
+		UserAccountEntity user = new UserAccountEntity();
+		ReflectionTestUtils.setField(user, "id", userId);
+		ReflectionTestUtils.setField(user, "businessId", businessId);
+		ReflectionTestUtils.setField(user, "email", "admin@example.com");
+		ReflectionTestUtils.setField(user, "firstName", "Admin");
+		ReflectionTestUtils.setField(user, "lastName", "Demo");
+		user.setPasswordHash("hash");
+		user.setStatus(UserAccountStatus.ACTIVE);
+		user.setTimezone("America/Santiago");
+		return user;
+	}
 
-    private SecurityPolicyEntity securityPolicy(UUID businessId) {
-        SecurityPolicyEntity policy = new SecurityPolicyEntity();
-        ReflectionTestUtils.setField(policy, "businessId", businessId);
-        ReflectionTestUtils.setField(policy, "passwordMinLength", 12);
-        ReflectionTestUtils.setField(policy, "maxFailedLoginAttempts", 5);
-        return policy;
-    }
+	private SecurityPolicyEntity securityPolicy(UUID businessId) {
+		SecurityPolicyEntity policy = new SecurityPolicyEntity();
+		ReflectionTestUtils.setField(policy, "businessId", businessId);
+		ReflectionTestUtils.setField(policy, "passwordMinLength", 12);
+		ReflectionTestUtils.setField(policy, "maxFailedLoginAttempts", 5);
+		return policy;
+	}
 }

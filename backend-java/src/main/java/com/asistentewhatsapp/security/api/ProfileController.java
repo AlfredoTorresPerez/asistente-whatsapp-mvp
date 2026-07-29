@@ -15,22 +15,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class ProfileController {
 
-    private final UserProfileService userProfileService;
+	private final UserProfileService userProfileService;
 
-    public ProfileController(UserProfileService userProfileService) {
-        this.userProfileService = userProfileService;
-    }
+	public ProfileController(UserProfileService userProfileService) {
+		this.userProfileService = userProfileService;
+	}
 
-    @GetMapping("/api/v1/users/me")
-    public UserProfileResponse profile(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        return userProfileService.getCurrentProfile(authenticatedUser);
-    }
+	@GetMapping("/api/v1/users/me")
+	public UserProfileResponse profile(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+		return userProfileService.getCurrentProfile(authenticatedUser);
+	}
 
-    @PatchMapping("/api/v1/users/me")
-    public UserProfileResponse updateProfile(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @Valid @RequestBody UpdateProfileRequest request) {
-        return userProfileService.updateCurrentProfile(authenticatedUser, request);
-    }
+	@PatchMapping("/api/v1/users/me")
+	public UserProfileResponse updateProfile(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@Valid @RequestBody UpdateProfileRequest request) {
+		return userProfileService.updateCurrentProfile(authenticatedUser, request);
+	}
 }
-

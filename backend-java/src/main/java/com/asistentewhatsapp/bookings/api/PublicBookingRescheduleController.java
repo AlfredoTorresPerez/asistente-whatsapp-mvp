@@ -18,52 +18,48 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/public/booking-reschedules/{token}")
 public class PublicBookingRescheduleController {
 
-    private final BookingPublicActionService bookingPublicActionService;
+	private final BookingPublicActionService bookingPublicActionService;
 
-    public PublicBookingRescheduleController(BookingPublicActionService bookingPublicActionService) {
-        this.bookingPublicActionService = bookingPublicActionService;
-    }
+	public PublicBookingRescheduleController(BookingPublicActionService bookingPublicActionService) {
+		this.bookingPublicActionService = bookingPublicActionService;
+	}
 
-    @GetMapping
-    public PublicBookingRescheduleResponse preview(@PathVariable String token) {
-        return bookingPublicActionService.previewReschedule(token);
-    }
+	@GetMapping
+	public PublicBookingRescheduleResponse preview(@PathVariable String token) {
+		return bookingPublicActionService.previewReschedule(token);
+	}
 
-    @PostMapping("/confirm")
-    public PublicBookingRescheduleResponse confirm(@PathVariable String token) {
-        return bookingPublicActionService.confirmReschedule(token);
-    }
+	@PostMapping("/confirm")
+	public PublicBookingRescheduleResponse confirm(@PathVariable String token) {
+		return bookingPublicActionService.confirmReschedule(token);
+	}
 
-    @GetMapping("/confirm")
-    public PublicBookingRescheduleResponse confirmViaGetFallback(@PathVariable String token) {
-        return bookingPublicActionService.confirmReschedule(token);
-    }
+	@GetMapping("/confirm")
+	public PublicBookingRescheduleResponse confirmViaGetFallback(@PathVariable String token) {
+		return bookingPublicActionService.confirmReschedule(token);
+	}
 
-    @PostMapping("/reject")
-    public PublicBookingRescheduleResponse reject(@PathVariable String token) {
-        return bookingPublicActionService.rejectReschedule(token);
-    }
+	@PostMapping("/reject")
+	public PublicBookingRescheduleResponse reject(@PathVariable String token) {
+		return bookingPublicActionService.rejectReschedule(token);
+	}
 
-    @GetMapping("/reject")
-    public PublicBookingRescheduleResponse rejectViaGetFallback(@PathVariable String token) {
-        return bookingPublicActionService.rejectReschedule(token);
-    }
+	@GetMapping("/reject")
+	public PublicBookingRescheduleResponse rejectViaGetFallback(@PathVariable String token) {
+		return bookingPublicActionService.rejectReschedule(token);
+	}
 
-    @GetMapping("/{bookingId}/availability")
-    public AgendaAvailabilityResponse availability(
-            @PathVariable String token,
-            @PathVariable UUID bookingId,
-            @RequestParam UUID serviceId,
-            @RequestParam UUID locationId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return bookingPublicActionService.getRescheduleAvailability(token, bookingId, serviceId, locationId, date);
-    }
+	@GetMapping("/{bookingId}/availability")
+	public AgendaAvailabilityResponse availability(@PathVariable String token, @PathVariable UUID bookingId,
+			@RequestParam UUID serviceId, @RequestParam UUID locationId,
+			@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+		return bookingPublicActionService.getRescheduleAvailability(token, bookingId, serviceId, locationId, date);
+	}
 
-    @PostMapping("/{bookingId}/reschedule")
-    public com.asistentewhatsapp.customerbookings.api.CustomerBookingItemResponse rescheduleBooking(
-            @PathVariable String token,
-            @PathVariable UUID bookingId,
-            @Valid @RequestBody PublicBookingRescheduleRequest request) {
-        return bookingPublicActionService.rescheduleBooking(token, bookingId, request);
-    }
+	@PostMapping("/{bookingId}/reschedule")
+	public com.asistentewhatsapp.customerbookings.api.CustomerBookingItemResponse rescheduleBooking(
+			@PathVariable String token, @PathVariable UUID bookingId,
+			@Valid @RequestBody PublicBookingRescheduleRequest request) {
+		return bookingPublicActionService.rescheduleBooking(token, bookingId, request);
+	}
 }

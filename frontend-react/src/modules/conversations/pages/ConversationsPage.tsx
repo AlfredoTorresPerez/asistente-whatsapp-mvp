@@ -1092,7 +1092,11 @@ export function ConversationsPage() {
     const unread = detailQuery.data?.unreadCount ?? 0
     if (unread <= 0) return
     if (markReadMutation.isPending) return
-    if (lastMarkedRef.current?.conversationId === conversationId && lastMarkedRef.current?.unreadCount === unread) return
+    if (
+      lastMarkedRef.current?.conversationId === conversationId &&
+      lastMarkedRef.current?.unreadCount === unread
+    )
+      return
 
     lastMarkedRef.current = { conversationId, unreadCount: unread }
     markReadMutation.mutate(conversationId)

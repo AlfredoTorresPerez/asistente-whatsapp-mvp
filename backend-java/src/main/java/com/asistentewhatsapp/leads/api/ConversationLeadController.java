@@ -17,20 +17,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class ConversationLeadController {
 
-    private final LeadService leadService;
+	private final LeadService leadService;
 
-    public ConversationLeadController(LeadService leadService) {
-        this.leadService = leadService;
-    }
+	public ConversationLeadController(LeadService leadService) {
+		this.leadService = leadService;
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LEAD_MANAGE')")
-    @PostMapping(
-            value = {"/api/v1/conversations/{conversationId}/prospects", "/api/v1/conversations/{conversationId}/leads"},
-            consumes = MediaType.APPLICATION_JSON_VALUE)
-    public LeadDetailResponse createFromConversation(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @PathVariable UUID conversationId,
-            @Valid @RequestBody CreateLeadFromConversationRequest request) {
-        return leadService.createFromConversation(authenticatedUser, conversationId, request);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LEAD_MANAGE')")
+	@PostMapping(value = {"/api/v1/conversations/{conversationId}/prospects",
+			"/api/v1/conversations/{conversationId}/leads"}, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public LeadDetailResponse createFromConversation(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@PathVariable UUID conversationId, @Valid @RequestBody CreateLeadFromConversationRequest request) {
+		return leadService.createFromConversation(authenticatedUser, conversationId, request);
+	}
 }

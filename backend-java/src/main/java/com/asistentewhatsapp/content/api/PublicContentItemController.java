@@ -18,33 +18,32 @@ import java.util.UUID;
 @RequestMapping(value = "/api/v1/public/v1/content-items", produces = MediaType.APPLICATION_JSON_VALUE)
 public class PublicContentItemController {
 
-    private final ContentItemService service;
-    private final MetaOnboardingRepository metaOnboardingRepository;
-    private final BusinessRepository businessRepository;
+	private final ContentItemService service;
+	private final MetaOnboardingRepository metaOnboardingRepository;
+	private final BusinessRepository businessRepository;
 
-    public PublicContentItemController(
-            ContentItemService service,
-            MetaOnboardingRepository metaOnboardingRepository,
-            BusinessRepository businessRepository) {
-        this.service = service;
-        this.metaOnboardingRepository = metaOnboardingRepository;
-        this.businessRepository = businessRepository;
-    }
+	public PublicContentItemController(ContentItemService service, MetaOnboardingRepository metaOnboardingRepository,
+			BusinessRepository businessRepository) {
+		this.service = service;
+		this.metaOnboardingRepository = metaOnboardingRepository;
+		this.businessRepository = businessRepository;
+	}
 
-    private UUID getDefaultBusinessId() {
-        return metaOnboardingRepository.findCentralizedChannel()
-                .map(channel -> businessRepository.findById(channel.businessId())
-                        .orElseThrow(() -> new IllegalStateException("El canal centralizado no tiene un negocio valido.")))
-                .orElseGet(() -> businessRepository.findFirstByActiveTrueOrderByCreatedAtAsc()
-                        .orElseThrow(() -> new IllegalStateException("No hay un negocio configurado en el sistema.")))
-                .getId();
-    }
+	private UUID getDefaultBusinessId() {
+		return metaOnboardingRepository.findCentralizedChannel()
+				.map(channel -> businessRepository.findById(channel.businessId()).orElseThrow(
+						() -> new IllegalStateException("El canal centralizado no tiene un negocio valido.")))
+				.orElseGet(() -> businessRepository.findFirstByActiveTrueOrderByCreatedAtAsc()
+						.orElseThrow(() -> new IllegalStateException("No hay un negocio configurado en el sistema.")))
+				.getId();
+	}
 
-    @GetMapping
-    public List<PublicContentItemResponse> list(
-            @RequestParam(required = false) String type) {
-        UUID businessId = getDefaultBusinessId();
-        ContentItemType contentType = type != null && !type.isBlank() ? ContentItemType.valueOf(type.toUpperCase()) : null;
-        return service.getPublicContent(businessId, contentType);
-    }
+	@GetMapping
+	public List<PublicContentItemResponse> list(@RequestParam(required = false) String type) {
+		UUID businessId = getDefaultBusinessId();
+		ContentItemType contentType = type != null && !type.isBlank()
+				? ContentItemType.valueOf(type.toUpperCase())
+				: null;
+		return service.getPublicContent(businessId, contentType);
+	}
 }

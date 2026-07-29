@@ -32,7 +32,6 @@ import {
   buildAppointmentWhatsAppMessage,
   buildWhatsAppUrl,
   normalizeWhatsAppPhone,
-  openWhatsAppUrl,
 } from '../../../lib/whatsapp'
 import {
   buildVisibleDays,
@@ -368,11 +367,20 @@ export function CompleteAgendaPage() {
       return
     }
 
-    let popup: Window | null = null
+    let url: string | null = null
     try {
-      popup = window.open('about:blank', '_blank', 'noopener,noreferrer')
+      const normalizedPhone = normalizeWhatsAppPhone(phone)
+      const message = selectedItem ? buildAppointmentWhatsAppMessage(selectedItem) : undefined
+      url = buildWhatsAppUrl(normalizedPhone, message)
     } catch {
-      /* popup blocked */
+      /* URL building failed */
+    }
+
+    if (url) {
+      const newWindow = window.open(url, '_blank', 'noopener,noreferrer')
+      if (newWindow) {
+        newWindow.opener = null
+      }
     }
 
     confirmWhatsAppMutation.mutate(bookingId, {
@@ -385,47 +393,32 @@ export function CompleteAgendaPage() {
         })
         void bookingDetailQuery.refetch()
         void calendarQuery.refetch()
-
-        try {
-          const normalizedPhone = normalizeWhatsAppPhone(phone)
-          const message = selectedItem
-            ? buildAppointmentWhatsAppMessage(selectedItem)
-            : undefined
-          const url = buildWhatsAppUrl(normalizedPhone, message)
-
-          if (popup && !popup.closed) {
-            popup.location.href = url
-          } else {
-            openWhatsAppUrl(url)
-          }
-        } catch {
-          /* URL building failed, confirmation was already sent */
-        }
       },
       onError: (error) => {
-        if (popup && !popup.closed) {
-          popup.close()
-        }
         const apiError = error as ApiClientError
         const code = apiError?.code
         let description = apiError?.message ?? 'Revisa la conexion del canal o intenta nuevamente.'
 
         if (apiError?.status === 409) {
           if (code === 'BOOKING_NOT_CONFIRMABLE') {
-            description = 'La cita no puede recibir confirmacion en su estado actual. Verifica que este pendiente o solicitada.'
+            description =
+              'La cita no puede recibir confirmacion en su estado actual. Verifica que este pendiente o solicitada.'
           } else if (code === 'BOOKING_SLOT_NOT_AVAILABLE') {
-            description = 'El horario ya esta ocupado. Actualiza la agenda para ver la disponibilidad actual.'
+            description =
+              'El horario ya esta ocupado. Actualiza la agenda para ver la disponibilidad actual.'
           } else if (code === 'BOOKING_PAYMENT_REQUIRED') {
             description = 'La cita requiere un pago antes de poder confirmarse.'
           } else {
-            description = apiError?.fieldErrors && Object.keys(apiError.fieldErrors).length > 0
-              ? Object.values(apiError.fieldErrors)[0]
-              : description
+            description =
+              apiError?.fieldErrors && Object.keys(apiError.fieldErrors).length > 0
+                ? Object.values(apiError.fieldErrors)[0]
+                : description
           }
         } else {
-          description = apiError?.fieldErrors && Object.keys(apiError.fieldErrors).length > 0
-            ? Object.values(apiError.fieldErrors)[0]
-            : description
+          description =
+            apiError?.fieldErrors && Object.keys(apiError.fieldErrors).length > 0
+              ? Object.values(apiError.fieldErrors)[0]
+              : description
         }
 
         showToast({
@@ -634,9 +627,7 @@ export function CompleteAgendaPage() {
           description="Eventos de estado, recordatorios y acciones operativas."
           title="Trazabilidad reciente"
         >
-          {bookingDetailQuery.isFetching ? (
-            <StatusBadge label="Actualizando" tone="info" />
-          ) : null}
+          {bookingDetailQuery.isFetching ? <StatusBadge label="Actualizando" tone="info" /> : null}
           <div className="space-y-2">
             {activityItems.length === 0 ? (
               <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50/50 p-3 text-xs text-slate-500">
@@ -760,7 +751,9 @@ export function CompleteAgendaPage() {
                     type="button"
                   >
                     <div className="flex items-center justify-between gap-3">
-                      <strong className="text-sm text-slate-900">{formatAgendaTime(slot.startsAt)}</strong>
+                      <strong className="text-sm text-slate-900">
+                        {formatAgendaTime(slot.startsAt)}
+                      </strong>
                       <StatusBadge
                         label={slot.available ? 'Disponible' : 'Bloqueado'}
                         tone={slot.available ? 'success' : 'danger'}

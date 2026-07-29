@@ -29,21 +29,58 @@ $ComposeFile = Join-Path $ROOT "docker-compose.local.yml"
 $EnvFile = Join-Path $ROOT ".env.local"
 $ErrorActionPreference = 'Stop'
 
+function Set-EnvValueFromFile {
+  param([string]$Key, [string]$FilePath)
+
+  if (-not (Test-Path $FilePath)) {
+    return
+  }
+
+  $pattern = "^$([regex]::Escape($Key))=(.*)$"
+  foreach ($line in Get-Content -Path $FilePath) {
+    if ($line -match $pattern) {
+      Set-Item -Path "env:$Key" -Value $Matches[1]
+      return
+    }
+  }
+}
+
 # ------------------------------------------------------------------------
 # Restaurar secretos desde Windows Credential Manager
 # ------------------------------------------------------------------------
 $RestoreScript = Join-Path $PSScriptRoot "restore-local-secrets.ps1"
 if (Test-Path $RestoreScript) {
   Write-Host "=== Restaurando secretos desde Windows Credential Manager ===" -ForegroundColor Cyan
+  $global:LASTEXITCODE = 0
   & $RestoreScript
   if ($LASTEXITCODE -ne 0) {
-    Write-Warn "Algunos secretos no estan en Credential Manager."
+    Write-Warning "Algunos secretos no estan en Credential Manager."
     Write-Host "Ejecuta .\scripts\store-local-secrets.ps1 para guardarlos" -ForegroundColor Yellow
   }
 } else {
-  Write-Warn "restore-local-secrets.ps1 no encontrado, secretos no seran restaurados"
+  Write-Warning "restore-local-secrets.ps1 no encontrado, secretos no seran restaurados"
 }
 # ------------------------------------------------------------------------
+
+# Docker Compose da precedencia a variables ya presentes en el shell por sobre
+# --env-file. Sincroniza valores no secretos que cambian por tunel/perfil para
+# evitar que un Env: antiguo reemplace lo definido en .env.local.
+foreach ($key in @(
+  "APP_WHATSAPP_CLOUD_API_WEBHOOK_PUBLIC_URL",
+  "APP_FRONTEND_PUBLIC_BASE_URL",
+  "APP_BOOKING_CONFIRMATION_PUBLIC_BASE_URL",
+  "APP_BOOKING_RESCHEDULE_PUBLIC_BASE_URL",
+  "APP_BOOKING_CANCELLATION_PUBLIC_BASE_URL",
+  "APP_BOOKING_PAYMENT_CHECKOUT_PUBLIC_BASE_URL",
+  "APP_AI_AGENTS_ENABLED",
+  "APP_AI_AGENTS_AUTO_REPLY_ENABLED",
+  "APP_AI_AGENTS_AUDIT_ENABLED",
+  "APP_AI_AGENTS_SAFE_MODE_ENABLED",
+  "APP_WHATSAPP_CLOUD_API_DRY_RUN_ENABLED",
+  "APP_OPENAI_ENABLED"
+)) {
+  Set-EnvValueFromFile -Key $key -FilePath $EnvFile
+}
 
 if (-not (Test-Path $ComposeFile)) {
   Write-Error "No se encuentra $ComposeFile"
@@ -55,7 +92,7 @@ $cmd = "docker compose"
 if (Test-Path $EnvFile) {
   $cmd += " --env-file `"$EnvFile`""
 } else {
-  Write-Warn ".env.local no encontrado, usando defaults"
+  Write-Warning ".env.local no encontrado, usando defaults"
 }
 
 $cmd += " -f `"$ComposeFile`""

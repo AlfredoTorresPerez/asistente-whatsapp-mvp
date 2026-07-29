@@ -1,0 +1,80 @@
+{
+  "metadata": {
+    "source": "documentacion\\conversacion\\intenciones_agenda_whatsapp_es419_actualizada.xlsx",
+    "sheet_counts": {
+      "Resumen": 10,
+      "Reservar": 73,
+      "Reprogramar": 67,
+      "Cancelar": 67,
+      "Taxonomia_Intenciones": 42,
+      "Ejemplos_Ampliados": 168,
+      "Escenarios_Multiturno": 36,
+      "Conversaciones_Multiturno": 118,
+      "Entidades_Estructuradas": 60,
+      "Casos_Negativos": 60,
+      "Contexto_Referencias": 45,
+      "Cambios_Intencion": 30,
+      "Multiples_Reservas": 25,
+      "Respuestas_Acciones": 47,
+      "Estados_Conversacion": 24,
+      "Transiciones_Conversacion": 30,
+      "Evaluacion_Dataset": 104,
+      "Cobertura_Dataset": 42,
+      "Ambiguas_Contexto": 10,
+      "Reglas_Modelo": 10,
+      "Fuentes": 18,
+      "Metodologia": 12
+    },
+    "warnings": []
+  },
+  "items": [
+    {
+      "campo": "Fecha de generación",
+      "descripcion": "2026-07-26"
+    },
+    {
+      "campo": "Versión",
+      "descripcion": "2.0 ampliada"
+    },
+    {
+      "campo": "Intenciones cubiertas",
+      "descripcion": "39 intenciones y controles conversacionales, además de reservar, reprogramar y cancelar."
+    },
+    {
+      "campo": "Conversaciones de varios turnos",
+      "descripcion": "Incluye estados antes/después, datos acumulados, acciones del servidor y resultado final."
+    },
+    {
+      "campo": "Extracción de entidades",
+      "descripcion": "Incluye empresa, sucursal, servicio, profesional, fechas, horas, franjas, cliente, cantidad de personas y referencias contextuales."
+    },
+    {
+      "campo": "Seguridad",
+      "descripcion": "Las acciones sensibles requieren validación de pertenencia, disponibilidad actual, confirmación explícita e idempotencia."
+    },
+    {
+      "campo": "Conjuntos sugeridos",
+      "descripcion": "entrenamiento, validación y prueba; mantener conversaciones completas dentro del mismo conjunto para evitar fuga de contexto."
+    },
+    {
+      "campo": "Criterio Alta",
+      "descripcion": "Mensaje explícito y contexto suficiente."
+    },
+    {
+      "campo": "Criterio Media",
+      "descripcion": "Mensaje probable, pero requiere contexto o aclaración."
+    },
+    {
+      "campo": "Criterio Baja",
+      "descripcion": "No ejecutar acciones; pedir aclaración o derivar."
+    },
+    {
+      "campo": "Región objetivo",
+      "descripcion": "es-419, con énfasis en vocabulario usado en Chile."
+    },
+    {
+      "campo": "Uso recomendado",
+      "descripcion": "Pruebas, reglas, ejemplos para instrucciones de un modelo y evaluación; no entrenar decisiones transaccionales directamente."
+    }
+  ]
+}

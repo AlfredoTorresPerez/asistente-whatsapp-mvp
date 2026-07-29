@@ -17,28 +17,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class ReportsController {
 
-    private final ReportsService reportsService;
+	private final ReportsService reportsService;
 
-    public ReportsController(ReportsService reportsService) {
-        this.reportsService = reportsService;
-    }
+	public ReportsController(ReportsService reportsService) {
+		this.reportsService = reportsService;
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'REPORTS_VIEW')")
-    @GetMapping("/api/v1/reports/summary")
-    public ReportsSummaryResponse summary(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
-            @RequestParam(required = false) UUID locationId,
-            @RequestParam(required = false) UUID professionalId,
-            @RequestParam(required = false) UUID serviceId,
-            @RequestParam(required = false) String bookingStatus,
-            @RequestParam(required = false) UUID ownerUserId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return reportsService.getSummary(
-                authenticatedUser, from, to,
-                locationId, professionalId, serviceId, bookingStatus, ownerUserId,
-                page, size);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'REPORTS_VIEW')")
+	@GetMapping("/api/v1/reports/summary")
+	public ReportsSummaryResponse summary(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+			@RequestParam(required = false) UUID locationId, @RequestParam(required = false) UUID professionalId,
+			@RequestParam(required = false) UUID serviceId, @RequestParam(required = false) String bookingStatus,
+			@RequestParam(required = false) UUID ownerUserId, @RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "20") int size) {
+		return reportsService.getSummary(authenticatedUser, from, to, locationId, professionalId, serviceId,
+				bookingStatus, ownerUserId, page, size);
+	}
 }

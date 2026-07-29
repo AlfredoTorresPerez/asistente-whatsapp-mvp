@@ -9,16 +9,13 @@ import org.springframework.data.repository.query.Param;
 
 public interface UserAccountRepository extends JpaRepository<UserAccountEntity, UUID> {
 
-    Optional<UserAccountEntity> findByEmailIgnoreCase(String email);
+	Optional<UserAccountEntity> findByEmailIgnoreCase(String email);
 
-    @Query("""
-            select user
-            from UserAccountEntity user
-            where user.id = :userId
-              and user.businessId = :businessId
-            """)
-    Optional<UserAccountEntity> findScopedById(
-            @Param("businessId") UUID businessId,
-            @Param("userId") UUID userId);
+	@Query("""
+			select user
+			from UserAccountEntity user
+			where user.id = :userId
+			  and user.businessId = :businessId
+			""")
+	Optional<UserAccountEntity> findScopedById(@Param("businessId") UUID businessId, @Param("userId") UUID userId);
 }
-

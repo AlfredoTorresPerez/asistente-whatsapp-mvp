@@ -18,7 +18,12 @@ export function CalendarWeekNavigation({
   const daysFromMonday = (weekStart.day() + 6) % 7
   const monday = weekStart.subtract(daysFromMonday, 'day')
   const sunday = monday.add(6, 'day')
-  const isCurrentWeek = monday.isSame(dayjs(today).startOf('day').subtract((dayjs(today).day() + 6) % 7, 'day'), 'day')
+  const isCurrentWeek = monday.isSame(
+    dayjs(today)
+      .startOf('day')
+      .subtract((dayjs(today).day() + 6) % 7, 'day'),
+    'day',
+  )
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 px-1 pb-3">
@@ -31,7 +36,12 @@ export function CalendarWeekNavigation({
             aria-label="Semana anterior"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </Button>
           <Button

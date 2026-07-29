@@ -1,0 +1,2762 @@
+[
+  {
+    "number": 1,
+    "section": "Inicio, orientación y ayuda general",
+    "expectedIntent": "`ORIENTACIÓN_GENERAL / SOLICITUD_PERSONA`",
+    "text": "Hola, ¿me pueden ayudar?"
+  },
+  {
+    "number": 2,
+    "section": "Inicio, orientación y ayuda general",
+    "expectedIntent": "`ORIENTACIÓN_GENERAL / SOLICITUD_PERSONA`",
+    "text": "Quisiera hacer una consulta."
+  },
+  {
+    "number": 3,
+    "section": "Inicio, orientación y ayuda general",
+    "expectedIntent": "`ORIENTACIÓN_GENERAL / SOLICITUD_PERSONA`",
+    "text": "¿Qué cosas puedo hacer por este WhatsApp?"
+  },
+  {
+    "number": 4,
+    "section": "Inicio, orientación y ayuda general",
+    "expectedIntent": "`ORIENTACIÓN_GENERAL / SOLICITUD_PERSONA`",
+    "text": "Necesito información del centro."
+  },
+  {
+    "number": 5,
+    "section": "Inicio, orientación y ayuda general",
+    "expectedIntent": "`ORIENTACIÓN_GENERAL / SOLICITUD_PERSONA`",
+    "text": "¿Me puedes orientar?"
+  },
+  {
+    "number": 6,
+    "section": "Inicio, orientación y ayuda general",
+    "expectedIntent": "`ORIENTACIÓN_GENERAL / SOLICITUD_PERSONA`",
+    "text": "No sé por dónde empezar."
+  },
+  {
+    "number": 7,
+    "section": "Inicio, orientación y ayuda general",
+    "expectedIntent": "`ORIENTACIÓN_GENERAL / SOLICITUD_PERSONA`",
+    "text": "Quiero hablar con alguien de recepción."
+  },
+  {
+    "number": 8,
+    "section": "Inicio, orientación y ayuda general",
+    "expectedIntent": "`ORIENTACIÓN_GENERAL / SOLICITUD_PERSONA`",
+    "text": "Necesito hablar con una persona."
+  },
+  {
+    "number": 9,
+    "section": "Inicio, orientación y ayuda general",
+    "expectedIntent": "`ORIENTACIÓN_GENERAL / SOLICITUD_PERSONA`",
+    "text": "¿Me puede atender un ejecutivo?"
+  },
+  {
+    "number": 10,
+    "section": "Inicio, orientación y ayuda general",
+    "expectedIntent": "`ORIENTACIÓN_GENERAL / SOLICITUD_PERSONA`",
+    "text": "Quiero que me llame alguien del centro."
+  },
+  {
+    "number": 11,
+    "section": "Inicio, orientación y ayuda general",
+    "expectedIntent": "`ORIENTACIÓN_GENERAL / SOLICITUD_PERSONA`",
+    "text": "¿Pueden contactarme por teléfono?"
+  },
+  {
+    "number": 12,
+    "section": "Inicio, orientación y ayuda general",
+    "expectedIntent": "`ORIENTACIÓN_GENERAL / SOLICITUD_PERSONA`",
+    "text": "Tengo una situación especial y necesito ayuda."
+  },
+  {
+    "number": 13,
+    "section": "Consulta de servicios y tratamientos",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / CONSULTA_COMERCIAL`",
+    "text": "¿Qué servicios tienen disponibles?"
+  },
+  {
+    "number": 14,
+    "section": "Consulta de servicios y tratamientos",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / CONSULTA_COMERCIAL`",
+    "text": "¿Qué tratamientos realizan?"
+  },
+  {
+    "number": 15,
+    "section": "Consulta de servicios y tratamientos",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / CONSULTA_COMERCIAL`",
+    "text": "¿Qué servicios faciales ofrecen?"
+  },
+  {
+    "number": 16,
+    "section": "Consulta de servicios y tratamientos",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / CONSULTA_COMERCIAL`",
+    "text": "¿Qué servicios corporales tienen?"
+  },
+  {
+    "number": 17,
+    "section": "Consulta de servicios y tratamientos",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / CONSULTA_COMERCIAL`",
+    "text": "¿Tienen limpieza facial?"
+  },
+  {
+    "number": 18,
+    "section": "Consulta de servicios y tratamientos",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / CONSULTA_COMERCIAL`",
+    "text": "¿Realizan depilación láser?"
+  },
+  {
+    "number": 19,
+    "section": "Consulta de servicios y tratamientos",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / CONSULTA_COMERCIAL`",
+    "text": "¿Hacen masajes?"
+  },
+  {
+    "number": 20,
+    "section": "Consulta de servicios y tratamientos",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / CONSULTA_COMERCIAL`",
+    "text": "¿Tienen manicure y pedicure?"
+  },
+  {
+    "number": 21,
+    "section": "Consulta de servicios y tratamientos",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / CONSULTA_COMERCIAL`",
+    "text": "¿Qué incluye la limpieza facial profunda?"
+  },
+  {
+    "number": 22,
+    "section": "Consulta de servicios y tratamientos",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / CONSULTA_COMERCIAL`",
+    "text": "¿Cuánto dura este tratamiento?"
+  },
+  {
+    "number": 23,
+    "section": "Consulta de servicios y tratamientos",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / CONSULTA_COMERCIAL`",
+    "text": "¿En qué consiste el servicio?"
+  },
+  {
+    "number": 24,
+    "section": "Consulta de servicios y tratamientos",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / CONSULTA_COMERCIAL`",
+    "text": "¿Este tratamiento es invasivo?"
+  },
+  {
+    "number": 25,
+    "section": "Consulta de servicios y tratamientos",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / CONSULTA_COMERCIAL`",
+    "text": "¿Cuántas sesiones necesito?"
+  },
+  {
+    "number": 26,
+    "section": "Consulta de servicios y tratamientos",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / CONSULTA_COMERCIAL`",
+    "text": "¿Qué resultados puedo esperar?"
+  },
+  {
+    "number": 27,
+    "section": "Consulta de servicios y tratamientos",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / CONSULTA_COMERCIAL`",
+    "text": "¿Este servicio necesita evaluación previa?"
+  },
+  {
+    "number": 28,
+    "section": "Consulta de servicios y tratamientos",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / CONSULTA_COMERCIAL`",
+    "text": "¿Puedo reservar directamente o primero necesito una evaluación?"
+  },
+  {
+    "number": 29,
+    "section": "Consulta de servicios y tratamientos",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / CONSULTA_COMERCIAL`",
+    "text": "¿Qué requisitos tiene el tratamiento?"
+  },
+  {
+    "number": 30,
+    "section": "Consulta de servicios y tratamientos",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / CONSULTA_COMERCIAL`",
+    "text": "¿Qué servicio está disponible en mi sucursal?"
+  },
+  {
+    "number": 31,
+    "section": "Consulta de servicios y tratamientos",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / CONSULTA_COMERCIAL`",
+    "text": "No encuentro el servicio que busco, ¿lo realizan?"
+  },
+  {
+    "number": 32,
+    "section": "Consulta de servicios y tratamientos",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / CONSULTA_COMERCIAL`",
+    "text": "¿Tienen otro tratamiento parecido?"
+  },
+  {
+    "number": 33,
+    "section": "Consulta de servicios y tratamientos",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / CONSULTA_COMERCIAL`",
+    "text": "Quiero un servicio distinto a los que aparecen en la lista."
+  },
+  {
+    "number": 34,
+    "section": "Consulta de servicios y tratamientos",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / CONSULTA_COMERCIAL`",
+    "text": "¿Puedo escribir el nombre del tratamiento que necesito?"
+  },
+  {
+    "number": 35,
+    "section": "Recomendación de servicios",
+    "expectedIntent": "`RECOMENDACIÓN_SERVICIO`",
+    "text": "No sé qué tratamiento necesito, ¿me pueden orientar?"
+  },
+  {
+    "number": 36,
+    "section": "Recomendación de servicios",
+    "expectedIntent": "`RECOMENDACIÓN_SERVICIO`",
+    "text": "¿Qué me recomiendan para piel sensible?"
+  },
+  {
+    "number": 37,
+    "section": "Recomendación de servicios",
+    "expectedIntent": "`RECOMENDACIÓN_SERVICIO`",
+    "text": "¿Qué tratamiento sirve para hidratar la piel?"
+  },
+  {
+    "number": 38,
+    "section": "Recomendación de servicios",
+    "expectedIntent": "`RECOMENDACIÓN_SERVICIO`",
+    "text": "¿Qué me recomiendan para manchas?"
+  },
+  {
+    "number": 39,
+    "section": "Recomendación de servicios",
+    "expectedIntent": "`RECOMENDACIÓN_SERVICIO`",
+    "text": "¿Qué servicio sirve para una limpieza profunda?"
+  },
+  {
+    "number": 40,
+    "section": "Recomendación de servicios",
+    "expectedIntent": "`RECOMENDACIÓN_SERVICIO`",
+    "text": "Quiero mejorar mi piel, pero no sé qué elegir."
+  },
+  {
+    "number": 41,
+    "section": "Recomendación de servicios",
+    "expectedIntent": "`RECOMENDACIÓN_SERVICIO`",
+    "text": "Busco algo no invasivo."
+  },
+  {
+    "number": 42,
+    "section": "Recomendación de servicios",
+    "expectedIntent": "`RECOMENDACIÓN_SERVICIO`",
+    "text": "Quiero un tratamiento para relajarme."
+  },
+  {
+    "number": 43,
+    "section": "Recomendación de servicios",
+    "expectedIntent": "`RECOMENDACIÓN_SERVICIO`",
+    "text": "¿Qué tratamiento me conviene antes de un evento?"
+  },
+  {
+    "number": 44,
+    "section": "Recomendación de servicios",
+    "expectedIntent": "`RECOMENDACIÓN_SERVICIO`",
+    "text": "¿Cuál es la diferencia entre estos dos servicios?"
+  },
+  {
+    "number": 45,
+    "section": "Recomendación de servicios",
+    "expectedIntent": "`RECOMENDACIÓN_SERVICIO`",
+    "text": "¿Qué servicio es mejor para mí?"
+  },
+  {
+    "number": 46,
+    "section": "Recomendación de servicios",
+    "expectedIntent": "`RECOMENDACIÓN_SERVICIO`",
+    "text": "¿Necesito una evaluación para que me recomienden algo?"
+  },
+  {
+    "number": 47,
+    "section": "Recomendación de servicios",
+    "expectedIntent": "`RECOMENDACIÓN_SERVICIO`",
+    "text": "¿Me pueden recomendar un tratamiento según mi necesidad?"
+  },
+  {
+    "number": 48,
+    "section": "Recomendación de servicios",
+    "expectedIntent": "`RECOMENDACIÓN_SERVICIO`",
+    "text": "¿Puedo hablar con una profesional antes de reservar?"
+  },
+  {
+    "number": 49,
+    "section": "Precios, promociones y cotizaciones",
+    "expectedIntent": "`CONSULTA_PRECIO / SOLICITUD_COTIZACIÓN`",
+    "text": "¿Cuánto cuesta la limpieza facial?"
+  },
+  {
+    "number": 50,
+    "section": "Precios, promociones y cotizaciones",
+    "expectedIntent": "`CONSULTA_PRECIO / SOLICITUD_COTIZACIÓN`",
+    "text": "¿Cuál es el precio del tratamiento?"
+  },
+  {
+    "number": 51,
+    "section": "Precios, promociones y cotizaciones",
+    "expectedIntent": "`CONSULTA_PRECIO / SOLICITUD_COTIZACIÓN`",
+    "text": "¿Cuánto vale una sesión?"
+  },
+  {
+    "number": 52,
+    "section": "Precios, promociones y cotizaciones",
+    "expectedIntent": "`CONSULTA_PRECIO / SOLICITUD_COTIZACIÓN`",
+    "text": "¿El precio cambia según la sucursal?"
+  },
+  {
+    "number": 53,
+    "section": "Precios, promociones y cotizaciones",
+    "expectedIntent": "`CONSULTA_PRECIO / SOLICITUD_COTIZACIÓN`",
+    "text": "¿El precio cambia según la profesional?"
+  },
+  {
+    "number": 54,
+    "section": "Precios, promociones y cotizaciones",
+    "expectedIntent": "`CONSULTA_PRECIO / SOLICITUD_COTIZACIÓN`",
+    "text": "¿Tienen promociones vigentes?"
+  },
+  {
+    "number": 55,
+    "section": "Precios, promociones y cotizaciones",
+    "expectedIntent": "`CONSULTA_PRECIO / SOLICITUD_COTIZACIÓN`",
+    "text": "¿Tienen descuentos por varias sesiones?"
+  },
+  {
+    "number": 56,
+    "section": "Precios, promociones y cotizaciones",
+    "expectedIntent": "`CONSULTA_PRECIO / SOLICITUD_COTIZACIÓN`",
+    "text": "¿Hay paquetes de tratamientos?"
+  },
+  {
+    "number": 57,
+    "section": "Precios, promociones y cotizaciones",
+    "expectedIntent": "`CONSULTA_PRECIO / SOLICITUD_COTIZACIÓN`",
+    "text": "¿Me pueden enviar una cotización?"
+  },
+  {
+    "number": 58,
+    "section": "Precios, promociones y cotizaciones",
+    "expectedIntent": "`CONSULTA_PRECIO / SOLICITUD_COTIZACIÓN`",
+    "text": "¿Cuánto cuesta el paquete completo?"
+  },
+  {
+    "number": 59,
+    "section": "Precios, promociones y cotizaciones",
+    "expectedIntent": "`CONSULTA_PRECIO / SOLICITUD_COTIZACIÓN`",
+    "text": "¿El valor incluye todos los insumos?"
+  },
+  {
+    "number": 60,
+    "section": "Precios, promociones y cotizaciones",
+    "expectedIntent": "`CONSULTA_PRECIO / SOLICITUD_COTIZACIÓN`",
+    "text": "¿El precio incluye la evaluación?"
+  },
+  {
+    "number": 61,
+    "section": "Precios, promociones y cotizaciones",
+    "expectedIntent": "`CONSULTA_PRECIO / SOLICITUD_COTIZACIÓN`",
+    "text": "¿Hay algún costo adicional?"
+  },
+  {
+    "number": 62,
+    "section": "Precios, promociones y cotizaciones",
+    "expectedIntent": "`CONSULTA_PRECIO / SOLICITUD_COTIZACIÓN`",
+    "text": "¿Cuánto debo pagar para reservar?"
+  },
+  {
+    "number": 63,
+    "section": "Precios, promociones y cotizaciones",
+    "expectedIntent": "`CONSULTA_PRECIO / SOLICITUD_COTIZACIÓN`",
+    "text": "¿El abono se descuenta del total?"
+  },
+  {
+    "number": 64,
+    "section": "Precios, promociones y cotizaciones",
+    "expectedIntent": "`CONSULTA_PRECIO / SOLICITUD_COTIZACIÓN`",
+    "text": "¿Puedo pagar el total el día de la atención?"
+  },
+  {
+    "number": 65,
+    "section": "Precios, promociones y cotizaciones",
+    "expectedIntent": "`CONSULTA_PRECIO / SOLICITUD_COTIZACIÓN`",
+    "text": "¿Tienen precio especial por primera atención?"
+  },
+  {
+    "number": 66,
+    "section": "Precios, promociones y cotizaciones",
+    "expectedIntent": "`CONSULTA_PRECIO / SOLICITUD_COTIZACIÓN`",
+    "text": "¿La promoción aplica en todas las sucursales?"
+  },
+  {
+    "number": 67,
+    "section": "Solicitud inicial de reserva",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "Quiero reservar una hora."
+  },
+  {
+    "number": 68,
+    "section": "Solicitud inicial de reserva",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "Necesito agendar una hora."
+  },
+  {
+    "number": 69,
+    "section": "Solicitud inicial de reserva",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "Quiero pedir una cita."
+  },
+  {
+    "number": 70,
+    "section": "Solicitud inicial de reserva",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "¿Me pueden dar una hora?"
+  },
+  {
+    "number": 71,
+    "section": "Solicitud inicial de reserva",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "Necesito un cupo."
+  },
+  {
+    "number": 72,
+    "section": "Solicitud inicial de reserva",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "Quiero tomar una hora."
+  },
+  {
+    "number": 73,
+    "section": "Solicitud inicial de reserva",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "Quisiera reservar un tratamiento."
+  },
+  {
+    "number": 74,
+    "section": "Solicitud inicial de reserva",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "¿Cómo puedo agendar?"
+  },
+  {
+    "number": 75,
+    "section": "Solicitud inicial de reserva",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "¿Puedo reservar por WhatsApp?"
+  },
+  {
+    "number": 76,
+    "section": "Solicitud inicial de reserva",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "Quiero hacer una reserva."
+  },
+  {
+    "number": 77,
+    "section": "Solicitud inicial de reserva",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "Necesito una cita para esta semana."
+  },
+  {
+    "number": 78,
+    "section": "Solicitud inicial de reserva",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "Quiero agendar para mañana."
+  },
+  {
+    "number": 79,
+    "section": "Solicitud inicial de reserva",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "¿Me pueden anotar para una atención?"
+  },
+  {
+    "number": 80,
+    "section": "Solicitud inicial de reserva",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "Necesito atenderme lo antes posible."
+  },
+  {
+    "number": 81,
+    "section": "Solicitud inicial de reserva",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "Quiero reservar para otra persona."
+  },
+  {
+    "number": 82,
+    "section": "Solicitud inicial de reserva",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "Quiero agendarle una hora a mi hija."
+  },
+  {
+    "number": 83,
+    "section": "Solicitud inicial de reserva",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "Quiero reservar dos horas distintas."
+  },
+  {
+    "number": 84,
+    "section": "Solicitud inicial de reserva",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "Quiero reservar más de un servicio."
+  },
+  {
+    "number": 85,
+    "section": "Solicitud inicial de reserva",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "Quiero reservar para dos personas."
+  },
+  {
+    "number": 86,
+    "section": "Solicitud inicial de reserva",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "Quiero una hora, pero todavía no sé qué servicio elegir."
+  },
+  {
+    "number": 87,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "Quiero una hora para hoy."
+  },
+  {
+    "number": 88,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "Quiero reservar para mañana."
+  },
+  {
+    "number": 89,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Tienen horas para el viernes?"
+  },
+  {
+    "number": 90,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Hay disponibilidad esta semana?"
+  },
+  {
+    "number": 91,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Qué horas tienen para la próxima semana?"
+  },
+  {
+    "number": 92,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Tienen algo en la mañana?"
+  },
+  {
+    "number": 93,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Tienen horas en la tarde?"
+  },
+  {
+    "number": 94,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "Necesito una hora después de las seis."
+  },
+  {
+    "number": 95,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Cuál es la primera hora disponible?"
+  },
+  {
+    "number": 96,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Cuál es la última hora disponible?"
+  },
+  {
+    "number": 97,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Tienen un cupo a las diez?"
+  },
+  {
+    "number": 98,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Está disponible el horario de las quince horas?"
+  },
+  {
+    "number": 99,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Hay horas el sábado?"
+  },
+  {
+    "number": 100,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Atienden los domingos?"
+  },
+  {
+    "number": 101,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Tienen disponibilidad en un feriado?"
+  },
+  {
+    "number": 102,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Puedo reservar para el próximo mes?"
+  },
+  {
+    "number": 103,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Con cuánta anticipación puedo reservar?"
+  },
+  {
+    "number": 104,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Puedo reservar para una fecha muy lejana?"
+  },
+  {
+    "number": 105,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Puedo reservar una hora para ayer?"
+  },
+  {
+    "number": 106,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿El horario que aparece considera la duración completa del servicio?"
+  },
+  {
+    "number": 107,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Hay un horario más temprano?"
+  },
+  {
+    "number": 108,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Hay un horario más tarde?"
+  },
+  {
+    "number": 109,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Qué alternativa tienen cerca de las cuatro?"
+  },
+  {
+    "number": 110,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Tienen dos horarios consecutivos?"
+  },
+  {
+    "number": 111,
+    "section": "Selección de fecha y horario",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Puedo elegir un tramo horario en vez de una hora exacta?"
+  },
+  {
+    "number": 112,
+    "section": "Consulta de disponibilidad real",
+    "expectedIntent": "`CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Tienen horas disponibles para una limpieza facial?"
+  },
+  {
+    "number": 113,
+    "section": "Consulta de disponibilidad real",
+    "expectedIntent": "`CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Qué horarios quedan libres hoy?"
+  },
+  {
+    "number": 114,
+    "section": "Consulta de disponibilidad real",
+    "expectedIntent": "`CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Hay algún cupo disponible mañana?"
+  },
+  {
+    "number": 115,
+    "section": "Consulta de disponibilidad real",
+    "expectedIntent": "`CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Tienen una hora libre con cualquier profesional?"
+  },
+  {
+    "number": 116,
+    "section": "Consulta de disponibilidad real",
+    "expectedIntent": "`CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Hay disponibilidad en cualquier sucursal?"
+  },
+  {
+    "number": 117,
+    "section": "Consulta de disponibilidad real",
+    "expectedIntent": "`CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Qué sede tiene la hora más próxima?"
+  },
+  {
+    "number": 118,
+    "section": "Consulta de disponibilidad real",
+    "expectedIntent": "`CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Hay una cabina disponible para ese tratamiento?"
+  },
+  {
+    "number": 119,
+    "section": "Consulta de disponibilidad real",
+    "expectedIntent": "`CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Está disponible la máquina necesaria para el servicio?"
+  },
+  {
+    "number": 120,
+    "section": "Consulta de disponibilidad real",
+    "expectedIntent": "`CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Puedo reservar si la profesional está libre, pero la cabina está ocupada?"
+  },
+  {
+    "number": 121,
+    "section": "Consulta de disponibilidad real",
+    "expectedIntent": "`CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Queda capacidad para una atención grupal?"
+  },
+  {
+    "number": 122,
+    "section": "Consulta de disponibilidad real",
+    "expectedIntent": "`CONSULTA_DISPONIBILIDAD`",
+    "text": "¿El horario sigue disponible?"
+  },
+  {
+    "number": 123,
+    "section": "Consulta de disponibilidad real",
+    "expectedIntent": "`CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Pueden verificar nuevamente el cupo?"
+  },
+  {
+    "number": 124,
+    "section": "Consulta de disponibilidad real",
+    "expectedIntent": "`CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Por qué no aparece el horario de las cuatro?"
+  },
+  {
+    "number": 125,
+    "section": "Consulta de disponibilidad real",
+    "expectedIntent": "`CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Hay alguna pausa o bloqueo a esa hora?"
+  },
+  {
+    "number": 126,
+    "section": "Consulta de disponibilidad real",
+    "expectedIntent": "`CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Pueden ofrecerme horarios cercanos al que elegí?"
+  },
+  {
+    "number": 127,
+    "section": "Consulta de disponibilidad real",
+    "expectedIntent": "`CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Qué horarios reales quedan después de considerar la duración del tratamiento?"
+  },
+  {
+    "number": 128,
+    "section": "Consulta de disponibilidad real",
+    "expectedIntent": "`CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Existe un cupo si no elijo profesional?"
+  },
+  {
+    "number": 129,
+    "section": "Consulta de disponibilidad real",
+    "expectedIntent": "`CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Hay disponibilidad con otro equipo o cabina?"
+  },
+  {
+    "number": 130,
+    "section": "Sucursales, dirección y cobertura",
+    "expectedIntent": "`CONSULTA_UBICACIÓN / SOLICITUD_RESERVA`",
+    "text": "¿Dónde están ubicados?"
+  },
+  {
+    "number": 131,
+    "section": "Sucursales, dirección y cobertura",
+    "expectedIntent": "`CONSULTA_UBICACIÓN / SOLICITUD_RESERVA`",
+    "text": "¿Cuál es la dirección de la sucursal?"
+  },
+  {
+    "number": 132,
+    "section": "Sucursales, dirección y cobertura",
+    "expectedIntent": "`CONSULTA_UBICACIÓN / SOLICITUD_RESERVA`",
+    "text": "¿Qué sucursales tienen?"
+  },
+  {
+    "number": 133,
+    "section": "Sucursales, dirección y cobertura",
+    "expectedIntent": "`CONSULTA_UBICACIÓN / SOLICITUD_RESERVA`",
+    "text": "¿Cuál es la sucursal más cercana?"
+  },
+  {
+    "number": 134,
+    "section": "Sucursales, dirección y cobertura",
+    "expectedIntent": "`CONSULTA_UBICACIÓN / SOLICITUD_RESERVA`",
+    "text": "Estoy en Providencia, ¿qué sucursal me conviene?"
+  },
+  {
+    "number": 135,
+    "section": "Sucursales, dirección y cobertura",
+    "expectedIntent": "`CONSULTA_UBICACIÓN / SOLICITUD_RESERVA`",
+    "text": "¿Tienen una sede en Las Condes?"
+  },
+  {
+    "number": 136,
+    "section": "Sucursales, dirección y cobertura",
+    "expectedIntent": "`CONSULTA_UBICACIÓN / SOLICITUD_RESERVA`",
+    "text": "¿Este tratamiento está disponible en todas las sucursales?"
+  },
+  {
+    "number": 137,
+    "section": "Sucursales, dirección y cobertura",
+    "expectedIntent": "`CONSULTA_UBICACIÓN / SOLICITUD_RESERVA`",
+    "text": "¿En qué sucursal realizan este servicio?"
+  },
+  {
+    "number": 138,
+    "section": "Sucursales, dirección y cobertura",
+    "expectedIntent": "`CONSULTA_UBICACIÓN / SOLICITUD_RESERVA`",
+    "text": "¿Qué horarios tiene la sucursal de Providencia?"
+  },
+  {
+    "number": 139,
+    "section": "Sucursales, dirección y cobertura",
+    "expectedIntent": "`CONSULTA_UBICACIÓN / SOLICITUD_RESERVA`",
+    "text": "¿La sucursal abre los sábados?"
+  },
+  {
+    "number": 140,
+    "section": "Sucursales, dirección y cobertura",
+    "expectedIntent": "`CONSULTA_UBICACIÓN / SOLICITUD_RESERVA`",
+    "text": "¿La sede estará abierta el feriado?"
+  },
+  {
+    "number": 141,
+    "section": "Sucursales, dirección y cobertura",
+    "expectedIntent": "`CONSULTA_UBICACIÓN / SOLICITUD_RESERVA`",
+    "text": "¿Tienen estacionamiento?"
+  },
+  {
+    "number": 142,
+    "section": "Sucursales, dirección y cobertura",
+    "expectedIntent": "`CONSULTA_UBICACIÓN / SOLICITUD_RESERVA`",
+    "text": "¿Cómo llego a la sucursal?"
+  },
+  {
+    "number": 143,
+    "section": "Sucursales, dirección y cobertura",
+    "expectedIntent": "`CONSULTA_UBICACIÓN / SOLICITUD_RESERVA`",
+    "text": "¿Tienen alguna referencia para encontrar el lugar?"
+  },
+  {
+    "number": 144,
+    "section": "Sucursales, dirección y cobertura",
+    "expectedIntent": "`CONSULTA_UBICACIÓN / SOLICITUD_RESERVA`",
+    "text": "¿La atención es presencial o a domicilio?"
+  },
+  {
+    "number": 145,
+    "section": "Sucursales, dirección y cobertura",
+    "expectedIntent": "`CONSULTA_UBICACIÓN / SOLICITUD_RESERVA`",
+    "text": "¿Puedo elegir cualquier sucursal?"
+  },
+  {
+    "number": 146,
+    "section": "Sucursales, dirección y cobertura",
+    "expectedIntent": "`CONSULTA_UBICACIÓN / SOLICITUD_RESERVA`",
+    "text": "¿Puedo cambiar mi reserva a otra sucursal?"
+  },
+  {
+    "number": 147,
+    "section": "Sucursales, dirección y cobertura",
+    "expectedIntent": "`CONSULTA_UBICACIÓN / SOLICITUD_RESERVA`",
+    "text": "¿El precio cambia si elijo otra sede?"
+  },
+  {
+    "number": 148,
+    "section": "Sucursales, dirección y cobertura",
+    "expectedIntent": "`CONSULTA_UBICACIÓN / SOLICITUD_RESERVA`",
+    "text": "¿Las políticas de cancelación son iguales en todas las sucursales?"
+  },
+  {
+    "number": 149,
+    "section": "Sucursales, dirección y cobertura",
+    "expectedIntent": "`CONSULTA_UBICACIÓN / SOLICITUD_RESERVA`",
+    "text": "¿Hay disponibilidad en otra sucursal si aquí está lleno?"
+  },
+  {
+    "number": 150,
+    "section": "Selección y consulta de profesionales",
+    "expectedIntent": "`CONSULTA_PROFESIONAL / SOLICITUD_RESERVA`",
+    "text": "¿Quién realiza este tratamiento?"
+  },
+  {
+    "number": 151,
+    "section": "Selección y consulta de profesionales",
+    "expectedIntent": "`CONSULTA_PROFESIONAL / SOLICITUD_RESERVA`",
+    "text": "¿Qué profesionales tienen disponibles?"
+  },
+  {
+    "number": 152,
+    "section": "Selección y consulta de profesionales",
+    "expectedIntent": "`CONSULTA_PROFESIONAL / SOLICITUD_RESERVA`",
+    "text": "Quiero reservar con Carla."
+  },
+  {
+    "number": 153,
+    "section": "Selección y consulta de profesionales",
+    "expectedIntent": "`CONSULTA_PROFESIONAL / SOLICITUD_RESERVA`",
+    "text": "¿Carla atiende mañana?"
+  },
+  {
+    "number": 154,
+    "section": "Selección y consulta de profesionales",
+    "expectedIntent": "`CONSULTA_PROFESIONAL / SOLICITUD_RESERVA`",
+    "text": "¿En qué sucursal atiende esa profesional?"
+  },
+  {
+    "number": 155,
+    "section": "Selección y consulta de profesionales",
+    "expectedIntent": "`CONSULTA_PROFESIONAL / SOLICITUD_RESERVA`",
+    "text": "¿La profesional está habilitada para este servicio?"
+  },
+  {
+    "number": 156,
+    "section": "Selección y consulta de profesionales",
+    "expectedIntent": "`CONSULTA_PROFESIONAL / SOLICITUD_RESERVA`",
+    "text": "¿Puedo elegir una profesional específica?"
+  },
+  {
+    "number": 157,
+    "section": "Selección y consulta de profesionales",
+    "expectedIntent": "`CONSULTA_PROFESIONAL / SOLICITUD_RESERVA`",
+    "text": "No tengo preferencia, ¿me asignan a alguien?"
+  },
+  {
+    "number": 158,
+    "section": "Selección y consulta de profesionales",
+    "expectedIntent": "`CONSULTA_PROFESIONAL / SOLICITUD_RESERVA`",
+    "text": "¿Quién tiene la primera hora disponible?"
+  },
+  {
+    "number": 159,
+    "section": "Selección y consulta de profesionales",
+    "expectedIntent": "`CONSULTA_PROFESIONAL / SOLICITUD_RESERVA`",
+    "text": "¿Pueden asignarme a la profesional con menos carga?"
+  },
+  {
+    "number": 160,
+    "section": "Selección y consulta de profesionales",
+    "expectedIntent": "`CONSULTA_PROFESIONAL / SOLICITUD_RESERVA`",
+    "text": "¿Hay una profesional especialista en este tratamiento?"
+  },
+  {
+    "number": 161,
+    "section": "Selección y consulta de profesionales",
+    "expectedIntent": "`CONSULTA_PROFESIONAL / SOLICITUD_RESERVA`",
+    "text": "¿Este servicio requiere una profesional de nivel avanzado?"
+  },
+  {
+    "number": 162,
+    "section": "Selección y consulta de profesionales",
+    "expectedIntent": "`CONSULTA_PROFESIONAL / SOLICITUD_RESERVA`",
+    "text": "¿Puedo cambiar de profesional?"
+  },
+  {
+    "number": 163,
+    "section": "Selección y consulta de profesionales",
+    "expectedIntent": "`CONSULTA_PROFESIONAL / SOLICITUD_RESERVA`",
+    "text": "Si mi profesional no está disponible, ¿me pueden ofrecer otra?"
+  },
+  {
+    "number": 164,
+    "section": "Selección y consulta de profesionales",
+    "expectedIntent": "`CONSULTA_PROFESIONAL / SOLICITUD_RESERVA`",
+    "text": "No quiero que cambien a la profesional sin avisarme."
+  },
+  {
+    "number": 165,
+    "section": "Selección y consulta de profesionales",
+    "expectedIntent": "`CONSULTA_PROFESIONAL / SOLICITUD_RESERVA`",
+    "text": "¿La profesional debe confirmar mi cita?"
+  },
+  {
+    "number": 166,
+    "section": "Selección y consulta de profesionales",
+    "expectedIntent": "`CONSULTA_PROFESIONAL / SOLICITUD_RESERVA`",
+    "text": "¿Mi cita todavía está esperando confirmación de la profesional?"
+  },
+  {
+    "number": 167,
+    "section": "Selección y consulta de profesionales",
+    "expectedIntent": "`CONSULTA_PROFESIONAL / SOLICITUD_RESERVA`",
+    "text": "¿Quién me atenderá finalmente?"
+  },
+  {
+    "number": 168,
+    "section": "Selección y consulta de profesionales",
+    "expectedIntent": "`CONSULTA_PROFESIONAL / SOLICITUD_RESERVA`",
+    "text": "¿La profesional estará en esa sucursal a esa hora?"
+  },
+  {
+    "number": 169,
+    "section": "Selección y consulta de profesionales",
+    "expectedIntent": "`CONSULTA_PROFESIONAL / SOLICITUD_RESERVA`",
+    "text": "¿Tiene disponibilidad después de su colación?"
+  },
+  {
+    "number": 170,
+    "section": "Reserva de recursos, cabinas y equipos",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿El tratamiento necesita una cabina especial?"
+  },
+  {
+    "number": 171,
+    "section": "Reserva de recursos, cabinas y equipos",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Hay una cabina disponible a esa hora?"
+  },
+  {
+    "number": 172,
+    "section": "Reserva de recursos, cabinas y equipos",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿La máquina está disponible en esa sucursal?"
+  },
+  {
+    "number": 173,
+    "section": "Reserva de recursos, cabinas y equipos",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿En qué sede tienen el equipo para este tratamiento?"
+  },
+  {
+    "number": 174,
+    "section": "Reserva de recursos, cabinas y equipos",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Puedo reservar si el equipo está en mantención?"
+  },
+  {
+    "number": 175,
+    "section": "Reserva de recursos, cabinas y equipos",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Tienen otra máquina disponible?"
+  },
+  {
+    "number": 176,
+    "section": "Reserva de recursos, cabinas y equipos",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Cuántas personas pueden atender al mismo tiempo?"
+  },
+  {
+    "number": 177,
+    "section": "Reserva de recursos, cabinas y equipos",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Hay cupos para una atención grupal?"
+  },
+  {
+    "number": 178,
+    "section": "Reserva de recursos, cabinas y equipos",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿El recurso queda reservado junto con mi cita?"
+  },
+  {
+    "number": 179,
+    "section": "Reserva de recursos, cabinas y equipos",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Pueden cambiarme de cabina sin cambiar la hora?"
+  },
+  {
+    "number": 180,
+    "section": "Reserva de recursos, cabinas y equipos",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Qué pasa si el equipo deja de estar disponible?"
+  },
+  {
+    "number": 181,
+    "section": "Reserva de recursos, cabinas y equipos",
+    "expectedIntent": "`SOLICITUD_RESERVA / CONSULTA_DISPONIBILIDAD`",
+    "text": "¿Me pueden ofrecer otra sede con el mismo equipo?"
+  },
+  {
+    "number": 182,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "¿Mi hora quedó reservada?"
+  },
+  {
+    "number": 183,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "¿Mi reserva está confirmada?"
+  },
+  {
+    "number": 184,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "¿Cuál es el estado de mi cita?"
+  },
+  {
+    "number": 185,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "¿Me pueden enviar el resumen de mi reserva?"
+  },
+  {
+    "number": 186,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "¿Cuál es el código de mi reserva?"
+  },
+  {
+    "number": 187,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "¿Qué servicio tengo agendado?"
+  },
+  {
+    "number": 188,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "¿Para qué fecha tengo la hora?"
+  },
+  {
+    "number": 189,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "¿A qué sucursal debo ir?"
+  },
+  {
+    "number": 190,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "¿Quién me atenderá?"
+  },
+  {
+    "number": 191,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "¿Mi reserva está pendiente de pago?"
+  },
+  {
+    "number": 192,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "¿Mi reserva está pendiente de recepción?"
+  },
+  {
+    "number": 193,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "¿Tengo más de una reserva creada?"
+  },
+  {
+    "number": 194,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "Creo que reservé dos veces, ¿pueden revisar?"
+  },
+  {
+    "number": 195,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "¿El horario quedó bloqueado mientras confirmo?"
+  },
+  {
+    "number": 196,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "¿Cuánto tiempo tengo para confirmar?"
+  },
+  {
+    "number": 197,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "¿Qué pasa si no confirmo dentro del plazo?"
+  },
+  {
+    "number": 198,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "No me llegó el enlace de confirmación."
+  },
+  {
+    "number": 199,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "El enlace de confirmación venció."
+  },
+  {
+    "number": 200,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "El enlace de confirmación no funciona."
+  },
+  {
+    "number": 201,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "¿Me pueden reenviar el enlace?"
+  },
+  {
+    "number": 202,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "Quiero confirmar mi hora."
+  },
+  {
+    "number": 203,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "¿Puedo responder por WhatsApp para confirmar?"
+  },
+  {
+    "number": 204,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "¿La cita ya aparece en la agenda?"
+  },
+  {
+    "number": 205,
+    "section": "Confirmación de la reserva y estado",
+    "expectedIntent": "`ESTADO_RESERVA / CONFIRMACIÓN_RESERVA`",
+    "text": "¿Me pueden agregar la cita a mi calendario?"
+  },
+  {
+    "number": 206,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "¿Necesito pagar para reservar?"
+  },
+  {
+    "number": 207,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "¿Este servicio requiere abono?"
+  },
+  {
+    "number": 208,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "¿Cuánto tengo que abonar?"
+  },
+  {
+    "number": 209,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "¿El abono confirma inmediatamente la cita?"
+  },
+  {
+    "number": 210,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "¿Qué medios de pago aceptan?"
+  },
+  {
+    "number": 211,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "¿Me pueden enviar el enlace de pago?"
+  },
+  {
+    "number": 212,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "No me llegó el enlace de pago."
+  },
+  {
+    "number": 213,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "El enlace de pago venció."
+  },
+  {
+    "number": 214,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "El enlace de pago no funciona."
+  },
+  {
+    "number": 215,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "Ya pagué, ¿pueden confirmar mi reserva?"
+  },
+  {
+    "number": 216,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "¿Recibieron mi pago?"
+  },
+  {
+    "number": 217,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "El pago aparece pendiente."
+  },
+  {
+    "number": 218,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "Mi pago fue rechazado."
+  },
+  {
+    "number": 219,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "Me cobraron dos veces."
+  },
+  {
+    "number": 220,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "El monto cobrado no corresponde."
+  },
+  {
+    "number": 221,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "¿Puedo enviar el comprobante por WhatsApp?"
+  },
+  {
+    "number": 222,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "¿Me pueden enviar una boleta?"
+  },
+  {
+    "number": 223,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "¿Me pueden enviar una factura?"
+  },
+  {
+    "number": 224,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "¿El abono es reembolsable?"
+  },
+  {
+    "number": 225,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "¿Qué pasa con mi abono si cancelo?"
+  },
+  {
+    "number": 226,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "¿Qué pasa con mi abono si reprogramo?"
+  },
+  {
+    "number": 227,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "¿Puedo usar el abono para otra cita?"
+  },
+  {
+    "number": 228,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "¿Puedo pagar la diferencia si cambio de servicio?"
+  },
+  {
+    "number": 229,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "¿Me corresponde una devolución?"
+  },
+  {
+    "number": 230,
+    "section": "Pagos, abonos y comprobantes",
+    "expectedIntent": "`CONSULTA_PAGO / PROBLEMA_PAGO`",
+    "text": "¿Cuánto demora el reembolso?"
+  },
+  {
+    "number": 231,
+    "section": "Recordatorios y notificaciones",
+    "expectedIntent": "`ESTADO_RESERVA / CONSULTA_NOTIFICACIÓN`",
+    "text": "¿Me enviarán una confirmación por WhatsApp?"
+  },
+  {
+    "number": 232,
+    "section": "Recordatorios y notificaciones",
+    "expectedIntent": "`ESTADO_RESERVA / CONSULTA_NOTIFICACIÓN`",
+    "text": "¿Me enviarán la confirmación por correo?"
+  },
+  {
+    "number": 233,
+    "section": "Recordatorios y notificaciones",
+    "expectedIntent": "`ESTADO_RESERVA / CONSULTA_NOTIFICACIÓN`",
+    "text": "¿Me pueden recordar la cita?"
+  },
+  {
+    "number": 234,
+    "section": "Recordatorios y notificaciones",
+    "expectedIntent": "`ESTADO_RESERVA / CONSULTA_NOTIFICACIÓN`",
+    "text": "¿Cuándo enviarán el recordatorio?"
+  },
+  {
+    "number": 235,
+    "section": "Recordatorios y notificaciones",
+    "expectedIntent": "`ESTADO_RESERVA / CONSULTA_NOTIFICACIÓN`",
+    "text": "¿Pueden enviarme un recordatorio el día anterior?"
+  },
+  {
+    "number": 236,
+    "section": "Recordatorios y notificaciones",
+    "expectedIntent": "`ESTADO_RESERVA / CONSULTA_NOTIFICACIÓN`",
+    "text": "¿Pueden recordarme la cita unas horas antes?"
+  },
+  {
+    "number": 237,
+    "section": "Recordatorios y notificaciones",
+    "expectedIntent": "`ESTADO_RESERVA / CONSULTA_NOTIFICACIÓN`",
+    "text": "No me llegó el recordatorio."
+  },
+  {
+    "number": 238,
+    "section": "Recordatorios y notificaciones",
+    "expectedIntent": "`ESTADO_RESERVA / CONSULTA_NOTIFICACIÓN`",
+    "text": "¿A qué número enviarán las notificaciones?"
+  },
+  {
+    "number": 239,
+    "section": "Recordatorios y notificaciones",
+    "expectedIntent": "`ESTADO_RESERVA / CONSULTA_NOTIFICACIÓN`",
+    "text": "¿Pueden enviar la información a otro correo?"
+  },
+  {
+    "number": 240,
+    "section": "Recordatorios y notificaciones",
+    "expectedIntent": "`ESTADO_RESERVA / CONSULTA_NOTIFICACIÓN`",
+    "text": "¿Puedo dejar de recibir recordatorios?"
+  },
+  {
+    "number": 241,
+    "section": "Recordatorios y notificaciones",
+    "expectedIntent": "`ESTADO_RESERVA / CONSULTA_NOTIFICACIÓN`",
+    "text": "¿El recordatorio incluye la dirección?"
+  },
+  {
+    "number": 242,
+    "section": "Recordatorios y notificaciones",
+    "expectedIntent": "`ESTADO_RESERVA / CONSULTA_NOTIFICACIÓN`",
+    "text": "¿El recordatorio incluye un enlace para cancelar o reprogramar?"
+  },
+  {
+    "number": 243,
+    "section": "Recordatorios y notificaciones",
+    "expectedIntent": "`ESTADO_RESERVA / CONSULTA_NOTIFICACIÓN`",
+    "text": "¿También le avisarán a la profesional?"
+  },
+  {
+    "number": 244,
+    "section": "Recordatorios y notificaciones",
+    "expectedIntent": "`ESTADO_RESERVA / CONSULTA_NOTIFICACIÓN`",
+    "text": "¿Me avisarán si cambia la profesional?"
+  },
+  {
+    "number": 245,
+    "section": "Recordatorios y notificaciones",
+    "expectedIntent": "`ESTADO_RESERVA / CONSULTA_NOTIFICACIÓN`",
+    "text": "¿Me avisarán si cambia la sucursal?"
+  },
+  {
+    "number": 246,
+    "section": "Recordatorios y notificaciones",
+    "expectedIntent": "`ESTADO_RESERVA / CONSULTA_NOTIFICACIÓN`",
+    "text": "¿Me avisarán si el centro cancela la cita?"
+  },
+  {
+    "number": 247,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "Quiero cambiar mi hora."
+  },
+  {
+    "number": 248,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "Necesito reprogramar mi cita."
+  },
+  {
+    "number": 249,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "¿Puedo cambiar la fecha?"
+  },
+  {
+    "number": 250,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "¿Puedo cambiar el horario?"
+  },
+  {
+    "number": 251,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "¿Puedo mover mi cita para mañana?"
+  },
+  {
+    "number": 252,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "Quiero cambiar mi reserva para la próxima semana."
+  },
+  {
+    "number": 253,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "¿Puedo cambiar de sucursal?"
+  },
+  {
+    "number": 254,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "¿Puedo cambiar de profesional al reprogramar?"
+  },
+  {
+    "number": 255,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "¿Puedo cambiar el servicio de mi reserva?"
+  },
+  {
+    "number": 256,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "No encuentro mi reserva para reprogramarla."
+  },
+  {
+    "number": 257,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "No tengo el código de la reserva."
+  },
+  {
+    "number": 258,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "¿Pueden buscar mi cita por teléfono?"
+  },
+  {
+    "number": 259,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "¿Esta reserva permite reprogramación?"
+  },
+  {
+    "number": 260,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "Mi cita está pendiente de pago, ¿la puedo mover?"
+  },
+  {
+    "number": 261,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "¿Hasta cuándo puedo reprogramar?"
+  },
+  {
+    "number": 262,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "¿Existe un cobro por reprogramar?"
+  },
+  {
+    "number": 263,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "¿Cuántas veces puedo cambiar mi cita?"
+  },
+  {
+    "number": 264,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "¿Puedo reprogramar una cita vencida?"
+  },
+  {
+    "number": 265,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "¿Puedo reprogramar una cita cancelada?"
+  },
+  {
+    "number": 266,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "¿Puedo reprogramar después de no asistir?"
+  },
+  {
+    "number": 267,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "¿Qué horarios tienen para reemplazar mi cita?"
+  },
+  {
+    "number": 268,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "¿Pueden mantener mi hora actual mientras elijo una nueva?"
+  },
+  {
+    "number": 269,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "¿Qué pasa si el nuevo horario se ocupa antes de confirmar?"
+  },
+  {
+    "number": 270,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "¿Me enviarán una nueva confirmación?"
+  },
+  {
+    "number": 271,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "¿La reserva anterior quedará anulada?"
+  },
+  {
+    "number": 272,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "¿Qué pasa con mi pago después del cambio?"
+  },
+  {
+    "number": 273,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "¿El precio cambia al elegir otra sucursal?"
+  },
+  {
+    "number": 274,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "¿El precio cambia al elegir otra profesional?"
+  },
+  {
+    "number": 275,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "Quiero volver a mi horario anterior."
+  },
+  {
+    "number": 276,
+    "section": "Reprogramación de citas",
+    "expectedIntent": "`REPROGRAMACIÓN_RESERVA`",
+    "text": "Me equivoqué al reprogramar, ¿pueden ayudarme?"
+  },
+  {
+    "number": 277,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "Quiero cancelar mi hora."
+  },
+  {
+    "number": 278,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "Necesito anular mi reserva."
+  },
+  {
+    "number": 279,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "¿Cómo cancelo mi cita?"
+  },
+  {
+    "number": 280,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "No puedo asistir, quiero cancelar."
+  },
+  {
+    "number": 281,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "No encuentro mi reserva para cancelarla."
+  },
+  {
+    "number": 282,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "No tengo el código de la cita."
+  },
+  {
+    "number": 283,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "¿Pueden buscar la reserva por mi teléfono?"
+  },
+  {
+    "number": 284,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "¿Esta reserva todavía se puede cancelar?"
+  },
+  {
+    "number": 285,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "¿Puedo cancelar una cita pendiente de pago?"
+  },
+  {
+    "number": 286,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "¿Puedo cancelar una cita ya confirmada?"
+  },
+  {
+    "number": 287,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "¿Puedo cancelar una reserva de otra persona?"
+  },
+  {
+    "number": 288,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "¿Necesitan validar que soy el titular?"
+  },
+  {
+    "number": 289,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "¿Hasta cuándo puedo cancelar sin cobro?"
+  },
+  {
+    "number": 290,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "¿Hay una penalización por cancelar tarde?"
+  },
+  {
+    "number": 291,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "¿Debo indicar el motivo de la cancelación?"
+  },
+  {
+    "number": 292,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "¿Qué pasa con el cupo después de cancelar?"
+  },
+  {
+    "number": 293,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "¿Le avisarán a la profesional?"
+  },
+  {
+    "number": 294,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "¿Me enviarán una confirmación de cancelación?"
+  },
+  {
+    "number": 295,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "¿Qué pasa con el abono?"
+  },
+  {
+    "number": 296,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "¿Me devolverán el dinero?"
+  },
+  {
+    "number": 297,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "¿Puedo dejar el pago como saldo a favor?"
+  },
+  {
+    "number": 298,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "¿Puedo cancelar solo uno de los servicios del paquete?"
+  },
+  {
+    "number": 299,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "Cancelé por error, ¿pueden recuperar mi cita?"
+  },
+  {
+    "number": 300,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "Mi reserva ya aparece cancelada, ¿pueden revisar?"
+  },
+  {
+    "number": 301,
+    "section": "Cancelación de citas",
+    "expectedIntent": "`CANCELACIÓN_RESERVA`",
+    "text": "El centro canceló mi hora, ¿qué alternativas tengo?"
+  },
+  {
+    "number": 302,
+    "section": "Lista de espera y cupos liberados",
+    "expectedIntent": "`SOLICITUD_LISTA_ESPERA`",
+    "text": "No hay horas, ¿me pueden dejar en lista de espera?"
+  },
+  {
+    "number": 303,
+    "section": "Lista de espera y cupos liberados",
+    "expectedIntent": "`SOLICITUD_LISTA_ESPERA`",
+    "text": "¿Tienen lista de espera?"
+  },
+  {
+    "number": 304,
+    "section": "Lista de espera y cupos liberados",
+    "expectedIntent": "`SOLICITUD_LISTA_ESPERA`",
+    "text": "¿Me pueden avisar si se libera un cupo?"
+  },
+  {
+    "number": 305,
+    "section": "Lista de espera y cupos liberados",
+    "expectedIntent": "`SOLICITUD_LISTA_ESPERA`",
+    "text": "Quiero quedar esperando una hora para mañana."
+  },
+  {
+    "number": 306,
+    "section": "Lista de espera y cupos liberados",
+    "expectedIntent": "`SOLICITUD_LISTA_ESPERA`",
+    "text": "¿Puedo elegir varios horarios en la lista de espera?"
+  },
+  {
+    "number": 307,
+    "section": "Lista de espera y cupos liberados",
+    "expectedIntent": "`SOLICITUD_LISTA_ESPERA`",
+    "text": "¿Puedo quedar en espera para cualquier profesional?"
+  },
+  {
+    "number": 308,
+    "section": "Lista de espera y cupos liberados",
+    "expectedIntent": "`SOLICITUD_LISTA_ESPERA`",
+    "text": "¿Puedo quedar en espera en varias sucursales?"
+  },
+  {
+    "number": 309,
+    "section": "Lista de espera y cupos liberados",
+    "expectedIntent": "`SOLICITUD_LISTA_ESPERA`",
+    "text": "¿Qué posición tengo en la lista de espera?"
+  },
+  {
+    "number": 310,
+    "section": "Lista de espera y cupos liberados",
+    "expectedIntent": "`SOLICITUD_LISTA_ESPERA`",
+    "text": "¿Cuánto tiempo tengo para aceptar un cupo liberado?"
+  },
+  {
+    "number": 311,
+    "section": "Lista de espera y cupos liberados",
+    "expectedIntent": "`SOLICITUD_LISTA_ESPERA`",
+    "text": "Me avisaron de un cupo, ¿todavía está disponible?"
+  },
+  {
+    "number": 312,
+    "section": "Lista de espera y cupos liberados",
+    "expectedIntent": "`SOLICITUD_LISTA_ESPERA`",
+    "text": "Quiero aceptar el cupo que se liberó."
+  },
+  {
+    "number": 313,
+    "section": "Lista de espera y cupos liberados",
+    "expectedIntent": "`SOLICITUD_LISTA_ESPERA`",
+    "text": "No puedo tomar el cupo, ¿pueden ofrecérselo a otra persona?"
+  },
+  {
+    "number": 314,
+    "section": "Lista de espera y cupos liberados",
+    "expectedIntent": "`SOLICITUD_LISTA_ESPERA`",
+    "text": "Quiero salir de la lista de espera."
+  },
+  {
+    "number": 315,
+    "section": "Lista de espera y cupos liberados",
+    "expectedIntent": "`SOLICITUD_LISTA_ESPERA`",
+    "text": "¿Me pueden avisar solo por WhatsApp?"
+  },
+  {
+    "number": 316,
+    "section": "Lista de espera y cupos liberados",
+    "expectedIntent": "`SOLICITUD_LISTA_ESPERA`",
+    "text": "¿Me avisarán a todos al mismo tiempo o por orden?"
+  },
+  {
+    "number": 317,
+    "section": "Servicios múltiples, paquetes y reservas grupales",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "Quiero reservar dos servicios el mismo día."
+  },
+  {
+    "number": 318,
+    "section": "Servicios múltiples, paquetes y reservas grupales",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "¿Puedo hacerme una limpieza y después un masaje?"
+  },
+  {
+    "number": 319,
+    "section": "Servicios múltiples, paquetes y reservas grupales",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "¿Pueden agendar los servicios uno después del otro?"
+  },
+  {
+    "number": 320,
+    "section": "Servicios múltiples, paquetes y reservas grupales",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "¿Cuánto tiempo necesito para el paquete completo?"
+  },
+  {
+    "number": 321,
+    "section": "Servicios múltiples, paquetes y reservas grupales",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "¿Los servicios pueden ser con profesionales diferentes?"
+  },
+  {
+    "number": 322,
+    "section": "Servicios múltiples, paquetes y reservas grupales",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "¿Los servicios deben realizarse en la misma sucursal?"
+  },
+  {
+    "number": 323,
+    "section": "Servicios múltiples, paquetes y reservas grupales",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "¿Puedo cambiar solo uno de los servicios del paquete?"
+  },
+  {
+    "number": 324,
+    "section": "Servicios múltiples, paquetes y reservas grupales",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "¿Puedo cancelar solo una parte del paquete?"
+  },
+  {
+    "number": 325,
+    "section": "Servicios múltiples, paquetes y reservas grupales",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "Quiero reservar varias sesiones del tratamiento."
+  },
+  {
+    "number": 326,
+    "section": "Servicios múltiples, paquetes y reservas grupales",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "¿Puedo dejar agendadas todas mis sesiones?"
+  },
+  {
+    "number": 327,
+    "section": "Servicios múltiples, paquetes y reservas grupales",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "Quiero reservar para mí y otra persona."
+  },
+  {
+    "number": 328,
+    "section": "Servicios múltiples, paquetes y reservas grupales",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "¿Pueden atendernos a las dos a la misma hora?"
+  },
+  {
+    "number": 329,
+    "section": "Servicios múltiples, paquetes y reservas grupales",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "¿Tienen capacidad para un grupo?"
+  },
+  {
+    "number": 330,
+    "section": "Servicios múltiples, paquetes y reservas grupales",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "¿Puedo reservar una atención grupal?"
+  },
+  {
+    "number": 331,
+    "section": "Servicios múltiples, paquetes y reservas grupales",
+    "expectedIntent": "`SOLICITUD_RESERVA`",
+    "text": "¿El pago se realiza por persona o por la reserva completa?"
+  },
+  {
+    "number": 332,
+    "section": "Evaluación previa, consentimiento y restricciones de edad",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / SOLICITUD_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Este tratamiento necesita evaluación previa?"
+  },
+  {
+    "number": 333,
+    "section": "Evaluación previa, consentimiento y restricciones de edad",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / SOLICITUD_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Puedo reservar la evaluación por WhatsApp?"
+  },
+  {
+    "number": 334,
+    "section": "Evaluación previa, consentimiento y restricciones de edad",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / SOLICITUD_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿La evaluación tiene costo?"
+  },
+  {
+    "number": 335,
+    "section": "Evaluación previa, consentimiento y restricciones de edad",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / SOLICITUD_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Puedo reservar el tratamiento el mismo día de la evaluación?"
+  },
+  {
+    "number": 336,
+    "section": "Evaluación previa, consentimiento y restricciones de edad",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / SOLICITUD_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Necesito firmar un consentimiento?"
+  },
+  {
+    "number": 337,
+    "section": "Evaluación previa, consentimiento y restricciones de edad",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / SOLICITUD_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Me pueden enviar el consentimiento antes de la cita?"
+  },
+  {
+    "number": 338,
+    "section": "Evaluación previa, consentimiento y restricciones de edad",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / SOLICITUD_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Puedo aceptar el consentimiento por WhatsApp?"
+  },
+  {
+    "number": 339,
+    "section": "Evaluación previa, consentimiento y restricciones de edad",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / SOLICITUD_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Qué información incluye el consentimiento?"
+  },
+  {
+    "number": 340,
+    "section": "Evaluación previa, consentimiento y restricciones de edad",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / SOLICITUD_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Existe una edad mínima para este servicio?"
+  },
+  {
+    "number": 341,
+    "section": "Evaluación previa, consentimiento y restricciones de edad",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / SOLICITUD_RESERVA / SOLICITUD_PERSONA`",
+    "text": "Soy menor de edad, ¿puedo reservar?"
+  },
+  {
+    "number": 342,
+    "section": "Evaluación previa, consentimiento y restricciones de edad",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / SOLICITUD_RESERVA / SOLICITUD_PERSONA`",
+    "text": "Quiero reservar para mi hija menor de edad."
+  },
+  {
+    "number": 343,
+    "section": "Evaluación previa, consentimiento y restricciones de edad",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / SOLICITUD_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Debe asistir un adulto responsable?"
+  },
+  {
+    "number": 344,
+    "section": "Evaluación previa, consentimiento y restricciones de edad",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / SOLICITUD_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Necesitan autorización del tutor?"
+  },
+  {
+    "number": 345,
+    "section": "Evaluación previa, consentimiento y restricciones de edad",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / SOLICITUD_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Qué datos del tutor necesitan?"
+  },
+  {
+    "number": 346,
+    "section": "Evaluación previa, consentimiento y restricciones de edad",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / SOLICITUD_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Hay tratamientos que no se realizan a menores?"
+  },
+  {
+    "number": 347,
+    "section": "Evaluación previa, consentimiento y restricciones de edad",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO / SOLICITUD_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Puedo hablar con recepción por una restricción especial?"
+  },
+  {
+    "number": 348,
+    "section": "Preparación, requisitos y condiciones antes de asistir",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO`",
+    "text": "¿Cómo debo prepararme para la cita?"
+  },
+  {
+    "number": 349,
+    "section": "Preparación, requisitos y condiciones antes de asistir",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO`",
+    "text": "¿Debo hacer algo antes del tratamiento?"
+  },
+  {
+    "number": 350,
+    "section": "Preparación, requisitos y condiciones antes de asistir",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO`",
+    "text": "¿Tengo que llegar sin maquillaje?"
+  },
+  {
+    "number": 351,
+    "section": "Preparación, requisitos y condiciones antes de asistir",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO`",
+    "text": "¿Debo suspender algún producto antes de la sesión?"
+  },
+  {
+    "number": 352,
+    "section": "Preparación, requisitos y condiciones antes de asistir",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO`",
+    "text": "¿Necesito llevar algún documento?"
+  },
+  {
+    "number": 353,
+    "section": "Preparación, requisitos y condiciones antes de asistir",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO`",
+    "text": "¿Debo llevar el comprobante de pago?"
+  },
+  {
+    "number": 354,
+    "section": "Preparación, requisitos y condiciones antes de asistir",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO`",
+    "text": "¿Cuánto antes debo llegar?"
+  },
+  {
+    "number": 355,
+    "section": "Preparación, requisitos y condiciones antes de asistir",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO`",
+    "text": "¿Puedo ir acompañada?"
+  },
+  {
+    "number": 356,
+    "section": "Preparación, requisitos y condiciones antes de asistir",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO`",
+    "text": "¿Qué pasa si estoy embarazada?"
+  },
+  {
+    "number": 357,
+    "section": "Preparación, requisitos y condiciones antes de asistir",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO`",
+    "text": "Tengo una condición médica, ¿puedo realizarme el tratamiento?"
+  },
+  {
+    "number": 358,
+    "section": "Preparación, requisitos y condiciones antes de asistir",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO`",
+    "text": "Tuve una reacción anterior, ¿puedo reservar nuevamente?"
+  },
+  {
+    "number": 359,
+    "section": "Preparación, requisitos y condiciones antes de asistir",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO`",
+    "text": "¿Necesito informar alergias?"
+  },
+  {
+    "number": 360,
+    "section": "Preparación, requisitos y condiciones antes de asistir",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO`",
+    "text": "¿Hay contraindicaciones para este servicio?"
+  },
+  {
+    "number": 361,
+    "section": "Preparación, requisitos y condiciones antes de asistir",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO`",
+    "text": "¿Puedo comer antes de la atención?"
+  },
+  {
+    "number": 362,
+    "section": "Preparación, requisitos y condiciones antes de asistir",
+    "expectedIntent": "`INFORMACIÓN_SERVICIO`",
+    "text": "¿Qué ropa conviene llevar?"
+  },
+  {
+    "number": 363,
+    "section": "Atrasos, inasistencias y bloqueos del cliente",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "Voy atrasada, ¿todavía me pueden atender?"
+  },
+  {
+    "number": 364,
+    "section": "Atrasos, inasistencias y bloqueos del cliente",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Cuántos minutos de atraso permiten?"
+  },
+  {
+    "number": 365,
+    "section": "Atrasos, inasistencias y bloqueos del cliente",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Qué pasa si llego tarde?"
+  },
+  {
+    "number": 366,
+    "section": "Atrasos, inasistencias y bloqueos del cliente",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "No pude asistir a mi cita, ¿qué debo hacer?"
+  },
+  {
+    "number": 367,
+    "section": "Atrasos, inasistencias y bloqueos del cliente",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Puedo reprogramar después de una inasistencia?"
+  },
+  {
+    "number": 368,
+    "section": "Atrasos, inasistencias y bloqueos del cliente",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Existe una penalización por no asistir?"
+  },
+  {
+    "number": 369,
+    "section": "Atrasos, inasistencias y bloqueos del cliente",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Perdí el abono por no presentarme?"
+  },
+  {
+    "number": 370,
+    "section": "Atrasos, inasistencias y bloqueos del cliente",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Cuántas inasistencias tengo registradas?"
+  },
+  {
+    "number": 371,
+    "section": "Atrasos, inasistencias y bloqueos del cliente",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "El sistema no me deja reservar, ¿por qué?"
+  },
+  {
+    "number": 372,
+    "section": "Atrasos, inasistencias y bloqueos del cliente",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "Me informaron que estoy bloqueada, ¿qué significa?"
+  },
+  {
+    "number": 373,
+    "section": "Atrasos, inasistencias y bloqueos del cliente",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Cómo puedo regularizar una deuda pendiente?"
+  },
+  {
+    "number": 374,
+    "section": "Atrasos, inasistencias y bloqueos del cliente",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Puedo hablar con recepción para desbloquear mi cuenta?"
+  },
+  {
+    "number": 375,
+    "section": "Atrasos, inasistencias y bloqueos del cliente",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "Creo que el bloqueo es un error."
+  },
+  {
+    "number": 376,
+    "section": "Atrasos, inasistencias y bloqueos del cliente",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Puedo reservar si tengo una deuda?"
+  },
+  {
+    "number": 377,
+    "section": "Atrasos, inasistencias y bloqueos del cliente",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Qué debo hacer para volver a agendar?"
+  },
+  {
+    "number": 378,
+    "section": "Horarios de atención y días especiales",
+    "expectedIntent": "`CONSULTA_HORARIO_ATENCIÓN`",
+    "text": "¿A qué hora abren?"
+  },
+  {
+    "number": 379,
+    "section": "Horarios de atención y días especiales",
+    "expectedIntent": "`CONSULTA_HORARIO_ATENCIÓN`",
+    "text": "¿Hasta qué hora atienden?"
+  },
+  {
+    "number": 380,
+    "section": "Horarios de atención y días especiales",
+    "expectedIntent": "`CONSULTA_HORARIO_ATENCIÓN`",
+    "text": "¿Cuál es el horario de atención?"
+  },
+  {
+    "number": 381,
+    "section": "Horarios de atención y días especiales",
+    "expectedIntent": "`CONSULTA_HORARIO_ATENCIÓN`",
+    "text": "¿Atienden a la hora de almuerzo?"
+  },
+  {
+    "number": 382,
+    "section": "Horarios de atención y días especiales",
+    "expectedIntent": "`CONSULTA_HORARIO_ATENCIÓN`",
+    "text": "¿Abren los sábados?"
+  },
+  {
+    "number": 383,
+    "section": "Horarios de atención y días especiales",
+    "expectedIntent": "`CONSULTA_HORARIO_ATENCIÓN`",
+    "text": "¿Trabajan los domingos?"
+  },
+  {
+    "number": 384,
+    "section": "Horarios de atención y días especiales",
+    "expectedIntent": "`CONSULTA_HORARIO_ATENCIÓN`",
+    "text": "¿Atienden en días feriados?"
+  },
+  {
+    "number": 385,
+    "section": "Horarios de atención y días especiales",
+    "expectedIntent": "`CONSULTA_HORARIO_ATENCIÓN`",
+    "text": "¿Hoy tienen horario normal?"
+  },
+  {
+    "number": 386,
+    "section": "Horarios de atención y días especiales",
+    "expectedIntent": "`CONSULTA_HORARIO_ATENCIÓN`",
+    "text": "¿Mañana abren más temprano?"
+  },
+  {
+    "number": 387,
+    "section": "Horarios de atención y días especiales",
+    "expectedIntent": "`CONSULTA_HORARIO_ATENCIÓN`",
+    "text": "¿Tienen horario extendido esta semana?"
+  },
+  {
+    "number": 388,
+    "section": "Horarios de atención y días especiales",
+    "expectedIntent": "`CONSULTA_HORARIO_ATENCIÓN`",
+    "text": "¿La sucursal cerrará más temprano?"
+  },
+  {
+    "number": 389,
+    "section": "Horarios de atención y días especiales",
+    "expectedIntent": "`CONSULTA_HORARIO_ATENCIÓN`",
+    "text": "¿Hay una apertura extraordinaria?"
+  },
+  {
+    "number": 390,
+    "section": "Horarios de atención y días especiales",
+    "expectedIntent": "`CONSULTA_HORARIO_ATENCIÓN`",
+    "text": "¿El horario es igual en todas las sucursales?"
+  },
+  {
+    "number": 391,
+    "section": "Horarios de atención y días especiales",
+    "expectedIntent": "`CONSULTA_HORARIO_ATENCIÓN`",
+    "text": "¿La profesional tiene el mismo horario que la sucursal?"
+  },
+  {
+    "number": 392,
+    "section": "Horarios de atención y días especiales",
+    "expectedIntent": "`CONSULTA_HORARIO_ATENCIÓN`",
+    "text": "¿Hay atención después de las siete?"
+  },
+  {
+    "number": 393,
+    "section": "Cambios operativos del centro o de la profesional",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Qué pasa si la profesional se ausenta?"
+  },
+  {
+    "number": 394,
+    "section": "Cambios operativos del centro o de la profesional",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Me pueden asignar otra profesional?"
+  },
+  {
+    "number": 395,
+    "section": "Cambios operativos del centro o de la profesional",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Puedo aceptar o rechazar el cambio de profesional?"
+  },
+  {
+    "number": 396,
+    "section": "Cambios operativos del centro o de la profesional",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Puedo cambiar la cita si no está mi profesional?"
+  },
+  {
+    "number": 397,
+    "section": "Cambios operativos del centro o de la profesional",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Qué pasa si la profesional cambia de sucursal?"
+  },
+  {
+    "number": 398,
+    "section": "Cambios operativos del centro o de la profesional",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Consideran el tiempo de traslado entre sucursales?"
+  },
+  {
+    "number": 399,
+    "section": "Cambios operativos del centro o de la profesional",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Mi cita puede atrasarse por el traslado de la profesional?"
+  },
+  {
+    "number": 400,
+    "section": "Cambios operativos del centro o de la profesional",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Me avisarán si la profesional está con licencia?"
+  },
+  {
+    "number": 401,
+    "section": "Cambios operativos del centro o de la profesional",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Me avisarán si hay una capacitación o reunión?"
+  },
+  {
+    "number": 402,
+    "section": "Cambios operativos del centro o de la profesional",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Qué pasa si la cabina o el equipo entra en mantención?"
+  },
+  {
+    "number": 403,
+    "section": "Cambios operativos del centro o de la profesional",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Me ofrecerán otra hora si el centro cambia mi cita?"
+  },
+  {
+    "number": 404,
+    "section": "Cambios operativos del centro o de la profesional",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Puedo elegir entre reprogramar o cancelar?"
+  },
+  {
+    "number": 405,
+    "section": "Cambios operativos del centro o de la profesional",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Qué pasa con mi pago si el cambio lo hace el centro?"
+  },
+  {
+    "number": 406,
+    "section": "Cambios operativos del centro o de la profesional",
+    "expectedIntent": "`ESTADO_RESERVA / SOLICITUD_PERSONA`",
+    "text": "¿Mi cita está pendiente de aceptación de la profesional?"
+  },
+  {
+    "number": 407,
+    "section": "Reclamos, problemas y situaciones sensibles",
+    "expectedIntent": "`RECLAMO / SOLICITUD_PERSONA / PROBLEMA_PAGO`",
+    "text": "Quiero hacer un reclamo."
+  },
+  {
+    "number": 408,
+    "section": "Reclamos, problemas y situaciones sensibles",
+    "expectedIntent": "`RECLAMO / SOLICITUD_PERSONA / PROBLEMA_PAGO`",
+    "text": "Tuve un problema con mi atención."
+  },
+  {
+    "number": 409,
+    "section": "Reclamos, problemas y situaciones sensibles",
+    "expectedIntent": "`RECLAMO / SOLICITUD_PERSONA / PROBLEMA_PAGO`",
+    "text": "No quedé conforme con el servicio."
+  },
+  {
+    "number": 410,
+    "section": "Reclamos, problemas y situaciones sensibles",
+    "expectedIntent": "`RECLAMO / SOLICITUD_PERSONA / PROBLEMA_PAGO`",
+    "text": "Necesito hablar con un supervisor."
+  },
+  {
+    "number": 411,
+    "section": "Reclamos, problemas y situaciones sensibles",
+    "expectedIntent": "`RECLAMO / SOLICITUD_PERSONA / PROBLEMA_PAGO`",
+    "text": "Nadie responde mi solicitud."
+  },
+  {
+    "number": 412,
+    "section": "Reclamos, problemas y situaciones sensibles",
+    "expectedIntent": "`RECLAMO / SOLICITUD_PERSONA / PROBLEMA_PAGO`",
+    "text": "Me cobraron un monto incorrecto."
+  },
+  {
+    "number": 413,
+    "section": "Reclamos, problemas y situaciones sensibles",
+    "expectedIntent": "`RECLAMO / SOLICITUD_PERSONA / PROBLEMA_PAGO`",
+    "text": "Tengo un problema con una devolución."
+  },
+  {
+    "number": 414,
+    "section": "Reclamos, problemas y situaciones sensibles",
+    "expectedIntent": "`RECLAMO / SOLICITUD_PERSONA / PROBLEMA_PAGO`",
+    "text": "Me hicieron un cobro duplicado."
+  },
+  {
+    "number": 415,
+    "section": "Reclamos, problemas y situaciones sensibles",
+    "expectedIntent": "`RECLAMO / SOLICITUD_PERSONA / PROBLEMA_PAGO`",
+    "text": "Tuve una reacción después del tratamiento."
+  },
+  {
+    "number": 416,
+    "section": "Reclamos, problemas y situaciones sensibles",
+    "expectedIntent": "`RECLAMO / SOLICITUD_PERSONA / PROBLEMA_PAGO`",
+    "text": "Tengo irritación después de la sesión."
+  },
+  {
+    "number": 417,
+    "section": "Reclamos, problemas y situaciones sensibles",
+    "expectedIntent": "`RECLAMO / SOLICITUD_PERSONA / PROBLEMA_PAGO`",
+    "text": "Siento dolor fuerte después del tratamiento."
+  },
+  {
+    "number": 418,
+    "section": "Reclamos, problemas y situaciones sensibles",
+    "expectedIntent": "`RECLAMO / SOLICITUD_PERSONA / PROBLEMA_PAGO`",
+    "text": "Tuve una quemadura y necesito ayuda."
+  },
+  {
+    "number": 419,
+    "section": "Reclamos, problemas y situaciones sensibles",
+    "expectedIntent": "`RECLAMO / SOLICITUD_PERSONA / PROBLEMA_PAGO`",
+    "text": "Creo que hubo un error en mi reserva."
+  },
+  {
+    "number": 420,
+    "section": "Reclamos, problemas y situaciones sensibles",
+    "expectedIntent": "`RECLAMO / SOLICITUD_PERSONA / PROBLEMA_PAGO`",
+    "text": "Mi reserva desapareció de la agenda."
+  },
+  {
+    "number": 421,
+    "section": "Reclamos, problemas y situaciones sensibles",
+    "expectedIntent": "`RECLAMO / SOLICITUD_PERSONA / PROBLEMA_PAGO`",
+    "text": "Llegué a la sucursal y no tenían registrada mi cita."
+  },
+  {
+    "number": 422,
+    "section": "Reclamos, problemas y situaciones sensibles",
+    "expectedIntent": "`RECLAMO / SOLICITUD_PERSONA / PROBLEMA_PAGO`",
+    "text": "Quiero que una persona revise mi caso."
+  },
+  {
+    "number": 423,
+    "section": "Frases breves, coloquiales y con errores frecuentes",
+    "expectedIntent": "`VARIAS INTENCIONES`",
+    "text": "Hola, una horita porfa."
+  },
+  {
+    "number": 424,
+    "section": "Frases breves, coloquiales y con errores frecuentes",
+    "expectedIntent": "`VARIAS INTENCIONES`",
+    "text": "Quiero agendarme."
+  },
+  {
+    "number": 425,
+    "section": "Frases breves, coloquiales y con errores frecuentes",
+    "expectedIntent": "`VARIAS INTENCIONES`",
+    "text": "Necesito hora pa mañana."
+  },
+  {
+    "number": 426,
+    "section": "Frases breves, coloquiales y con errores frecuentes",
+    "expectedIntent": "`VARIAS INTENCIONES`",
+    "text": "¿Tienen cupito hoy?"
+  },
+  {
+    "number": 427,
+    "section": "Frases breves, coloquiales y con errores frecuentes",
+    "expectedIntent": "`VARIAS INTENCIONES`",
+    "text": "Quiero reservar altiro."
+  },
+  {
+    "number": 428,
+    "section": "Frases breves, coloquiales y con errores frecuentes",
+    "expectedIntent": "`VARIAS INTENCIONES`",
+    "text": "¿Hay algo tipo cinco?"
+  },
+  {
+    "number": 429,
+    "section": "Frases breves, coloquiales y con errores frecuentes",
+    "expectedIntent": "`VARIAS INTENCIONES`",
+    "text": "¿Qué tienen libre en la tarde?"
+  },
+  {
+    "number": 430,
+    "section": "Frases breves, coloquiales y con errores frecuentes",
+    "expectedIntent": "`VARIAS INTENCIONES`",
+    "text": "Agéndame con Carla."
+  },
+  {
+    "number": 431,
+    "section": "Frases breves, coloquiales y con errores frecuentes",
+    "expectedIntent": "`VARIAS INTENCIONES`",
+    "text": "Ajendar hora para mañana."
+  },
+  {
+    "number": 432,
+    "section": "Frases breves, coloquiales y con errores frecuentes",
+    "expectedIntent": "`VARIAS INTENCIONES`",
+    "text": "Quiero reserbar una cita."
+  },
+  {
+    "number": 433,
+    "section": "Frases breves, coloquiales y con errores frecuentes",
+    "expectedIntent": "`VARIAS INTENCIONES`",
+    "text": "Necesito una hroa."
+  },
+  {
+    "number": 434,
+    "section": "Frases breves, coloquiales y con errores frecuentes",
+    "expectedIntent": "`VARIAS INTENCIONES`",
+    "text": "Cambiarme la hora."
+  },
+  {
+    "number": 435,
+    "section": "Frases breves, coloquiales y con errores frecuentes",
+    "expectedIntent": "`VARIAS INTENCIONES`",
+    "text": "Mover mi cita porfa."
+  },
+  {
+    "number": 436,
+    "section": "Frases breves, coloquiales y con errores frecuentes",
+    "expectedIntent": "`VARIAS INTENCIONES`",
+    "text": "Anular hora."
+  },
+  {
+    "number": 437,
+    "section": "Frases breves, coloquiales y con errores frecuentes",
+    "expectedIntent": "`VARIAS INTENCIONES`",
+    "text": "No voy a poder ir."
+  },
+  {
+    "number": 438,
+    "section": "Frases breves, coloquiales y con errores frecuentes",
+    "expectedIntent": "`VARIAS INTENCIONES`",
+    "text": "No me llegó el enlace."
+  },
+  {
+    "number": 439,
+    "section": "Frases breves, coloquiales y con errores frecuentes",
+    "expectedIntent": "`VARIAS INTENCIONES`",
+    "text": "El enlace expiró."
+  },
+  {
+    "number": 440,
+    "section": "Frases breves, coloquiales y con errores frecuentes",
+    "expectedIntent": "`VARIAS INTENCIONES`",
+    "text": "Ya pagué."
+  },
+  {
+    "number": 441,
+    "section": "Frases breves, coloquiales y con errores frecuentes",
+    "expectedIntent": "`VARIAS INTENCIONES`",
+    "text": "¿Dónde queda?"
+  },
+  {
+    "number": 442,
+    "section": "Frases breves, coloquiales y con errores frecuentes",
+    "expectedIntent": "`VARIAS INTENCIONES`",
+    "text": "Quiero hablar con alguien."
+  },
+  {
+    "number": 443,
+    "section": "Casos ambiguos que requieren aclaración",
+    "expectedIntent": "`AMBIGUA / REQUIERE_ACLARACIÓN`",
+    "text": "Quiero ver lo de mañana."
+  },
+  {
+    "number": 444,
+    "section": "Casos ambiguos que requieren aclaración",
+    "expectedIntent": "`AMBIGUA / REQUIERE_ACLARACIÓN`",
+    "text": "Necesito cambiar eso."
+  },
+  {
+    "number": 445,
+    "section": "Casos ambiguos que requieren aclaración",
+    "expectedIntent": "`AMBIGUA / REQUIERE_ACLARACIÓN`",
+    "text": "No puedo ir."
+  },
+  {
+    "number": 446,
+    "section": "Casos ambiguos que requieren aclaración",
+    "expectedIntent": "`AMBIGUA / REQUIERE_ACLARACIÓN`",
+    "text": "Quiero otra opción."
+  },
+  {
+    "number": 447,
+    "section": "Casos ambiguos que requieren aclaración",
+    "expectedIntent": "`AMBIGUA / REQUIERE_ACLARACIÓN`",
+    "text": "¿Está listo?"
+  },
+  {
+    "number": 448,
+    "section": "Casos ambiguos que requieren aclaración",
+    "expectedIntent": "`AMBIGUA / REQUIERE_ACLARACIÓN`",
+    "text": "¿Todavía sirve?"
+  },
+  {
+    "number": 449,
+    "section": "Casos ambiguos que requieren aclaración",
+    "expectedIntent": "`AMBIGUA / REQUIERE_ACLARACIÓN`",
+    "text": "La misma de la otra vez."
+  },
+  {
+    "number": 450,
+    "section": "Casos ambiguos que requieren aclaración",
+    "expectedIntent": "`AMBIGUA / REQUIERE_ACLARACIÓN`",
+    "text": "Quiero con ella."
+  },
+  {
+    "number": 451,
+    "section": "Casos ambiguos que requieren aclaración",
+    "expectedIntent": "`AMBIGUA / REQUIERE_ACLARACIÓN`",
+    "text": "A la misma hora."
+  },
+  {
+    "number": 452,
+    "section": "Casos ambiguos que requieren aclaración",
+    "expectedIntent": "`AMBIGUA / REQUIERE_ACLARACIÓN`",
+    "text": "En la otra sucursal."
+  },
+  {
+    "number": 453,
+    "section": "Casos ambiguos que requieren aclaración",
+    "expectedIntent": "`AMBIGUA / REQUIERE_ACLARACIÓN`",
+    "text": "Quiero el tratamiento anterior."
+  },
+  {
+    "number": 454,
+    "section": "Casos ambiguos que requieren aclaración",
+    "expectedIntent": "`AMBIGUA / REQUIERE_ACLARACIÓN`",
+    "text": "No quiero ese."
+  },
+  {
+    "number": 455,
+    "section": "Casos ambiguos que requieren aclaración",
+    "expectedIntent": "`AMBIGUA / REQUIERE_ACLARACIÓN`",
+    "text": "Quiero confirmar."
+  },
+  {
+    "number": 456,
+    "section": "Casos ambiguos que requieren aclaración",
+    "expectedIntent": "`AMBIGUA / REQUIERE_ACLARACIÓN`",
+    "text": "Quiero cancelarlo."
+  },
+  {
+    "number": 457,
+    "section": "Casos ambiguos que requieren aclaración",
+    "expectedIntent": "`AMBIGUA / REQUIERE_ACLARACIÓN`",
+    "text": "¿Cuánto sale?"
+  },
+  {
+    "number": 458,
+    "section": "Casos ambiguos que requieren aclaración",
+    "expectedIntent": "`AMBIGUA / REQUIERE_ACLARACIÓN`",
+    "text": "¿Tienen para después?"
+  },
+  {
+    "number": 459,
+    "section": "Casos ambiguos que requieren aclaración",
+    "expectedIntent": "`AMBIGUA / REQUIERE_ACLARACIÓN`",
+    "text": "Quiero reservar, pero no ahora."
+  },
+  {
+    "number": 460,
+    "section": "Casos ambiguos que requieren aclaración",
+    "expectedIntent": "`AMBIGUA / REQUIERE_ACLARACIÓN`",
+    "text": "No quiero cancelar, solo necesito información."
+  }
+]

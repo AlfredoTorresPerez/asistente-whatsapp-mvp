@@ -20,29 +20,24 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class SecurityController {
 
-    private final UserProfileService userProfileService;
-    private final AuditLogService auditLogService;
+	private final UserProfileService userProfileService;
+	private final AuditLogService auditLogService;
 
-    public SecurityController(
-            UserProfileService userProfileService,
-            AuditLogService auditLogService) {
-        this.userProfileService = userProfileService;
-        this.auditLogService = auditLogService;
-    }
+	public SecurityController(UserProfileService userProfileService, AuditLogService auditLogService) {
+		this.userProfileService = userProfileService;
+		this.auditLogService = auditLogService;
+	}
 
-    @PostMapping({"/api/v1/users/me/change-password", "/api/security/change-password"})
-    public StatusResponse changePassword(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @Valid @RequestBody ChangePasswordRequest request) {
-        return userProfileService.changePassword(authenticatedUser, request);
-    }
+	@PostMapping({"/api/v1/users/me/change-password", "/api/security/change-password"})
+	public StatusResponse changePassword(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@Valid @RequestBody ChangePasswordRequest request) {
+		return userProfileService.changePassword(authenticatedUser, request);
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'SECURITY_AUDIT_VIEW')")
-    @GetMapping({"/api/v1/security/audit-log", "/api/security/audit-log"})
-    public PagedResponse<AuditLogResponse> auditLog(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return auditLogService.list(authenticatedUser, page, size);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'SECURITY_AUDIT_VIEW')")
+	@GetMapping({"/api/v1/security/audit-log", "/api/security/audit-log"})
+	public PagedResponse<AuditLogResponse> auditLog(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
+		return auditLogService.list(authenticatedUser, page, size);
+	}
 }

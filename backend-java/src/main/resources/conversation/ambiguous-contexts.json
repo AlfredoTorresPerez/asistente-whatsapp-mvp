@@ -1,0 +1,122 @@
+{
+  "metadata": {
+    "source": "documentacion\\conversacion\\intenciones_agenda_whatsapp_es419_actualizada.xlsx",
+    "sheet_counts": {
+      "Resumen": 10,
+      "Reservar": 73,
+      "Reprogramar": 67,
+      "Cancelar": 67,
+      "Taxonomia_Intenciones": 42,
+      "Ejemplos_Ampliados": 168,
+      "Escenarios_Multiturno": 36,
+      "Conversaciones_Multiturno": 118,
+      "Entidades_Estructuradas": 60,
+      "Casos_Negativos": 60,
+      "Contexto_Referencias": 45,
+      "Cambios_Intencion": 30,
+      "Multiples_Reservas": 25,
+      "Respuestas_Acciones": 47,
+      "Estados_Conversacion": 24,
+      "Transiciones_Conversacion": 30,
+      "Evaluacion_Dataset": 104,
+      "Cobertura_Dataset": 42,
+      "Ambiguas_Contexto": 10,
+      "Reglas_Modelo": 10,
+      "Fuentes": 18,
+      "Metodologia": 12
+    },
+    "warnings": []
+  },
+  "items": [
+    {
+      "expresion_ambigua": "hora",
+      "puede_significar": "reservar, reprogramar o consultar",
+      "como_resolver": "Pedir acción concreta",
+      "regla_sugerida": "No clasificar sólo por palabra 'hora'",
+      "ejemplo": "¿Hora mañana?",
+      "riesgo": "Alta ambigüedad",
+      "fuente_url": "https://agendapro.com/blog/transformar-conversaciones-de-whatsapp-en-reservas/"
+    },
+    {
+      "expresion_ambigua": "cita",
+      "puede_significar": "reservar, cancelar, confirmar o consultar",
+      "como_resolver": "Buscar verbo cercano o contexto previo",
+      "regla_sugerida": "Usar ventana de contexto de 3 a 5 mensajes",
+      "ejemplo": "Cita viernes",
+      "riesgo": "Alta ambigüedad",
+      "fuente_url": "https://www.doctoralia.es/faq/consulta-online"
+    },
+    {
+      "expresion_ambigua": "turno",
+      "puede_significar": "reservar o reprogramar",
+      "como_resolver": "Detectar país y verbo",
+      "regla_sugerida": "En Argentina/Uruguay mapear como equivalente a cita",
+      "ejemplo": "Turno mañana",
+      "riesgo": "Media",
+      "fuente_url": "https://www.doctoralia.es/faq/consulta-online"
+    },
+    {
+      "expresion_ambigua": "confirmo",
+      "puede_significar": "confirmar asistencia",
+      "como_resolver": "No confundir con reservar",
+      "regla_sugerida": "Crear intención separada confirmar_asistencia",
+      "ejemplo": "Confirmo mi hora",
+      "riesgo": "Media",
+      "fuente_url": "https://agendapro.com/blog/confirmaciones-automaticas-por-whatsapp/"
+    },
+    {
+      "expresion_ambigua": "no puedo",
+      "puede_significar": "reprogramar o cancelar",
+      "como_resolver": "Preguntar si desea cambiar o cancelar",
+      "regla_sugerida": "Si aparece nueva fecha, reprogramar; si no, cancelar probable",
+      "ejemplo": "No puedo ir",
+      "riesgo": "Alta",
+      "fuente_url": "https://biz.booksy.com/es-es/blog/politica-de-cancelacion-y-no-show-para-salones"
+    },
+    {
+      "expresion_ambigua": "me sirve",
+      "puede_significar": "aceptar horario propuesto",
+      "como_resolver": "Asociar al último horario ofrecido",
+      "regla_sugerida": "Estado conversacional requerido",
+      "ejemplo": "Me sirve a las 16",
+      "riesgo": "Media",
+      "fuente_url": "https://respond.io/es/blog/whatsapp-appointment-booking"
+    },
+    {
+      "expresion_ambigua": "no me sirve",
+      "puede_significar": "rechazar horario, reprogramar o cancelar",
+      "como_resolver": "Preguntar alternativa",
+      "regla_sugerida": "No cancelar sin confirmación",
+      "ejemplo": "No me sirve mañana",
+      "riesgo": "Alta",
+      "fuente_url": "https://agendapro.com/blog/transformar-conversaciones-de-whatsapp-en-reservas/"
+    },
+    {
+      "expresion_ambigua": "ok",
+      "puede_significar": "aceptación, confirmación o cierre",
+      "como_resolver": "Ver estado anterior",
+      "regla_sugerida": "No ejecutar acción nueva",
+      "ejemplo": "Ok gracias",
+      "riesgo": "Alta",
+      "fuente_url": "https://respond.io/es/blog/whatsapp-appointment-booking"
+    },
+    {
+      "expresion_ambigua": "mañana",
+      "puede_significar": "fecha relativa",
+      "como_resolver": "Resolver fecha absoluta",
+      "regla_sugerida": "No clasificar intención por sí sola",
+      "ejemplo": "Mañana en la tarde",
+      "riesgo": "Alta",
+      "fuente_url": "https://www.tucalendi.com/es/blog/frases-clave-para-mejorar-la-comunicacion-en-la-programacion-de-citas-441"
+    },
+    {
+      "expresion_ambigua": "link",
+      "puede_significar": "reservar, pagar o consultar",
+      "como_resolver": "Pedir precisión si no hay acción",
+      "regla_sugerida": "Si coaparece con agenda/reserva, reservar",
+      "ejemplo": "Mándame el link",
+      "riesgo": "Media",
+      "fuente_url": "https://respond.io/es/blog/whatsapp-appointment-booking"
+    }
+  ]
+}

@@ -1,0 +1,452 @@
+{
+  "metadata": {
+    "source": "documentacion\\conversacion\\intenciones_agenda_whatsapp_es419_actualizada.xlsx",
+    "sheet_counts": {
+      "Resumen": 10,
+      "Reservar": 73,
+      "Reprogramar": 67,
+      "Cancelar": 67,
+      "Taxonomia_Intenciones": 42,
+      "Ejemplos_Ampliados": 168,
+      "Escenarios_Multiturno": 36,
+      "Conversaciones_Multiturno": 118,
+      "Entidades_Estructuradas": 60,
+      "Casos_Negativos": 60,
+      "Contexto_Referencias": 45,
+      "Cambios_Intencion": 30,
+      "Multiples_Reservas": 25,
+      "Respuestas_Acciones": 47,
+      "Estados_Conversacion": 24,
+      "Transiciones_Conversacion": 30,
+      "Evaluacion_Dataset": 104,
+      "Cobertura_Dataset": 42,
+      "Ambiguas_Contexto": 10,
+      "Reglas_Modelo": 10,
+      "Fuentes": 18,
+      "Metodologia": 12
+    },
+    "warnings": []
+  },
+  "items": [
+    {
+      "intencion": "saludar",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "despedirse",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "agradecer",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "solicitar_ayuda",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "consultar_servicios",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "consultar_precio",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "consultar_duracion",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "consultar_promocion",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "consultar_sucursales",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "consultar_direccion",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "consultar_horario_empresa",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "consultar_profesionales",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "consultar_disponibilidad",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "reservar",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "seleccionar_servicio",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "seleccionar_sucursal",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "seleccionar_profesional",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "seleccionar_horario",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "confirmar_reserva",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "rechazar_horario",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "consultar_reserva",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "listar_reservas",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "seleccionar_reserva",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "reprogramar",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "cancelar",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "confirmar_cancelacion",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "rechazar_cancelacion",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "confirmar_asistencia",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "enviar_datos_cliente",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "corregir_dato",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "consultar_medio_pago",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "consultar_abono",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "solicitar_devolucion",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "solicitar_comprobante",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "hablar_con_persona",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "presentar_reclamo",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "cambiar_intencion",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "mensaje_fuera_de_contexto",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "mensaje_incomprensible",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "confirmar_reprogramacion",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "rechazar_reprogramacion",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    },
+    {
+      "intencion": "consultar_politica_cancelacion",
+      "ejemplos_originales": null,
+      "ejemplos_ampliados": null,
+      "turnos_multiconversacion": null,
+      "casos_negativos_correctos": null,
+      "cobertura_total": null,
+      "nivel": null,
+      "accion_recomendada": "Revisar ejemplos, contexto y reglas antes de utilizar en un modelo"
+    }
+  ]
+}

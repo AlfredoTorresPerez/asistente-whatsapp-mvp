@@ -28,7 +28,7 @@ export function LandingImage({
   const [imgSrc, setImgSrc] = useState(src ?? fallbackSrc)
   const [failed, setFailed] = useState(false)
 
-  const currentSrc = failed ? fallbackSrc : (imgSrc || fallbackSrc)
+  const currentSrc = failed ? fallbackSrc : imgSrc || fallbackSrc
 
   const handleError = () => {
     if (!failed && currentSrc !== fallbackSrc) {

@@ -13,7 +13,8 @@ import { getAdminSummaryRequest } from '../../../services/api/administrationApi'
 import type { AdminSummaryResponse } from '../../../services/api/types'
 import { AdminContentPage } from './AdminContentPage'
 
-type AdminArea = 'company' | 'locations' | 'multisite' | 'whatsapp-web' | 'users' | 'security' | 'content'
+type AdminArea =
+  'company' | 'locations' | 'multisite' | 'whatsapp-web' | 'users' | 'security' | 'content'
 
 function getWhatsAppWebTone(status: string) {
   switch (status) {
@@ -138,9 +139,7 @@ export function AdministrationPage() {
           {activeArea === 'security' ? (
             <SecurityAdminPanel sessionTimeoutMinutes={summary.security.sessionTimeoutMinutes} />
           ) : null}
-          {activeArea === 'content' ? (
-            <AdminContentPage />
-          ) : null}
+          {activeArea === 'content' ? <AdminContentPage /> : null}
         </>
       ) : null}
     </section>

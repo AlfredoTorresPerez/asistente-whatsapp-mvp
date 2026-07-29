@@ -9,7 +9,12 @@ import { IMAGES } from '../../../lib/landingImages'
 vi.mock('../hooks/usePublicContent', () => ({
   usePublicLandingContent: () => ({ items: [], isLoading: false, error: null, refetch: vi.fn() }),
   usePublicServicesContent: () => ({ items: [], isLoading: false, error: null, refetch: vi.fn() }),
-  usePublicCategoriesContent: () => ({ items: [], isLoading: false, error: null, refetch: vi.fn() }),
+  usePublicCategoriesContent: () => ({
+    items: [],
+    isLoading: false,
+    error: null,
+    refetch: vi.fn(),
+  }),
 }))
 
 function renderPage() {
@@ -59,7 +64,16 @@ describe('BeautyCenterLandingPage', () => {
 
   it('cada servicio tiene imagen con texto alternativo descriptivo', () => {
     renderPage()
-    const serviceNames = ['Limpiezas faciales', 'Hidratación', 'Depilación', 'Tratamientos estéticos', 'Alisado', 'Asesoría estética', 'Baby face', 'Bushing']
+    const serviceNames = [
+      'Limpiezas faciales',
+      'Hidratación',
+      'Depilación',
+      'Tratamientos estéticos',
+      'Alisado',
+      'Asesoría estética',
+      'Baby face',
+      'Bushing',
+    ]
     for (const name of serviceNames) {
       const img = screen.getByAltText(`${name} en Centro Estética Bella`)
       expect(img).toBeInTheDocument()
@@ -104,25 +118,16 @@ describe('BeautyCenterLandingPage', () => {
     expect(mapaImg).toHaveAttribute('src', IMAGES.MAPA)
   })
 
-  it('el botón principal abre WhatsApp con el número correcto', async () => {
-    const user = userEvent.setup()
+  it('el botón principal navega a la página de reserva', async () => {
     renderPage()
-    const primaryBtn = screen.getByRole('button', { name: /agendar por whatsapp/i })
-    await user.click(primaryBtn)
-    expect(globalThis.open).toHaveBeenCalledWith(
-      expect.stringMatching(/^https:\/\/wa\.me\/56927305158\?text=/),
-      '_blank',
-      'noopener,noreferrer',
-    )
+    const link = screen.getByRole('link', { name: /agenda en línea/i })
+    expect(link).toHaveAttribute('href', '/reservar')
   })
 
-  it('el mensaje de WhatsApp incluye el nombre del centro', async () => {
-    const user = userEvent.setup()
+  it('el botón principal tiene el color de fondo azul', () => {
     renderPage()
-    const primaryBtn = screen.getByRole('button', { name: /agendar por whatsapp/i })
-    await user.click(primaryBtn)
-    const callUrl = vi.mocked(globalThis.open).mock.calls[0][0] as string
-    expect(decodeURIComponent(callUrl)).toContain('Centro Estética Bella')
+    const link = screen.getByRole('link', { name: /agenda en línea/i })
+    expect(link).toHaveClass('bg-[#2563EB]')
   })
 
   it('los botones de servicio modifican el mensaje', async () => {

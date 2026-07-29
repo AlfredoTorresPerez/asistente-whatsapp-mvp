@@ -217,7 +217,10 @@ export function buildAgendaHourLayout(
   })
 
   function computeRowHeight(maxItems: number) {
-    const required = rowVerticalPadding * 2 + maxItems * eventCardEstimatedHeight + Math.max(0, maxItems - 1) * eventGap
+    const required =
+      rowVerticalPadding * 2 +
+      maxItems * eventCardEstimatedHeight +
+      Math.max(0, maxItems - 1) * eventGap
     return Math.max(required, baseHourHeight)
   }
 

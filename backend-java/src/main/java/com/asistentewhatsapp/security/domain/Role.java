@@ -10,31 +10,31 @@ import java.util.UUID;
 @Table(name = "role")
 public class Role {
 
-    @Id
-    private UUID id;
+	@Id
+	private UUID id;
 
-    @Column(name = "code", nullable = false)
-    private String code;
+	@Column(name = "code", nullable = false)
+	private String code;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+	@Column(name = "name", nullable = false)
+	private String name;
 
-    @Column(name = "active", nullable = false)
-    private boolean active;
+	@Column(name = "active", nullable = false)
+	private boolean active;
 
-    public UUID getId() {
-        return id;
-    }
+	public UUID getId() {
+		return id;
+	}
 
-    public String getCode() {
-        return code;
-    }
+	public String getCode() {
+		return code;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public boolean isActive() {
-        return active;
-    }
+	public boolean isActive() {
+		return active;
+	}
 }

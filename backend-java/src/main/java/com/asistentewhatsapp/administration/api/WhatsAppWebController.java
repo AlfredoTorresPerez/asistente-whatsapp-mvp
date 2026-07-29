@@ -16,47 +16,46 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class WhatsAppWebController {
 
-    private final WhatsAppWebAdministrationService whatsAppWebAdministrationService;
+	private final WhatsAppWebAdministrationService whatsAppWebAdministrationService;
 
-    public WhatsAppWebController(WhatsAppWebAdministrationService whatsAppWebAdministrationService) {
-        this.whatsAppWebAdministrationService = whatsAppWebAdministrationService;
-    }
+	public WhatsAppWebController(WhatsAppWebAdministrationService whatsAppWebAdministrationService) {
+		this.whatsAppWebAdministrationService = whatsAppWebAdministrationService;
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_VIEW')")
-    @GetMapping({"/api/v1/whatsapp-web/status", "/api/channels/whatsapp-web/status"})
-    public WhatsAppWebStatusResponse status(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        return whatsAppWebAdministrationService.getStatus(authenticatedUser);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_VIEW')")
+	@GetMapping({"/api/v1/whatsapp-web/status", "/api/channels/whatsapp-web/status"})
+	public WhatsAppWebStatusResponse status(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+		return whatsAppWebAdministrationService.getStatus(authenticatedUser);
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
-    @GetMapping({"/api/v1/whatsapp-web/qr", "/api/channels/whatsapp-web/qr"})
-    public WhatsAppWebQrResponse qr(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        return whatsAppWebAdministrationService.getQr(authenticatedUser);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
+	@GetMapping({"/api/v1/whatsapp-web/qr", "/api/channels/whatsapp-web/qr"})
+	public WhatsAppWebQrResponse qr(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+		return whatsAppWebAdministrationService.getQr(authenticatedUser);
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
-    @PostMapping({"/api/v1/whatsapp-web/connect", "/api/channels/whatsapp-web/connect"})
-    public WhatsAppWebActionResponse connect(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        return whatsAppWebAdministrationService.connect(authenticatedUser);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
+	@PostMapping({"/api/v1/whatsapp-web/connect", "/api/channels/whatsapp-web/connect"})
+	public WhatsAppWebActionResponse connect(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+		return whatsAppWebAdministrationService.connect(authenticatedUser);
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
-    @PostMapping({"/api/v1/whatsapp-web/refresh-qr", "/api/channels/whatsapp-web/refresh-qr"})
-    public WhatsAppWebActionResponse refreshQr(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        return whatsAppWebAdministrationService.refreshQr(authenticatedUser);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
+	@PostMapping({"/api/v1/whatsapp-web/refresh-qr", "/api/channels/whatsapp-web/refresh-qr"})
+	public WhatsAppWebActionResponse refreshQr(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+		return whatsAppWebAdministrationService.refreshQr(authenticatedUser);
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
-    @PostMapping({"/api/v1/whatsapp-web/disconnect", "/api/channels/whatsapp-web/disconnect"})
-    public WhatsAppWebActionResponse disconnect(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        return whatsAppWebAdministrationService.disconnect(authenticatedUser);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
+	@PostMapping({"/api/v1/whatsapp-web/disconnect", "/api/channels/whatsapp-web/disconnect"})
+	public WhatsAppWebActionResponse disconnect(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+		return whatsAppWebAdministrationService.disconnect(authenticatedUser);
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
-    @PostMapping({"/api/v1/whatsapp-web/test-message", "/api/channels/whatsapp-web/test-message"})
-    public WhatsAppWebTestMessageResponse sendTestMessage(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @Valid @RequestBody WhatsAppWebTestMessageRequest request) {
-        return whatsAppWebAdministrationService.sendTestMessage(authenticatedUser, request);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
+	@PostMapping({"/api/v1/whatsapp-web/test-message", "/api/channels/whatsapp-web/test-message"})
+	public WhatsAppWebTestMessageResponse sendTestMessage(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@Valid @RequestBody WhatsAppWebTestMessageRequest request) {
+		return whatsAppWebAdministrationService.sendTestMessage(authenticatedUser, request);
+	}
 }

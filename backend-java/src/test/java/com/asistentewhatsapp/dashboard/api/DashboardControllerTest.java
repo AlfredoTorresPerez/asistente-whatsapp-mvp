@@ -29,49 +29,39 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({SecurityConfig.class, GlobalExceptionHandler.class})
 class DashboardControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+	@Autowired
+	private MockMvc mockMvc;
 
-    @MockitoBean
-    private JwtService jwtService;
+	@MockitoBean
+	private JwtService jwtService;
 
-    @MockitoBean
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+	@MockitoBean
+	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-    @MockitoBean
-    private JwtAccessDeniedHandler jwtAccessDeniedHandler;
+	@MockitoBean
+	private JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
-    @MockitoBean
-    private DashboardService dashboardService;
+	@MockitoBean
+	private DashboardService dashboardService;
 
-    @Test
-    @WithMockUser(roles = "OWNER")
-    void shouldReturnDashboardSummary() throws Exception {
-        when(dashboardService.getSummary(nullable(AuthenticatedUser.class), isNull(), isNull(), isNull()))
-                .thenReturn(new DashboardSummaryResponse(
-                        new DashboardKpisResponse(2, 3, 1, 4),
-                        List.of(new DashboardSeriesPointResponse("2026-05-23", 2)),
-                        List.of(new DashboardSeriesPointResponse("2026-05-23", 1)),
-                        List.of(new DashboardAppointmentResponse(
-                                UUID.fromString("68000000-0000-0000-0000-000000000001"),
-                                "Evaluacion facial inicial",
-                                "SCHEDULED",
-                                "Sofia Rojas",
-                                OffsetDateTime.parse("2026-05-27T14:00:00Z"),
-                                45,
-                                "Sucursal Providencia")),
-                        List.of(new DashboardActivityResponse(
-                                "CONVERSATION",
-                                UUID.fromString("64000000-0000-0000-0000-000000000001"),
-                                "Nuevo mensaje de Sofia Rojas",
-                                "Quiero saber el precio",
-                                "OPEN",
-                                OffsetDateTime.parse("2026-05-23T18:10:00Z")))));
+	@Test
+	@WithMockUser(roles = "OWNER")
+	void shouldReturnDashboardSummary() throws Exception {
+		when(dashboardService.getSummary(nullable(AuthenticatedUser.class), isNull(), isNull(), isNull()))
+				.thenReturn(new DashboardSummaryResponse(new DashboardKpisResponse(2, 3, 1, 4),
+						List.of(new DashboardSeriesPointResponse("2026-05-23", 2)),
+						List.of(new DashboardSeriesPointResponse("2026-05-23", 1)),
+						List.of(new DashboardAppointmentResponse(
+								UUID.fromString("68000000-0000-0000-0000-000000000001"), "Evaluacion facial inicial",
+								"SCHEDULED", "Sofia Rojas", OffsetDateTime.parse("2026-05-27T14:00:00Z"), 45,
+								"Sucursal Providencia")),
+						List.of(new DashboardActivityResponse("CONVERSATION",
+								UUID.fromString("64000000-0000-0000-0000-000000000001"), "Nuevo mensaje de Sofia Rojas",
+								"Quiero saber el precio", "OPEN", OffsetDateTime.parse("2026-05-23T18:10:00Z")))));
 
-        mockMvc.perform(get("/api/v1/dashboard/summary"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.kpis.openConversations").value(2))
-                .andExpect(jsonPath("$.todayAppointments[0].customerName").value("Sofia Rojas"))
-                .andExpect(jsonPath("$.recentActivity[0].entityType").value("CONVERSATION"));
-    }
+		mockMvc.perform(get("/api/v1/dashboard/summary")).andExpect(status().isOk())
+				.andExpect(jsonPath("$.kpis.openConversations").value(2))
+				.andExpect(jsonPath("$.todayAppointments[0].customerName").value("Sofia Rojas"))
+				.andExpect(jsonPath("$.recentActivity[0].entityType").value("CONVERSATION"));
+	}
 }

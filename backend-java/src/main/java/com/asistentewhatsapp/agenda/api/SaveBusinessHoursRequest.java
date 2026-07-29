@@ -7,13 +7,8 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
-public record SaveBusinessHoursRequest(
-        @NotNull UUID locationId,
-        @NotEmpty @Valid List<BusinessHourEntry> hours
-) {
-    public record BusinessHourEntry(
-            @NotNull Integer dayOfWeek,
-            @NotNull LocalTime startTime,
-            @NotNull LocalTime endTime
-    ) {}
+public record SaveBusinessHoursRequest(@NotNull UUID locationId, @NotEmpty @Valid List<BusinessHourEntry> hours) {
+	public record BusinessHourEntry(@NotNull Integer dayOfWeek, @NotNull LocalTime startTime,
+			@NotNull LocalTime endTime) {
+	}
 }

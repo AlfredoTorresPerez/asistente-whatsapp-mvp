@@ -21,42 +21,37 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/api/v1/public/centros", produces = MediaType.APPLICATION_JSON_VALUE)
 public class PublicCenterController {
 
-    private final PublicCenterService publicCenterService;
+	private final PublicCenterService publicCenterService;
 
-    public PublicCenterController(PublicCenterService publicCenterService) {
-        this.publicCenterService = publicCenterService;
-    }
+	public PublicCenterController(PublicCenterService publicCenterService) {
+		this.publicCenterService = publicCenterService;
+	}
 
-    @GetMapping("/{slug}")
-    public PublicCenterResponse getCenter(@PathVariable String slug) {
-        return publicCenterService.getCenterBySlug(slug);
-    }
+	@GetMapping("/{slug}")
+	public PublicCenterResponse getCenter(@PathVariable String slug) {
+		return publicCenterService.getCenterBySlug(slug);
+	}
 
-    @PostMapping("/{slug}/contacto")
-    public Map<String, String> saveContact(
-            @PathVariable String slug,
-            @Valid @RequestBody PublicContactRequest request) {
-        String waUrl = publicCenterService.saveContact(slug, request.name(), request.phone());
-        return Map.of("waUrl", waUrl);
-    }
+	@PostMapping("/{slug}/contacto")
+	public Map<String, String> saveContact(@PathVariable String slug,
+			@Valid @RequestBody PublicContactRequest request) {
+		String waUrl = publicCenterService.saveContact(slug, request.name(), request.phone());
+		return Map.of("waUrl", waUrl);
+	}
 
-    @GetMapping("/{slug}/whatsapp")
-    public ResponseEntity<Void> redirectWhatsApp(
-            @PathVariable String slug,
-            HttpServletRequest request) {
-        WhatsAppInfo whatsapp = publicCenterService.getWhatsAppInfo(slug);
+	@GetMapping("/{slug}/whatsapp")
+	public ResponseEntity<Void> redirectWhatsApp(@PathVariable String slug, HttpServletRequest request) {
+		WhatsAppInfo whatsapp = publicCenterService.getWhatsAppInfo(slug);
 
-        if (whatsapp == null || whatsapp.waUrl() == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+		if (whatsapp == null || whatsapp.waUrl() == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
 
-        publicCenterService.registerClick(slug,
-                request.getRemoteAddr(),
-                request.getHeader("User-Agent"),
-                request.getHeader("Referer"));
+		publicCenterService.registerClick(slug, request.getRemoteAddr(), request.getHeader("User-Agent"),
+				request.getHeader("Referer"));
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(URI.create(whatsapp.waUrl()));
-        return new ResponseEntity<>(headers, HttpStatus.FOUND);
-    }
+		HttpHeaders headers = new HttpHeaders();
+		headers.setLocation(URI.create(whatsapp.waUrl()));
+		return new ResponseEntity<>(headers, HttpStatus.FOUND);
+	}
 }

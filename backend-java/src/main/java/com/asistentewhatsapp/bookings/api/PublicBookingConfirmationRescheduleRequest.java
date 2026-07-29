@@ -4,9 +4,6 @@ import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-public record PublicBookingConfirmationRescheduleRequest(
-        @NotNull OffsetDateTime startsAt,
-        UUID professionalId,
-        UUID roomId,
-        String reason) {
+public record PublicBookingConfirmationRescheduleRequest(@NotNull OffsetDateTime startsAt, UUID professionalId,
+		UUID roomId, String reason) {
 }

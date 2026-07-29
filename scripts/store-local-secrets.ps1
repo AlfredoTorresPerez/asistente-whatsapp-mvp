@@ -13,6 +13,7 @@
     - WHATSAPP_ACCESS_TOKEN : Token persistente de WhatsApp Cloud API
     - GMAIL_PASSWORD       : App Password de Gmail para envio SMTP local
     - OPENAI_API_KEY       : API Key de OpenAI para respuestas automaticas
+    - SENTRY_DSN           : DSN de Sentry para observabilidad local (opcional)
 
 .PARAMETER Batch
   Permite pasar los valores como parametros (solo para automatizacion).
@@ -39,6 +40,7 @@ $secretDefs = @(
   @{ Name = "WHATSAPP_ACCESS_TOKEN"; Prompt = "Access Token de WhatsApp Cloud API" }
   @{ Name = "GMAIL_PASSWORD"; Prompt = "App Password de Gmail (notificacionesassistentelocale@gmail.com)" }
   @{ Name = "OPENAI_API_KEY"; Prompt = "API Key de OpenAI (platform.openai.com/api-keys)" }
+  @{ Name = "SENTRY_DSN"; Prompt = "DSN de Sentry para observabilidad local (opcional, enter para omitir)" }
 )
 
 Write-Host "=== Almacenar secretos locales en Windows Credential Manager ===" -ForegroundColor Cyan
@@ -77,7 +79,7 @@ foreach ($def in $secretDefs) {
   }
 
   if ([string]::IsNullOrEmpty($value)) {
-    Write-Warn "  [$name] valor vacio, se omite"
+    Write-Warning "  [$name] valor vacio, se omite"
     continue
   }
 

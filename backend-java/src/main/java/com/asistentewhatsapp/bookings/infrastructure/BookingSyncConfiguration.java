@@ -15,22 +15,22 @@ import org.springframework.context.annotation.Primary;
 @EnableConfigurationProperties(BookingSyncProperties.class)
 public class BookingSyncConfiguration {
 
-    @Bean
-    public SincronizadorReservaLocal sincronizadorReservaLocal(
-            BookingSyncJdbcRepository repository, BookingPhoneObfuscator phoneObfuscator) {
-        return new SincronizadorReservaLocal(repository, phoneObfuscator);
-    }
+	@Bean
+	public SincronizadorReservaLocal sincronizadorReservaLocal(BookingSyncJdbcRepository repository,
+			BookingPhoneObfuscator phoneObfuscator) {
+		return new SincronizadorReservaLocal(repository, phoneObfuscator);
+	}
 
-    @Bean
-    public SincronizadorReservaEventos sincronizadorReservaEventos(
-            BookingSyncEventJdbcRepository eventRepository, BookingSyncProperties properties) {
-        return new SincronizadorReservaEventos(eventRepository, properties);
-    }
+	@Bean
+	public SincronizadorReservaEventos sincronizadorReservaEventos(BookingSyncEventJdbcRepository eventRepository,
+			BookingSyncProperties properties) {
+		return new SincronizadorReservaEventos(eventRepository, properties);
+	}
 
-    @Bean
-    @Primary
-    public SincronizadorReservaMotorReglas sincronizadorReservaCompuesto(
-            SincronizadorReservaLocal local, SincronizadorReservaEventos eventos) {
-        return new SincronizadorReservaCompuesto(local, eventos);
-    }
+	@Bean
+	@Primary
+	public SincronizadorReservaMotorReglas sincronizadorReservaCompuesto(SincronizadorReservaLocal local,
+			SincronizadorReservaEventos eventos) {
+		return new SincronizadorReservaCompuesto(local, eventos);
+	}
 }

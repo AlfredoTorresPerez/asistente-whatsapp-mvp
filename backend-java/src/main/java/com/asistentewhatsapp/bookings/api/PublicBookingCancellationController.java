@@ -12,26 +12,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/public/booking-cancellations/{token}")
 public class PublicBookingCancellationController {
 
-    private final BookingPublicActionService bookingPublicActionService;
+	private final BookingPublicActionService bookingPublicActionService;
 
-    public PublicBookingCancellationController(BookingPublicActionService bookingPublicActionService) {
-        this.bookingPublicActionService = bookingPublicActionService;
-    }
+	public PublicBookingCancellationController(BookingPublicActionService bookingPublicActionService) {
+		this.bookingPublicActionService = bookingPublicActionService;
+	}
 
-    @GetMapping
-    public PublicBookingCancellationResponse preview(@PathVariable String token) {
-        return bookingPublicActionService.previewCancellation(token);
-    }
+	@GetMapping
+	public PublicBookingCancellationResponse preview(@PathVariable String token) {
+		return bookingPublicActionService.previewCancellation(token);
+	}
 
-    @PostMapping("/confirm")
-    public PublicBookingCancellationResponse confirm(
-            @PathVariable String token,
-            @RequestBody(required = false) PublicBookingCancellationRequest request) {
-        return bookingPublicActionService.confirmCancellation(token, request);
-    }
+	@PostMapping("/confirm")
+	public PublicBookingCancellationResponse confirm(@PathVariable String token,
+			@RequestBody(required = false) PublicBookingCancellationRequest request) {
+		return bookingPublicActionService.confirmCancellation(token, request);
+	}
 
-    @GetMapping("/confirm")
-    public PublicBookingCancellationResponse confirmViaGetFallback(@PathVariable String token) {
-        return bookingPublicActionService.confirmCancellation(token, null);
-    }
+	@GetMapping("/confirm")
+	public PublicBookingCancellationResponse confirmViaGetFallback(@PathVariable String token) {
+		return bookingPublicActionService.confirmCancellation(token, null);
+	}
 }

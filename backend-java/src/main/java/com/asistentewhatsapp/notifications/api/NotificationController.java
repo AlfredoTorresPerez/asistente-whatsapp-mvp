@@ -19,36 +19,31 @@ import java.util.UUID;
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class NotificationController {
 
-    private final NotificationService notificationService;
+	private final NotificationService notificationService;
 
-    public NotificationController(NotificationService notificationService) {
-        this.notificationService = notificationService;
-    }
+	public NotificationController(NotificationService notificationService) {
+		this.notificationService = notificationService;
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'NOTIFICATION_VIEW')")
-    @GetMapping("/api/v1/notifications")
-    public PagedResponse<NotificationResponse> list(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String type) {
-        return notificationService.list(authenticatedUser, page, size, search, status, type);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'NOTIFICATION_VIEW')")
+	@GetMapping("/api/v1/notifications")
+	public PagedResponse<NotificationResponse> list(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size,
+			@RequestParam(required = false) String search, @RequestParam(required = false) String status,
+			@RequestParam(required = false) String type) {
+		return notificationService.list(authenticatedUser, page, size, search, status, type);
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'NOTIFICATION_VIEW')")
-    @PatchMapping("/api/v1/notifications/{notificationId}/read")
-    public NotificationReadResponse markAsRead(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @PathVariable UUID notificationId) {
-        return notificationService.markAsRead(authenticatedUser, notificationId);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'NOTIFICATION_VIEW')")
+	@PatchMapping("/api/v1/notifications/{notificationId}/read")
+	public NotificationReadResponse markAsRead(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@PathVariable UUID notificationId) {
+		return notificationService.markAsRead(authenticatedUser, notificationId);
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'NOTIFICATION_VIEW')")
-    @PatchMapping("/api/v1/notifications/read-all")
-    public NotificationsReadAllResponse markAllAsRead(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        return notificationService.markAllAsRead(authenticatedUser);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'NOTIFICATION_VIEW')")
+	@PatchMapping("/api/v1/notifications/read-all")
+	public NotificationsReadAllResponse markAllAsRead(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+		return notificationService.markAllAsRead(authenticatedUser);
+	}
 }

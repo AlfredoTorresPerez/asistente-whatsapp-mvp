@@ -13,15 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class AdministrationController {
 
-    private final AdminSummaryService adminSummaryService;
+	private final AdminSummaryService adminSummaryService;
 
-    public AdministrationController(AdminSummaryService adminSummaryService) {
-        this.adminSummaryService = adminSummaryService;
-    }
+	public AdministrationController(AdminSummaryService adminSummaryService) {
+		this.adminSummaryService = adminSummaryService;
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'ADMIN_MANAGE')")
-    @GetMapping("/api/v1/admin/summary")
-    public AdminSummaryResponse summary(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        return adminSummaryService.getSummary(authenticatedUser);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'ADMIN_MANAGE')")
+	@GetMapping("/api/v1/admin/summary")
+	public AdminSummaryResponse summary(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+		return adminSummaryService.getSummary(authenticatedUser);
+	}
 }

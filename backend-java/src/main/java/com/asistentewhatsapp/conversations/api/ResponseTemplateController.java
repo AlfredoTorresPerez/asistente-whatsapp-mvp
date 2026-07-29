@@ -22,43 +22,37 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class ResponseTemplateController {
 
-    private final ResponseTemplateService responseTemplateService;
+	private final ResponseTemplateService responseTemplateService;
 
-    public ResponseTemplateController(ResponseTemplateService responseTemplateService) {
-        this.responseTemplateService = responseTemplateService;
-    }
+	public ResponseTemplateController(ResponseTemplateService responseTemplateService) {
+		this.responseTemplateService = responseTemplateService;
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CONVERSATIONS_VIEW')")
-    @GetMapping("/api/v1/templates")
-    public List<ResponseTemplateResponse> list(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @RequestParam(required = false) Boolean active) {
-        return responseTemplateService.list(authenticatedUser, active);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'CONVERSATIONS_VIEW')")
+	@GetMapping("/api/v1/templates")
+	public List<ResponseTemplateResponse> list(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@RequestParam(required = false) Boolean active) {
+		return responseTemplateService.list(authenticatedUser, active);
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'TEMPLATE_MANAGE')")
-    @PostMapping(value = "/api/v1/templates", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseTemplateResponse create(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @Valid @RequestBody CreateResponseTemplateRequest request) {
-        return responseTemplateService.create(authenticatedUser, request);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'TEMPLATE_MANAGE')")
+	@PostMapping(value = "/api/v1/templates", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseTemplateResponse create(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@Valid @RequestBody CreateResponseTemplateRequest request) {
+		return responseTemplateService.create(authenticatedUser, request);
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'TEMPLATE_MANAGE')")
-    @PutMapping(value = "/api/v1/templates/{templateId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseTemplateResponse update(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @PathVariable UUID templateId,
-            @Valid @RequestBody UpdateResponseTemplateRequest request) {
-        return responseTemplateService.update(authenticatedUser, templateId, request);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'TEMPLATE_MANAGE')")
+	@PutMapping(value = "/api/v1/templates/{templateId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseTemplateResponse update(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@PathVariable UUID templateId, @Valid @RequestBody UpdateResponseTemplateRequest request) {
+		return responseTemplateService.update(authenticatedUser, templateId, request);
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'TEMPLATE_MANAGE')")
-    @PatchMapping(value = "/api/v1/templates/{templateId}/status", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseTemplateResponse updateStatus(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @PathVariable UUID templateId,
-            @Valid @RequestBody UpdateTemplateStatusRequest request) {
-        return responseTemplateService.updateStatus(authenticatedUser, templateId, request);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'TEMPLATE_MANAGE')")
+	@PatchMapping(value = "/api/v1/templates/{templateId}/status", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseTemplateResponse updateStatus(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@PathVariable UUID templateId, @Valid @RequestBody UpdateTemplateStatusRequest request) {
+		return responseTemplateService.updateStatus(authenticatedUser, templateId, request);
+	}
 }

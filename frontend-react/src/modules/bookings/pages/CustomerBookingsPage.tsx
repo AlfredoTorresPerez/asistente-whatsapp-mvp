@@ -9,6 +9,7 @@ import { Select } from '../../../components/ui/Select'
 import { Textarea } from '../../../components/ui/Textarea'
 import {
   cancelCustomerBookingRequest,
+  getCustomerBookingRescheduleAvailabilityRequest,
   getCustomerBookingReschedulePreviewRequest,
   getCustomerBookingsRequest,
   rescheduleCustomerBookingRequest,
@@ -20,16 +21,13 @@ import type { UseMutationResult } from '@tanstack/react-query'
 type RescheduleDraft = {
   serviceId: string
   locationId: string
-  startsAt: string
+  date: string
+  slotStartsAt: string
   reason: string
 }
 
 function formatDateTime(value: string) {
   return dayjs(value).format('DD/MM/YYYY HH:mm')
-}
-
-function formatDateInput(value: string) {
-  return dayjs(value).format('YYYY-MM-DDTHH:mm')
 }
 
 function getErrorMessage(error: unknown, fallback: string) {
@@ -87,7 +85,8 @@ export function CustomerBookingsPage({ mode }: { mode?: PageMode }) {
       setDraft({
         serviceId: booking.serviceId ?? preview.services[0]?.id ?? '',
         locationId: booking.locationId ?? preview.locations[0]?.id ?? '',
-        startsAt: formatDateInput(booking.startsAt),
+        date: dayjs(booking.startsAt).format('YYYY-MM-DD'),
+        slotStartsAt: booking.startsAt,
         reason: '',
       })
     }, 0)
@@ -108,26 +107,43 @@ export function CustomerBookingsPage({ mode }: { mode?: PageMode }) {
     },
   })
 
+  const availabilityQuery = useQuery({
+    queryKey: [
+      'customer-booking-reschedule-availability',
+      token,
+      selectedBookingId,
+      draft?.date,
+      draft?.serviceId,
+      draft?.locationId,
+    ],
+    queryFn: () =>
+      getCustomerBookingRescheduleAvailabilityRequest(
+        token ?? '',
+        selectedBookingId ?? '',
+        draft!.serviceId,
+        draft!.locationId,
+        draft!.date,
+      ),
+    enabled:
+      Boolean(token && selectedBookingId && draft?.date && draft?.serviceId && draft?.locationId),
+    retry: false,
+  })
+
   const rescheduleMutation = useMutation({
     mutationFn: async () => {
       if (!token || !selectedBookingId || !draft || !selectedBooking) {
         throw new Error('No hay reserva seleccionada.')
       }
 
-      if (!draft.serviceId || !draft.locationId || !draft.startsAt) {
-        throw new Error('Completa el servicio, la sucursal y la nueva fecha.')
-      }
-
-      const startsAt = dayjs(draft.startsAt)
-      if (!startsAt.isValid()) {
-        throw new Error('La nueva fecha y hora no es valida.')
+      if (!draft.serviceId || !draft.locationId || !draft.date || !draft.slotStartsAt) {
+        throw new Error('Completa el servicio, la sucursal, la fecha y el horario.')
       }
 
       return rescheduleCustomerBookingRequest(token, selectedBookingId, {
         serviceId: draft.serviceId,
         locationId: draft.locationId,
-        startsAt: startsAt.toISOString(),
-        date: startsAt.format('YYYY-MM-DD'),
+        startsAt: draft.slotStartsAt,
+        date: draft.date,
         reason: (draft.reason ?? '').trim() || undefined,
       })
     },
@@ -140,6 +156,7 @@ export function CustomerBookingsPage({ mode }: { mode?: PageMode }) {
 
   const bookings = bookingsQuery.data ?? []
   const preview = previewQuery.data
+  const availability = availabilityQuery.data
   const serviceOptions = preview?.services ?? []
   const locationOptions = preview?.locations ?? []
 
@@ -277,12 +294,13 @@ export function CustomerBookingsPage({ mode }: { mode?: PageMode }) {
                         onChange={(event) =>
                           setDraft((current) =>
                             current
-                              ? { ...current, serviceId: event.target.value }
+                              ? { ...current, serviceId: event.target.value, slotStartsAt: '' }
                               : {
                                   serviceId: event.target.value,
                                   locationId:
                                     preview.booking.locationId ?? locationOptions[0]?.id ?? '',
-                                  startsAt: formatDateInput(preview.booking.startsAt),
+                                  date: dayjs(preview.booking.startsAt).format('YYYY-MM-DD'),
+                                  slotStartsAt: '',
                                   reason: '',
                                 },
                           )
@@ -298,12 +316,13 @@ export function CustomerBookingsPage({ mode }: { mode?: PageMode }) {
                         onChange={(event) =>
                           setDraft((current) =>
                             current
-                              ? { ...current, locationId: event.target.value }
+                              ? { ...current, locationId: event.target.value, slotStartsAt: '' }
                               : {
                                   serviceId:
                                     preview.booking.serviceId ?? serviceOptions[0]?.id ?? '',
                                   locationId: event.target.value,
-                                  startsAt: formatDateInput(preview.booking.startsAt),
+                                  date: dayjs(preview.booking.startsAt).format('YYYY-MM-DD'),
+                                  slotStartsAt: '',
                                   reason: '',
                                 },
                           )
@@ -319,19 +338,21 @@ export function CustomerBookingsPage({ mode }: { mode?: PageMode }) {
 
                     <div className="grid gap-5 md:grid-cols-2">
                       <Input
-                        label="Nueva fecha y hora"
-                        type="datetime-local"
-                        value={draft?.startsAt ?? ''}
+                        label="Nueva fecha"
+                        type="date"
+                        value={draft?.date ?? ''}
+                        min={dayjs().format('YYYY-MM-DD')}
                         onChange={(event) =>
                           setDraft((current) =>
                             current
-                              ? { ...current, startsAt: event.target.value }
+                              ? { ...current, date: event.target.value, slotStartsAt: '' }
                               : {
                                   serviceId:
                                     preview.booking.serviceId ?? serviceOptions[0]?.id ?? '',
                                   locationId:
                                     preview.booking.locationId ?? locationOptions[0]?.id ?? '',
-                                  startsAt: event.target.value,
+                                  date: event.target.value,
+                                  slotStartsAt: '',
                                   reason: '',
                                 },
                           )
@@ -348,7 +369,8 @@ export function CustomerBookingsPage({ mode }: { mode?: PageMode }) {
                                     preview.booking.serviceId ?? serviceOptions[0]?.id ?? '',
                                   locationId:
                                     preview.booking.locationId ?? locationOptions[0]?.id ?? '',
-                                  startsAt: formatDateInput(preview.booking.startsAt),
+                                  date: dayjs(preview.booking.startsAt).format('YYYY-MM-DD'),
+                                  slotStartsAt: '',
                                   reason: event.target.value,
                                 },
                           )
@@ -357,6 +379,67 @@ export function CustomerBookingsPage({ mode }: { mode?: PageMode }) {
                         rows={4}
                         value={draft?.reason ?? ''}
                       />
+                    </div>
+
+                    <div className="space-y-3">
+                      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+                        Horarios disponibles
+                      </p>
+                      {!draft?.date ? (
+                        <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center">
+                          <p className="text-sm text-slate-500">
+                            Selecciona una fecha para ver los horarios disponibles.
+                          </p>
+                        </div>
+                      ) : availabilityQuery.isPending ? (
+                        <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center">
+                          <p className="text-sm font-medium text-slate-700">
+                            Cargando horarios...
+                          </p>
+                        </div>
+                      ) : availabilityQuery.isError ? (
+                        <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-center">
+                          <p className="text-sm text-rose-700">
+                            {getErrorMessage(
+                              availabilityQuery.error,
+                              'No se pudieron cargar los horarios disponibles.',
+                            )}
+                          </p>
+                        </div>
+                      ) : !availability || availability.slots.length === 0 ? (
+                        <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center">
+                          <p className="text-sm text-slate-500">
+                            No hay horarios disponibles para esta fecha.
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="flex flex-wrap gap-2">
+                          {availability.slots
+                            .filter((slot) => slot.available)
+                            .map((slot) => {
+                              const selected = draft?.slotStartsAt === slot.startsAt
+                              return (
+                                <button
+                                  key={slot.startsAt}
+                                  type="button"
+                                  onClick={() =>
+                                    setDraft((current) =>
+                                      current ? { ...current, slotStartsAt: slot.startsAt } : null,
+                                    )
+                                  }
+                                  className={[
+                                    'rounded-xl border px-4 py-2 text-sm font-medium transition-colors',
+                                    selected
+                                      ? 'border-teal-500 bg-teal-50 text-teal-800'
+                                      : 'border-slate-200 bg-white text-slate-700 hover:border-teal-300 hover:bg-teal-50/50',
+                                  ].join(' ')}
+                                >
+                                  {dayjs(slot.startsAt).format('HH:mm')}
+                                </button>
+                              )
+                            })}
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex flex-col gap-3 border-t border-teal-200 pt-5 sm:flex-row sm:justify-end">
@@ -370,7 +453,9 @@ export function CustomerBookingsPage({ mode }: { mode?: PageMode }) {
                         Cerrar
                       </Button>
                       <Button
-                        disabled={!draft?.serviceId || !draft?.locationId || !draft?.startsAt}
+                        disabled={
+                          !draft?.serviceId || !draft?.locationId || !draft?.date || !draft?.slotStartsAt
+                        }
                         loading={rescheduleMutation.isPending}
                         onClick={() => rescheduleMutation.mutate()}
                       >

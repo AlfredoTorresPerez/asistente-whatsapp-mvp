@@ -47,9 +47,7 @@ export function buildWhatsAppUrl(phone: string, message?: string): string {
   return `https://wa.me/${normalized}?text=${encodeURIComponent(message.trim())}`
 }
 
-export function buildAppointmentWhatsAppMessage(
-  item: AgendaCalendarItemResponse,
-): string {
+export function buildAppointmentWhatsAppMessage(item: AgendaCalendarItemResponse): string {
   const parts: string[] = ['Hola ' + (item.customerName ?? '') + '.']
   parts.push('')
   parts.push('Tu cita ha sido confirmada.')
@@ -105,5 +103,15 @@ export function openWhatsAppUrl(url: string): boolean {
   }
 
   const win = window.open(url, '_blank', 'noopener,noreferrer')
+  if (win) {
+    win.opener = null
+  }
   return win !== null
+}
+
+export function openWhatsAppInNewTab(url: string): void {
+  const newWindow = window.open(url, '_blank', 'noopener,noreferrer')
+  if (newWindow) {
+    newWindow.opener = null
+  }
 }

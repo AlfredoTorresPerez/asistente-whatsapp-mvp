@@ -14,65 +14,65 @@ import java.util.UUID;
 @Table(name = "password_reset_token")
 public class PasswordResetToken {
 
-    @Id
-    private UUID id;
+	@Id
+	private UUID id;
 
-    @Column(name = "business_id", nullable = false)
-    private UUID businessId;
+	@Column(name = "business_id", nullable = false)
+	private UUID businessId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserAccount user;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "user_id", nullable = false)
+	private UserAccount user;
 
-    @Column(name = "token_hash", nullable = false, unique = true)
-    private String tokenHash;
+	@Column(name = "token_hash", nullable = false, unique = true)
+	private String tokenHash;
 
-    @Column(name = "expires_at", nullable = false)
-    private OffsetDateTime expiresAt;
+	@Column(name = "expires_at", nullable = false)
+	private OffsetDateTime expiresAt;
 
-    @Column(name = "consumed_at")
-    private OffsetDateTime consumedAt;
+	@Column(name = "consumed_at")
+	private OffsetDateTime consumedAt;
 
-    protected PasswordResetToken() {
-    }
+	protected PasswordResetToken() {
+	}
 
-    public PasswordResetToken(UUID id, UUID businessId, UserAccount user, String tokenHash, OffsetDateTime expiresAt) {
-        this.id = id;
-        this.businessId = businessId;
-        this.user = user;
-        this.tokenHash = tokenHash;
-        this.expiresAt = expiresAt;
-    }
+	public PasswordResetToken(UUID id, UUID businessId, UserAccount user, String tokenHash, OffsetDateTime expiresAt) {
+		this.id = id;
+		this.businessId = businessId;
+		this.user = user;
+		this.tokenHash = tokenHash;
+		this.expiresAt = expiresAt;
+	}
 
-    public UUID getId() {
-        return id;
-    }
+	public UUID getId() {
+		return id;
+	}
 
-    public UUID getBusinessId() {
-        return businessId;
-    }
+	public UUID getBusinessId() {
+		return businessId;
+	}
 
-    public UserAccount getUser() {
-        return user;
-    }
+	public UserAccount getUser() {
+		return user;
+	}
 
-    public String getTokenHash() {
-        return tokenHash;
-    }
+	public String getTokenHash() {
+		return tokenHash;
+	}
 
-    public OffsetDateTime getExpiresAt() {
-        return expiresAt;
-    }
+	public OffsetDateTime getExpiresAt() {
+		return expiresAt;
+	}
 
-    public OffsetDateTime getConsumedAt() {
-        return consumedAt;
-    }
+	public OffsetDateTime getConsumedAt() {
+		return consumedAt;
+	}
 
-    public boolean isUsable(OffsetDateTime now) {
-        return consumedAt == null && expiresAt.isAfter(now);
-    }
+	public boolean isUsable(OffsetDateTime now) {
+		return consumedAt == null && expiresAt.isAfter(now);
+	}
 
-    public void consume(OffsetDateTime when) {
-        this.consumedAt = when;
-    }
+	public void consume(OffsetDateTime when) {
+		this.consumedAt = when;
+	}
 }

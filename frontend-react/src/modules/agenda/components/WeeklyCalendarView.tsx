@@ -72,15 +72,15 @@ function DayHeaderCell({
         >
           {fd.dayNumber}
         </span>
-        <span className={`text-[10px] font-semibold ${isToday ? 'text-blue-500' : 'text-slate-400'}`}>
+        <span
+          className={`text-[10px] font-semibold ${isToday ? 'text-blue-500' : 'text-slate-400'}`}
+        >
           /{fd.month}
         </span>
       </div>
       {hasHours ? (
         <div className="mt-1 flex items-center gap-1">
-          <span className="text-[10px] font-semibold text-slate-700">
-            {usedSlots}
-          </span>
+          <span className="text-[10px] font-semibold text-slate-700">{usedSlots}</span>
           <span className="text-[9px] text-slate-400">/ {totalSlots}</span>
           <div className="ml-1 h-1.5 w-10 overflow-hidden rounded-full bg-slate-200">
             <div

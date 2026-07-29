@@ -13,13 +13,13 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Order(-2)
 public class SecurityHeadersFilter extends OncePerRequestFilter {
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-            FilterChain filterChain) throws ServletException, IOException {
-        response.setHeader("X-Content-Type-Options", "nosniff");
-        response.setHeader("X-Frame-Options", "DENY");
-        response.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
-        response.setHeader("X-XSS-Protection", "0");
-        filterChain.doFilter(request, response);
-    }
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
+		response.setHeader("X-Content-Type-Options", "nosniff");
+		response.setHeader("X-Frame-Options", "DENY");
+		response.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+		response.setHeader("X-XSS-Protection", "0");
+		filterChain.doFilter(request, response);
+	}
 }

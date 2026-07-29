@@ -1,25 +1,28 @@
 package com.asistentewhatsapp.channels.domain;
 
 /**
- * Puerto principal para desacoplar el dominio de la tecnologia concreta de WhatsApp.
+ * Puerto principal para desacoplar el dominio de la tecnologia concreta de
+ * WhatsApp.
  *
- * <p>Ambiente local: implementacion WhatsAppWebAdapter con whatsapp-web.js.
- * Ambiente productivo: implementacion WhatsAppCloudApiAdapter, habilitable por configuracion.
+ * <p>
+ * Ambiente local: implementacion WhatsAppWebAdapter con whatsapp-web.js.
+ * Ambiente productivo: implementacion WhatsAppCloudApiAdapter, habilitable por
+ * configuracion.
  */
 public interface CanalWhatsApp extends MessagingChannel {
 
-    WhatsAppChannelProvider provider();
+	WhatsAppChannelProvider provider();
 
-    WhatsAppSessionStatus getStatus();
+	WhatsAppSessionStatus getStatus();
 
-    WhatsAppSessionAction connect();
+	WhatsAppSessionAction connect();
 
-    WhatsAppSessionAction refreshQr();
+	WhatsAppSessionAction refreshQr();
 
-    WhatsAppSessionAction disconnect();
+	WhatsAppSessionAction disconnect();
 
-    @Override
-    default MessageChannelType type() {
-        return MessageChannelType.WHATSAPP;
-    }
+	@Override
+	default MessageChannelType type() {
+		return MessageChannelType.WHATSAPP;
+	}
 }

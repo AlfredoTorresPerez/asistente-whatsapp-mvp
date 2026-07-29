@@ -12,7 +12,7 @@ export function usePublicContent(type?: string) {
 
 export function usePublicLandingContent() {
   const { data, isLoading, error, refetch } = usePublicContent('LANDING_PAGE')
-  
+
   return {
     items: data ?? [],
     isLoading,
@@ -23,7 +23,7 @@ export function usePublicLandingContent() {
 
 export function usePublicServicesContent() {
   const { data, isLoading, error, refetch } = usePublicContent('SERVICE')
-  
+
   return {
     items: data ?? [],
     isLoading,
@@ -34,7 +34,7 @@ export function usePublicServicesContent() {
 
 export function usePublicCategoriesContent() {
   const { data, isLoading, error, refetch } = usePublicContent('CATEGORY')
-  
+
   return {
     items: data ?? [],
     isLoading,

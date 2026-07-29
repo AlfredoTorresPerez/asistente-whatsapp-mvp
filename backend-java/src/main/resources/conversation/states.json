@@ -1,0 +1,272 @@
+{
+  "metadata": {
+    "source": "documentacion\\conversacion\\intenciones_agenda_whatsapp_es419_actualizada.xlsx",
+    "sheet_counts": {
+      "Resumen": 10,
+      "Reservar": 73,
+      "Reprogramar": 67,
+      "Cancelar": 67,
+      "Taxonomia_Intenciones": 42,
+      "Ejemplos_Ampliados": 168,
+      "Escenarios_Multiturno": 36,
+      "Conversaciones_Multiturno": 118,
+      "Entidades_Estructuradas": 60,
+      "Casos_Negativos": 60,
+      "Contexto_Referencias": 45,
+      "Cambios_Intencion": 30,
+      "Multiples_Reservas": 25,
+      "Respuestas_Acciones": 47,
+      "Estados_Conversacion": 24,
+      "Transiciones_Conversacion": 30,
+      "Evaluacion_Dataset": 104,
+      "Cobertura_Dataset": 42,
+      "Ambiguas_Contexto": 10,
+      "Reglas_Modelo": 10,
+      "Fuentes": 18,
+      "Metodologia": 12
+    },
+    "warnings": []
+  },
+  "items": [
+    {
+      "id": "EST-001",
+      "estado": "INICIO",
+      "grupo": "Neutro",
+      "descripcion": "No existe operación activa",
+      "intenciones_o_eventos_aceptados": "saludar, consultar o iniciar un flujo",
+      "confirmacion_sensible": "No",
+      "condicion_de_entrada": "Ninguno",
+      "prioridad": "Alta"
+    },
+    {
+      "id": "EST-002",
+      "estado": "ESPERANDO_SERVICIO",
+      "grupo": "Reserva",
+      "descripcion": "Falta seleccionar servicio",
+      "intenciones_o_eventos_aceptados": "seleccionar_servicio, consultar_servicios, cambiar_intencion",
+      "confirmacion_sensible": "No",
+      "condicion_de_entrada": "Servicio válido de la empresa",
+      "prioridad": "Alta"
+    },
+    {
+      "id": "EST-003",
+      "estado": "ESPERANDO_SUCURSAL",
+      "grupo": "Reserva",
+      "descripcion": "Falta seleccionar sede",
+      "intenciones_o_eventos_aceptados": "seleccionar_sucursal, consultar_direccion, cambiar_intencion",
+      "confirmacion_sensible": "No",
+      "condicion_de_entrada": "Sede activa que ofrece servicio",
+      "prioridad": "Alta"
+    },
+    {
+      "id": "EST-004",
+      "estado": "ESPERANDO_PROFESIONAL",
+      "grupo": "Reserva",
+      "descripcion": "Falta preferencia profesional",
+      "intenciones_o_eventos_aceptados": "seleccionar_profesional, cambiar_intencion",
+      "confirmacion_sensible": "No",
+      "condicion_de_entrada": "Profesional habilitado o cualquiera",
+      "prioridad": "Alta"
+    },
+    {
+      "id": "EST-005",
+      "estado": "ESPERANDO_FECHA",
+      "grupo": "Reserva",
+      "descripcion": "Falta fecha futura",
+      "intenciones_o_eventos_aceptados": "seleccionar_horario, cambiar_intencion",
+      "confirmacion_sensible": "No",
+      "condicion_de_entrada": "Fecha normalizada y futura",
+      "prioridad": "Alta"
+    },
+    {
+      "id": "EST-006",
+      "estado": "ESPERANDO_HORARIO",
+      "grupo": "Reserva",
+      "descripcion": "Se ofrecieron cupos vigentes",
+      "intenciones_o_eventos_aceptados": "seleccionar_horario, rechazar_horario, cambiar_intencion",
+      "confirmacion_sensible": "No",
+      "condicion_de_entrada": "Slot perteneciente a lista vigente",
+      "prioridad": "Alta"
+    },
+    {
+      "id": "EST-007",
+      "estado": "ESPERANDO_CONFIRMACION_RESERVA",
+      "grupo": "Reserva",
+      "descripcion": "Existe resumen y retención temporal",
+      "intenciones_o_eventos_aceptados": "confirmar_reserva, rechazar_horario, cambiar_intencion",
+      "confirmacion_sensible": "Sí",
+      "condicion_de_entrada": "Retención vigente",
+      "prioridad": "Crítica"
+    },
+    {
+      "id": "EST-008",
+      "estado": "RESERVA_CONFIRMADA",
+      "grupo": "Terminal",
+      "descripcion": "Reserva creada",
+      "intenciones_o_eventos_aceptados": "consultar_reserva, reprogramar, cancelar",
+      "confirmacion_sensible": "No",
+      "condicion_de_entrada": "booking_id",
+      "prioridad": "Alta"
+    },
+    {
+      "id": "EST-009",
+      "estado": "ESPERANDO_SELECCION_RESERVA",
+      "grupo": "Gestión",
+      "descripcion": "Hay varias citas coincidentes",
+      "intenciones_o_eventos_aceptados": "seleccionar_reserva, cambiar_intencion",
+      "confirmacion_sensible": "No",
+      "condicion_de_entrada": "booking_id propio",
+      "prioridad": "Alta"
+    },
+    {
+      "id": "EST-010",
+      "estado": "ESPERANDO_FECHA_REPROGRAMACION",
+      "grupo": "Reprogramación",
+      "descripcion": "Cita original identificada; falta fecha nueva",
+      "intenciones_o_eventos_aceptados": "seleccionar_horario, cambiar_intencion",
+      "confirmacion_sensible": "No",
+      "condicion_de_entrada": "Fecha futura",
+      "prioridad": "Alta"
+    },
+    {
+      "id": "EST-011",
+      "estado": "ESPERANDO_HORARIO_REPROGRAMACION",
+      "grupo": "Reprogramación",
+      "descripcion": "Se ofrecieron cupos nuevos",
+      "intenciones_o_eventos_aceptados": "seleccionar_horario, rechazar_horario, cambiar_intencion",
+      "confirmacion_sensible": "No",
+      "condicion_de_entrada": "Nuevo slot vigente",
+      "prioridad": "Alta"
+    },
+    {
+      "id": "EST-012",
+      "estado": "ESPERANDO_CONFIRMACION_REPROGRAMACION",
+      "grupo": "Reprogramación",
+      "descripcion": "Existe cita original y retención nueva",
+      "intenciones_o_eventos_aceptados": "confirmar_reprogramacion, rechazar_reprogramacion, cambiar_intencion",
+      "confirmacion_sensible": "Sí",
+      "condicion_de_entrada": "Cita original activa y retención nueva",
+      "prioridad": "Crítica"
+    },
+    {
+      "id": "EST-013",
+      "estado": "RESERVA_REPROGRAMADA",
+      "grupo": "Terminal",
+      "descripcion": "Cambio aplicado",
+      "intenciones_o_eventos_aceptados": "consultar_reserva, reprogramar, cancelar",
+      "confirmacion_sensible": "No",
+      "condicion_de_entrada": "booking_id actualizado",
+      "prioridad": "Alta"
+    },
+    {
+      "id": "EST-014",
+      "estado": "ESPERANDO_CONFIRMACION_CANCELACION",
+      "grupo": "Cancelación",
+      "descripcion": "Cita identificada y política mostrada",
+      "intenciones_o_eventos_aceptados": "confirmar_cancelacion, rechazar_cancelacion, cambiar_intencion",
+      "confirmacion_sensible": "Sí",
+      "condicion_de_entrada": "Cita cancelable",
+      "prioridad": "Crítica"
+    },
+    {
+      "id": "EST-015",
+      "estado": "RESERVA_CANCELADA",
+      "grupo": "Terminal",
+      "descripcion": "Cancelación aplicada",
+      "intenciones_o_eventos_aceptados": "reservar, consultar_reserva",
+      "confirmacion_sensible": "No",
+      "condicion_de_entrada": "booking_id cancelado",
+      "prioridad": "Alta"
+    },
+    {
+      "id": "EST-016",
+      "estado": "RESERVA_MANTENIDA",
+      "grupo": "Terminal",
+      "descripcion": "Cliente rechazó cambio o cancelación",
+      "intenciones_o_eventos_aceptados": "consultar_reserva, reprogramar, cancelar",
+      "confirmacion_sensible": "No",
+      "condicion_de_entrada": "Cita original activa",
+      "prioridad": "Alta"
+    },
+    {
+      "id": "EST-017",
+      "estado": "RECORDATORIO_ENVIADO",
+      "grupo": "Recordatorio",
+      "descripcion": "Existe una cita próxima",
+      "intenciones_o_eventos_aceptados": "confirmar_asistencia, reprogramar, cancelar",
+      "confirmacion_sensible": "No",
+      "condicion_de_entrada": "booking_id",
+      "prioridad": "Alta"
+    },
+    {
+      "id": "EST-018",
+      "estado": "ASISTENCIA_CONFIRMADA",
+      "grupo": "Terminal",
+      "descripcion": "Cliente confirmó asistencia",
+      "intenciones_o_eventos_aceptados": "reprogramar, cancelar",
+      "confirmacion_sensible": "No",
+      "condicion_de_entrada": "booking_id",
+      "prioridad": "Alta"
+    },
+    {
+      "id": "EST-019",
+      "estado": "ESPERANDO_DATOS_CLIENTE",
+      "grupo": "Datos",
+      "descripcion": "Faltan datos mínimos",
+      "intenciones_o_eventos_aceptados": "enviar_datos_cliente, corregir_dato, hablar_con_persona",
+      "confirmacion_sensible": "No",
+      "condicion_de_entrada": "Consentimiento y validación",
+      "prioridad": "Alta"
+    },
+    {
+      "id": "EST-020",
+      "estado": "ESPERANDO_DECISION_ALTERNATIVA",
+      "grupo": "Excepción",
+      "descripcion": "No existe la opción original",
+      "intenciones_o_eventos_aceptados": "seleccionar_horario, seleccionar_profesional, cambiar_intencion",
+      "confirmacion_sensible": "No",
+      "condicion_de_entrada": "Alternativas vigentes",
+      "prioridad": "Alta"
+    },
+    {
+      "id": "EST-021",
+      "estado": "ESPERANDO_REFORMULACION",
+      "grupo": "Control",
+      "descripcion": "Mensaje no comprendido",
+      "intenciones_o_eventos_aceptados": "cualquier intención válida, hablar_con_persona",
+      "confirmacion_sensible": "No",
+      "condicion_de_entrada": "Texto interpretable",
+      "prioridad": "Alta"
+    },
+    {
+      "id": "EST-022",
+      "estado": "DERIVADO_HUMANO",
+      "grupo": "Soporte",
+      "descripcion": "Caso asignado a una persona",
+      "intenciones_o_eventos_aceptados": "mensajes gestionados por agente",
+      "confirmacion_sensible": "No",
+      "condicion_de_entrada": "ticket o conversation_id",
+      "prioridad": "Alta"
+    },
+    {
+      "id": "EST-023",
+      "estado": "CERRADO",
+      "grupo": "Terminal",
+      "descripcion": "Conversación terminada sin operación",
+      "intenciones_o_eventos_aceptados": "saludar o nueva intención",
+      "confirmacion_sensible": "No",
+      "condicion_de_entrada": "Ninguno",
+      "prioridad": "Alta"
+    },
+    {
+      "id": "EST-024",
+      "estado": "ERROR_CANAL",
+      "grupo": "Error",
+      "descripcion": "No se resolvió empresa por canal",
+      "intenciones_o_eventos_aceptados": "ninguna acción de negocio",
+      "confirmacion_sensible": "No",
+      "condicion_de_entrada": "Canal válido",
+      "prioridad": "Crítica"
+    }
+  ]
+}

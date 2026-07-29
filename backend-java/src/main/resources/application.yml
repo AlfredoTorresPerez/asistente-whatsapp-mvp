@@ -162,6 +162,15 @@ app:
     from: ${APP_EMAIL_FROM:no-reply@localhost}
     from-name: ${APP_EMAIL_FROM_NAME:Centro estetico}
     simulation-enabled: ${APP_EMAIL_SIMULATION_ENABLED:true}
+    mirror:
+      enabled: ${APP_EMAIL_MIRROR_ENABLED:false}
+      host: ${APP_EMAIL_MIRROR_HOST:}
+      port: ${APP_EMAIL_MIRROR_PORT:587}
+      username: ${APP_EMAIL_MIRROR_USERNAME:}
+      password: ${APP_EMAIL_MIRROR_PASSWORD:}
+      smtp-auth: ${APP_EMAIL_MIRROR_SMTP_AUTH:true}
+      starttls-enable: ${APP_EMAIL_MIRROR_SMTP_STARTTLS_ENABLE:true}
+      starttls-required: ${APP_EMAIL_MIRROR_SMTP_STARTTLS_REQUIRED:false}
   calendar:
     encryption-secret: ${APP_CALENDAR_ENCRYPTION_SECRET:}
     google:

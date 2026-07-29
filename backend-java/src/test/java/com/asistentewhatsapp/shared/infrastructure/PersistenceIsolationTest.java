@@ -12,14 +12,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 class PersistenceIsolationTest {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 
-    @Test
-    void flywayMigratedSuccessfully() {
-        Integer tableCount = jdbcTemplate.queryForObject(
-                "select count(*) from information_schema.tables where table_schema = 'public'",
-                Integer.class);
-        assertThat(tableCount).isPositive();
-    }
+	@Test
+	void flywayMigratedSuccessfully() {
+		Integer tableCount = jdbcTemplate.queryForObject(
+				"select count(*) from information_schema.tables where table_schema = 'public'", Integer.class);
+		assertThat(tableCount).isPositive();
+	}
 }

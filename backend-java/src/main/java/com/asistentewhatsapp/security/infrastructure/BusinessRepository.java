@@ -8,9 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BusinessRepository extends JpaRepository<BusinessEntity, UUID> {
 
-    List<BusinessEntity> findByActiveTrueOrderByCreatedAtAsc();
+	List<BusinessEntity> findByActiveTrueOrderByCreatedAtAsc();
 
-    Optional<BusinessEntity> findFirstByActiveTrueOrderByCreatedAtAsc();
+	Optional<BusinessEntity> findFirstByActiveTrueOrderByCreatedAtAsc();
 
-    Optional<BusinessEntity> findByCode(String code);
+	Optional<BusinessEntity> findByCode(String code);
 }

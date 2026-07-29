@@ -1,0 +1,112 @@
+{
+  "metadata": {
+    "source": "documentacion\\conversacion\\intenciones_agenda_whatsapp_es419_actualizada.xlsx",
+    "sheet_counts": {
+      "Resumen": 10,
+      "Reservar": 73,
+      "Reprogramar": 67,
+      "Cancelar": 67,
+      "Taxonomia_Intenciones": 42,
+      "Ejemplos_Ampliados": 168,
+      "Escenarios_Multiturno": 36,
+      "Conversaciones_Multiturno": 118,
+      "Entidades_Estructuradas": 60,
+      "Casos_Negativos": 60,
+      "Contexto_Referencias": 45,
+      "Cambios_Intencion": 30,
+      "Multiples_Reservas": 25,
+      "Respuestas_Acciones": 47,
+      "Estados_Conversacion": 24,
+      "Transiciones_Conversacion": 30,
+      "Evaluacion_Dataset": 104,
+      "Cobertura_Dataset": 42,
+      "Ambiguas_Contexto": 10,
+      "Reglas_Modelo": 10,
+      "Fuentes": 18,
+      "Metodologia": 12
+    },
+    "warnings": []
+  },
+  "items": [
+    {
+      "regla": "Negación explícita",
+      "prioridad": "Alta",
+      "aplica_a": "todas",
+      "descripcion": "Si el mensaje dice 'no quiero cancelar, solo cambiar', inhibir cancelar y activar reprogramar.",
+      "ejemplo": "No quiero cancelar, solo cambiar la hora",
+      "accion_recomendada": "Aplicar análisis de negación antes de clasificar intención"
+    },
+    {
+      "regla": "Contexto de cita existente",
+      "prioridad": "Alta",
+      "aplica_a": "reprogramar/cancelar",
+      "descripcion": "Reprogramar y cancelar requieren identificar una cita previa.",
+      "ejemplo": "Quiero cambiarla",
+      "accion_recomendada": "Buscar reserva activa por teléfono, nombre o último estado conversacional"
+    },
+    {
+      "regla": "Fecha u horario nuevo",
+      "prioridad": "Alta",
+      "aplica_a": "reprogramar",
+      "descripcion": "Si aparece una nueva fecha/hora junto con imposibilidad de asistir, preferir reprogramar.",
+      "ejemplo": "No puedo hoy, ¿puede ser mañana?",
+      "accion_recomendada": "Consultar disponibilidad para nueva fecha"
+    },
+    {
+      "regla": "Sin fecha nueva",
+      "prioridad": "Media",
+      "aplica_a": "cancelar",
+      "descripcion": "Si aparece imposibilidad de asistir sin alternativa, clasificar como cancelar probable pero pedir confirmación.",
+      "ejemplo": "No podré ir",
+      "accion_recomendada": "Preguntar: ¿Deseas cancelar o reprogramar?"
+    },
+    {
+      "regla": "Verbo de creación",
+      "prioridad": "Alta",
+      "aplica_a": "reservar",
+      "descripcion": "Reservar/agendar/programar/pedir hora activan flujo de nueva reserva.",
+      "ejemplo": "Quiero agendar",
+      "accion_recomendada": "Solicitar servicio, fecha y horario"
+    },
+    {
+      "regla": "Disponibilidad",
+      "prioridad": "Alta",
+      "aplica_a": "reservar",
+      "descripcion": "Preguntas de disponibilidad suelen ser pre-reserva.",
+      "ejemplo": "¿Tienen hora mañana?",
+      "accion_recomendada": "Mostrar horarios disponibles"
+    },
+    {
+      "regla": "Errores ortográficos",
+      "prioridad": "Media",
+      "aplica_a": "todas",
+      "descripcion": "Aplicar normalización: minúsculas, tildes, distancia de edición y equivalentes regionales.",
+      "ejemplo": "ajendar, canselar, rejendar",
+      "accion_recomendada": "Normalizar antes de clasificar"
+    },
+    {
+      "regla": "Emoji aislado",
+      "prioridad": "Baja",
+      "aplica_a": "todas",
+      "descripcion": "Un emoji no debe ejecutar una acción por sí solo.",
+      "ejemplo": "❌",
+      "accion_recomendada": "Pedir confirmación textual"
+    },
+    {
+      "regla": "Intención compuesta",
+      "prioridad": "Alta",
+      "aplica_a": "todas",
+      "descripcion": "Cuando hay pago, reembolso o abono, agregar atributo secundario.",
+      "ejemplo": "Cancelar y pedir reembolso",
+      "accion_recomendada": "Clasificar intención primaria y derivar subflujo de pago"
+    },
+    {
+      "regla": "Derivación humana",
+      "prioridad": "Alta",
+      "aplica_a": "todas",
+      "descripcion": "Derivar si hay reclamo, enojo, cargo, devolución compleja o ambigüedad persistente.",
+      "ejemplo": "Me cobraron y quiero cancelar",
+      "accion_recomendada": "Escalar a operador"
+    }
+  ]
+}

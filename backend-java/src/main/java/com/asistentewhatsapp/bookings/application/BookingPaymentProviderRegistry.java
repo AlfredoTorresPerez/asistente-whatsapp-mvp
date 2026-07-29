@@ -10,30 +10,26 @@ import org.springframework.stereotype.Component;
 @Component
 public class BookingPaymentProviderRegistry {
 
-    private final Map<String, BookingPaymentProvider> providerMap;
-    private final BookingPaymentProvider defaultProvider;
+	private final Map<String, BookingPaymentProvider> providerMap;
+	private final BookingPaymentProvider defaultProvider;
 
-    public BookingPaymentProviderRegistry(List<BookingPaymentProvider> providers,
-                                          BookingPaymentProperties properties) {
-        this.providerMap = providers.stream()
-                .collect(Collectors.toMap(
-                        BookingPaymentProvider::providerName,
-                        Function.identity(),
-                        (existing, replacement) -> existing));
-        String defaultName = properties.getProvider() != null && !properties.getProvider().isBlank()
-                ? properties.getProvider().trim().toUpperCase()
-                : "SIMULATED";
-        this.defaultProvider = providerMap.getOrDefault(defaultName, providerMap.get("SIMULATED"));
-    }
+	public BookingPaymentProviderRegistry(List<BookingPaymentProvider> providers, BookingPaymentProperties properties) {
+		this.providerMap = providers.stream().collect(Collectors.toMap(BookingPaymentProvider::providerName,
+				Function.identity(), (existing, replacement) -> existing));
+		String defaultName = properties.getProvider() != null && !properties.getProvider().isBlank()
+				? properties.getProvider().trim().toUpperCase()
+				: "SIMULATED";
+		this.defaultProvider = providerMap.getOrDefault(defaultName, providerMap.get("SIMULATED"));
+	}
 
-    public BookingPaymentProvider getProvider(String providerName) {
-        if (providerName == null || providerName.isBlank()) {
-            return defaultProvider;
-        }
-        return providerMap.getOrDefault(providerName.trim().toUpperCase(), defaultProvider);
-    }
+	public BookingPaymentProvider getProvider(String providerName) {
+		if (providerName == null || providerName.isBlank()) {
+			return defaultProvider;
+		}
+		return providerMap.getOrDefault(providerName.trim().toUpperCase(), defaultProvider);
+	}
 
-    public BookingPaymentProvider getDefaultProvider() {
-        return defaultProvider;
-    }
+	public BookingPaymentProvider getDefaultProvider() {
+		return defaultProvider;
+	}
 }

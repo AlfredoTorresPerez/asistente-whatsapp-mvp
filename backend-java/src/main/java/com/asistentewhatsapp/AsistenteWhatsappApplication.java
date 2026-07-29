@@ -14,10 +14,12 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-@EnableConfigurationProperties({AppSecurityProperties.class, JwtProperties.class, WhatsAppChannelProperties.class, BookingConfirmationProperties.class, BookingPaymentProperties.class, BookingReminderProperties.class, BookingSyncProperties.class})
+@EnableConfigurationProperties({AppSecurityProperties.class, JwtProperties.class, WhatsAppChannelProperties.class,
+		BookingConfirmationProperties.class, BookingPaymentProperties.class, BookingReminderProperties.class,
+		BookingSyncProperties.class})
 public class AsistenteWhatsappApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(AsistenteWhatsappApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(AsistenteWhatsappApplication.class, args);
+	}
 }

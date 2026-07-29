@@ -17,24 +17,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class LeadBookingController {
 
-    private final BookingService bookingService;
+	private final BookingService bookingService;
 
-    public LeadBookingController(BookingService bookingService) {
-        this.bookingService = bookingService;
-    }
+	public LeadBookingController(BookingService bookingService) {
+		this.bookingService = bookingService;
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_CREATE')")
-    @PostMapping(
-            value = {
-                "/api/v1/prospects/{leadId}/bookings",
-                "/api/v1/prospects/{leadId}/appointments",
-                "/api/v1/leads/{leadId}/bookings"
-            },
-            consumes = MediaType.APPLICATION_JSON_VALUE)
-    public BookingDetailResponse createFromLead(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @PathVariable UUID leadId,
-            @Valid @RequestBody CreateBookingFromLeadRequest request) {
-        return bookingService.createFromLead(authenticatedUser, leadId, request);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_CREATE')")
+	@PostMapping(value = {"/api/v1/prospects/{leadId}/bookings", "/api/v1/prospects/{leadId}/appointments",
+			"/api/v1/leads/{leadId}/bookings"}, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public BookingDetailResponse createFromLead(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@PathVariable UUID leadId, @Valid @RequestBody CreateBookingFromLeadRequest request) {
+		return bookingService.createFromLead(authenticatedUser, leadId, request);
+	}
 }

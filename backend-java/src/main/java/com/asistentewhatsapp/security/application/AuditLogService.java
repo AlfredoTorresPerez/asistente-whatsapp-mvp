@@ -10,15 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AuditLogService {
 
-    private final AuditLogJdbcRepository auditLogJdbcRepository;
+	private final AuditLogJdbcRepository auditLogJdbcRepository;
 
-    public AuditLogService(AuditLogJdbcRepository auditLogJdbcRepository) {
-        this.auditLogJdbcRepository = auditLogJdbcRepository;
-    }
+	public AuditLogService(AuditLogJdbcRepository auditLogJdbcRepository) {
+		this.auditLogJdbcRepository = auditLogJdbcRepository;
+	}
 
-    @Transactional(readOnly = true)
-    public PagedResponse<AuditLogResponse> list(AuthenticatedUser authenticatedUser, int page, int size) {
-        return auditLogJdbcRepository.findByBusinessId(authenticatedUser.businessId(), page, size);
-    }
+	@Transactional(readOnly = true)
+	public PagedResponse<AuditLogResponse> list(AuthenticatedUser authenticatedUser, int page, int size) {
+		return auditLogJdbcRepository.findByBusinessId(authenticatedUser.businessId(), page, size);
+	}
 }
-

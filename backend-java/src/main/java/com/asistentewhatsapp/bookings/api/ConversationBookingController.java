@@ -17,23 +17,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class ConversationBookingController {
 
-    private final BookingService bookingService;
+	private final BookingService bookingService;
 
-    public ConversationBookingController(BookingService bookingService) {
-        this.bookingService = bookingService;
-    }
+	public ConversationBookingController(BookingService bookingService) {
+		this.bookingService = bookingService;
+	}
 
-    @PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_CREATE')")
-    @PostMapping(
-            value = {
-                "/api/v1/conversations/{conversationId}/bookings",
-                "/api/v1/conversations/{conversationId}/appointments"
-            },
-            consumes = MediaType.APPLICATION_JSON_VALUE)
-    public BookingDetailResponse createFromConversation(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-            @PathVariable UUID conversationId,
-            @Valid @RequestBody CreateBookingFromConversationRequest request) {
-        return bookingService.createFromConversation(authenticatedUser, conversationId, request);
-    }
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_CREATE')")
+	@PostMapping(value = {"/api/v1/conversations/{conversationId}/bookings",
+			"/api/v1/conversations/{conversationId}/appointments"}, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public BookingDetailResponse createFromConversation(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@PathVariable UUID conversationId, @Valid @RequestBody CreateBookingFromConversationRequest request) {
+		return bookingService.createFromConversation(authenticatedUser, conversationId, request);
+	}
 }

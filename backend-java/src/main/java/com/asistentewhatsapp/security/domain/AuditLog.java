@@ -13,57 +13,75 @@ import java.util.UUID;
 @Table(name = "audit_log")
 public class AuditLog {
 
-    @Id
-    private UUID id;
+	@Id
+	private UUID id;
 
-    @Column(name = "business_id", nullable = false)
-    private UUID businessId;
+	@Column(name = "business_id", nullable = false)
+	private UUID businessId;
 
-    @Column(name = "actor_user_id")
-    private UUID actorUserId;
+	@Column(name = "actor_user_id")
+	private UUID actorUserId;
 
-    @Column(name = "action_type", nullable = false)
-    private String actionType;
+	@Column(name = "action_type", nullable = false)
+	private String actionType;
 
-    @Column(name = "entity_type", nullable = false)
-    private String entityType;
+	@Column(name = "entity_type", nullable = false)
+	private String entityType;
 
-    @Column(name = "entity_id")
-    private UUID entityId;
+	@Column(name = "entity_id")
+	private UUID entityId;
 
-    @Column(name = "summary", nullable = false)
-    private String summary;
+	@Column(name = "summary", nullable = false)
+	private String summary;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "metadata", nullable = false, columnDefinition = "jsonb")
-    private String metadata;
+	@JdbcTypeCode(SqlTypes.JSON)
+	@Column(name = "metadata", nullable = false, columnDefinition = "jsonb")
+	private String metadata;
 
-    @Column(name = "occurred_at", nullable = false)
-    private OffsetDateTime occurredAt;
+	@Column(name = "occurred_at", nullable = false)
+	private OffsetDateTime occurredAt;
 
-    protected AuditLog() {
-    }
+	protected AuditLog() {
+	}
 
-    public AuditLog(UUID id, UUID businessId, UUID actorUserId, String actionType, String entityType, UUID entityId,
-                    String summary, String metadata, OffsetDateTime occurredAt) {
-        this.id = id;
-        this.businessId = businessId;
-        this.actorUserId = actorUserId;
-        this.actionType = actionType;
-        this.entityType = entityType;
-        this.entityId = entityId;
-        this.summary = summary;
-        this.metadata = metadata;
-        this.occurredAt = occurredAt;
-    }
+	public AuditLog(UUID id, UUID businessId, UUID actorUserId, String actionType, String entityType, UUID entityId,
+			String summary, String metadata, OffsetDateTime occurredAt) {
+		this.id = id;
+		this.businessId = businessId;
+		this.actorUserId = actorUserId;
+		this.actionType = actionType;
+		this.entityType = entityType;
+		this.entityId = entityId;
+		this.summary = summary;
+		this.metadata = metadata;
+		this.occurredAt = occurredAt;
+	}
 
-    public UUID getId() { return id; }
-    public UUID getBusinessId() { return businessId; }
-    public UUID getActorUserId() { return actorUserId; }
-    public String getActionType() { return actionType; }
-    public String getEntityType() { return entityType; }
-    public UUID getEntityId() { return entityId; }
-    public String getSummary() { return summary; }
-    public String getMetadata() { return metadata; }
-    public OffsetDateTime getOccurredAt() { return occurredAt; }
+	public UUID getId() {
+		return id;
+	}
+	public UUID getBusinessId() {
+		return businessId;
+	}
+	public UUID getActorUserId() {
+		return actorUserId;
+	}
+	public String getActionType() {
+		return actionType;
+	}
+	public String getEntityType() {
+		return entityType;
+	}
+	public UUID getEntityId() {
+		return entityId;
+	}
+	public String getSummary() {
+		return summary;
+	}
+	public String getMetadata() {
+		return metadata;
+	}
+	public OffsetDateTime getOccurredAt() {
+		return occurredAt;
+	}
 }

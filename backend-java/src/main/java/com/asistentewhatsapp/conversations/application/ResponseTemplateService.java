@@ -17,67 +17,48 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ResponseTemplateService {
 
-    private final ConversationJdbcRepository conversationJdbcRepository;
+	private final ConversationJdbcRepository conversationJdbcRepository;
 
-    public ResponseTemplateService(ConversationJdbcRepository conversationJdbcRepository) {
-        this.conversationJdbcRepository = conversationJdbcRepository;
-    }
+	public ResponseTemplateService(ConversationJdbcRepository conversationJdbcRepository) {
+		this.conversationJdbcRepository = conversationJdbcRepository;
+	}
 
-    @Transactional(readOnly = true)
-    public List<ResponseTemplateResponse> list(AuthenticatedUser authenticatedUser, Boolean active) {
-        return conversationJdbcRepository.findTemplates(authenticatedUser.businessId(), active);
-    }
+	@Transactional(readOnly = true)
+	public List<ResponseTemplateResponse> list(AuthenticatedUser authenticatedUser, Boolean active) {
+		return conversationJdbcRepository.findTemplates(authenticatedUser.businessId(), active);
+	}
 
-    @Transactional
-    public ResponseTemplateResponse create(
-            AuthenticatedUser authenticatedUser,
-            CreateResponseTemplateRequest request) {
-        String name = request.name().trim();
-        validateTemplateName(authenticatedUser.businessId(), name, null);
-        UUID templateId = conversationJdbcRepository.insertTemplate(
-                authenticatedUser.businessId(),
-                name,
-                request.category().trim().toUpperCase(),
-                request.body().trim(),
-                request.active() == null || request.active());
-        return conversationJdbcRepository.findTemplateById(authenticatedUser.businessId(), templateId);
-    }
+	@Transactional
+	public ResponseTemplateResponse create(AuthenticatedUser authenticatedUser, CreateResponseTemplateRequest request) {
+		String name = request.name().trim();
+		validateTemplateName(authenticatedUser.businessId(), name, null);
+		UUID templateId = conversationJdbcRepository.insertTemplate(authenticatedUser.businessId(), name,
+				request.category().trim().toUpperCase(), request.body().trim(),
+				request.active() == null || request.active());
+		return conversationJdbcRepository.findTemplateById(authenticatedUser.businessId(), templateId);
+	}
 
-    @Transactional
-    public ResponseTemplateResponse update(
-            AuthenticatedUser authenticatedUser,
-            UUID templateId,
-            UpdateResponseTemplateRequest request) {
-        String name = request.name().trim();
-        validateTemplateName(authenticatedUser.businessId(), name, templateId);
-        conversationJdbcRepository.updateTemplate(
-                authenticatedUser.businessId(),
-                templateId,
-                name,
-                request.category().trim().toUpperCase(),
-                request.body().trim());
-        return conversationJdbcRepository.findTemplateById(authenticatedUser.businessId(), templateId);
-    }
+	@Transactional
+	public ResponseTemplateResponse update(AuthenticatedUser authenticatedUser, UUID templateId,
+			UpdateResponseTemplateRequest request) {
+		String name = request.name().trim();
+		validateTemplateName(authenticatedUser.businessId(), name, templateId);
+		conversationJdbcRepository.updateTemplate(authenticatedUser.businessId(), templateId, name,
+				request.category().trim().toUpperCase(), request.body().trim());
+		return conversationJdbcRepository.findTemplateById(authenticatedUser.businessId(), templateId);
+	}
 
-    @Transactional
-    public ResponseTemplateResponse updateStatus(
-            AuthenticatedUser authenticatedUser,
-            UUID templateId,
-            UpdateTemplateStatusRequest request) {
-        conversationJdbcRepository.updateTemplateStatus(
-                authenticatedUser.businessId(),
-                templateId,
-                request.active());
-        return conversationJdbcRepository.findTemplateById(authenticatedUser.businessId(), templateId);
-    }
+	@Transactional
+	public ResponseTemplateResponse updateStatus(AuthenticatedUser authenticatedUser, UUID templateId,
+			UpdateTemplateStatusRequest request) {
+		conversationJdbcRepository.updateTemplateStatus(authenticatedUser.businessId(), templateId, request.active());
+		return conversationJdbcRepository.findTemplateById(authenticatedUser.businessId(), templateId);
+	}
 
-    private void validateTemplateName(UUID businessId, String name, UUID templateId) {
-        if (conversationJdbcRepository.existsTemplateName(businessId, name, templateId)) {
-            throw new ApiException(
-                    HttpStatus.BAD_REQUEST,
-                    "VALIDATION_ERROR",
-                    "La solicitud contiene datos invalidos.",
-                    Map.of("name", "Ya existe una plantilla con ese nombre."));
-        }
-    }
+	private void validateTemplateName(UUID businessId, String name, UUID templateId) {
+		if (conversationJdbcRepository.existsTemplateName(businessId, name, templateId)) {
+			throw new ApiException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "La solicitud contiene datos invalidos.",
+					Map.of("name", "Ya existe una plantilla con ese nombre."));
+		}
+	}
 }

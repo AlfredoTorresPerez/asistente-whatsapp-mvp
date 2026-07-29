@@ -124,7 +124,11 @@ export function AdminContentPage() {
   })
 
   const updateMutation = useMutation({
-    mutationFn: async (payload: { id: string; request: UpdateContentItemRequest; image?: File }) => {
+    mutationFn: async (payload: {
+      id: string
+      request: UpdateContentItemRequest
+      image?: File
+    }) => {
       const result = await updateContentItemRequest(payload.id, payload.request)
       if (payload.image) {
         await uploadContentItemImageRequest(payload.id, payload.image)
@@ -256,27 +260,31 @@ export function AdminContentPage() {
     return errors
   }
 
-  const updateField = useCallback((field: keyof FormState | 'imageFile' | 'imagePreview', value: string | File | null) => {
-    setForm((current) => {
-      const next = { ...current, [field]: value }
-      if (field === 'imageFile' && value instanceof File) {
-        next.imagePreview = URL.createObjectURL(value)
-      } else if (field === 'imageFile' && value === null) {
-        next.imagePreview = null
-      }
-      return next
-    })
-    setFormErrors((current) => {
-      const { [field]: _, general: __, ...remaining } = current
-      return remaining
-    })
-  }, [])
+  const updateField = useCallback(
+    (field: keyof FormState | 'imageFile' | 'imagePreview', value: string | File | null) => {
+      setForm((current) => {
+        const next = { ...current, [field]: value }
+        if (field === 'imageFile' && value instanceof File) {
+          next.imagePreview = URL.createObjectURL(value)
+        } else if (field === 'imageFile' && value === null) {
+          next.imagePreview = null
+        }
+        return next
+      })
+      setFormErrors((current) => {
+        const { [field]: _, general: __, ...remaining } = current
+        return remaining
+      })
+    },
+    [],
+  )
 
   const validateForm = useCallback((): FormErrors => {
     const errors: FormErrors = {}
     if (!form.type) errors.type = 'El tipo es obligatorio.'
     if (!form.text.trim()) errors.text = 'El texto es obligatorio.'
-    else if (form.text.trim().length > 200) errors.text = 'El texto no puede superar 200 caracteres.'
+    else if (form.text.trim().length > 200)
+      errors.text = 'El texto no puede superar 200 caracteres.'
     if (!form.status) errors.status = 'El estado es obligatorio.'
     return errors
   }, [form])
@@ -287,7 +295,11 @@ export function AdminContentPage() {
       const errors = validateForm()
       setFormErrors(errors)
       if (Object.keys(errors).length > 0) {
-        showToast({ title: 'Revisa el formulario', description: 'Corrige los campos marcados.', tone: 'error' })
+        showToast({
+          title: 'Revisa el formulario',
+          description: 'Corrige los campos marcados.',
+          tone: 'error',
+        })
         return
       }
       const payload: CreateContentItemRequest | UpdateContentItemRequest = {
@@ -296,12 +308,19 @@ export function AdminContentPage() {
         status: form.status,
       }
       if (form.id) {
-        updateMutation.mutate({ id: form.id, request: payload as UpdateContentItemRequest, image: form.imageFile ?? undefined })
+        updateMutation.mutate({
+          id: form.id,
+          request: payload as UpdateContentItemRequest,
+          image: form.imageFile ?? undefined,
+        })
       } else {
-        createMutation.mutate({ request: payload as CreateContentItemRequest, image: form.imageFile ?? undefined })
+        createMutation.mutate({
+          request: payload as CreateContentItemRequest,
+          image: form.imageFile ?? undefined,
+        })
       }
     },
-    [form, validateForm, createMutation, updateMutation, showToast]
+    [form, validateForm, createMutation, updateMutation, showToast],
   )
 
   const startNew = useCallback(() => {
@@ -321,7 +340,7 @@ export function AdminContentPage() {
       const newStatus = item.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'
       statusMutation.mutate({ id: item.id, status: newStatus })
     },
-    [statusMutation]
+    [statusMutation],
   )
 
   const confirmDelete = useCallback((item: ContentItemSummaryResponse) => {
@@ -342,9 +361,7 @@ export function AdminContentPage() {
   return (
     <section className="space-y-6">
       <PageHeader
-        actions={
-          <Button onClick={startNew}>Nuevo registro</Button>
-        }
+        actions={<Button onClick={startNew}>Nuevo registro</Button>}
         description="Administra imágenes y textos utilizados en categorías, servicios y landing page."
         eyebrow="Administración"
         title="Contenido visual"
@@ -361,10 +378,30 @@ export function AdminContentPage() {
       ) : (
         <>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <MetricCard label="Total de registros" value={String(stats?.total ?? 0)} helper="En esta empresa" icon="\uD83D\uDCC4" />
-            <MetricCard label="Activos" value={String(stats?.active ?? 0)} helper="Visibles en público" icon="\u2705" />
-            <MetricCard label="Inactivos" value={String(stats?.inactive ?? 0)} helper="Borradores u ocultos" icon="\u23F8\uFE0F" />
-            <MetricCard label="Sin imagen" value={String(stats?.withoutImage ?? 0)} helper="Pendientes de imagen" icon="\uD83D\uDDBC\uFE0F" />
+            <MetricCard
+              label="Total de registros"
+              value={String(stats?.total ?? 0)}
+              helper="En esta empresa"
+              icon="\uD83D\uDCC4"
+            />
+            <MetricCard
+              label="Activos"
+              value={String(stats?.active ?? 0)}
+              helper="Visibles en público"
+              icon="\u2705"
+            />
+            <MetricCard
+              label="Inactivos"
+              value={String(stats?.inactive ?? 0)}
+              helper="Borradores u ocultos"
+              icon="\u23F8\uFE0F"
+            />
+            <MetricCard
+              label="Sin imagen"
+              value={String(stats?.withoutImage ?? 0)}
+              helper="Pendientes de imagen"
+              icon="\uD83D\uDDBC\uFE0F"
+            />
           </div>
 
           <Card className="space-y-5">
@@ -400,7 +437,14 @@ export function AdminContentPage() {
                   ]}
                 />
                 {(search || typeFilter !== 'ALL' || statusFilter !== 'ALL') && (
-                  <Button onClick={() => { setSearch(''); setTypeFilter('ALL'); setStatusFilter('ALL'); }} variant="secondary">
+                  <Button
+                    onClick={() => {
+                      setSearch('')
+                      setTypeFilter('ALL')
+                      setStatusFilter('ALL')
+                    }}
+                    variant="secondary"
+                  >
                     Limpiar filtros
                   </Button>
                 )}
@@ -431,20 +475,48 @@ export function AdminContentPage() {
                       />
                     ) : (
                       <div className="h-full w-full flex items-center justify-center rounded-lg bg-slate-100">
-                        <svg className="h-6 w-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <svg
+                          className="h-6 w-6 text-slate-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={1.5}
+                            d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={1.5}
+                            d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
                         </svg>
                       </div>
                     )}
                   </div>
                   <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-                    {CONTENT_TYPES.find((t) => t.value === item.typeLabel.toUpperCase().replace(' ', '_'))?.label ?? item.typeLabel}
+                    {CONTENT_TYPES.find(
+                      (t) => t.value === item.typeLabel.toUpperCase().replace(' ', '_'),
+                    )?.label ?? item.typeLabel}
                   </span>
-                  <p className="truncate text-sm text-slate-600 max-w-xs" title={item.textPreview}>{item.textPreview}</p>
-                  <StatusBadge label={item.status} tone={item.status === 'ACTIVE' ? 'success' : 'neutral'} />
+                  <p className="truncate text-sm text-slate-600 max-w-xs" title={item.textPreview}>
+                    {item.textPreview}
+                  </p>
+                  <StatusBadge
+                    label={item.status}
+                    tone={item.status === 'ACTIVE' ? 'success' : 'neutral'}
+                  />
                   <span className="text-sm text-slate-600 hidden sm:block">
-                    {new Date(item.updatedAt).toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    {new Date(item.updatedAt).toLocaleDateString('es-CL', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
                   </span>
                   <div className="flex shrink-0 gap-1.5">
                     <Button
@@ -483,7 +555,9 @@ export function AdminContentPage() {
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600">
-              <span>Mostrando {filteredItems.length} de {stats?.total ?? 0} registros.</span>
+              <span>
+                Mostrando {filteredItems.length} de {stats?.total ?? 0} registros.
+              </span>
               <div className="flex gap-2">
                 <Button
                   disabled={page === 0}
@@ -494,7 +568,9 @@ export function AdminContentPage() {
                   Anterior
                 </Button>
                 <Button
-                  disabled={filteredItems.length < size || (stats && (page + 1) * size >= stats.total)}
+                  disabled={
+                    filteredItems.length < size || (stats && (page + 1) * size >= stats.total)
+                  }
                   onClick={() => setPage((p) => p + 1)}
                   size="sm"
                   variant="secondary"
@@ -514,7 +590,8 @@ export function AdminContentPage() {
                 {form.id ? 'Datos del registro' : 'Crear nuevo registro'}
               </h2>
               <p className="mt-1 text-sm text-slate-500">
-                Selecciona el tipo, escribe el texto (máx. 200 caracteres), elige una imagen opcional y define el estado.
+                Selecciona el tipo, escribe el texto (máx. 200 caracteres), elige una imagen
+                opcional y define el estado.
               </p>
             </div>
 
@@ -591,7 +668,9 @@ export function AdminContentPage() {
         <div className="space-y-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Eliminar contenido</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+                Eliminar contenido
+              </p>
               <h3 className="mt-1 text-lg font-semibold text-slate-950">
                 ¿Eliminar "{selectedItem?.textPreview}"?
               </h3>
@@ -602,24 +681,26 @@ export function AdminContentPage() {
               type="button"
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
 
           <p className="text-sm text-slate-600">
-            Esta acción eliminará el registro permanentemente. Si tiene una imagen asociada, también se eliminará del almacenamiento.
+            Esta acción eliminará el registro permanentemente. Si tiene una imagen asociada, también
+            se eliminará del almacenamiento.
           </p>
 
           <div className="flex flex-wrap justify-end gap-3 pt-4 border-t border-slate-200">
             <Button onClick={() => setSelectedItem(null)} type="button" variant="secondary">
               Cancelar
             </Button>
-            <Button
-              loading={deleteMutation.isPending}
-              onClick={executeDelete}
-              variant="danger"
-            >
+            <Button loading={deleteMutation.isPending} onClick={executeDelete} variant="danger">
               Eliminar
             </Button>
           </div>
@@ -629,10 +710,22 @@ export function AdminContentPage() {
   )
 }
 
-function MetricCard({ helper, icon, label, value }: { helper: string; icon: string; label: string; value: string }) {
+function MetricCard({
+  helper,
+  icon,
+  label,
+  value,
+}: {
+  helper: string
+  icon: string
+  label: string
+  value: string
+}) {
   return (
     <Card className="flex items-center gap-4">
-      <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-2xl">{icon}</span>
+      <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-2xl">
+        {icon}
+      </span>
       <span>
         <span className="block text-2xl font-semibold text-slate-950">{value}</span>
         <span className="block text-sm font-semibold text-slate-700">{label}</span>

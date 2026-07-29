@@ -307,10 +307,7 @@ export function MultisiteOperationsPage() {
           <TabBar activeTab={activeTab} onChange={setActiveTab} />
 
           {activeTab === 'summary' ? (
-            <SummaryPanel
-              locations={locations}
-              selectedLocationId={selectedLocationId}
-            />
+            <SummaryPanel locations={locations} selectedLocationId={selectedLocationId} />
           ) : null}
           {activeTab === 'catalog' ? (
             <CatalogPanel
@@ -443,7 +440,9 @@ function SummaryPanel({
   if (filtered.length === 0) {
     return (
       <Card className="flex flex-col items-center justify-center py-16 text-center">
-        <p className="text-lg font-semibold text-slate-950">No existen sedes para el filtro seleccionado</p>
+        <p className="text-lg font-semibold text-slate-950">
+          No existen sedes para el filtro seleccionado
+        </p>
         <p className="mt-2 text-sm text-slate-500">
           {selectedLocationId
             ? 'Intenta seleccionar otra sede o vuelve a "Todas las sedes".'
@@ -459,14 +458,30 @@ function SummaryPanel({
         <table className="min-w-full divide-y divide-[var(--color-border)] text-sm">
           <thead className="bg-slate-50 text-left text-xs uppercase tracking-[0.16em] text-slate-500">
             <tr>
-              <th scope="col" className="sticky left-0 z-10 bg-slate-50 px-5 py-4">Sede</th>
-              <th scope="col" className="px-5 py-4">Estado</th>
-              <th scope="col" className="px-5 py-4 text-right">Conversaciones</th>
-              <th scope="col" className="px-5 py-4 text-right">Prospectos</th>
-              <th scope="col" className="px-5 py-4 text-right">Citas</th>
-              <th scope="col" className="px-5 py-4 text-right">Pedidos</th>
-              <th scope="col" className="px-5 py-4 text-right">Productos stock</th>
-              <th scope="col" className="px-5 py-4 text-right">Profesionales</th>
+              <th scope="col" className="sticky left-0 z-10 bg-slate-50 px-5 py-4">
+                Sede
+              </th>
+              <th scope="col" className="px-5 py-4">
+                Estado
+              </th>
+              <th scope="col" className="px-5 py-4 text-right">
+                Conversaciones
+              </th>
+              <th scope="col" className="px-5 py-4 text-right">
+                Prospectos
+              </th>
+              <th scope="col" className="px-5 py-4 text-right">
+                Citas
+              </th>
+              <th scope="col" className="px-5 py-4 text-right">
+                Pedidos
+              </th>
+              <th scope="col" className="px-5 py-4 text-right">
+                Productos stock
+              </th>
+              <th scope="col" className="px-5 py-4 text-right">
+                Profesionales
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--color-border)]">

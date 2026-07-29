@@ -1,18 +1,25 @@
 import { useCallback } from 'react'
+import { Link } from 'react-router-dom'
 import { LandingImage } from '../../../components/ui/LandingImage'
 import { buildPublicWhatsAppUrl } from '../../../lib/whatsapp'
 import { IMAGES, DEFAULT_LANDING_IMAGE } from '../../../lib/landingImages'
-import { usePublicLandingContent, usePublicServicesContent, usePublicCategoriesContent } from '../hooks/usePublicContent'
+import {
+  usePublicLandingContent,
+  usePublicServicesContent,
+  usePublicCategoriesContent,
+} from '../hooks/usePublicContent'
 import type { PublicContentItemResponse } from '../../../services/api/types'
 
-const WHATSAPP_MESSAGE_DEFAULT = 'Hola, quiero solicitar información y agendar una hora en Centro Estética Bella.'
+const WHATSAPP_MESSAGE_DEFAULT =
+  'Hola, quiero solicitar información y agendar una hora en Centro Estética Bella.'
 
 const FALLBACK_SERVICES = [
   {
     name: 'Limpiezas faciales',
     slug: 'limpiezas-faciales',
     description: 'Tratamientos diseñados para limpiar, renovar y mejorar la apariencia de tu piel.',
-    message: 'Hola, quiero información sobre el servicio de limpieza facial de Centro Estética Bella.',
+    message:
+      'Hola, quiero información sobre el servicio de limpieza facial de Centro Estética Bella.',
   },
   {
     name: 'Hidratación',
@@ -59,11 +66,31 @@ const FALLBACK_SERVICES = [
 ]
 
 const BENEFITS = [
-  { icon: '👩‍⚕️', title: 'Profesionales expertas', text: 'Equipo altamente capacitado con años de experiencia en estética y bienestar.' },
-  { icon: '✨', title: 'Atención personalizada', text: 'Cada tratamiento se adapta a tus necesidades y objetivos específicos.' },
-  { icon: '🏆', title: 'Productos de calidad', text: 'Trabajamos con marcas premium para garantizar los mejores resultados.' },
-  { icon: '🏠', title: 'Ambiente cómodo y seguro', text: 'Un espacio pensado para que te sientas como en casa.' },
-  { icon: '💬', title: 'Reserva rápida por WhatsApp', text: 'Agenda tu cita en minutos a través de nuestro canal directo.' },
+  {
+    icon: '👩‍⚕️',
+    title: 'Profesionales expertas',
+    text: 'Equipo altamente capacitado con años de experiencia en estética y bienestar.',
+  },
+  {
+    icon: '✨',
+    title: 'Atención personalizada',
+    text: 'Cada tratamiento se adapta a tus necesidades y objetivos específicos.',
+  },
+  {
+    icon: '🏆',
+    title: 'Productos de calidad',
+    text: 'Trabajamos con marcas premium para garantizar los mejores resultados.',
+  },
+  {
+    icon: '🏠',
+    title: 'Ambiente cómodo y seguro',
+    text: 'Un espacio pensado para que te sientas como en casa.',
+  },
+  {
+    icon: '💬',
+    title: 'Reserva rápida por WhatsApp',
+    text: 'Agenda tu cita en minutos a través de nuestro canal directo.',
+  },
 ]
 
 const PROMOTIONS = [
@@ -73,7 +100,8 @@ const PROMOTIONS = [
     originalPrice: '$35.000',
     promoPrice: '$25.000',
     validUntil: '31 de agosto, 2026',
-    message: 'Hola, quiero información sobre la promoción de limpieza facial de Centro Estética Bella.',
+    message:
+      'Hola, quiero información sobre la promoción de limpieza facial de Centro Estética Bella.',
   },
 ]
 
@@ -92,6 +120,23 @@ function WhatsAppIcon({ className }: { className?: string }) {
   )
 }
 
+function CalendarIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <rect height="14" rx="3" strokeWidth="2" width="14" x="5" y="6" />
+      <path d="M8 4V8" strokeLinecap="round" strokeWidth="2" />
+      <path d="M16 4V8" strokeLinecap="round" strokeWidth="2" />
+      <path d="M3 10h18" strokeLinecap="round" strokeWidth="2" />
+    </svg>
+  )
+}
+
 function StarIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
@@ -100,7 +145,15 @@ function StarIcon({ className }: { className?: string }) {
   )
 }
 
-function ScrollLink({ targetId, children, className }: { targetId: string; children: React.ReactNode; className?: string }) {
+function ScrollLink({
+  targetId,
+  children,
+  className,
+}: {
+  targetId: string
+  children: React.ReactNode
+  className?: string
+}) {
   const handleClick = useCallback(() => {
     const el = document.getElementById(targetId)
     if (el) {
@@ -115,7 +168,15 @@ function ScrollLink({ targetId, children, className }: { targetId: string; child
   )
 }
 
-function ServiceCard({ imageUrl, text, message }: { imageUrl: string | null; text: string; message: string }) {
+function ServiceCard({
+  imageUrl,
+  text,
+  message,
+}: {
+  imageUrl: string | null
+  text: string
+  message: string
+}) {
   return (
     <article className="group flex flex-col rounded-2xl border border-rose-100/60 bg-white shadow-sm transition hover:shadow-md">
       <div className="aspect-[4/3] overflow-hidden rounded-t-2xl">
@@ -165,10 +226,20 @@ function ContentCard({ item }: { item: PublicContentItemResponse }) {
   )
 }
 
-function LandingSectionHeader({ label, title, description }: { label?: string; title: string; description?: string }) {
+function LandingSectionHeader({
+  label,
+  title,
+  description,
+}: {
+  label?: string
+  title: string
+  description?: string
+}) {
   return (
     <div className="mx-auto max-w-2xl text-center">
-      {label && <p className="text-sm font-semibold uppercase tracking-[0.2em] text-rose-400">{label}</p>}
+      {label && (
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-rose-400">{label}</p>
+      )}
       <h2 className="mt-3 text-3xl font-bold text-gray-900 md:text-4xl">{title}</h2>
       {description && <p className="mt-3 text-gray-600">{description}</p>}
     </div>
@@ -183,12 +254,15 @@ export function BeautyCenterLandingPage() {
   const hasLandingData = !landingLoading && landingItems.length > 0
   const hasServiceData = !servicesLoading && serviceItems.length > 0
 
-  const heroLandingItem = landingItems.find(i => i.imageUrl) ?? landingItems[0]
+  const heroLandingItem = landingItems.find((i) => i.imageUrl) ?? landingItems[0]
   const heroImageUrl = heroLandingItem?.imageUrl ?? IMAGES.HERO
 
   return (
     <div className="min-h-screen bg-[#fefcfb] font-sans text-gray-800">
-      <a href="#inicio" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-rose-600 focus:shadow-lg">
+      <a
+        href="#inicio"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-rose-600 focus:shadow-lg"
+      >
         Saltar al contenido principal
       </a>
 
@@ -197,13 +271,35 @@ export function BeautyCenterLandingPage() {
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-rose-300 to-rose-500 text-sm font-bold text-white shadow-sm">
             CB
           </div>
-          <span className="text-base font-semibold tracking-tight text-gray-800">Centro Estética Bella</span>
+          <span className="text-base font-semibold tracking-tight text-gray-800">
+            Centro Estética Bella
+          </span>
         </div>
         <nav className="hidden items-center gap-6 md:flex" aria-label="Navegación principal">
-          <ScrollLink targetId="servicios" className="text-sm font-medium text-gray-500 transition hover:text-rose-600">Servicios</ScrollLink>
-          <ScrollLink targetId="beneficios" className="text-sm font-medium text-gray-500 transition hover:text-rose-600">Beneficios</ScrollLink>
-          <ScrollLink targetId="promociones" className="text-sm font-medium text-gray-500 transition hover:text-rose-600">Promociones</ScrollLink>
-          <ScrollLink targetId="contacto" className="text-sm font-medium text-gray-500 transition hover:text-rose-600">Contacto</ScrollLink>
+          <ScrollLink
+            targetId="servicios"
+            className="text-sm font-medium text-gray-500 transition hover:text-rose-600"
+          >
+            Servicios
+          </ScrollLink>
+          <ScrollLink
+            targetId="beneficios"
+            className="text-sm font-medium text-gray-500 transition hover:text-rose-600"
+          >
+            Beneficios
+          </ScrollLink>
+          <ScrollLink
+            targetId="promociones"
+            className="text-sm font-medium text-gray-500 transition hover:text-rose-600"
+          >
+            Promociones
+          </ScrollLink>
+          <ScrollLink
+            targetId="contacto"
+            className="text-sm font-medium text-gray-500 transition hover:text-rose-600"
+          >
+            Contacto
+          </ScrollLink>
           <button
             onClick={() => openWhatsApp(WHATSAPP_MESSAGE_DEFAULT)}
             className="inline-flex items-center gap-2 rounded-xl bg-[#25D366] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#20BD5A]"
@@ -231,19 +327,23 @@ export function BeautyCenterLandingPage() {
                 Centro Estética Bella
               </p>
               <h1 className="mt-4 text-4xl font-bold leading-tight tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
-                {hasLandingData ? landingItems[0].text : 'Realza tu belleza y disfruta una experiencia pensada para ti'}
+                {hasLandingData
+                  ? landingItems[0].text
+                  : 'Realza tu belleza y disfruta una experiencia pensada para ti'}
               </h1>
               <p className="mt-4 max-w-xl text-base leading-relaxed text-gray-600 md:text-lg">
-                {hasLandingData && landingItems.length > 1 ? landingItems[1].text : 'En Centro Estética Bella ofrecemos tratamientos faciales, hidratación, depilación y cuidado estético personalizado, en un ambiente profesional, cálido y seguro.'}
+                {hasLandingData && landingItems.length > 1
+                  ? landingItems[1].text
+                  : 'En Centro Estética Bella ofrecemos tratamientos faciales, hidratación, depilación y cuidado estético personalizado, en un ambiente profesional, cálido y seguro.'}
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-4">
-                <button
-                  onClick={() => openWhatsApp(WHATSAPP_MESSAGE_DEFAULT)}
-                  className="inline-flex items-center gap-2.5 rounded-xl bg-[#25D366] px-8 py-4 text-base font-bold text-white shadow-lg transition hover:bg-[#20BD5A]"
+                <Link
+                  to="/reservar"
+                  className="inline-flex items-center gap-2.5 rounded-xl bg-[#2563EB] px-8 py-4 text-base font-bold text-white shadow-lg transition hover:bg-[#1D4ED8]"
                 >
-                  <WhatsAppIcon className="h-5 w-5" />
-                  Agendar por WhatsApp
-                </button>
+                  <CalendarIcon className="h-5 w-5" />
+                  Agenda en línea
+                </Link>
                 <ScrollLink
                   targetId="servicios"
                   className="inline-flex items-center gap-2 rounded-xl border-2 border-gray-200 bg-white px-8 py-4 text-base font-semibold text-gray-700 shadow-sm transition hover:border-rose-200 hover:text-rose-600"
@@ -277,7 +377,7 @@ export function BeautyCenterLandingPage() {
           <section className="bg-white py-16 md:py-24">
             <div className="mx-auto max-w-7xl px-4">
               <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {landingItems.slice(1).map(item => (
+                {landingItems.slice(1).map((item) => (
                   <ContentCard key={item.id} item={item} />
                 ))}
               </div>
@@ -293,41 +393,45 @@ export function BeautyCenterLandingPage() {
               description="Descubre nuestra amplia gama de servicios diseñados para realzar tu belleza natural."
             />
             <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {hasServiceData ? serviceItems.map(item => (
-                <ServiceCard
-                  key={item.id}
-                  imageUrl={item.imageUrl}
-                  text={item.text}
-                  message={`Hola, quiero información sobre este servicio de Centro Estética Bella.`}
-                />
-              )) : FALLBACK_SERVICES.map((service) => (
-                <article
-                  key={service.name}
-                  className="group flex flex-col rounded-2xl border border-rose-100/60 bg-white shadow-sm transition hover:shadow-md"
-                >
-                  <div className="aspect-[4/3] overflow-hidden rounded-t-2xl">
-                    <LandingImage
-                      src={null}
-                      fallbackSrc={IMAGES.HERO_SECONDARY}
-                      alt={`${service.name} en Centro Estética Bella`}
-                      className="h-full w-full transition duration-300 group-hover:scale-105"
-                      width={340}
-                      height={255}
-                      objectFit="cover"
+              {hasServiceData
+                ? serviceItems.map((item) => (
+                    <ServiceCard
+                      key={item.id}
+                      imageUrl={item.imageUrl}
+                      text={item.text}
+                      message={`Hola, quiero información sobre este servicio de Centro Estética Bella.`}
                     />
-                  </div>
-                  <div className="flex flex-1 flex-col p-5">
-                    <h3 className="text-lg font-semibold text-gray-900">{service.name}</h3>
-                    <p className="mt-2 flex-1 text-sm leading-relaxed text-gray-500">{service.description}</p>
-                    <button
-                      onClick={() => openWhatsApp(service.message)}
-                      className="mt-4 w-full rounded-xl bg-gray-50 py-2.5 text-xs font-semibold text-gray-600 transition hover:bg-[#25D366] hover:text-white"
+                  ))
+                : FALLBACK_SERVICES.map((service) => (
+                    <article
+                      key={service.name}
+                      className="group flex flex-col rounded-2xl border border-rose-100/60 bg-white shadow-sm transition hover:shadow-md"
                     >
-                      Consultar por WhatsApp
-                    </button>
-                  </div>
-                </article>
-              ))}
+                      <div className="aspect-[4/3] overflow-hidden rounded-t-2xl">
+                        <LandingImage
+                          src={null}
+                          fallbackSrc={IMAGES.HERO_SECONDARY}
+                          alt={`${service.name} en Centro Estética Bella`}
+                          className="h-full w-full transition duration-300 group-hover:scale-105"
+                          width={340}
+                          height={255}
+                          objectFit="cover"
+                        />
+                      </div>
+                      <div className="flex flex-1 flex-col p-5">
+                        <h3 className="text-lg font-semibold text-gray-900">{service.name}</h3>
+                        <p className="mt-2 flex-1 text-sm leading-relaxed text-gray-500">
+                          {service.description}
+                        </p>
+                        <button
+                          onClick={() => openWhatsApp(service.message)}
+                          className="mt-4 w-full rounded-xl bg-gray-50 py-2.5 text-xs font-semibold text-gray-600 transition hover:bg-[#25D366] hover:text-white"
+                        >
+                          Consultar por WhatsApp
+                        </button>
+                      </div>
+                    </article>
+                  ))}
             </div>
           </div>
         </section>
@@ -341,7 +445,7 @@ export function BeautyCenterLandingPage() {
                 description="Encuentra el tratamiento perfecto para ti."
               />
               <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                {categoryItems.map(item => (
+                {categoryItems.map((item) => (
                   <ContentCard key={item.id} item={item} />
                 ))}
               </div>
@@ -353,13 +457,20 @@ export function BeautyCenterLandingPage() {
           <div className="mx-auto max-w-7xl px-4">
             <div className="grid items-center gap-10 md:grid-cols-2 md:gap-16">
               <div className="order-2 md:order-1">
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-rose-400">Sobre nosotros</p>
-                <h2 className="mt-3 text-3xl font-bold text-gray-900 md:text-4xl">Un espacio pensado para tu bienestar</h2>
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-rose-400">
+                  Sobre nosotros
+                </p>
+                <h2 className="mt-3 text-3xl font-bold text-gray-900 md:text-4xl">
+                  Un espacio pensado para tu bienestar
+                </h2>
                 <p className="mt-4 text-base leading-relaxed text-gray-600">
-                  En Centro Estética Bella combinamos experiencia, calidez y profesionalismo para ofrecerte una experiencia única de cuidado personal. Nuestras instalaciones están diseñadas para que te sientas cómoda y segura desde el momento en que ingresas.
+                  En Centro Estética Bella combinamos experiencia, calidez y profesionalismo para
+                  ofrecerte una experiencia única de cuidado personal. Nuestras instalaciones están
+                  diseñadas para que te sientas cómoda y segura desde el momento en que ingresas.
                 </p>
                 <p className="mt-3 text-base leading-relaxed text-gray-600">
-                  Contamos con cabinas equipadas con tecnología de última generación y un equipo de profesionales apasionados por la estética y el bienestar.
+                  Contamos con cabinas equipadas con tecnología de última generación y un equipo de
+                  profesionales apasionados por la estética y el bienestar.
                 </p>
               </div>
               <div className="order-1 md:order-2">
@@ -387,7 +498,10 @@ export function BeautyCenterLandingPage() {
             />
             <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
               {BENEFITS.map((benefit) => (
-                <div key={benefit.title} className="rounded-2xl border border-rose-50 bg-white p-6 text-center shadow-sm">
+                <div
+                  key={benefit.title}
+                  className="rounded-2xl border border-rose-50 bg-white p-6 text-center shadow-sm"
+                >
                   <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200 text-2xl shadow-sm">
                     {benefit.icon}
                   </div>
@@ -425,9 +539,13 @@ export function BeautyCenterLandingPage() {
                   </div>
                   <div className="p-5">
                     <h3 className="text-lg font-semibold text-gray-900">{promo.name}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-gray-500">{promo.description}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-gray-500">
+                      {promo.description}
+                    </p>
                     <div className="mt-3 flex items-baseline gap-2">
-                      <span className="text-sm text-gray-400 line-through">{promo.originalPrice}</span>
+                      <span className="text-sm text-gray-400 line-through">
+                        {promo.originalPrice}
+                      </span>
                       <span className="text-xl font-bold text-rose-500">{promo.promoPrice}</span>
                     </div>
                     <p className="mt-1 text-xs text-gray-400">Válido hasta {promo.validUntil}</p>
@@ -446,9 +564,12 @@ export function BeautyCenterLandingPage() {
 
         <section className="bg-gradient-to-br from-rose-50 via-white to-amber-50 py-16 md:py-24">
           <div className="mx-auto max-w-3xl px-4 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">Tu momento de bienestar comienza aquí</h2>
+            <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">
+              Tu momento de bienestar comienza aquí
+            </h2>
             <p className="mt-4 text-lg text-gray-600">
-              Conversa directamente con Centro Estética Bella y encuentra el tratamiento adecuado para ti.
+              Conversa directamente con Centro Estética Bella y encuentra el tratamiento adecuado
+              para ti.
             </p>
             <button
               onClick={() => openWhatsApp(WHATSAPP_MESSAGE_DEFAULT)}
@@ -462,10 +583,7 @@ export function BeautyCenterLandingPage() {
 
         <section id="contacto" className="scroll-mt-16 bg-white py-16 md:py-24">
           <div className="mx-auto max-w-7xl px-4">
-            <LandingSectionHeader
-              label="Contacto"
-              title="Visítanos"
-            />
+            <LandingSectionHeader label="Contacto" title="Visítanos" />
             <div className="mt-12 grid items-start gap-10 md:grid-cols-2 md:gap-16">
               <div>
                 <div className="space-y-4 text-base text-gray-600">
@@ -518,7 +636,8 @@ export function BeautyCenterLandingPage() {
             <span className="text-sm font-semibold text-gray-700">Centro Estética Bella</span>
           </div>
           <p className="mt-4">
-            &copy; {new Date().getFullYear()} Centro Estética Bella &mdash; Todos los derechos reservados.
+            &copy; {new Date().getFullYear()} Centro Estética Bella &mdash; Todos los derechos
+            reservados.
           </p>
         </div>
       </footer>

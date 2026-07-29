@@ -350,7 +350,11 @@ describe('app shell router', () => {
     )
 
     expect(await screen.findByText('Conversaciones abiertas')).toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: /Administración|Administracion/i })).not.toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: /Configuración|Configuracion/i })).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('link', { name: /Administración|Administracion/i }),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('link', { name: /Configuración|Configuracion/i }),
+    ).not.toBeInTheDocument()
   })
 })

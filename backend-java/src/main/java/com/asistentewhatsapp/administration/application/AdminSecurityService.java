@@ -14,42 +14,32 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AdminSecurityService {
 
-    private final AdministrationJdbcRepository administrationJdbcRepository;
-    private final AuditLogJdbcRepository auditLogJdbcRepository;
+	private final AdministrationJdbcRepository administrationJdbcRepository;
+	private final AuditLogJdbcRepository auditLogJdbcRepository;
 
-    public AdminSecurityService(
-            AdministrationJdbcRepository administrationJdbcRepository,
-            AuditLogJdbcRepository auditLogJdbcRepository) {
-        this.administrationJdbcRepository = administrationJdbcRepository;
-        this.auditLogJdbcRepository = auditLogJdbcRepository;
-    }
+	public AdminSecurityService(AdministrationJdbcRepository administrationJdbcRepository,
+			AuditLogJdbcRepository auditLogJdbcRepository) {
+		this.administrationJdbcRepository = administrationJdbcRepository;
+		this.auditLogJdbcRepository = auditLogJdbcRepository;
+	}
 
-    @Transactional(readOnly = true)
-    public SecurityPolicyResponse getPolicy(AuthenticatedUser authenticatedUser) {
-        AdminAccessGuard.requireOwnerAdminOrSupervisor(authenticatedUser);
-        return administrationJdbcRepository.findSecurityPolicy(authenticatedUser.businessId());
-    }
+	@Transactional(readOnly = true)
+	public SecurityPolicyResponse getPolicy(AuthenticatedUser authenticatedUser) {
+		AdminAccessGuard.requireOwnerAdminOrSupervisor(authenticatedUser);
+		return administrationJdbcRepository.findSecurityPolicy(authenticatedUser.businessId());
+	}
 
-    @Transactional
-    public SecurityPolicyResponse updatePolicy(
-            AuthenticatedUser authenticatedUser,
-            SecurityPolicyRequest request) {
-        AdminAccessGuard.requireOwnerOrAdmin(authenticatedUser);
-        SecurityPolicyResponse updated = administrationJdbcRepository.updateSecurityPolicy(
-                authenticatedUser.businessId(),
-                request);
-        auditLogJdbcRepository.insert(
-                authenticatedUser.businessId(),
-                authenticatedUser.userId(),
-                "SECURITY_POLICY_UPDATED",
-                "SECURITY_POLICY",
-                updated.id(),
-                "Politicas de seguridad actualizadas desde administracion.",
-                Map.of(
-                        "sessionTimeoutMinutes", request.sessionTimeoutMinutes(),
-                        "passwordMinLength", request.passwordMinLength(),
-                        "maxFailedLoginAttempts", request.maxFailedLoginAttempts()),
-                OffsetDateTime.now(ZoneOffset.UTC));
-        return updated;
-    }
+	@Transactional
+	public SecurityPolicyResponse updatePolicy(AuthenticatedUser authenticatedUser, SecurityPolicyRequest request) {
+		AdminAccessGuard.requireOwnerOrAdmin(authenticatedUser);
+		SecurityPolicyResponse updated = administrationJdbcRepository
+				.updateSecurityPolicy(authenticatedUser.businessId(), request);
+		auditLogJdbcRepository.insert(authenticatedUser.businessId(), authenticatedUser.userId(),
+				"SECURITY_POLICY_UPDATED", "SECURITY_POLICY", updated.id(),
+				"Politicas de seguridad actualizadas desde administracion.",
+				Map.of("sessionTimeoutMinutes", request.sessionTimeoutMinutes(), "passwordMinLength",
+						request.passwordMinLength(), "maxFailedLoginAttempts", request.maxFailedLoginAttempts()),
+				OffsetDateTime.now(ZoneOffset.UTC));
+		return updated;
+	}
 }

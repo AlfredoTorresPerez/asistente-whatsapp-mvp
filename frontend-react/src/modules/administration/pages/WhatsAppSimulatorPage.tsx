@@ -61,9 +61,11 @@ export function WhatsAppSimulatorPage() {
     },
     onError: (error) => {
       const apiError = error as ApiClientError
-      const description = apiError?.status === 404
-        ? 'No hay canales activos. Configura un canal WhatsApp Web primero.'
-        : apiError?.message ?? 'No pudimos procesar la simulacion. Verifica que el backend este disponible.'
+      const description =
+        apiError?.status === 404
+          ? 'No hay canales activos. Configura un canal WhatsApp Web primero.'
+          : (apiError?.message ??
+            'No pudimos procesar la simulacion. Verifica que el backend este disponible.')
       showToast({
         title: 'Error al simular',
         description,

@@ -9,10 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetTokenEntity, UUID> {
 
-    Optional<PasswordResetTokenEntity> findByTokenHash(String tokenHash);
+	Optional<PasswordResetTokenEntity> findByTokenHash(String tokenHash);
 
-    List<PasswordResetTokenEntity> findAllByUserIdAndConsumedAtIsNullAndExpiresAtAfter(
-            UUID userId,
-            OffsetDateTime expiresAt);
+	List<PasswordResetTokenEntity> findAllByUserIdAndConsumedAtIsNullAndExpiresAtAfter(UUID userId,
+			OffsetDateTime expiresAt);
 }
-

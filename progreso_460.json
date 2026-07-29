@@ -1,0 +1,4607 @@
+{
+  "completed": [
+    "P001",
+    "P002",
+    "P003",
+    "P004",
+    "P005",
+    "P006",
+    "P007",
+    "P008",
+    "P009",
+    "P010",
+    "P011",
+    "P012",
+    "P013",
+    "P014",
+    "P015",
+    "P016",
+    "P017",
+    "P018",
+    "P019",
+    "P020",
+    "P021",
+    "P022",
+    "P023",
+    "P024",
+    "P025",
+    "P026",
+    "P027",
+    "P028",
+    "P029",
+    "P030",
+    "P031",
+    "P032",
+    "P033",
+    "P034",
+    "P035",
+    "P036",
+    "P037",
+    "P038",
+    "P039",
+    "P040",
+    "P041",
+    "P042",
+    "P043",
+    "P044",
+    "P045",
+    "P046",
+    "P047",
+    "P048",
+    "P049",
+    "P050",
+    "P051",
+    "P052",
+    "P053",
+    "P054",
+    "P055",
+    "P056",
+    "P057",
+    "P058",
+    "P059",
+    "P060",
+    "P061",
+    "P062",
+    "P063",
+    "P064",
+    "P065",
+    "P066",
+    "P067",
+    "P068",
+    "P069",
+    "P070",
+    "P071",
+    "P072",
+    "P073",
+    "P074",
+    "P075",
+    "P076",
+    "P077",
+    "P078",
+    "P079",
+    "P080",
+    "P081",
+    "P082",
+    "P083",
+    "P084",
+    "P085",
+    "P086",
+    "P087",
+    "P088",
+    "P089",
+    "P090",
+    "P091",
+    "P092",
+    "P093",
+    "P094",
+    "P095",
+    "P096",
+    "P097",
+    "P098",
+    "P099",
+    "P100",
+    "P101",
+    "P102",
+    "P103",
+    "P104",
+    "P105",
+    "P106",
+    "P107",
+    "P108",
+    "P109",
+    "P110",
+    "P111",
+    "P112",
+    "P113",
+    "P114",
+    "P115",
+    "P116",
+    "P117",
+    "P118",
+    "P119",
+    "P120",
+    "P121",
+    "P122",
+    "P123",
+    "P124",
+    "P125",
+    "P126",
+    "P127",
+    "P128",
+    "P129",
+    "P130",
+    "P131",
+    "P132",
+    "P133",
+    "P134",
+    "P135",
+    "P136",
+    "P137",
+    "P138",
+    "P139",
+    "P140",
+    "P141",
+    "P142",
+    "P143",
+    "P144",
+    "P145",
+    "P146",
+    "P147",
+    "P148",
+    "P149",
+    "P150",
+    "P151",
+    "P152",
+    "P153",
+    "P154",
+    "P155",
+    "P156",
+    "P157",
+    "P158",
+    "P159",
+    "P160",
+    "P161",
+    "P162",
+    "P163",
+    "P164",
+    "P165",
+    "P166",
+    "P167",
+    "P168",
+    "P169",
+    "P170",
+    "P171",
+    "P172",
+    "P173",
+    "P174",
+    "P175",
+    "P176",
+    "P177",
+    "P178",
+    "P179",
+    "P180",
+    "P181",
+    "P182",
+    "P183",
+    "P184",
+    "P185",
+    "P186",
+    "P187",
+    "P188",
+    "P189",
+    "P190",
+    "P191",
+    "P192",
+    "P193",
+    "P194",
+    "P195",
+    "P196",
+    "P197",
+    "P198",
+    "P199",
+    "P200",
+    "P201",
+    "P202",
+    "P203",
+    "P204",
+    "P205",
+    "P206",
+    "P207",
+    "P208",
+    "P209",
+    "P210",
+    "P211",
+    "P212",
+    "P213",
+    "P214",
+    "P215",
+    "P216",
+    "P217",
+    "P218",
+    "P219",
+    "P220",
+    "P221",
+    "P222",
+    "P223",
+    "P224",
+    "P225",
+    "P226",
+    "P227",
+    "P228",
+    "P229",
+    "P230",
+    "P231",
+    "P232",
+    "P233",
+    "P234",
+    "P235",
+    "P236",
+    "P237",
+    "P238",
+    "P239",
+    "P240",
+    "P241",
+    "P242",
+    "P243",
+    "P244",
+    "P245",
+    "P246",
+    "P247",
+    "P248",
+    "P249",
+    "P250",
+    "P251",
+    "P252",
+    "P253",
+    "P254",
+    "P255",
+    "P256",
+    "P257",
+    "P258",
+    "P259",
+    "P260",
+    "P261",
+    "P262",
+    "P263",
+    "P264",
+    "P265",
+    "P266",
+    "P267",
+    "P268",
+    "P269",
+    "P270",
+    "P271",
+    "P272",
+    "P273",
+    "P274",
+    "P275",
+    "P276",
+    "P277",
+    "P278",
+    "P279",
+    "P280",
+    "P281",
+    "P282",
+    "P283",
+    "P284",
+    "P285",
+    "P286",
+    "P287",
+    "P288",
+    "P289",
+    "P290",
+    "P291",
+    "P292",
+    "P293",
+    "P294",
+    "P295",
+    "P296",
+    "P297",
+    "P298",
+    "P299",
+    "P300",
+    "P301",
+    "P302",
+    "P303",
+    "P304",
+    "P305",
+    "P306",
+    "P307",
+    "P308",
+    "P309",
+    "P310",
+    "P311",
+    "P312",
+    "P313",
+    "P314",
+    "P315",
+    "P316",
+    "P317",
+    "P318",
+    "P319",
+    "P320",
+    "P321",
+    "P322",
+    "P323",
+    "P324",
+    "P325",
+    "P326",
+    "P327",
+    "P328",
+    "P329",
+    "P330",
+    "P331",
+    "P332",
+    "P333",
+    "P334",
+    "P335",
+    "P336",
+    "P337",
+    "P338",
+    "P339",
+    "P340",
+    "P341",
+    "P342",
+    "P343",
+    "P344",
+    "P345",
+    "P346",
+    "P347",
+    "P348",
+    "P349",
+    "P350",
+    "P351",
+    "P352",
+    "P353",
+    "P354",
+    "P355",
+    "P356",
+    "P357",
+    "P358",
+    "P359",
+    "P360",
+    "P361",
+    "P362",
+    "P363",
+    "P364",
+    "P365",
+    "P366",
+    "P367",
+    "P368",
+    "P369",
+    "P370",
+    "P371",
+    "P372",
+    "P373",
+    "P374",
+    "P375",
+    "P376",
+    "P377",
+    "P378",
+    "P379",
+    "P380",
+    "P381",
+    "P382",
+    "P383",
+    "P384",
+    "P385",
+    "P386",
+    "P387",
+    "P388",
+    "P389",
+    "P390",
+    "P391",
+    "P392",
+    "P393",
+    "P394",
+    "P395",
+    "P396",
+    "P397",
+    "P398",
+    "P399",
+    "P400",
+    "P401",
+    "P402",
+    "P403",
+    "P404",
+    "P405",
+    "P406",
+    "P407",
+    "P408",
+    "P409",
+    "P410",
+    "P411",
+    "P412",
+    "P413",
+    "P414",
+    "P415",
+    "P416",
+    "P417",
+    "P418",
+    "P419",
+    "P420",
+    "P421",
+    "P422",
+    "P423",
+    "P424",
+    "P425",
+    "P426",
+    "P427",
+    "P428",
+    "P429",
+    "P430",
+    "P431",
+    "P432",
+    "P433",
+    "P434",
+    "P435",
+    "P436",
+    "P437",
+    "P438",
+    "P439",
+    "P440",
+    "P441",
+    "P442",
+    "P443",
+    "P444",
+    "P445",
+    "P446",
+    "P447",
+    "P448",
+    "P449",
+    "P450",
+    "P451",
+    "P452",
+    "P453",
+    "P454",
+    "P455",
+    "P456",
+    "P457",
+    "P458",
+    "P459",
+    "P460"
+  ],
+  "responses": {
+    "P001": {
+      "pregunta": "Hola, ¿me pueden ayudar?",
+      "respuesta": "Puedo ayudarte con eso. ¿Me indicas el número de solicitud o el correo asociado?",
+      "phone": "+56910000001",
+      "modality": "CASO_AMBIGUO",
+      "setupContext": null,
+      "duration": 154,
+      "error": null
+    },
+    "P002": {
+      "pregunta": "Quisiera hacer una consulta.",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000002",
+      "modality": "CASO_AMBIGUO",
+      "setupContext": null,
+      "duration": 169,
+      "error": null
+    },
+    "P003": {
+      "pregunta": "¿Qué cosas puedo hacer por este WhatsApp?",
+      "respuesta": "El valor base de limpieza facial profunda es $34.990 y dura aproximadamente 60 minutos. ¿Quieres agendar una hora?",
+      "phone": "+56910000003",
+      "modality": "CASO_AMBIGUO",
+      "setupContext": null,
+      "duration": 148,
+      "error": null
+    },
+    "P004": {
+      "pregunta": "Necesito información del centro.",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000004",
+      "modality": "CASO_AMBIGUO",
+      "setupContext": null,
+      "duration": 1295,
+      "error": null
+    },
+    "P005": {
+      "pregunta": "¿Me puedes orientar?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000005",
+      "modality": "CASO_AMBIGUO",
+      "setupContext": null,
+      "duration": 1279,
+      "error": null
+    },
+    "P006": {
+      "pregunta": "No sé por dónde empezar.",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000006",
+      "modality": "CASO_AMBIGUO",
+      "setupContext": null,
+      "duration": 1277,
+      "error": null
+    },
+    "P007": {
+      "pregunta": "Quiero hablar con alguien de recepción.",
+      "respuesta": "Te derivaré con una persona del equipo para que pueda ayudarte directamente.",
+      "phone": "+56910000007",
+      "modality": "DERIVACION_HUMANA",
+      "setupContext": null,
+      "duration": 148,
+      "error": null
+    },
+    "P008": {
+      "pregunta": "Necesito hablar con una persona.",
+      "respuesta": "Te derivaré con una persona del equipo para que pueda ayudarte directamente.",
+      "phone": "+56910000008",
+      "modality": "DERIVACION_HUMANA",
+      "setupContext": null,
+      "duration": 1291,
+      "error": null
+    },
+    "P009": {
+      "pregunta": "¿Me puede atender un ejecutivo?",
+      "respuesta": "Te derivaré con una persona del equipo para que pueda ayudarte directamente.",
+      "phone": "+56910000009",
+      "modality": "DERIVACION_HUMANA",
+      "setupContext": null,
+      "duration": 150,
+      "error": null
+    },
+    "P010": {
+      "pregunta": "Quiero que me llame alguien del centro.",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000010",
+      "modality": "DERIVACION_HUMANA",
+      "setupContext": null,
+      "duration": 1292,
+      "error": null
+    },
+    "P011": {
+      "pregunta": "¿Pueden contactarme por teléfono?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000011",
+      "modality": "DERIVACION_HUMANA",
+      "setupContext": null,
+      "duration": 1279,
+      "error": null
+    },
+    "P012": {
+      "pregunta": "Tengo una situación especial y necesito ayuda.",
+      "respuesta": "Puedo ayudarte con eso. ¿Me indicas el número de solicitud o el correo asociado?",
+      "phone": "+56910000012",
+      "modality": "CASO_AMBIGUO",
+      "setupContext": null,
+      "duration": 170,
+      "error": null
+    },
+    "P013": {
+      "pregunta": "¿Qué servicios tienen disponibles?",
+      "respuesta": "Puedo ayudarte con información del catálogo, pero necesito el servicio específico que quieres revisar.",
+      "phone": "+56910000013",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1317,
+      "error": null
+    },
+    "P014": {
+      "pregunta": "¿Qué tratamientos realizan?",
+      "respuesta": "Puedo ayudarte con información del catálogo, pero necesito el servicio específico que quieres revisar.",
+      "phone": "+56910000014",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 201,
+      "error": null
+    },
+    "P015": {
+      "pregunta": "¿Qué servicios faciales ofrecen?",
+      "respuesta": "limpieza facial profunda: duración aproximada 60 minutos, valor base $34.990. ¿Quieres que revise horarios disponibles?",
+      "phone": "+56910000015",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1299,
+      "error": null
+    },
+    "P016": {
+      "pregunta": "¿Qué servicios corporales tienen?",
+      "respuesta": "Puedo ayudarte con información del catálogo, pero necesito el servicio específico que quieres revisar.",
+      "phone": "+56910000016",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 139,
+      "error": null
+    },
+    "P017": {
+      "pregunta": "¿Tienen limpieza facial?",
+      "respuesta": "Puedo orientarte con Limpieza facial profunda. ¿Quieres revisar precio, características o agendar una atención?",
+      "phone": "+56910000017",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1322,
+      "error": null
+    },
+    "P018": {
+      "pregunta": "¿Realizan depilación láser?",
+      "respuesta": "Puedo orientarte con Depilacion laser. ¿Quieres revisar precio, características o agendar una atención?",
+      "phone": "+56910000018",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 144,
+      "error": null
+    },
+    "P019": {
+      "pregunta": "¿Hacen masajes?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000019",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1319,
+      "error": null
+    },
+    "P020": {
+      "pregunta": "¿Tienen manicure y pedicure?",
+      "respuesta": "Puedo orientarte con Manicure tradicional. ¿Quieres revisar precio, características o agendar una atención?",
+      "phone": "+56910000020",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 179,
+      "error": null
+    },
+    "P021": {
+      "pregunta": "¿Qué incluye la limpieza facial profunda?",
+      "respuesta": "limpieza facial profunda: duración aproximada 60 minutos, valor base $34.990. ¿Quieres que revise horarios disponibles?",
+      "phone": "+56910000021",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1305,
+      "error": null
+    },
+    "P022": {
+      "pregunta": "¿Cuánto dura este tratamiento?",
+      "respuesta": "Puedo ayudarte con información del catálogo, pero necesito el servicio específico que quieres revisar.",
+      "phone": "+56910000022",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 137,
+      "error": null
+    },
+    "P023": {
+      "pregunta": "¿En qué consiste el servicio?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000023",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1307,
+      "error": null
+    },
+    "P024": {
+      "pregunta": "¿Este tratamiento es invasivo?",
+      "respuesta": "Puedo ayudarte con información del catálogo, pero necesito el servicio específico que quieres revisar.",
+      "phone": "+56910000024",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 148,
+      "error": null
+    },
+    "P025": {
+      "pregunta": "¿Cuántas sesiones necesito?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000025",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 143,
+      "error": null
+    },
+    "P026": {
+      "pregunta": "¿Qué resultados puedo esperar?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000026",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1297,
+      "error": null
+    },
+    "P027": {
+      "pregunta": "¿Este servicio necesita evaluación previa?",
+      "respuesta": "evaluacion estetica: duración aproximada 45 minutos, valor base $19.990. ¿Quieres que revise horarios disponibles?",
+      "phone": "+56910000027",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1280,
+      "error": null
+    },
+    "P028": {
+      "pregunta": "¿Puedo reservar directamente o primero necesito una evaluación?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000028",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 146,
+      "error": null
+    },
+    "P029": {
+      "pregunta": "¿Qué requisitos tiene el tratamiento?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000029",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1292,
+      "error": null
+    },
+    "P030": {
+      "pregunta": "¿Qué servicio está disponible en mi sucursal?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000030",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 130,
+      "error": null
+    },
+    "P031": {
+      "pregunta": "No encuentro el servicio que busco, ¿lo realizan?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000031",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 2448,
+      "error": null
+    },
+    "P032": {
+      "pregunta": "¿Tienen otro tratamiento parecido?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000032",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 179,
+      "error": null
+    },
+    "P033": {
+      "pregunta": "Quiero un servicio distinto a los que aparecen en la lista.",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000033",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1300,
+      "error": null
+    },
+    "P034": {
+      "pregunta": "¿Puedo escribir el nombre del tratamiento que necesito?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000034",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 146,
+      "error": null
+    },
+    "P035": {
+      "pregunta": "No sé qué tratamiento necesito, ¿me pueden orientar?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000035",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1301,
+      "error": null
+    },
+    "P036": {
+      "pregunta": "¿Qué me recomiendan para piel sensible?",
+      "respuesta": "Según el catálogo activo, podría orientarte con dermapen estetico, hidratacion facial y limpieza facial profunda. Para piel sensible la elección definitiva debería confirmarla una profesional, especialmente si hay irritación o una condición dermatológica. ¿Quieres que te explique alguna opción o que revise horarios?",
+      "phone": "+56910000036",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 132,
+      "error": null
+    },
+    "P037": {
+      "pregunta": "¿Qué tratamiento sirve para hidratar la piel?",
+      "respuesta": "Según el catálogo activo, podría orientarte con hidratacion facial. La elección definitiva debe confirmarse según evaluación profesional y disponibilidad. ¿Quieres que te explique alguna opción o que revise horarios?",
+      "phone": "+56910000037",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1294,
+      "error": null
+    },
+    "P038": {
+      "pregunta": "¿Qué me recomiendan para manchas?",
+      "respuesta": "Puedo orientarte con los servicios configurados, pero necesito un poco más de contexto. ¿Buscas hidratación, limpieza, relajación u otro objetivo?",
+      "phone": "+56910000038",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 140,
+      "error": null
+    },
+    "P039": {
+      "pregunta": "¿Qué servicio sirve para una limpieza profunda?",
+      "respuesta": "Puedo orientarte con los servicios configurados, pero necesito un poco más de contexto. ¿Buscas hidratación, limpieza, relajación u otro objetivo?",
+      "phone": "+56910000039",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1315,
+      "error": null
+    },
+    "P040": {
+      "pregunta": "Quiero mejorar mi piel, pero no sé qué elegir.",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000040",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 5900,
+      "error": null
+    },
+    "P041": {
+      "pregunta": "Busco algo no invasivo.",
+      "respuesta": "Según el catálogo activo, podría orientarte con dermapen estetico, hidratacion facial y limpieza facial profunda. La elección definitiva debe confirmarse según evaluación profesional y disponibilidad. ¿Quieres que te explique alguna opción o que revise horarios?",
+      "phone": "+56910000041",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 135,
+      "error": null
+    },
+    "P042": {
+      "pregunta": "Quiero un tratamiento para relajarme.",
+      "respuesta": "Según el catálogo activo, podría orientarte con masaje reductivo y masaje relajante. La elección definitiva debe confirmarse según evaluación profesional y disponibilidad. ¿Quieres que te explique alguna opción o que revise horarios?",
+      "phone": "+56910000042",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 166,
+      "error": null
+    },
+    "P043": {
+      "pregunta": "¿Qué tratamiento me conviene antes de un evento?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000043",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1301,
+      "error": null
+    },
+    "P044": {
+      "pregunta": "¿Cuál es la diferencia entre estos dos servicios?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000044",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 151,
+      "error": null
+    },
+    "P045": {
+      "pregunta": "¿Qué servicio es mejor para mí?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000045",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1284,
+      "error": null
+    },
+    "P046": {
+      "pregunta": "¿Necesito una evaluación para que me recomienden algo?",
+      "respuesta": "Puedo orientarte con los servicios configurados, pero necesito un poco más de contexto. ¿Buscas hidratación, limpieza, relajación u otro objetivo?",
+      "phone": "+56910000046",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 143,
+      "error": null
+    },
+    "P047": {
+      "pregunta": "¿Me pueden recomendar un tratamiento según mi necesidad?",
+      "respuesta": "Puedo orientarte con los servicios configurados, pero necesito un poco más de contexto. ¿Buscas hidratación, limpieza, relajación u otro objetivo?",
+      "phone": "+56910000047",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1309,
+      "error": null
+    },
+    "P048": {
+      "pregunta": "¿Puedo hablar con una profesional antes de reservar?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000048",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 143,
+      "error": null
+    },
+    "P049": {
+      "pregunta": "¿Cuánto cuesta la limpieza facial?",
+      "respuesta": "El valor base de limpieza facial profunda es $34.990 y dura aproximadamente 60 minutos. ¿Quieres agendar una hora?",
+      "phone": "+56910000049",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1304,
+      "error": null
+    },
+    "P050": {
+      "pregunta": "¿Cuál es el precio del tratamiento?",
+      "respuesta": "Para darte un precio correcto, ¿me indicas el servicio exacto que quieres revisar?",
+      "phone": "+56910000050",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1316,
+      "error": null
+    },
+    "P051": {
+      "pregunta": "¿Cuánto vale una sesión?",
+      "respuesta": "Para darte un precio correcto, ¿me indicas el servicio exacto que quieres revisar?",
+      "phone": "+56910000051",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1303,
+      "error": null
+    },
+    "P052": {
+      "pregunta": "¿El precio cambia según la sucursal?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000052",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1286,
+      "error": null
+    },
+    "P053": {
+      "pregunta": "¿El precio cambia según la profesional?",
+      "respuesta": "Para darte un precio correcto, ¿me indicas el servicio exacto que quieres revisar?",
+      "phone": "+56910000053",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 154,
+      "error": null
+    },
+    "P054": {
+      "pregunta": "¿Tienen promociones vigentes?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000054",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 144,
+      "error": null
+    },
+    "P055": {
+      "pregunta": "¿Tienen descuentos por varias sesiones?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000055",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1288,
+      "error": null
+    },
+    "P056": {
+      "pregunta": "¿Hay paquetes de tratamientos?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000056",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 150,
+      "error": null
+    },
+    "P057": {
+      "pregunta": "¿Me pueden enviar una cotización?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000057",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1298,
+      "error": null
+    },
+    "P058": {
+      "pregunta": "¿Cuánto cuesta el paquete completo?",
+      "respuesta": "Para darte un precio correcto, ¿me indicas el servicio exacto que quieres revisar?",
+      "phone": "+56910000058",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1287,
+      "error": null
+    },
+    "P059": {
+      "pregunta": "¿El valor incluye todos los insumos?",
+      "respuesta": "Para darte un precio correcto, ¿me indicas el servicio exacto que quieres revisar?",
+      "phone": "+56910000059",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 148,
+      "error": null
+    },
+    "P060": {
+      "pregunta": "¿El precio incluye la evaluación?",
+      "respuesta": "El valor base de evaluacion estetica es $19.990 y dura aproximadamente 45 minutos. ¿Quieres agendar una hora?",
+      "phone": "+56910000060",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 5919,
+      "error": null
+    },
+    "P061": {
+      "pregunta": "¿Hay algún costo adicional?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000061",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1290,
+      "error": null
+    },
+    "P062": {
+      "pregunta": "¿Cuánto debo pagar para reservar?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000062",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 158,
+      "error": null
+    },
+    "P063": {
+      "pregunta": "¿El abono se descuenta del total?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000063",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 1313,
+      "error": null
+    },
+    "P064": {
+      "pregunta": "¿Puedo pagar el total el día de la atención?",
+      "respuesta": "Gracias. Para revisar el pago, ¿me indicas el número de pedido o solicitud?",
+      "phone": "+56910000064",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 140,
+      "error": null
+    },
+    "P065": {
+      "pregunta": "¿Tienen precio especial por primera atención?",
+      "respuesta": "Para darte un precio correcto, ¿me indicas el servicio exacto que quieres revisar?",
+      "phone": "+56910000065",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1303,
+      "error": null
+    },
+    "P066": {
+      "pregunta": "¿La promoción aplica en todas las sucursales?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000066",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 135,
+      "error": null
+    },
+    "P067": {
+      "pregunta": "Quiero reservar una hora.",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000067",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 137,
+      "error": null
+    },
+    "P068": {
+      "pregunta": "Necesito agendar una hora.",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000068",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1280,
+      "error": null
+    },
+    "P069": {
+      "pregunta": "Quiero pedir una cita.",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000069",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1313,
+      "error": null
+    },
+    "P070": {
+      "pregunta": "¿Me pueden dar una hora?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000070",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 142,
+      "error": null
+    },
+    "P071": {
+      "pregunta": "Necesito un cupo.",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000071",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1304,
+      "error": null
+    },
+    "P072": {
+      "pregunta": "Quiero tomar una hora.",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000072",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1281,
+      "error": null
+    },
+    "P073": {
+      "pregunta": "Quisiera reservar un tratamiento.",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000073",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 1323,
+      "error": null
+    },
+    "P074": {
+      "pregunta": "¿Cómo puedo agendar?",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000074",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 143,
+      "error": null
+    },
+    "P075": {
+      "pregunta": "¿Puedo reservar por WhatsApp?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000075",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 1309,
+      "error": null
+    },
+    "P076": {
+      "pregunta": "Quiero hacer una reserva.",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000076",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 153,
+      "error": null
+    },
+    "P077": {
+      "pregunta": "Necesito una cita para esta semana.",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000077",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 133,
+      "error": null
+    },
+    "P078": {
+      "pregunta": "Quiero agendar para mañana.",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000078",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1320,
+      "error": null
+    },
+    "P079": {
+      "pregunta": "¿Me pueden anotar para una atención?",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000079",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 7139,
+      "error": null
+    },
+    "P080": {
+      "pregunta": "Necesito atenderme lo antes posible.",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000080",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1317,
+      "error": null
+    },
+    "P081": {
+      "pregunta": "Quiero reservar para otra persona.",
+      "respuesta": "Te derivaré con una persona del equipo para que pueda ayudarte directamente.",
+      "phone": "+56910000081",
+      "modality": "DERIVACION_HUMANA",
+      "setupContext": null,
+      "duration": 150,
+      "error": null
+    },
+    "P082": {
+      "pregunta": "Quiero agendarle una hora a mi hija.",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000082",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1312,
+      "error": null
+    },
+    "P083": {
+      "pregunta": "Quiero reservar dos horas distintas.",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000083",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 154,
+      "error": null
+    },
+    "P084": {
+      "pregunta": "Quiero reservar más de un servicio.",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000084",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 148,
+      "error": null
+    },
+    "P085": {
+      "pregunta": "Quiero reservar para dos personas.",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000085",
+      "modality": "DERIVACION_HUMANA",
+      "setupContext": null,
+      "duration": 1294,
+      "error": null
+    },
+    "P086": {
+      "pregunta": "Quiero una hora, pero todavía no sé qué servicio elegir.",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000086",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 150,
+      "error": null
+    },
+    "P087": {
+      "pregunta": "Quiero una hora para hoy.",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000087",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1292,
+      "error": null
+    },
+    "P088": {
+      "pregunta": "Quiero reservar para mañana.",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000088",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 141,
+      "error": null
+    },
+    "P089": {
+      "pregunta": "¿Tienen horas para el viernes?",
+      "respuesta": "Sí, puedo revisarlo para viernes. ¿Para qué servicio necesitas una hora?",
+      "phone": "+56910000089",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1288,
+      "error": null
+    },
+    "P090": {
+      "pregunta": "¿Hay disponibilidad esta semana?",
+      "respuesta": "Sí, puedo revisarlo para esta semana. ¿Para qué servicio necesitas una hora?",
+      "phone": "+56910000090",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 135,
+      "error": null
+    },
+    "P091": {
+      "pregunta": "¿Qué horas tienen para la próxima semana?",
+      "respuesta": "Sí, puedo revisarlo para próxima semana. ¿Para qué servicio necesitas una hora?",
+      "phone": "+56910000091",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 3603,
+      "error": null
+    },
+    "P092": {
+      "pregunta": "¿Tienen algo en la mañana?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000092",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1329,
+      "error": null
+    },
+    "P093": {
+      "pregunta": "¿Tienen horas en la tarde?",
+      "respuesta": "Sí, puedo revisarlo. ¿Para qué servicio necesitas una hora?",
+      "phone": "+56910000093",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 150,
+      "error": null
+    },
+    "P094": {
+      "pregunta": "Necesito una hora después de las seis.",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000094",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1313,
+      "error": null
+    },
+    "P095": {
+      "pregunta": "¿Cuál es la primera hora disponible?",
+      "respuesta": "Sí, puedo revisarlo. ¿Para qué servicio necesitas una hora?",
+      "phone": "+56910000095",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1291,
+      "error": null
+    },
+    "P096": {
+      "pregunta": "¿Cuál es la última hora disponible?",
+      "respuesta": "Sí, puedo revisarlo. ¿Para qué servicio necesitas una hora?",
+      "phone": "+56910000096",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1299,
+      "error": null
+    },
+    "P097": {
+      "pregunta": "¿Tienen un cupo a las diez?",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000097",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 146,
+      "error": null
+    },
+    "P098": {
+      "pregunta": "¿Está disponible el horario de las quince horas?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000098",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 5937,
+      "error": null
+    },
+    "P099": {
+      "pregunta": "¿Hay horas el sábado?",
+      "respuesta": "Sí, puedo revisarlo para sábado. ¿Para qué servicio necesitas una hora?",
+      "phone": "+56910000099",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1317,
+      "error": null
+    },
+    "P100": {
+      "pregunta": "¿Atienden los domingos?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000100",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 162,
+      "error": null
+    },
+    "P101": {
+      "pregunta": "¿Tienen disponibilidad en un feriado?",
+      "respuesta": "Sí, puedo revisarlo. ¿Para qué servicio necesitas una hora?",
+      "phone": "+56910000101",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 142,
+      "error": null
+    },
+    "P102": {
+      "pregunta": "¿Puedo reservar para el próximo mes?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000102",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 1327,
+      "error": null
+    },
+    "P103": {
+      "pregunta": "¿Con cuánta anticipación puedo reservar?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000103",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 136,
+      "error": null
+    },
+    "P104": {
+      "pregunta": "¿Puedo reservar para una fecha muy lejana?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000104",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 1300,
+      "error": null
+    },
+    "P105": {
+      "pregunta": "¿Puedo reservar una hora para ayer?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000105",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 154,
+      "error": null
+    },
+    "P106": {
+      "pregunta": "¿El horario que aparece considera la duración completa del servicio?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000106",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 150,
+      "error": null
+    },
+    "P107": {
+      "pregunta": "¿Hay un horario más temprano?",
+      "respuesta": "Puedo ayudarte con eso. ¿Me indicas el número de solicitud o el correo asociado?",
+      "phone": "+56910000107",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1266,
+      "error": null
+    },
+    "P108": {
+      "pregunta": "¿Hay un horario más tarde?",
+      "respuesta": "Puedo ayudarte con eso. ¿Me indicas el número de solicitud o el correo asociado?",
+      "phone": "+56910000108",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 158,
+      "error": null
+    },
+    "P109": {
+      "pregunta": "¿Qué alternativa tienen cerca de las cuatro?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000109",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1291,
+      "error": null
+    },
+    "P110": {
+      "pregunta": "¿Tienen dos horarios consecutivos?",
+      "respuesta": "Puedo ayudarte con eso. ¿Me indicas el número de solicitud o el correo asociado?",
+      "phone": "+56910000110",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1273,
+      "error": null
+    },
+    "P111": {
+      "pregunta": "¿Puedo elegir un tramo horario en vez de una hora exacta?",
+      "respuesta": "Puedo ayudarte con eso. ¿Me indicas el número de solicitud o el correo asociado?",
+      "phone": "+56910000111",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 2477,
+      "error": null
+    },
+    "P112": {
+      "pregunta": "¿Tienen horas disponibles para una limpieza facial?",
+      "respuesta": "Perfecto, reviso Limpieza facial profunda. ¿En qué sucursal quieres consultar disponibilidad?",
+      "phone": "+56910000112",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1296,
+      "error": null
+    },
+    "P113": {
+      "pregunta": "¿Qué horarios quedan libres hoy?",
+      "respuesta": "Sí, puedo revisarlo para hoy. ¿Para qué servicio necesitas una hora?",
+      "phone": "+56910000113",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1297,
+      "error": null
+    },
+    "P114": {
+      "pregunta": "¿Hay algún cupo disponible mañana?",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000114",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 159,
+      "error": null
+    },
+    "P115": {
+      "pregunta": "¿Tienen una hora libre con cualquier profesional?",
+      "respuesta": "Sí, puedo revisarlo. ¿Para qué servicio necesitas una hora?",
+      "phone": "+56910000115",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 160,
+      "error": null
+    },
+    "P116": {
+      "pregunta": "¿Hay disponibilidad en cualquier sucursal?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000116",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1298,
+      "error": null
+    },
+    "P117": {
+      "pregunta": "¿Qué sede tiene la hora más próxima?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000117",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 5980,
+      "error": null
+    },
+    "P118": {
+      "pregunta": "¿Hay una cabina disponible para ese tratamiento?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000118",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 136,
+      "error": null
+    },
+    "P119": {
+      "pregunta": "¿Está disponible la máquina necesaria para el servicio?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000119",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1330,
+      "error": null
+    },
+    "P120": {
+      "pregunta": "¿Puedo reservar si la profesional está libre, pero la cabina está ocupada?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000120",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 137,
+      "error": null
+    },
+    "P121": {
+      "pregunta": "¿Queda capacidad para una atención grupal?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000121",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 4787,
+      "error": null
+    },
+    "P122": {
+      "pregunta": "¿El horario sigue disponible?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000122",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1296,
+      "error": null
+    },
+    "P123": {
+      "pregunta": "¿Pueden verificar nuevamente el cupo?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000123",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 149,
+      "error": null
+    },
+    "P124": {
+      "pregunta": "¿Por qué no aparece el horario de las cuatro?",
+      "respuesta": "Te derivaré con una persona del equipo para que pueda ayudarte directamente.",
+      "phone": "+56910000124",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1321,
+      "error": null
+    },
+    "P125": {
+      "pregunta": "¿Hay alguna pausa o bloqueo a esa hora?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000125",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 147,
+      "error": null
+    },
+    "P126": {
+      "pregunta": "¿Pueden ofrecerme horarios cercanos al que elegí?",
+      "respuesta": "Puedo ayudarte con eso. ¿Me indicas el número de solicitud o el correo asociado?",
+      "phone": "+56910000126",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 162,
+      "error": null
+    },
+    "P127": {
+      "pregunta": "¿Qué horarios reales quedan después de considerar la duración del tratamiento?",
+      "respuesta": "Sí, puedo revisarlo. ¿Para qué servicio necesitas una hora?",
+      "phone": "+56910000127",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 136,
+      "error": null
+    },
+    "P128": {
+      "pregunta": "¿Existe un cupo si no elijo profesional?",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000128",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 138,
+      "error": null
+    },
+    "P129": {
+      "pregunta": "¿Hay disponibilidad con otro equipo o cabina?",
+      "respuesta": "Sí, puedo revisarlo. ¿Para qué servicio necesitas una hora?",
+      "phone": "+56910000129",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 5973,
+      "error": null
+    },
+    "P130": {
+      "pregunta": "¿Dónde están ubicados?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000130",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 147,
+      "error": null
+    },
+    "P131": {
+      "pregunta": "¿Cuál es la dirección de la sucursal?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000131",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 145,
+      "error": null
+    },
+    "P132": {
+      "pregunta": "¿Qué sucursales tienen?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000132",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1328,
+      "error": null
+    },
+    "P133": {
+      "pregunta": "¿Cuál es la sucursal más cercana?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000133",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1281,
+      "error": null
+    },
+    "P134": {
+      "pregunta": "Estoy en Providencia, ¿qué sucursal me conviene?",
+      "respuesta": "La sucursal Providencia está ubicada en:\nAv. Providencia 2450, Santiago",
+      "phone": "+56910000134",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 140,
+      "error": null
+    },
+    "P135": {
+      "pregunta": "¿Tienen una sede en Las Condes?",
+      "respuesta": "La sucursal Las Condes está ubicada en:\nAv. Apoquindo 4800, Las Condes",
+      "phone": "+56910000135",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 140,
+      "error": null
+    },
+    "P136": {
+      "pregunta": "¿Este tratamiento está disponible en todas las sucursales?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000136",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1324,
+      "error": null
+    },
+    "P137": {
+      "pregunta": "¿En qué sucursal realizan este servicio?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000137",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 163,
+      "error": null
+    },
+    "P138": {
+      "pregunta": "¿Qué horarios tiene la sucursal de Providencia?",
+      "respuesta": "La sucursal Providencia está ubicada en:\nAv. Providencia 2450, Santiago",
+      "phone": "+56910000138",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1302,
+      "error": null
+    },
+    "P139": {
+      "pregunta": "¿La sucursal abre los sábados?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000139",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1308,
+      "error": null
+    },
+    "P140": {
+      "pregunta": "¿La sede estará abierta el feriado?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000140",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 145,
+      "error": null
+    },
+    "P141": {
+      "pregunta": "¿Tienen estacionamiento?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000141",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1307,
+      "error": null
+    },
+    "P142": {
+      "pregunta": "¿Cómo llego a la sucursal?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000142",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 134,
+      "error": null
+    },
+    "P143": {
+      "pregunta": "¿Tienen alguna referencia para encontrar el lugar?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000143",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1305,
+      "error": null
+    },
+    "P144": {
+      "pregunta": "¿La atención es presencial o a domicilio?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000144",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 141,
+      "error": null
+    },
+    "P145": {
+      "pregunta": "¿Puedo elegir cualquier sucursal?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000145",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1322,
+      "error": null
+    },
+    "P146": {
+      "pregunta": "¿Puedo cambiar mi reserva a otra sucursal?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000146",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 150,
+      "error": null
+    },
+    "P147": {
+      "pregunta": "¿El precio cambia si elijo otra sede?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000147",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1283,
+      "error": null
+    },
+    "P148": {
+      "pregunta": "¿Las políticas de cancelación son iguales en todas las sucursales?",
+      "respuesta": "Puedo revisar la información autorizada. ¿Sobre qué política, documento o servicio necesitas información?",
+      "phone": "+56910000148",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 143,
+      "error": null
+    },
+    "P149": {
+      "pregunta": "¿Hay disponibilidad en otra sucursal si aquí está lleno?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000149",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1300,
+      "error": null
+    },
+    "P150": {
+      "pregunta": "¿Quién realiza este tratamiento?",
+      "respuesta": "Puedo revisar profesionales disponibles. ¿Con qué profesional o para qué servicio necesitas atención?",
+      "phone": "+56910000150",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 159,
+      "error": null
+    },
+    "P151": {
+      "pregunta": "¿Qué profesionales tienen disponibles?",
+      "respuesta": "Puedo revisar profesionales disponibles. ¿Con qué profesional o para qué servicio necesitas atención?",
+      "phone": "+56910000151",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 2521,
+      "error": null
+    },
+    "P152": {
+      "pregunta": "Quiero reservar con Carla.",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000152",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 1306,
+      "error": null
+    },
+    "P153": {
+      "pregunta": "¿Carla atiende mañana?",
+      "respuesta": "Puedo revisar disponibilidad con Carla Mendez. ¿Qué servicio y qué día necesitas consultar?",
+      "phone": "+56910000153",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 160,
+      "error": null
+    },
+    "P154": {
+      "pregunta": "¿En qué sucursal atiende esa profesional?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000154",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1292,
+      "error": null
+    },
+    "P155": {
+      "pregunta": "¿La profesional está habilitada para este servicio?",
+      "respuesta": "Puedo revisar profesionales disponibles. ¿Con qué profesional o para qué servicio necesitas atención?",
+      "phone": "+56910000155",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 154,
+      "error": null
+    },
+    "P156": {
+      "pregunta": "¿Puedo elegir una profesional específica?",
+      "respuesta": "Puedo revisar profesionales disponibles. ¿Con qué profesional o para qué servicio necesitas atención?",
+      "phone": "+56910000156",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1296,
+      "error": null
+    },
+    "P157": {
+      "pregunta": "No tengo preferencia, ¿me asignan a alguien?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000157",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 125,
+      "error": null
+    },
+    "P158": {
+      "pregunta": "¿Quién tiene la primera hora disponible?",
+      "respuesta": "Sí, puedo revisarlo. ¿Para qué servicio necesitas una hora?",
+      "phone": "+56910000158",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1290,
+      "error": null
+    },
+    "P159": {
+      "pregunta": "¿Pueden asignarme a la profesional con menos carga?",
+      "respuesta": "Puedo revisar disponibilidad con menos carga. ¿Qué servicio y qué día necesitas consultar?",
+      "phone": "+56910000159",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 5971,
+      "error": null
+    },
+    "P160": {
+      "pregunta": "¿Hay una profesional especialista en este tratamiento?",
+      "respuesta": "Puedo revisar profesionales disponibles. ¿Con qué profesional o para qué servicio necesitas atención?",
+      "phone": "+56910000160",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1335,
+      "error": null
+    },
+    "P161": {
+      "pregunta": "¿Este servicio requiere una profesional de nivel avanzado?",
+      "respuesta": "Puedo revisar profesionales disponibles. ¿Con qué profesional o para qué servicio necesitas atención?",
+      "phone": "+56910000161",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 156,
+      "error": null
+    },
+    "P162": {
+      "pregunta": "¿Puedo cambiar de profesional?",
+      "respuesta": "Puedo revisar profesionales disponibles. ¿Con qué profesional o para qué servicio necesitas atención?",
+      "phone": "+56910000162",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1290,
+      "error": null
+    },
+    "P163": {
+      "pregunta": "Si mi profesional no está disponible, ¿me pueden ofrecer otra?",
+      "respuesta": "Puedo revisar profesionales disponibles. ¿Con qué profesional o para qué servicio necesitas atención?",
+      "phone": "+56910000163",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1297,
+      "error": null
+    },
+    "P164": {
+      "pregunta": "No quiero que cambien a la profesional sin avisarme.",
+      "respuesta": "Puedo revisar profesionales disponibles. ¿Con qué profesional o para qué servicio necesitas atención?",
+      "phone": "+56910000164",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 151,
+      "error": null
+    },
+    "P165": {
+      "pregunta": "¿La profesional debe confirmar mi cita?",
+      "respuesta": "Puedo revisar profesionales disponibles. ¿Con qué profesional o para qué servicio necesitas atención?",
+      "phone": "+56910000165",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1294,
+      "error": null
+    },
+    "P166": {
+      "pregunta": "¿Mi cita todavía está esperando confirmación de la profesional?",
+      "respuesta": "Puedo revisar profesionales disponibles. ¿Con qué profesional o para qué servicio necesitas atención?",
+      "phone": "+56910000166",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 128,
+      "error": null
+    },
+    "P167": {
+      "pregunta": "¿Quién me atenderá finalmente?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000167",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1285,
+      "error": null
+    },
+    "P168": {
+      "pregunta": "¿La profesional estará en esa sucursal a esa hora?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000168",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 136,
+      "error": null
+    },
+    "P169": {
+      "pregunta": "¿Tiene disponibilidad después de su colación?",
+      "respuesta": "Sí, puedo revisarlo. ¿Para qué servicio necesitas una hora?",
+      "phone": "+56910000169",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1321,
+      "error": null
+    },
+    "P170": {
+      "pregunta": "¿El tratamiento necesita una cabina especial?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000170",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 139,
+      "error": null
+    },
+    "P171": {
+      "pregunta": "¿Hay una cabina disponible a esa hora?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000171",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1304,
+      "error": null
+    },
+    "P172": {
+      "pregunta": "¿La máquina está disponible en esa sucursal?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000172",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1319,
+      "error": null
+    },
+    "P173": {
+      "pregunta": "¿En qué sede tienen el equipo para este tratamiento?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000173",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 150,
+      "error": null
+    },
+    "P174": {
+      "pregunta": "¿Puedo reservar si el equipo está en mantención?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000174",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 138,
+      "error": null
+    },
+    "P175": {
+      "pregunta": "¿Tienen otra máquina disponible?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000175",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1313,
+      "error": null
+    },
+    "P176": {
+      "pregunta": "¿Cuántas personas pueden atender al mismo tiempo?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000176",
+      "modality": "DERIVACION_HUMANA",
+      "setupContext": null,
+      "duration": 167,
+      "error": null
+    },
+    "P177": {
+      "pregunta": "¿Hay cupos para una atención grupal?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000177",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1296,
+      "error": null
+    },
+    "P178": {
+      "pregunta": "¿El recurso queda reservado junto con mi cita?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000178",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 151,
+      "error": null
+    },
+    "P179": {
+      "pregunta": "¿Pueden cambiarme de cabina sin cambiar la hora?",
+      "respuesta": "No encontre una reserva activa asociada a este numero. ¿Me puedes indicar la fecha, hora o servicio de la cita que quieres reprogramar?",
+      "phone": "+56910000179",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1289,
+      "error": null
+    },
+    "P180": {
+      "pregunta": "¿Qué pasa si el equipo deja de estar disponible?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000180",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 138,
+      "error": null
+    },
+    "P181": {
+      "pregunta": "¿Me pueden ofrecer otra sede con el mismo equipo?",
+      "respuesta": "Puedo revisar disponibilidad con Carla en Providencia. ¿Qué servicio y qué día necesitas consultar?",
+      "phone": "+56910000181",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Antes me atendi con Carla en Providencia para una limpieza facial",
+      "duration": 2481,
+      "error": null
+    },
+    "P182": {
+      "pregunta": "¿Mi hora quedó reservada?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000182",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 133,
+      "error": null
+    },
+    "P183": {
+      "pregunta": "¿Mi reserva está confirmada?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000183",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 1285,
+      "error": null
+    },
+    "P184": {
+      "pregunta": "¿Cuál es el estado de mi cita?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000184",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 158,
+      "error": null
+    },
+    "P185": {
+      "pregunta": "¿Me pueden enviar el resumen de mi reserva?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000185",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 1328,
+      "error": null
+    },
+    "P186": {
+      "pregunta": "¿Cuál es el código de mi reserva?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000186",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 137,
+      "error": null
+    },
+    "P187": {
+      "pregunta": "¿Qué servicio tengo agendado?",
+      "respuesta": "Puedo ayudarte a revisar tus reservas, pero debo validarlo en agenda. ¿Qué fecha o mes quieres revisar?",
+      "phone": "+56910000187",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1274,
+      "error": null
+    },
+    "P188": {
+      "pregunta": "¿Para qué fecha tengo la hora?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000188",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 140,
+      "error": null
+    },
+    "P189": {
+      "pregunta": "¿A qué sucursal debo ir?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000189",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 9337,
+      "error": null
+    },
+    "P190": {
+      "pregunta": "¿Quién me atenderá?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000190",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1295,
+      "error": null
+    },
+    "P191": {
+      "pregunta": "¿Mi reserva está pendiente de pago?",
+      "respuesta": "Gracias. Para revisar el pago, ¿me indicas el número de pedido o solicitud?",
+      "phone": "+56910000191",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 139,
+      "error": null
+    },
+    "P192": {
+      "pregunta": "¿Mi reserva está pendiente de recepción?",
+      "respuesta": "Puedo ayudarte a revisar tus reservas, pero debo validarlo en agenda. ¿Qué fecha o mes quieres revisar?",
+      "phone": "+56910000192",
+      "modality": "DERIVACION_HUMANA",
+      "setupContext": null,
+      "duration": 1314,
+      "error": null
+    },
+    "P193": {
+      "pregunta": "¿Tengo más de una reserva creada?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000193",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 172,
+      "error": null
+    },
+    "P194": {
+      "pregunta": "Creo que reservé dos veces, ¿pueden revisar?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000194",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 1342,
+      "error": null
+    },
+    "P195": {
+      "pregunta": "¿El horario quedó bloqueado mientras confirmo?",
+      "respuesta": "Puedo ayudarte con eso. ¿Me indicas el número de solicitud o el correo asociado?",
+      "phone": "+56910000195",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 151,
+      "error": null
+    },
+    "P196": {
+      "pregunta": "¿Cuánto tiempo tengo para confirmar?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000196",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1296,
+      "error": null
+    },
+    "P197": {
+      "pregunta": "¿Qué pasa si no confirmo dentro del plazo?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000197",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 149,
+      "error": null
+    },
+    "P198": {
+      "pregunta": "No me llegó el enlace de confirmación.",
+      "respuesta": "🔁 *Reenvío de enlace de confirmación*\n\nRevisaré si tienes una reserva temporal vigente para reenviar el enlace de confirmación.\n\nSi no la encuentro, te pediré los datos mínimos para crear una nueva reserva.",
+      "phone": "+56910000198",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 156,
+      "error": null
+    },
+    "P199": {
+      "pregunta": "El enlace de confirmación venció.",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000199",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1301,
+      "error": null
+    },
+    "P200": {
+      "pregunta": "El enlace de confirmación no funciona.",
+      "respuesta": "Puedo ayudarte con eso. ¿Me indicas el número de solicitud o el correo asociado?",
+      "phone": "+56910000200",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 150,
+      "error": null
+    },
+    "P201": {
+      "pregunta": "¿Me pueden reenviar el enlace?",
+      "respuesta": "🔁 *Reenvío de enlace de confirmación*\n\nRevisaré si tienes una reserva temporal vigente para reenviar el enlace de confirmación.\n\nSi no la encuentro, te pediré los datos mínimos para crear una nueva reserva.",
+      "phone": "+56910000201",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 2477,
+      "error": null
+    },
+    "P202": {
+      "pregunta": "Quiero confirmar mi hora.",
+      "respuesta": "Puedo ayudarte a revisar tus reservas, pero debo validarlo en agenda. ¿Qué fecha o mes quieres revisar?",
+      "phone": "+56910000202",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 142,
+      "error": null
+    },
+    "P203": {
+      "pregunta": "¿Puedo responder por WhatsApp para confirmar?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000203",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1339,
+      "error": null
+    },
+    "P204": {
+      "pregunta": "¿La cita ya aparece en la agenda?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000204",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 147,
+      "error": null
+    },
+    "P205": {
+      "pregunta": "¿Me pueden agregar la cita a mi calendario?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000205",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1332,
+      "error": null
+    },
+    "P206": {
+      "pregunta": "¿Necesito pagar para reservar?",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000206",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 149,
+      "error": null
+    },
+    "P207": {
+      "pregunta": "¿Este servicio requiere abono?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000207",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 1341,
+      "error": null
+    },
+    "P208": {
+      "pregunta": "¿Cuánto tengo que abonar?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000208",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 145,
+      "error": null
+    },
+    "P209": {
+      "pregunta": "¿El abono confirma inmediatamente la cita?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000209",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 5970,
+      "error": null
+    },
+    "P210": {
+      "pregunta": "¿Qué medios de pago aceptan?",
+      "respuesta": "Gracias. Para revisar el pago, ¿me indicas el número de pedido o solicitud?",
+      "phone": "+56910000210",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 169,
+      "error": null
+    },
+    "P211": {
+      "pregunta": "¿Me pueden enviar el enlace de pago?",
+      "respuesta": "Gracias. Para revisar el pago, ¿me indicas el número de pedido o solicitud?",
+      "phone": "+56910000211",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 1282,
+      "error": null
+    },
+    "P212": {
+      "pregunta": "No me llegó el enlace de pago.",
+      "respuesta": "🔁 *Reenvío de enlace de confirmación*\n\nRevisaré si tienes una reserva temporal vigente para reenviar el enlace de confirmación.\n\nSi no la encuentro, te pediré los datos mínimos para crear una nueva reserva.",
+      "phone": "+56910000212",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 163,
+      "error": null
+    },
+    "P213": {
+      "pregunta": "El enlace de pago venció.",
+      "respuesta": "Gracias. Para revisar el pago, ¿me indicas el número de pedido o solicitud?",
+      "phone": "+56910000213",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 1296,
+      "error": null
+    },
+    "P214": {
+      "pregunta": "El enlace de pago no funciona.",
+      "respuesta": "Gracias. Para revisar el pago, ¿me indicas el número de pedido o solicitud?",
+      "phone": "+56910000214",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 137,
+      "error": null
+    },
+    "P215": {
+      "pregunta": "Ya pagué, ¿pueden confirmar mi reserva?",
+      "respuesta": "Puedo ayudarte a revisar tus reservas, pero debo validarlo en agenda. ¿Qué fecha o mes quieres revisar?",
+      "phone": "+56910000215",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 1292,
+      "error": null
+    },
+    "P216": {
+      "pregunta": "¿Recibieron mi pago?",
+      "respuesta": "Gracias. Para revisar el pago, ¿me indicas el número de pedido o solicitud?",
+      "phone": "+56910000216",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 142,
+      "error": null
+    },
+    "P217": {
+      "pregunta": "El pago aparece pendiente.",
+      "respuesta": "Gracias. Para revisar el pago, ¿me indicas el número de pedido o solicitud?",
+      "phone": "+56910000217",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 1322,
+      "error": null
+    },
+    "P218": {
+      "pregunta": "Mi pago fue rechazado.",
+      "respuesta": "Gracias. Para revisar el pago, ¿me indicas el número de pedido o solicitud?",
+      "phone": "+56910000218",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 150,
+      "error": null
+    },
+    "P219": {
+      "pregunta": "Me cobraron dos veces.",
+      "respuesta": "Te derivaré con una persona del equipo para que pueda ayudarte directamente.",
+      "phone": "+56910000219",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 1299,
+      "error": null
+    },
+    "P220": {
+      "pregunta": "El monto cobrado no corresponde.",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000220",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 141,
+      "error": null
+    },
+    "P221": {
+      "pregunta": "¿Puedo enviar el comprobante por WhatsApp?",
+      "respuesta": "Gracias. Para revisar el pago, ¿me indicas el número de pedido o solicitud?",
+      "phone": "+56910000221",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 1310,
+      "error": null
+    },
+    "P222": {
+      "pregunta": "¿Me pueden enviar una boleta?",
+      "respuesta": "Gracias. Para revisar el pago, ¿me indicas el número de pedido o solicitud?",
+      "phone": "+56910000222",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 151,
+      "error": null
+    },
+    "P223": {
+      "pregunta": "¿Me pueden enviar una factura?",
+      "respuesta": "Gracias. Para revisar el pago, ¿me indicas el número de pedido o solicitud?",
+      "phone": "+56910000223",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 1312,
+      "error": null
+    },
+    "P224": {
+      "pregunta": "¿El abono es reembolsable?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000224",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 1303,
+      "error": null
+    },
+    "P225": {
+      "pregunta": "¿Qué pasa con mi abono si cancelo?",
+      "respuesta": "📭 *Sin reservas activas*\n\nNo encontré reservas futuras activas asociadas a este WhatsApp.\n\nSi deseas agendar una nueva hora, solo dime el servicio, la fecha y la hora que prefieres.",
+      "phone": "+56910000225",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 149,
+      "error": null
+    },
+    "P226": {
+      "pregunta": "¿Qué pasa con mi abono si reprogramo?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000226",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 1290,
+      "error": null
+    },
+    "P227": {
+      "pregunta": "¿Puedo usar el abono para otra cita?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000227",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 150,
+      "error": null
+    },
+    "P228": {
+      "pregunta": "¿Puedo pagar la diferencia si cambio de servicio?",
+      "respuesta": "Gracias. Para revisar el pago, ¿me indicas el número de pedido o solicitud?",
+      "phone": "+56910000228",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 1313,
+      "error": null
+    },
+    "P229": {
+      "pregunta": "¿Me corresponde una devolución?",
+      "respuesta": "Te derivaré con una persona del equipo para que pueda ayudarte directamente.",
+      "phone": "+56910000229",
+      "modality": "CASO_SENSIBLE",
+      "setupContext": null,
+      "duration": 162,
+      "error": null
+    },
+    "P230": {
+      "pregunta": "¿Cuánto demora el reembolso?",
+      "respuesta": "Te derivaré con una persona del equipo para que pueda ayudarte directamente.",
+      "phone": "+56910000230",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 170,
+      "error": null
+    },
+    "P231": {
+      "pregunta": "¿Me enviarán una confirmación por WhatsApp?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000231",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1294,
+      "error": null
+    },
+    "P232": {
+      "pregunta": "¿Me enviarán la confirmación por correo?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000232",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 154,
+      "error": null
+    },
+    "P233": {
+      "pregunta": "¿Me pueden recordar la cita?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000233",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1311,
+      "error": null
+    },
+    "P234": {
+      "pregunta": "¿Cuándo enviarán el recordatorio?",
+      "respuesta": "Claro, puedo retomar el seguimiento. ¿Quieres continuar con la cotización, la cita o el pago pendiente?",
+      "phone": "+56910000234",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 147,
+      "error": null
+    },
+    "P235": {
+      "pregunta": "¿Pueden enviarme un recordatorio el día anterior?",
+      "respuesta": "Claro, puedo retomar el seguimiento. ¿Quieres continuar con la cotización, la cita o el pago pendiente?",
+      "phone": "+56910000235",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1321,
+      "error": null
+    },
+    "P236": {
+      "pregunta": "¿Pueden recordarme la cita unas horas antes?",
+      "respuesta": "Puedo orientarte con Unas acrilicas. ¿Quieres revisar precio, características o agendar una atención?",
+      "phone": "+56910000236",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 159,
+      "error": null
+    },
+    "P237": {
+      "pregunta": "No me llegó el recordatorio.",
+      "respuesta": "Claro, puedo retomar el seguimiento. ¿Quieres continuar con la cotización, la cita o el pago pendiente?",
+      "phone": "+56910000237",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1299,
+      "error": null
+    },
+    "P238": {
+      "pregunta": "¿A qué número enviarán las notificaciones?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000238",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 158,
+      "error": null
+    },
+    "P239": {
+      "pregunta": "¿Pueden enviar la información a otro correo?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000239",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1325,
+      "error": null
+    },
+    "P240": {
+      "pregunta": "¿Puedo dejar de recibir recordatorios?",
+      "respuesta": "Claro, puedo retomar el seguimiento. ¿Quieres continuar con la cotización, la cita o el pago pendiente?",
+      "phone": "+56910000240",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 171,
+      "error": null
+    },
+    "P241": {
+      "pregunta": "¿El recordatorio incluye la dirección?",
+      "respuesta": "Claro, puedo retomar el seguimiento. ¿Quieres continuar con la cotización, la cita o el pago pendiente?",
+      "phone": "+56910000241",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1315,
+      "error": null
+    },
+    "P242": {
+      "pregunta": "¿El recordatorio incluye un enlace para cancelar o reprogramar?",
+      "respuesta": "Claro, puedo retomar el seguimiento. ¿Quieres continuar con la cotización, la cita o el pago pendiente?",
+      "phone": "+56910000242",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 157,
+      "error": null
+    },
+    "P243": {
+      "pregunta": "¿También le avisarán a la profesional?",
+      "respuesta": "Puedo revisar profesionales disponibles. ¿Con qué profesional o para qué servicio necesitas atención?",
+      "phone": "+56910000243",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1315,
+      "error": null
+    },
+    "P244": {
+      "pregunta": "¿Me avisarán si cambia la profesional?",
+      "respuesta": "Puedo revisar profesionales disponibles. ¿Con qué profesional o para qué servicio necesitas atención?",
+      "phone": "+56910000244",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1330,
+      "error": null
+    },
+    "P245": {
+      "pregunta": "¿Me avisarán si cambia la sucursal?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000245",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 160,
+      "error": null
+    },
+    "P246": {
+      "pregunta": "¿Me avisarán si el centro cancela la cita?",
+      "respuesta": "📭 *Sin reservas activas*\n\nNo encontré reservas futuras activas asociadas a este WhatsApp.\n\nSi deseas agendar una nueva hora, solo dime el servicio, la fecha y la hora que prefieres.",
+      "phone": "+56910000246",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1290,
+      "error": null
+    },
+    "P247": {
+      "pregunta": "Quiero cambiar mi hora.",
+      "respuesta": "No encontre una reserva activa asociada a este numero. ¿Me puedes indicar la fecha, hora o servicio de la cita que quieres reprogramar?",
+      "phone": "+56910000247",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 142,
+      "error": null
+    },
+    "P248": {
+      "pregunta": "Necesito reprogramar mi cita.",
+      "respuesta": "No encontre una reserva activa asociada a este numero. ¿Me puedes indicar la fecha, hora o servicio de la cita que quieres reprogramar?",
+      "phone": "+56910000248",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1274,
+      "error": null
+    },
+    "P249": {
+      "pregunta": "¿Puedo cambiar la fecha?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000249",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 149,
+      "error": null
+    },
+    "P250": {
+      "pregunta": "¿Puedo cambiar el horario?",
+      "respuesta": "Puedo ayudarte con eso. ¿Me indicas el número de solicitud o el correo asociado?",
+      "phone": "+56910000250",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1297,
+      "error": null
+    },
+    "P251": {
+      "pregunta": "¿Puedo mover mi cita para mañana?",
+      "respuesta": "No encontre una reserva activa asociada a este numero. ¿Me puedes indicar la fecha, hora o servicio de la cita que quieres reprogramar?",
+      "phone": "+56910000251",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 157,
+      "error": null
+    },
+    "P252": {
+      "pregunta": "Quiero cambiar mi reserva para la próxima semana.",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000252",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 157,
+      "error": null
+    },
+    "P253": {
+      "pregunta": "¿Puedo cambiar de sucursal?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000253",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1279,
+      "error": null
+    },
+    "P254": {
+      "pregunta": "¿Puedo cambiar de profesional al reprogramar?",
+      "respuesta": "No encontre una reserva activa asociada a este numero. ¿Me puedes indicar la fecha, hora o servicio de la cita que quieres reprogramar?",
+      "phone": "+56910000254",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 154,
+      "error": null
+    },
+    "P255": {
+      "pregunta": "¿Puedo cambiar el servicio de mi reserva?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000255",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 1289,
+      "error": null
+    },
+    "P256": {
+      "pregunta": "No encuentro mi reserva para reprogramarla.",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000256",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 137,
+      "error": null
+    },
+    "P257": {
+      "pregunta": "No tengo el código de la reserva.",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000257",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 1307,
+      "error": null
+    },
+    "P258": {
+      "pregunta": "¿Pueden buscar mi cita por teléfono?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000258",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 154,
+      "error": null
+    },
+    "P259": {
+      "pregunta": "¿Esta reserva permite reprogramación?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000259",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 1320,
+      "error": null
+    },
+    "P260": {
+      "pregunta": "Mi cita está pendiente de pago, ¿la puedo mover?",
+      "respuesta": "No encontre una reserva activa asociada a este numero. ¿Me puedes indicar la fecha, hora o servicio de la cita que quieres reprogramar?",
+      "phone": "+56910000260",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 131,
+      "error": null
+    },
+    "P261": {
+      "pregunta": "¿Hasta cuándo puedo reprogramar?",
+      "respuesta": "No encontre una reserva activa asociada a este numero. ¿Me puedes indicar la fecha, hora o servicio de la cita que quieres reprogramar?",
+      "phone": "+56910000261",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 3686,
+      "error": null
+    },
+    "P262": {
+      "pregunta": "¿Existe un cobro por reprogramar?",
+      "respuesta": "No encontre una reserva activa asociada a este numero. ¿Me puedes indicar la fecha, hora o servicio de la cita que quieres reprogramar?",
+      "phone": "+56910000262",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1295,
+      "error": null
+    },
+    "P263": {
+      "pregunta": "¿Cuántas veces puedo cambiar mi cita?",
+      "respuesta": "No encontre una reserva activa asociada a este numero. ¿Me puedes indicar la fecha, hora o servicio de la cita que quieres reprogramar?",
+      "phone": "+56910000263",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 154,
+      "error": null
+    },
+    "P264": {
+      "pregunta": "¿Puedo reprogramar una cita vencida?",
+      "respuesta": "No encontre una reserva activa asociada a este numero. ¿Me puedes indicar la fecha, hora o servicio de la cita que quieres reprogramar?",
+      "phone": "+56910000264",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1313,
+      "error": null
+    },
+    "P265": {
+      "pregunta": "¿Puedo reprogramar una cita cancelada?",
+      "respuesta": "📭 *Sin reservas activas*\n\nNo encontré reservas futuras activas asociadas a este WhatsApp.\n\nSi deseas agendar una nueva hora, solo dime el servicio, la fecha y la hora que prefieres.",
+      "phone": "+56910000265",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 147,
+      "error": null
+    },
+    "P266": {
+      "pregunta": "¿Puedo reprogramar después de no asistir?",
+      "respuesta": "No encontre una reserva activa asociada a este numero. ¿Me puedes indicar la fecha, hora o servicio de la cita que quieres reprogramar?",
+      "phone": "+56910000266",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 5943,
+      "error": null
+    },
+    "P267": {
+      "pregunta": "¿Qué horarios tienen para reemplazar mi cita?",
+      "respuesta": "Sí, puedo revisarlo. ¿Para qué servicio necesitas una hora?",
+      "phone": "+56910000267",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 141,
+      "error": null
+    },
+    "P268": {
+      "pregunta": "¿Pueden mantener mi hora actual mientras elijo una nueva?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000268",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1331,
+      "error": null
+    },
+    "P269": {
+      "pregunta": "¿Qué pasa si el nuevo horario se ocupa antes de confirmar?",
+      "respuesta": "Puedo ayudarte con eso. ¿Me indicas el número de solicitud o el correo asociado?",
+      "phone": "+56910000269",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 152,
+      "error": null
+    },
+    "P270": {
+      "pregunta": "¿Me enviarán una nueva confirmación?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000270",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1312,
+      "error": null
+    },
+    "P271": {
+      "pregunta": "¿La reserva anterior quedará anulada?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000271",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 143,
+      "error": null
+    },
+    "P272": {
+      "pregunta": "¿Qué pasa con mi pago después del cambio?",
+      "respuesta": "Gracias. Para revisar el pago, ¿me indicas el número de pedido o solicitud?",
+      "phone": "+56910000272",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 1295,
+      "error": null
+    },
+    "P273": {
+      "pregunta": "¿El precio cambia al elegir otra sucursal?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000273",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 130,
+      "error": null
+    },
+    "P274": {
+      "pregunta": "¿El precio cambia al elegir otra profesional?",
+      "respuesta": "Para darte un precio correcto, ¿me indicas el servicio exacto que quieres revisar?",
+      "phone": "+56910000274",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1348,
+      "error": null
+    },
+    "P275": {
+      "pregunta": "Quiero volver a mi horario anterior.",
+      "respuesta": "Puedo ayudarte con eso. ¿Me indicas el número de solicitud o el correo asociado?",
+      "phone": "+56910000275",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1315,
+      "error": null
+    },
+    "P276": {
+      "pregunta": "Me equivoqué al reprogramar, ¿pueden ayudarme?",
+      "respuesta": "No encontre una reserva activa asociada a este numero. ¿Me puedes indicar la fecha, hora o servicio de la cita que quieres reprogramar?",
+      "phone": "+56910000276",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 153,
+      "error": null
+    },
+    "P277": {
+      "pregunta": "Quiero cancelar mi hora.",
+      "respuesta": "📭 *Sin reservas activas*\n\nNo encontré reservas futuras activas asociadas a este WhatsApp.\n\nSi deseas agendar una nueva hora, solo dime el servicio, la fecha y la hora que prefieres.",
+      "phone": "+56910000277",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1281,
+      "error": null
+    },
+    "P278": {
+      "pregunta": "Necesito anular mi reserva.",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000278",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 164,
+      "error": null
+    },
+    "P279": {
+      "pregunta": "¿Cómo cancelo mi cita?",
+      "respuesta": "📭 *Sin reservas activas*\n\nNo encontré reservas futuras activas asociadas a este WhatsApp.\n\nSi deseas agendar una nueva hora, solo dime el servicio, la fecha y la hora que prefieres.",
+      "phone": "+56910000279",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1286,
+      "error": null
+    },
+    "P280": {
+      "pregunta": "No puedo asistir, quiero cancelar.",
+      "respuesta": "📭 *Sin reservas activas*\n\nNo encontré reservas futuras activas asociadas a este WhatsApp.\n\nSi deseas agendar una nueva hora, solo dime el servicio, la fecha y la hora que prefieres.",
+      "phone": "+56910000280",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 143,
+      "error": null
+    },
+    "P281": {
+      "pregunta": "No encuentro mi reserva para cancelarla.",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000281",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 2489,
+      "error": null
+    },
+    "P282": {
+      "pregunta": "No tengo el código de la cita.",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000282",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 144,
+      "error": null
+    },
+    "P283": {
+      "pregunta": "¿Pueden buscar la reserva por mi teléfono?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000283",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 1281,
+      "error": null
+    },
+    "P284": {
+      "pregunta": "¿Esta reserva todavía se puede cancelar?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000284",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 137,
+      "error": null
+    },
+    "P285": {
+      "pregunta": "¿Puedo cancelar una cita pendiente de pago?",
+      "respuesta": "📭 *Sin reservas activas*\n\nNo encontré reservas futuras activas asociadas a este WhatsApp.\n\nSi deseas agendar una nueva hora, solo dime el servicio, la fecha y la hora que prefieres.",
+      "phone": "+56910000285",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 1314,
+      "error": null
+    },
+    "P286": {
+      "pregunta": "¿Puedo cancelar una cita ya confirmada?",
+      "respuesta": "📭 *Sin reservas activas*\n\nNo encontré reservas futuras activas asociadas a este WhatsApp.\n\nSi deseas agendar una nueva hora, solo dime el servicio, la fecha y la hora que prefieres.",
+      "phone": "+56910000286",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 145,
+      "error": null
+    },
+    "P287": {
+      "pregunta": "¿Puedo cancelar una reserva de otra persona?",
+      "respuesta": "Te derivaré con una persona del equipo para que pueda ayudarte directamente.",
+      "phone": "+56910000287",
+      "modality": "DERIVACION_HUMANA",
+      "setupContext": null,
+      "duration": 1308,
+      "error": null
+    },
+    "P288": {
+      "pregunta": "¿Necesitan validar que soy el titular?",
+      "respuesta": "Gracias. ¿Qué necesitas resolver hoy?",
+      "phone": "+56910000288",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 144,
+      "error": null
+    },
+    "P289": {
+      "pregunta": "¿Hasta cuándo puedo cancelar sin cobro?",
+      "respuesta": "📭 *Sin reservas activas*\n\nNo encontré reservas futuras activas asociadas a este WhatsApp.\n\nSi deseas agendar una nueva hora, solo dime el servicio, la fecha y la hora que prefieres.",
+      "phone": "+56910000289",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 8379,
+      "error": null
+    },
+    "P290": {
+      "pregunta": "¿Hay una penalización por cancelar tarde?",
+      "respuesta": "📭 *Sin reservas activas*\n\nNo encontré reservas futuras activas asociadas a este WhatsApp.\n\nSi deseas agendar una nueva hora, solo dime el servicio, la fecha y la hora que prefieres.",
+      "phone": "+56910000290",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 130,
+      "error": null
+    },
+    "P291": {
+      "pregunta": "¿Debo indicar el motivo de la cancelación?",
+      "respuesta": "📭 *Sin reservas activas*\n\nNo encontré reservas futuras activas asociadas a este WhatsApp.\n\nSi deseas agendar una nueva hora, solo dime el servicio, la fecha y la hora que prefieres.",
+      "phone": "+56910000291",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1320,
+      "error": null
+    },
+    "P292": {
+      "pregunta": "¿Qué pasa con el cupo después de cancelar?",
+      "respuesta": "📭 *Sin reservas activas*\n\nNo encontré reservas futuras activas asociadas a este WhatsApp.\n\nSi deseas agendar una nueva hora, solo dime el servicio, la fecha y la hora que prefieres.",
+      "phone": "+56910000292",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 150,
+      "error": null
+    },
+    "P293": {
+      "pregunta": "¿Le avisarán a la profesional?",
+      "respuesta": "Puedo revisar profesionales disponibles. ¿Con qué profesional o para qué servicio necesitas atención?",
+      "phone": "+56910000293",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1340,
+      "error": null
+    },
+    "P294": {
+      "pregunta": "¿Me enviarán una confirmación de cancelación?",
+      "respuesta": "📭 *Sin reservas activas*\n\nNo encontré reservas futuras activas asociadas a este WhatsApp.\n\nSi deseas agendar una nueva hora, solo dime el servicio, la fecha y la hora que prefieres.",
+      "phone": "+56910000294",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 130,
+      "error": null
+    },
+    "P295": {
+      "pregunta": "¿Qué pasa con el abono?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000295",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 1316,
+      "error": null
+    },
+    "P296": {
+      "pregunta": "¿Me devolverán el dinero?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000296",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 147,
+      "error": null
+    },
+    "P297": {
+      "pregunta": "¿Puedo dejar el pago como saldo a favor?",
+      "respuesta": "Gracias. Para revisar el pago, ¿me indicas el número de pedido o solicitud?",
+      "phone": "+56910000297",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 1308,
+      "error": null
+    },
+    "P298": {
+      "pregunta": "¿Puedo cancelar solo uno de los servicios del paquete?",
+      "respuesta": "📭 *Sin reservas activas*\n\nNo encontré reservas futuras activas asociadas a este WhatsApp.\n\nSi deseas agendar una nueva hora, solo dime el servicio, la fecha y la hora que prefieres.",
+      "phone": "+56910000298",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 177,
+      "error": null
+    },
+    "P299": {
+      "pregunta": "Cancelé por error, ¿pueden recuperar mi cita?",
+      "respuesta": "📭 *Sin reservas activas*\n\nNo encontré reservas futuras activas asociadas a este WhatsApp.\n\nSi deseas agendar una nueva hora, solo dime el servicio, la fecha y la hora que prefieres.",
+      "phone": "+56910000299",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1329,
+      "error": null
+    },
+    "P300": {
+      "pregunta": "Mi reserva ya aparece cancelada, ¿pueden revisar?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000300",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 152,
+      "error": null
+    },
+    "P301": {
+      "pregunta": "El centro canceló mi hora, ¿qué alternativas tengo?",
+      "respuesta": "📭 *Sin reservas activas*\n\nNo encontré reservas futuras activas asociadas a este WhatsApp.\n\nSi deseas agendar una nueva hora, solo dime el servicio, la fecha y la hora que prefieres.",
+      "phone": "+56910000301",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1302,
+      "error": null
+    },
+    "P302": {
+      "pregunta": "No hay horas, ¿me pueden dejar en lista de espera?",
+      "respuesta": "Sí, puedo revisarlo. ¿Para qué servicio necesitas una hora?",
+      "phone": "+56910000302",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1295,
+      "error": null
+    },
+    "P303": {
+      "pregunta": "¿Tienen lista de espera?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000303",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 161,
+      "error": null
+    },
+    "P304": {
+      "pregunta": "¿Me pueden avisar si se libera un cupo?",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000304",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1323,
+      "error": null
+    },
+    "P305": {
+      "pregunta": "Quiero quedar esperando una hora para mañana.",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000305",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 136,
+      "error": null
+    },
+    "P306": {
+      "pregunta": "¿Puedo elegir varios horarios en la lista de espera?",
+      "respuesta": "Puedo ayudarte con eso. ¿Me indicas el número de solicitud o el correo asociado?",
+      "phone": "+56910000306",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1308,
+      "error": null
+    },
+    "P307": {
+      "pregunta": "¿Puedo quedar en espera para cualquier profesional?",
+      "respuesta": "Puedo revisar profesionales disponibles. ¿Con qué profesional o para qué servicio necesitas atención?",
+      "phone": "+56910000307",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 164,
+      "error": null
+    },
+    "P308": {
+      "pregunta": "¿Puedo quedar en espera en varias sucursales?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000308",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1334,
+      "error": null
+    },
+    "P309": {
+      "pregunta": "¿Qué posición tengo en la lista de espera?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000309",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 146,
+      "error": null
+    },
+    "P310": {
+      "pregunta": "¿Cuánto tiempo tengo para aceptar un cupo liberado?",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000310",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 5936,
+      "error": null
+    },
+    "P311": {
+      "pregunta": "Me avisaron de un cupo, ¿todavía está disponible?",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000311",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 141,
+      "error": null
+    },
+    "P312": {
+      "pregunta": "Quiero aceptar el cupo que se liberó.",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000312",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1338,
+      "error": null
+    },
+    "P313": {
+      "pregunta": "No puedo tomar el cupo, ¿pueden ofrecérselo a otra persona?",
+      "respuesta": "Te derivaré con una persona del equipo para que pueda ayudarte directamente.",
+      "phone": "+56910000313",
+      "modality": "DERIVACION_HUMANA",
+      "setupContext": null,
+      "duration": 160,
+      "error": null
+    },
+    "P314": {
+      "pregunta": "Quiero salir de la lista de espera.",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000314",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1346,
+      "error": null
+    },
+    "P315": {
+      "pregunta": "¿Me pueden avisar solo por WhatsApp?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000315",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 153,
+      "error": null
+    },
+    "P316": {
+      "pregunta": "¿Me avisarán a todos al mismo tiempo o por orden?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000316",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 1286,
+      "error": null
+    },
+    "P317": {
+      "pregunta": "Quiero reservar dos servicios el mismo día.",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000317",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 148,
+      "error": null
+    },
+    "P318": {
+      "pregunta": "¿Puedo hacerme una limpieza y después un masaje?",
+      "respuesta": "Puedo orientarte con Limpieza facial profunda. ¿Quieres revisar precio, características o agendar una atención?",
+      "phone": "+56910000318",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1332,
+      "error": null
+    },
+    "P319": {
+      "pregunta": "¿Pueden agendar los servicios uno después del otro?",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000319",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 165,
+      "error": null
+    },
+    "P320": {
+      "pregunta": "¿Cuánto tiempo necesito para el paquete completo?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000320",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1325,
+      "error": null
+    },
+    "P321": {
+      "pregunta": "¿Los servicios pueden ser con profesionales diferentes?",
+      "respuesta": "Puedo revisar disponibilidad con profesionales diferentes. ¿Qué servicio y qué día necesitas consultar?",
+      "phone": "+56910000321",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1320,
+      "error": null
+    },
+    "P322": {
+      "pregunta": "¿Los servicios deben realizarse en la misma sucursal?",
+      "respuesta": "Puedo revisar disponibilidad con Carla en Providencia. ¿Qué servicio y qué día necesitas consultar?",
+      "phone": "+56910000322",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Antes me atendi con Carla en Providencia para una limpieza facial",
+      "duration": 1301,
+      "error": null
+    },
+    "P323": {
+      "pregunta": "¿Puedo cambiar solo uno de los servicios del paquete?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000323",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 167,
+      "error": null
+    },
+    "P324": {
+      "pregunta": "¿Puedo cancelar solo una parte del paquete?",
+      "respuesta": "📭 *Sin reservas activas*\n\nNo encontré reservas futuras activas asociadas a este WhatsApp.\n\nSi deseas agendar una nueva hora, solo dime el servicio, la fecha y la hora que prefieres.",
+      "phone": "+56910000324",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 1313,
+      "error": null
+    },
+    "P325": {
+      "pregunta": "Quiero reservar varias sesiones del tratamiento.",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000325",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 165,
+      "error": null
+    },
+    "P326": {
+      "pregunta": "¿Puedo dejar agendadas todas mis sesiones?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000326",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 166,
+      "error": null
+    },
+    "P327": {
+      "pregunta": "Quiero reservar para mí y otra persona.",
+      "respuesta": "Te derivaré con una persona del equipo para que pueda ayudarte directamente.",
+      "phone": "+56910000327",
+      "modality": "DERIVACION_HUMANA",
+      "setupContext": null,
+      "duration": 1292,
+      "error": null
+    },
+    "P328": {
+      "pregunta": "¿Pueden atendernos a las dos a la misma hora?",
+      "respuesta": "Puedo revisar disponibilidad con Carla en Providencia. ¿Qué servicio y qué día necesitas consultar?",
+      "phone": "+56910000328",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Antes me atendi con Carla en Providencia para una limpieza facial",
+      "duration": 154,
+      "error": null
+    },
+    "P329": {
+      "pregunta": "¿Tienen capacidad para un grupo?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000329",
+      "modality": "INDEPENDIENTE",
+      "setupContext": null,
+      "duration": 8248,
+      "error": null
+    },
+    "P330": {
+      "pregunta": "¿Puedo reservar una atención grupal?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000330",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 141,
+      "error": null
+    },
+    "P331": {
+      "pregunta": "¿El pago se realiza por persona o por la reserva completa?",
+      "respuesta": "Te derivaré con una persona del equipo para que pueda ayudarte directamente.",
+      "phone": "+56910000331",
+      "modality": "DERIVACION_HUMANA",
+      "setupContext": null,
+      "duration": 1278,
+      "error": null
+    },
+    "P332": {
+      "pregunta": "¿Este tratamiento necesita evaluación previa?",
+      "respuesta": "evaluacion estetica: duración aproximada 45 minutos, valor base $19.990. ¿Quieres que revise horarios disponibles?",
+      "phone": "+56910000332",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1311,
+      "error": null
+    },
+    "P333": {
+      "pregunta": "¿Puedo reservar la evaluación por WhatsApp?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000333",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 168,
+      "error": null
+    },
+    "P334": {
+      "pregunta": "¿La evaluación tiene costo?",
+      "respuesta": "Puedo orientarte con Evaluacion estetica. ¿Quieres revisar precio, características o agendar una atención?",
+      "phone": "+56910000334",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1335,
+      "error": null
+    },
+    "P335": {
+      "pregunta": "¿Puedo reservar el tratamiento el mismo día de la evaluación?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000335",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 1331,
+      "error": null
+    },
+    "P336": {
+      "pregunta": "¿Necesito firmar un consentimiento?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000336",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 141,
+      "error": null
+    },
+    "P337": {
+      "pregunta": "¿Me pueden enviar el consentimiento antes de la cita?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000337",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1317,
+      "error": null
+    },
+    "P338": {
+      "pregunta": "¿Puedo aceptar el consentimiento por WhatsApp?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000338",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 166,
+      "error": null
+    },
+    "P339": {
+      "pregunta": "¿Qué información incluye el consentimiento?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000339",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1289,
+      "error": null
+    },
+    "P340": {
+      "pregunta": "¿Existe una edad mínima para este servicio?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000340",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 7145,
+      "error": null
+    },
+    "P341": {
+      "pregunta": "Soy menor de edad, ¿puedo reservar?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000341",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 169,
+      "error": null
+    },
+    "P342": {
+      "pregunta": "Quiero reservar para mi hija menor de edad.",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000342",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 1333,
+      "error": null
+    },
+    "P343": {
+      "pregunta": "¿Debe asistir un adulto responsable?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000343",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 135,
+      "error": null
+    },
+    "P344": {
+      "pregunta": "¿Necesitan autorización del tutor?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000344",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1319,
+      "error": null
+    },
+    "P345": {
+      "pregunta": "¿Qué datos del tutor necesitan?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000345",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 151,
+      "error": null
+    },
+    "P346": {
+      "pregunta": "¿Hay tratamientos que no se realizan a menores?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000346",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1316,
+      "error": null
+    },
+    "P347": {
+      "pregunta": "¿Puedo hablar con recepción por una restricción especial?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000347",
+      "modality": "DERIVACION_HUMANA",
+      "setupContext": null,
+      "duration": 138,
+      "error": null
+    },
+    "P348": {
+      "pregunta": "¿Cómo debo prepararme para la cita?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000348",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 149,
+      "error": null
+    },
+    "P349": {
+      "pregunta": "¿Debo hacer algo antes del tratamiento?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000349",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1301,
+      "error": null
+    },
+    "P350": {
+      "pregunta": "¿Tengo que llegar sin maquillaje?",
+      "respuesta": "Puedo orientarte con Prueba maquillaje novia. ¿Quieres revisar precio, características o agendar una atención?",
+      "phone": "+56910000350",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 177,
+      "error": null
+    },
+    "P351": {
+      "pregunta": "¿Debo suspender algún producto antes de la sesión?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000351",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 141,
+      "error": null
+    },
+    "P352": {
+      "pregunta": "¿Necesito llevar algún documento?",
+      "respuesta": "Puedo revisar la información autorizada. ¿Sobre qué política, documento o servicio necesitas información?",
+      "phone": "+56910000352",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 136,
+      "error": null
+    },
+    "P353": {
+      "pregunta": "¿Debo llevar el comprobante de pago?",
+      "respuesta": "Gracias. Para revisar el pago, ¿me indicas el número de pedido o solicitud?",
+      "phone": "+56910000353",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 138,
+      "error": null
+    },
+    "P354": {
+      "pregunta": "¿Cuánto antes debo llegar?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000354",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 137,
+      "error": null
+    },
+    "P355": {
+      "pregunta": "¿Puedo ir acompañada?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000355",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 163,
+      "error": null
+    },
+    "P356": {
+      "pregunta": "¿Qué pasa si estoy embarazada?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000356",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 146,
+      "error": null
+    },
+    "P357": {
+      "pregunta": "Tengo una condición médica, ¿puedo realizarme el tratamiento?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000357",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 131,
+      "error": null
+    },
+    "P358": {
+      "pregunta": "Tuve una reacción anterior, ¿puedo reservar nuevamente?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000358",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 122,
+      "error": null
+    },
+    "P359": {
+      "pregunta": "¿Necesito informar alergias?",
+      "respuesta": "🚨 *Te derivaré con una persona del equipo*\n\nLamento que hayas tenido esa reacción.\n\nVoy a derivarte con una persona del equipo para ayudarte de inmediato.\n\nSi tienes molestias importantes o síntomas intensos, consulta con un profesional de salud.",
+      "phone": "+56910000359",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 142,
+      "error": null
+    },
+    "P360": {
+      "pregunta": "¿Hay contraindicaciones para este servicio?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000360",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 142,
+      "error": null
+    },
+    "P361": {
+      "pregunta": "¿Puedo comer antes de la atención?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000361",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 169,
+      "error": null
+    },
+    "P362": {
+      "pregunta": "¿Qué ropa conviene llevar?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000362",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 138,
+      "error": null
+    },
+    "P363": {
+      "pregunta": "Voy atrasada, ¿todavía me pueden atender?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000363",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 141,
+      "error": null
+    },
+    "P364": {
+      "pregunta": "¿Cuántos minutos de atraso permiten?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000364",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 141,
+      "error": null
+    },
+    "P365": {
+      "pregunta": "¿Qué pasa si llego tarde?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000365",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 128,
+      "error": null
+    },
+    "P366": {
+      "pregunta": "No pude asistir a mi cita, ¿qué debo hacer?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000366",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 124,
+      "error": null
+    },
+    "P367": {
+      "pregunta": "¿Puedo reprogramar después de una inasistencia?",
+      "respuesta": "No encontre una reserva activa asociada a este numero. ¿Me puedes indicar la fecha, hora o servicio de la cita que quieres reprogramar?",
+      "phone": "+56910000367",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 143,
+      "error": null
+    },
+    "P368": {
+      "pregunta": "¿Existe una penalización por no asistir?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000368",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 144,
+      "error": null
+    },
+    "P369": {
+      "pregunta": "¿Perdí el abono por no presentarme?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000369",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 147,
+      "error": null
+    },
+    "P370": {
+      "pregunta": "¿Cuántas inasistencias tengo registradas?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000370",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 132,
+      "error": null
+    },
+    "P371": {
+      "pregunta": "El sistema no me deja reservar, ¿por qué?",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000371",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 142,
+      "error": null
+    },
+    "P372": {
+      "pregunta": "Me informaron que estoy bloqueada, ¿qué significa?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000372",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 139,
+      "error": null
+    },
+    "P373": {
+      "pregunta": "¿Cómo puedo regularizar una deuda pendiente?",
+      "respuesta": "Gracias. Para revisar el pago, ¿me indicas el número de pedido o solicitud?",
+      "phone": "+56910000373",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 158,
+      "error": null
+    },
+    "P374": {
+      "pregunta": "¿Puedo hablar con recepción para desbloquear mi cuenta?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000374",
+      "modality": "DERIVACION_HUMANA",
+      "setupContext": null,
+      "duration": 161,
+      "error": null
+    },
+    "P375": {
+      "pregunta": "Creo que el bloqueo es un error.",
+      "respuesta": "Puedo ayudarte con eso. ¿Me indicas el número de solicitud o el correo asociado?",
+      "phone": "+56910000375",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 140,
+      "error": null
+    },
+    "P376": {
+      "pregunta": "¿Puedo reservar si tengo una deuda?",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000376",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 134,
+      "error": null
+    },
+    "P377": {
+      "pregunta": "¿Qué debo hacer para volver a agendar?",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000377",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 137,
+      "error": null
+    },
+    "P378": {
+      "pregunta": "¿A qué hora abren?",
+      "respuesta": "Puedo ayudarte con horarios de atención. Para no confundirlo con disponibilidad de citas, indícame la sucursal que quieres revisar.",
+      "phone": "+56910000378",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 146,
+      "error": null
+    },
+    "P379": {
+      "pregunta": "¿Hasta qué hora atienden?",
+      "respuesta": "Puedo ayudarte con horarios de atención. Para no confundirlo con disponibilidad de citas, indícame la sucursal que quieres revisar.",
+      "phone": "+56910000379",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 139,
+      "error": null
+    },
+    "P380": {
+      "pregunta": "¿Cuál es el horario de atención?",
+      "respuesta": "Puedo ayudarte con horarios de atención. Para no confundirlo con disponibilidad de citas, indícame la sucursal que quieres revisar.",
+      "phone": "+56910000380",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 142,
+      "error": null
+    },
+    "P381": {
+      "pregunta": "¿Atienden a la hora de almuerzo?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000381",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 147,
+      "error": null
+    },
+    "P382": {
+      "pregunta": "¿Abren los sábados?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000382",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 128,
+      "error": null
+    },
+    "P383": {
+      "pregunta": "¿Trabajan los domingos?",
+      "respuesta": "Puedo ayudarte con horarios de atención. Para no confundirlo con disponibilidad de citas, indícame la sucursal que quieres revisar.",
+      "phone": "+56910000383",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 152,
+      "error": null
+    },
+    "P384": {
+      "pregunta": "¿Atienden en días feriados?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000384",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 173,
+      "error": null
+    },
+    "P385": {
+      "pregunta": "¿Hoy tienen horario normal?",
+      "respuesta": "Sí, puedo revisarlo para hoy. ¿Para qué servicio necesitas una hora?",
+      "phone": "+56910000385",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 139,
+      "error": null
+    },
+    "P386": {
+      "pregunta": "¿Mañana abren más temprano?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000386",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 139,
+      "error": null
+    },
+    "P387": {
+      "pregunta": "¿Tienen horario extendido esta semana?",
+      "respuesta": "Sí, puedo revisarlo para esta semana. ¿Para qué servicio necesitas una hora?",
+      "phone": "+56910000387",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 136,
+      "error": null
+    },
+    "P388": {
+      "pregunta": "¿La sucursal cerrará más temprano?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000388",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 145,
+      "error": null
+    },
+    "P389": {
+      "pregunta": "¿Hay una apertura extraordinaria?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000389",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 127,
+      "error": null
+    },
+    "P390": {
+      "pregunta": "¿El horario es igual en todas las sucursales?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000390",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 150,
+      "error": null
+    },
+    "P391": {
+      "pregunta": "¿La profesional tiene el mismo horario que la sucursal?",
+      "respuesta": null,
+      "phone": "+56910000391",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 11609,
+      "error": "TIMEOUT"
+    },
+    "P392": {
+      "pregunta": "¿Hay atención después de las siete?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000392",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 10533,
+      "error": null
+    },
+    "P393": {
+      "pregunta": "¿Qué pasa si la profesional se ausenta?",
+      "respuesta": "Puedo revisar profesionales disponibles. ¿Con qué profesional o para qué servicio necesitas atención?",
+      "phone": "+56910000393",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 143,
+      "error": null
+    },
+    "P394": {
+      "pregunta": "¿Me pueden asignar otra profesional?",
+      "respuesta": "Puedo revisar profesionales disponibles. ¿Con qué profesional o para qué servicio necesitas atención?",
+      "phone": "+56910000394",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1299,
+      "error": null
+    },
+    "P395": {
+      "pregunta": "¿Puedo aceptar o rechazar el cambio de profesional?",
+      "respuesta": "Puedo revisar profesionales disponibles. ¿Con qué profesional o para qué servicio necesitas atención?",
+      "phone": "+56910000395",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 139,
+      "error": null
+    },
+    "P396": {
+      "pregunta": "¿Puedo cambiar la cita si no está mi profesional?",
+      "respuesta": "Puedo revisar profesionales disponibles. ¿Con qué profesional o para qué servicio necesitas atención?",
+      "phone": "+56910000396",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1277,
+      "error": null
+    },
+    "P397": {
+      "pregunta": "¿Qué pasa si la profesional cambia de sucursal?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000397",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 137,
+      "error": null
+    },
+    "P398": {
+      "pregunta": "¿Consideran el tiempo de traslado entre sucursales?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000398",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 7069,
+      "error": null
+    },
+    "P399": {
+      "pregunta": "¿Mi cita puede atrasarse por el traslado de la profesional?",
+      "respuesta": "Puedo revisar profesionales disponibles. ¿Con qué profesional o para qué servicio necesitas atención?",
+      "phone": "+56910000399",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1299,
+      "error": null
+    },
+    "P400": {
+      "pregunta": "¿Me avisarán si la profesional está con licencia?",
+      "respuesta": "Puedo revisar disponibilidad con licencia. ¿Qué servicio y qué día necesitas consultar?",
+      "phone": "+56910000400",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 143,
+      "error": null
+    },
+    "P401": {
+      "pregunta": "¿Me avisarán si hay una capacitación o reunión?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000401",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 164,
+      "error": null
+    },
+    "P402": {
+      "pregunta": "¿Qué pasa si la cabina o el equipo entra en mantención?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000402",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1272,
+      "error": null
+    },
+    "P403": {
+      "pregunta": "¿Me ofrecerán otra hora si el centro cambia mi cita?",
+      "respuesta": "Puedo orientarte con Depilacion con cera. ¿Quieres revisar precio, características o agendar una atención?",
+      "phone": "+56910000403",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 152,
+      "error": null
+    },
+    "P404": {
+      "pregunta": "¿Puedo elegir entre reprogramar o cancelar?",
+      "respuesta": "📭 *Sin reservas activas*\n\nNo encontré reservas futuras activas asociadas a este WhatsApp.\n\nSi deseas agendar una nueva hora, solo dime el servicio, la fecha y la hora que prefieres.",
+      "phone": "+56910000404",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1275,
+      "error": null
+    },
+    "P405": {
+      "pregunta": "¿Qué pasa con mi pago si el cambio lo hace el centro?",
+      "respuesta": "Gracias. Para revisar el pago, ¿me indicas el número de pedido o solicitud?",
+      "phone": "+56910000405",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 131,
+      "error": null
+    },
+    "P406": {
+      "pregunta": "¿Mi cita está pendiente de aceptación de la profesional?",
+      "respuesta": "Puedo revisar profesionales disponibles. ¿Con qué profesional o para qué servicio necesitas atención?",
+      "phone": "+56910000406",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1295,
+      "error": null
+    },
+    "P407": {
+      "pregunta": "Quiero hacer un reclamo.",
+      "respuesta": "Te derivaré con una persona del equipo para que pueda ayudarte directamente.",
+      "phone": "+56910000407",
+      "modality": "CASO_SENSIBLE",
+      "setupContext": null,
+      "duration": 138,
+      "error": null
+    },
+    "P408": {
+      "pregunta": "Tuve un problema con mi atención.",
+      "respuesta": "Puedo ayudarte con eso. ¿Me indicas el número de solicitud o el correo asociado?",
+      "phone": "+56910000408",
+      "modality": "CASO_SENSIBLE",
+      "setupContext": null,
+      "duration": 1281,
+      "error": null
+    },
+    "P409": {
+      "pregunta": "No quedé conforme con el servicio.",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000409",
+      "modality": "CASO_SENSIBLE",
+      "setupContext": null,
+      "duration": 143,
+      "error": null
+    },
+    "P410": {
+      "pregunta": "Necesito hablar con un supervisor.",
+      "respuesta": "Te derivaré con una persona del equipo para que pueda ayudarte directamente.",
+      "phone": "+56910000410",
+      "modality": "CASO_SENSIBLE",
+      "setupContext": null,
+      "duration": 1281,
+      "error": null
+    },
+    "P411": {
+      "pregunta": "Nadie responde mi solicitud.",
+      "respuesta": "Te derivaré con una persona del equipo para que pueda ayudarte directamente.",
+      "phone": "+56910000411",
+      "modality": "CASO_SENSIBLE",
+      "setupContext": null,
+      "duration": 165,
+      "error": null
+    },
+    "P412": {
+      "pregunta": "Me cobraron un monto incorrecto.",
+      "respuesta": "Te derivaré con una persona del equipo para que pueda ayudarte directamente.",
+      "phone": "+56910000412",
+      "modality": "CASO_SENSIBLE",
+      "setupContext": null,
+      "duration": 1307,
+      "error": null
+    },
+    "P413": {
+      "pregunta": "Tengo un problema con una devolución.",
+      "respuesta": "Te derivaré con una persona del equipo para que pueda ayudarte directamente.",
+      "phone": "+56910000413",
+      "modality": "CASO_SENSIBLE",
+      "setupContext": null,
+      "duration": 142,
+      "error": null
+    },
+    "P414": {
+      "pregunta": "Me hicieron un cobro duplicado.",
+      "respuesta": "Gracias. Para revisar el pago, ¿me indicas el número de pedido o solicitud?",
+      "phone": "+56910000414",
+      "modality": "CASO_SENSIBLE",
+      "setupContext": null,
+      "duration": 1290,
+      "error": null
+    },
+    "P415": {
+      "pregunta": "Tuve una reacción después del tratamiento.",
+      "respuesta": "🚨 *Te derivaré con una persona del equipo*\n\nLamento que hayas tenido esa reacción.\n\nVoy a derivarte con una persona del equipo para ayudarte de inmediato.\n\nSi tienes molestias importantes o síntomas intensos, consulta con un profesional de salud.",
+      "phone": "+56910000415",
+      "modality": "CASO_SENSIBLE",
+      "setupContext": null,
+      "duration": 127,
+      "error": null
+    },
+    "P416": {
+      "pregunta": "Tengo irritación después de la sesión.",
+      "respuesta": "🚨 *Te derivaré con una persona del equipo*\n\nLamento que hayas tenido esa reacción.\n\nVoy a derivarte con una persona del equipo para ayudarte de inmediato.\n\nSi tienes molestias importantes o síntomas intensos, consulta con un profesional de salud.",
+      "phone": "+56910000416",
+      "modality": "CASO_SENSIBLE",
+      "setupContext": null,
+      "duration": 1275,
+      "error": null
+    },
+    "P417": {
+      "pregunta": "Siento dolor fuerte después del tratamiento.",
+      "respuesta": "🚨 *Te derivaré con una persona del equipo*\n\nLamento que hayas tenido esa reacción.\n\nVoy a derivarte con una persona del equipo para ayudarte de inmediato.\n\nSi tienes molestias importantes o síntomas intensos, consulta con un profesional de salud.",
+      "phone": "+56910000417",
+      "modality": "CASO_SENSIBLE",
+      "setupContext": null,
+      "duration": 150,
+      "error": null
+    },
+    "P418": {
+      "pregunta": "Tuve una quemadura y necesito ayuda.",
+      "respuesta": "🚨 *Te derivaré con una persona del equipo*\n\nLamento que hayas tenido esa reacción.\n\nVoy a derivarte con una persona del equipo para ayudarte de inmediato.\n\nSi tienes molestias importantes o síntomas intensos, consulta con un profesional de salud.",
+      "phone": "+56910000418",
+      "modality": "CASO_SENSIBLE",
+      "setupContext": null,
+      "duration": 1283,
+      "error": null
+    },
+    "P419": {
+      "pregunta": "Creo que hubo un error en mi reserva.",
+      "respuesta": "Puedo ayudarte a revisar tus reservas, pero debo validarlo en agenda. ¿Qué fecha o mes quieres revisar?",
+      "phone": "+56910000419",
+      "modality": "CASO_SENSIBLE",
+      "setupContext": null,
+      "duration": 130,
+      "error": null
+    },
+    "P420": {
+      "pregunta": "Mi reserva desapareció de la agenda.",
+      "respuesta": "Puedo ayudarte a revisar tus reservas, pero debo validarlo en agenda. ¿Qué fecha o mes quieres revisar?",
+      "phone": "+56910000420",
+      "modality": "CASO_SENSIBLE",
+      "setupContext": null,
+      "duration": 123,
+      "error": null
+    },
+    "P421": {
+      "pregunta": "Llegué a la sucursal y no tenían registrada mi cita.",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000421",
+      "modality": "CASO_SENSIBLE",
+      "setupContext": null,
+      "duration": 1296,
+      "error": null
+    },
+    "P422": {
+      "pregunta": "Quiero que una persona revise mi caso.",
+      "respuesta": "Te derivaré con una persona del equipo para que pueda ayudarte directamente.",
+      "phone": "+56910000422",
+      "modality": "CASO_SENSIBLE",
+      "setupContext": null,
+      "duration": 133,
+      "error": null
+    },
+    "P423": {
+      "pregunta": "Hola, una horita porfa.",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000423",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1300,
+      "error": null
+    },
+    "P424": {
+      "pregunta": "Quiero agendarme.",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000424",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1275,
+      "error": null
+    },
+    "P425": {
+      "pregunta": "Necesito hora pa mañana.",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000425",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1308,
+      "error": null
+    },
+    "P426": {
+      "pregunta": "¿Tienen cupito hoy?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000426",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 158,
+      "error": null
+    },
+    "P427": {
+      "pregunta": "Quiero reservar altiro.",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000427",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 1268,
+      "error": null
+    },
+    "P428": {
+      "pregunta": "¿Hay algo tipo cinco?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000428",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 135,
+      "error": null
+    },
+    "P429": {
+      "pregunta": "¿Qué tienen libre en la tarde?",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000429",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1296,
+      "error": null
+    },
+    "P430": {
+      "pregunta": "Agéndame con Carla.",
+      "respuesta": "Puedo revisar disponibilidad con Carla. ¿Qué servicio y qué día necesitas consultar?",
+      "phone": "+56910000430",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 164,
+      "error": null
+    },
+    "P431": {
+      "pregunta": "Ajendar hora para mañana.",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000431",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1294,
+      "error": null
+    },
+    "P432": {
+      "pregunta": "Quiero reserbar una cita.",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000432",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 1326,
+      "error": null
+    },
+    "P433": {
+      "pregunta": "Necesito una hroa.",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000433",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 128,
+      "error": null
+    },
+    "P434": {
+      "pregunta": "Cambiarme la hora.",
+      "respuesta": "No encontre una reserva activa asociada a este numero. ¿Me puedes indicar la fecha, hora o servicio de la cita que quieres reprogramar?",
+      "phone": "+56910000434",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1316,
+      "error": null
+    },
+    "P435": {
+      "pregunta": "Mover mi cita porfa.",
+      "respuesta": "No encontre una reserva activa asociada a este numero. ¿Me puedes indicar la fecha, hora o servicio de la cita que quieres reprogramar?",
+      "phone": "+56910000435",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 160,
+      "error": null
+    },
+    "P436": {
+      "pregunta": "Anular hora.",
+      "respuesta": "📭 *Sin reservas activas*\n\nNo encontré reservas futuras activas asociadas a este WhatsApp.\n\nSi deseas agendar una nueva hora, solo dime el servicio, la fecha y la hora que prefieres.",
+      "phone": "+56910000436",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1297,
+      "error": null
+    },
+    "P437": {
+      "pregunta": "No voy a poder ir.",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000437",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1292,
+      "error": null
+    },
+    "P438": {
+      "pregunta": "No me llegó el enlace.",
+      "respuesta": "🔁 *Reenvío de enlace de confirmación*\n\nRevisaré si tienes una reserva temporal vigente para reenviar el enlace de confirmación.\n\nSi no la encuentro, te pediré los datos mínimos para crear una nueva reserva.",
+      "phone": "+56910000438",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 156,
+      "error": null
+    },
+    "P439": {
+      "pregunta": "El enlace expiró.",
+      "respuesta": "⏳ *El enlace de confirmación venció*\n\nEl enlace anterior ya no está disponible y el cupo pudo liberarse.\n\nPuedo ayudarte a revisar disponibilidad nuevamente para crear una nueva reserva temporal.",
+      "phone": "+56910000439",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1278,
+      "error": null
+    },
+    "P440": {
+      "pregunta": "Ya pagué.",
+      "respuesta": "Hola, gracias por escribirnos. ¿Te ayudo con servicios, precios o agenda?",
+      "phone": "+56910000440",
+      "modality": "ACCION_TRANSACCIONAL",
+      "setupContext": null,
+      "duration": 5919,
+      "error": null
+    },
+    "P441": {
+      "pregunta": "¿Dónde queda?",
+      "respuesta": "Tenemos estas sucursales activas: Centro Estetico Bella - Sede Principal, Las Condes, Maipu, Providencia, Santiago Centro, Vitacura, Ñuñoa. ¿Sobre cuál necesitas la dirección?",
+      "phone": "+56910000441",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 1306,
+      "error": null
+    },
+    "P442": {
+      "pregunta": "Quiero hablar con alguien.",
+      "respuesta": "Te derivaré con una persona del equipo para que pueda ayudarte directamente.",
+      "phone": "+56910000442",
+      "modality": "CONSULTA_INFORMATIVA",
+      "setupContext": null,
+      "duration": 136,
+      "error": null
+    },
+    "P443": {
+      "pregunta": "Quiero ver lo de mañana.",
+      "respuesta": "Sí, puedo revisarlo para esta semana. ¿Para qué servicio necesitas una hora?",
+      "phone": "+56910000443",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Quiero saber que disponibilidad tienen esta semana",
+      "duration": 1318,
+      "error": null
+    },
+    "P444": {
+      "pregunta": "Necesito cambiar eso.",
+      "respuesta": "Puedo ayudarte a revisar tus reservas, pero debo validarlo en agenda. ¿Qué fecha o mes quieres revisar?",
+      "phone": "+56910000444",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Tengo una reserva para el miercoles a las 16:00",
+      "duration": 144,
+      "error": null
+    },
+    "P445": {
+      "pregunta": "No puedo ir.",
+      "respuesta": "Puedo ayudarte a revisar tus reservas, pero debo validarlo en agenda. ¿Qué fecha o mes quieres revisar?",
+      "phone": "+56910000445",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Tengo una cita para manana a las 15:00",
+      "duration": 1282,
+      "error": null
+    },
+    "P446": {
+      "pregunta": "Quiero otra opción.",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000446",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 143,
+      "error": null
+    },
+    "P447": {
+      "pregunta": "¿Está listo?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000447",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 1304,
+      "error": null
+    },
+    "P448": {
+      "pregunta": "¿Todavía sirve?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000448",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 1302,
+      "error": null
+    },
+    "P449": {
+      "pregunta": "La misma de la otra vez.",
+      "respuesta": "Puedo revisar disponibilidad con Carla en Providencia. ¿Qué servicio y qué día necesitas consultar?",
+      "phone": "+56910000449",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Antes me atendi con Carla en Providencia para una limpieza facial",
+      "duration": 126,
+      "error": null
+    },
+    "P450": {
+      "pregunta": "Quiero con ella.",
+      "respuesta": "Puedo revisar disponibilidad con Carla en Providencia. ¿Qué servicio y qué día necesitas consultar?",
+      "phone": "+56910000450",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Antes me atendi con Carla en Providencia para una limpieza facial",
+      "duration": 1273,
+      "error": null
+    },
+    "P451": {
+      "pregunta": "A la misma hora.",
+      "respuesta": "Puedo revisar disponibilidad con Carla en Providencia. ¿Qué servicio y qué día necesitas consultar?",
+      "phone": "+56910000451",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Antes me atendi con Carla en Providencia para una limpieza facial",
+      "duration": 7070,
+      "error": null
+    },
+    "P452": {
+      "pregunta": "En la otra sucursal.",
+      "respuesta": "La sucursal Providencia está ubicada en:\nAv. Providencia 2450, Santiago",
+      "phone": "+56910000452",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "En Providencia no hay cupo, quiero saber de la otra sucursal",
+      "duration": 139,
+      "error": null
+    },
+    "P453": {
+      "pregunta": "Quiero el tratamiento anterior.",
+      "respuesta": "Puedo revisar disponibilidad con Carla. ¿Qué servicio y qué día necesitas consultar?",
+      "phone": "+56910000453",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Antes me hice una limpieza facial profunda con Carla",
+      "duration": 7128,
+      "error": null
+    },
+    "P454": {
+      "pregunta": "No quiero ese.",
+      "respuesta": "Puedo orientarte con Depilacion laser. ¿Quieres revisar precio, características o agendar una atención?",
+      "phone": "+56910000454",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Te ofreci depilacion laser pero te parece cara",
+      "duration": 1297,
+      "error": null
+    },
+    "P455": {
+      "pregunta": "Quiero confirmar.",
+      "respuesta": "Puedo ayudarte a revisar tus reservas, pero debo validarlo en agenda. ¿Qué fecha o mes quieres revisar?",
+      "phone": "+56910000455",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Tengo una reserva pendiente que hice ayer",
+      "duration": 1324,
+      "error": null
+    },
+    "P456": {
+      "pregunta": "Quiero cancelarlo.",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000456",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 154,
+      "error": null
+    },
+    "P457": {
+      "pregunta": "¿Cuánto sale?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000457",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 149,
+      "error": null
+    },
+    "P458": {
+      "pregunta": "¿Tienen para después?",
+      "respuesta": "Perfecto, puedo ayudarte. ¿Qué producto o servicio estás buscando exactamente?",
+      "phone": "+56910000458",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Hola necesito informacion sobre sus servicios de estetica",
+      "duration": 1284,
+      "error": null
+    },
+    "P459": {
+      "pregunta": "Quiero reservar, pero no ahora.",
+      "respuesta": "Claro 😊 Te ayudo a reservar.\n\nPara empezar, ¿qué servicio quieres agendar?\n\nOpciones disponibles:\n1. Limpieza facial profunda\n2. Depilación bozo\n3. Depilación rostro\n4. Depilación axilas\n5. Depilación piernas\n6. Depilación bikini\n\nTambién puedes escribir el nombre del tratamiento que necesitas.",
+      "phone": "+56910000459",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Quiero agendar para febrero del proximo año",
+      "duration": 149,
+      "error": null
+    },
+    "P460": {
+      "pregunta": "No quiero cancelar, solo necesito información.",
+      "respuesta": "Puedo orientarte con Depilacion laser. ¿Quieres revisar precio, características o agendar una atención?",
+      "phone": "+56910000460",
+      "modality": "CONTINUACION_CONVERSACIONAL",
+      "setupContext": "Te ofreci depilacion laser pero te parece cara",
+      "duration": 1289,
+      "error": null
+    }
+  },
+  "lastSeq": 460
+}
