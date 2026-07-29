@@ -61,25 +61,49 @@ public class IntentDetectorService {
 			"cuánto dura", "es invasivo", "es invasiva", "tratamientos tienen", "servicios tienen", "que tratamientos",
 			"qué tratamientos", "que servicios", "qué servicios", "necesita evaluacion", "necesita evaluación",
 			"informacion", "información", "mas informacion", "más información", "quiero informacion",
-			"quiero información");
+			"quiero información", "preparacion", "preparación", "prepararme", "como debo prepararme",
+			"cómo debo prepararme", "hacer algo antes del tratamiento", "hacer algo antes de la sesion",
+			"hacer algo antes de la sesión", "suspender algun producto", "suspender algún producto", "suspender algun",
+			"cuanto antes debo llegar", "cuánto antes debo llegar", "cuanto tiempo antes", "puedo ir acompañada",
+			"puedo ir acompañado", "puedo comer antes", "que ropa", "qué ropa", "contraindicacion", "contraindicación",
+			"como debo", "cómo debo");
 	private static final List<String> PROFESSIONAL_WORDS = List.of("carla", "profesional", "quien realiza",
 			"quién realiza", "atienden con", "trabaja los", "trabaja el", "hace hidratacion", "hace hidratación");
 	private static final List<String> BUSINESS_HOURS_WORDS = List.of("a que hora abren", "a qué hora abren",
 			"hasta que hora", "hasta qué hora", "atienden los sabados", "atienden los sábados", "trabajan domingos",
-			"trabajan los domingos", "horario de atencion", "horario de atención", "esta abierto", "está abierto");
+			"trabajan los domingos", "horario de atencion", "horario de atención", "esta abierto", "está abierto",
+			"atienden en la manana", "atienden en la mañana", "atienden en la tarde", "horario de apertura",
+			"abren los", "abren el", "abren en", "feriado", "a la hora de almuerzo", "hora de almuerzo",
+			"despues de las", "después de las", "apertura extraordinaria", "atienden en dias", "atienden en días",
+			"abren los sabados", "abren los sábados", "abren los domingos", "abren feriados");
 	private static final List<String> THANKS_WORDS = List.of("gracias", "muchas gracias", "hasta luego", "chao",
 			"eso era todo");
 	private static final List<String> BOOKING_STATUS_WORDS = List.of("tengo agendado", "tengo agendada",
 			"tengo reserva", "tengo una reserva", "mi reserva", "mis reservas", "revisar agenda", "revisa la agenda",
 			"revisala la agenda", "agenda de junio", "agenda de este mes", "estado reserva", "confirmar mi hora",
-			"ver mi cita", "tengo cita", "tengo una cita");
+			"ver mi cita", "tengo cita", "tengo una cita", "confirmar mi cita", "confirmar mi reserva",
+			"confirmacion de cita", "confirmación de cita", "confirmacion de reserva", "confirmación de reserva",
+			"codigo de reserva", "código de reserva", "codigo de cita", "código de cita", "codigo de la reserva",
+			"código de la reserva", "codigo de la cita", "código de la cita", "buscar mi cita", "buscar mi reserva",
+			"buscar por telefono", "buscar por teléfono", "ver lo de manana", "ver lo de mañana", "quiero confirmar",
+			"esta listo", "está listo", "ya pague", "ya pagué", "todavia sirve", "todavía sirve",
+			"me enviaran una nueva confirmacion", "me enviarán una nueva confirmación", "me enviaran una confirmacion",
+			"me enviarán una confirmación", "enviaran confirmacion", "enviarán confirmación",
+			"confirmacion por whatsapp", "confirmación por whatsapp", "confirmacion por correo",
+			"confirmación por correo", "no me llego confirmacion", "no me llegó confirmación",
+			"me pueden recordar la cita", "me pueden recordar la hora", "me avisaran si", "me avisarán si",
+			"me avisan por", "aviso de recordatorio");
 	private static final List<String> CHANGE_BOOKING_WORDS = List.of("reagendar", "reprogramar", "reprogramacion",
 			"reprogramación", "cambiar hora", "cambiar mi hora", "cambiar reserva", "cambiar mi reserva",
 			"cambiar cita", "cambiar mi cita", "cambio de hora", "cambio la hora", "cambiarme", "cámbiame", "cambieme",
 			"cambiar la hora", "cambiar de hora", "modificar cita", "modificar mi cita", "mover", "mover mi hora",
-			"mover mi reserva", "cambio de fecha", "cambiar de fecha");
-	private static final List<String> CANCEL_BOOKING_WORDS = List.of("cancelar", "cancela", "cancele", "canceló",
-			"cancelada", "cancelado", "anular", "anule", "anula", "cancelacion", "cancelación");
+			"mover mi reserva", "cambio de fecha", "cambiar de fecha", "cambiar fecha", "elegir otro dia",
+			"elegir otro día", "elegir otra hora", "cambie la cita", "cambie la reserva", "necesito cambiar",
+			"mantener mi hora actual", "mantener la hora");
+	private static final List<String> CANCEL_BOOKING_WORDS = List.of("cancelar", "cancela", "cancele", "cancelo",
+			"canceló", "cancelada", "cancelado", "anular", "anule", "anula", "cancelacion", "cancelación",
+			"no voy a poder ir", "no voy a poder asistir", "no puedo ir", "no voy a ir", "no poder asistir",
+			"no pude asistir");
 	private static final List<String> PRICE_WORDS = List.of("precio", "valor", "cuanto cuesta", "cuánto cuesta",
 			"cuanto vale", "cuánto vale", "tarifa", "sale", "cuesta");
 	private static final List<String> QUOTE_WORDS = List.of("cotizar", "cotizacion", "cotización", "presupuesto");
@@ -89,7 +113,19 @@ public class IntentDetectorService {
 	private static final List<String> SUPPORT_WORDS = List.of("ayuda", "soporte", "problema", "error", "falla",
 			"no funciona", "horario", "ubicacion", "ubicación", "direccion", "dirección");
 	private static final List<String> KNOWLEDGE_WORDS = List.of("politica", "política", "manual", "documento", "faq",
-			"preguntas frecuentes", "catalogo", "catálogo", "terminos", "términos");
+			"preguntas frecuentes", "catalogo", "catálogo", "terminos", "términos", "penalizacion", "penalización",
+			"no show", "inasistencia", "reembolso", "devolucion", "devolución", "bloqueada", "bloqueado", "registradas",
+			"edad minima", "edad mínima", "menor de edad", "edad", "tutor", "tutora", "autorizacion del tutor",
+			"autorización del tutor", "adulto responsable", "datos del tutor", "consentimiento",
+			"firmar un consentimiento", "aceptar el consentimiento", "como cancelo mi cita", "como cancelar",
+			"cómo cancelo mi cita", "cómo cancelar", "como anular", "cómo anular", "proceso de cancelacion",
+			"proceso de cancelación", "paso para cancelar", "penalizacion por cancelar", "penalización por cancelar",
+			"tratamientos que no se realizan a menores", "tratamiento a menor", "servicio requiere abono",
+			"abono es reembolsable", "abono si reprogramo", "abono para otra cita", "usar el abono", "abono confirma",
+			"abono", "cuanto tengo que abonar", "cuánto tengo que abonar", "cuanto abonar", "cuánto abonar",
+			"me devolveran el dinero", "me devolverán el dinero", "me devolveran", "me devolverán", "perdi el abono",
+			"perdí el abono", "no aparezco en la agenda", "no tenian registrada", "no tenían registrada",
+			"cuantas veces puedo cambiar", "cuántas veces puedo cambiar");
 	private static final List<String> FOLLOW_UP_WORDS = List.of("seguimiento", "retomar", "cotizacion pendiente",
 			"cotización pendiente", "recordatorio", "me contactaron");
 	private static final List<String> SOCIAL_GREETING_WORDS = List.of("como estas", "como esta", "que tal",
@@ -100,7 +136,7 @@ public class IntentDetectorService {
 
 	private static final List<String> SENSITIVE_WORDS = List.of("reaccion", "reacción", "ardor", "me ardio", "me ardió",
 			"inflamacion", "inflamación", "alergia", "irritacion", "irritación", "quemadura", "dolor fuerte",
-			"infeccion", "infección");
+			"infeccion", "infección", "embarazada", "condicion medica", "condición médica");
 	private static final List<String> LINK_RESEND_WORDS = List.of("no me llego el link", "no me llegó el link",
 			"no me llego el enlace", "no me llegó el enlace", "reenviar", "reenvia", "reenvía", "mandame el link",
 			"mándame el link", "mandame el enlace", "mándame el enlace");
@@ -109,6 +145,9 @@ public class IntentDetectorService {
 			"me dice expirado");
 	private static final List<String> LOCATION_WORDS = List.of("donde queda", "dónde queda", "direccion", "dirección",
 			"ubicacion", "ubicación", "como llego", "cómo llego", "sucursal", "sede");
+	private static final List<String> WAITLIST_WORDS = List.of("lista de espera", "listo de espera",
+			"cupo que se libero", "cupo que se liberó", "salir de la lista", "posicion en la lista",
+			"posición en la lista", "aceptar el cupo");
 	private static final List<String> HELP_WORDS = List.of("no se por donde empezar", "no sé por dónde empezar",
 			"por donde empezar", "por dónde empezar", "que cosas puedo hacer", "qué cosas puedo hacer",
 			"que puedo hacer", "qué puedo hacer", "como funciona", "cómo funciona", "que haces", "qué haces",
@@ -234,6 +273,10 @@ public class IntentDetectorService {
 
 		if (hasHelpQuery(text)) {
 			return new IntentDetectionResult(AgentIntent.COMMERCIAL_INQUIRY, null, 0.86, "bajo", false, null);
+		}
+
+		if (containsAny(text, WAITLIST_WORDS)) {
+			return new IntentDetectionResult(AgentIntent.WAITLIST_QUERY, null, 0.86, "bajo", false, null);
 		}
 
 		if (hasBookingStatus) {
@@ -417,7 +460,10 @@ public class IntentDetectorService {
 
 	private boolean isPureThanksOrFarewell(String text) {
 		String trimmed = text == null ? "" : text.trim();
-		return containsAny(trimmed, THANKS_WORDS) && trimmed.length() <= 40;
+		if (trimmed.length() > 40 || trimmed.contains("?")) {
+			return false;
+		}
+		return containsAny(trimmed, THANKS_WORDS);
 	}
 
 	private boolean isNameIntroduction(String text) {

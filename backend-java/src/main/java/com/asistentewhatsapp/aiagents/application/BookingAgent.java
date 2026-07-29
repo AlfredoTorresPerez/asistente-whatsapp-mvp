@@ -49,6 +49,12 @@ public class BookingAgent extends AbstractAgentHandler {
 					false, null);
 		}
 
+		if (intent.primaryIntent() == AgentIntent.WAITLIST_QUERY) {
+			return result(request, intent, type(), entities, missing("servicio_o_producto"),
+					"Puedo revisar la lista de espera. ¿Para qué servicio o tratamiento necesitas anotarte?", false,
+					null);
+		}
+
 		if (intent.primaryIntent() == AgentIntent.BOOKING_CHANGE) {
 			String response = transactionalAgendaBookingService.handleRescheduleBookingFromWhatsApp(
 					request.businessId(), request.customerId(), request.conversationId(), request.customerPhone(),

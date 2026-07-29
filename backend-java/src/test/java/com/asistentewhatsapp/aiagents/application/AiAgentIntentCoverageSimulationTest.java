@@ -116,7 +116,8 @@ class AiAgentIntentCoverageSimulationTest {
 						AgentType.HUMAN_HANDOFF, 94),
 				scenario("humano", "Quiero hablar con un ejecutivo", AgentIntent.HUMAN_REQUEST, AgentType.HUMAN_HANDOFF,
 						96),
-				scenario("ambiguo", "mmm", AgentIntent.AMBIGUOUS, AgentType.RECEPTION, 58));
+				scenario("ambiguo", "mmm", AgentIntent.AMBIGUOUS, AgentType.RECEPTION, 58), scenario("lista de espera",
+						"Quiero anotarme en la lista de espera", AgentIntent.WAITLIST_QUERY, AgentType.BOOKING, 86));
 
 		List<SimulationRow> rows = new ArrayList<>();
 		Set<AgentIntent> coveredIntents = EnumSet.noneOf(AgentIntent.class);

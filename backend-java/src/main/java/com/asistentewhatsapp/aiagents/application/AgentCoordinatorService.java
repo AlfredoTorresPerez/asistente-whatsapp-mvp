@@ -376,7 +376,8 @@ public class AgentCoordinatorService {
 				|| current.primaryIntent() == AgentIntent.LOCATION_QUERY
 				|| current.primaryIntent() == AgentIntent.BUSINESS_HOURS_QUERY
 				|| current.primaryIntent() == AgentIntent.HUMAN_REQUEST
-				|| current.primaryIntent() == AgentIntent.PRICE_REQUEST) {
+				|| current.primaryIntent() == AgentIntent.PRICE_REQUEST
+				|| current.primaryIntent() == AgentIntent.WAITLIST_QUERY) {
 			return current;
 		}
 		if (previousContext.isPresent()) {
@@ -437,11 +438,52 @@ public class AgentCoordinatorService {
 		}
 		if (current.primaryIntent() == AgentIntent.AMBIGUOUS && previousContext.isPresent()) {
 			AiAgentJdbcRepository.ConversationContextSnapshot context = previousContext.get();
-			if (hasOpenBookingData(context) && isAffirmative(value(entities, "ultimo_mensaje_cliente"))) {
-				return new IntentDetectionResult(AgentIntent.BOOKING_REQUEST, null, 0.78, "bajo", false, null);
+			if (hasOpenBookingData(context)) {
+				String message = value(entities, "ultimo_mensaje_cliente").toLowerCase(java.util.Locale.ROOT);
+				if (matchesCancelFollowUp(message)) {
+					return new IntentDetectionResult(AgentIntent.BOOKING_CANCEL, null, 0.82, "medio", false, null);
+				}
+				if (matchesStatusFollowUp(message)) {
+					return new IntentDetectionResult(AgentIntent.BOOKING_STATUS, null, 0.82, "medio", false, null);
+				}
+				if (matchesContinueBooking(message)) {
+					return new IntentDetectionResult(AgentIntent.BOOKING_REQUEST, null, 0.78, "bajo", false, null);
+				}
+				if (isAffirmative(message)) {
+					return new IntentDetectionResult(AgentIntent.BOOKING_REQUEST, null, 0.78, "bajo", false, null);
+				}
 			}
 		}
 		return current;
+	}
+
+	private boolean matchesCancelFollowUp(String message) {
+		if (message == null || message.isBlank())
+			return false;
+		String n = TextNormalizer.normalize(message);
+		return n.contains("no voy a poder ir") || n.contains("no puedo ir") || n.contains("no voy a ir")
+				|| n.contains("no pude asistir") || n.contains("no poder asistir");
+	}
+
+	private boolean matchesStatusFollowUp(String message) {
+		if (message == null || message.isBlank())
+			return false;
+		String n = TextNormalizer.normalize(message);
+		return n.contains("ya pague") || n.contains("ya pagué") || n.contains("esta listo") || n.contains("está listo")
+				|| n.contains("todavia sirve") || n.contains("todavía sirve") || n.contains("quiero confirmar")
+				|| n.equals("listo") || n.contains("confirmar mi cita") || n.contains("confirmar mi reserva")
+				|| n.contains("confirmar mi hora");
+	}
+
+	private boolean matchesContinueBooking(String message) {
+		if (message == null || message.isBlank())
+			return false;
+		String n = TextNormalizer.normalize(message);
+		return n.contains("la misma de la otra vez") || n.contains("el tratamiento anterior")
+				|| n.contains("a la misma hora") || n.contains("con ella") || n.contains("con el")
+				|| n.contains("no quiero ese") || n.contains("no quiero esa") || n.contains("quiero otra opcion")
+				|| n.contains("quiero otra opción") || n.contains("la de la otra vez") || n.contains("el anterior")
+				|| n.contains("lo mismo de antes") || n.contains("la misma hora") || n.contains("quiero lo mismo");
 	}
 
 	private boolean isAffirmative(String message) {
