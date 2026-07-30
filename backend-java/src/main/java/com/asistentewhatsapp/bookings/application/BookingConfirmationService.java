@@ -45,6 +45,7 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -439,6 +440,11 @@ public class BookingConfirmationService {
 				break;
 			}
 		}
+		Map<String, AgendaSlotResponse> unique = new LinkedHashMap<>();
+		for (AgendaSlotResponse s : slots) {
+			unique.putIfAbsent(s.startsAt() + "|" + s.endsAt(), s);
+		}
+		slots = new ArrayList<>(unique.values());
 		slots.sort(Comparator.comparing(AgendaSlotResponse::startsAt));
 		if (slots.size() > limit) {
 			slots = slots.subList(0, limit);

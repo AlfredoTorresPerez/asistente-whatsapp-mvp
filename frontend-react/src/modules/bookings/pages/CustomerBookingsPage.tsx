@@ -420,7 +420,7 @@ export function CustomerBookingsPage({ mode }: { mode?: PageMode }) {
                               const selected = draft?.slotStartsAt === slot.startsAt
                               return (
                                 <button
-                                  key={slot.startsAt}
+                                  key={`${slot.startsAt}-${slot.professionalId ?? 'any'}-${slot.roomId ?? 'any'}`}
                                   type="button"
                                   onClick={() =>
                                     setDraft((current) =>
