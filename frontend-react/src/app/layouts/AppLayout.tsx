@@ -54,6 +54,7 @@ export function AppLayout() {
           onClose={() => setIsSidebarOpen(false)}
           onLogout={() => setIsLogoutDialogOpen(true)}
           open={isSidebarOpen}
+          permissions={user.permissions ?? []}
           role={user.role}
         />
 

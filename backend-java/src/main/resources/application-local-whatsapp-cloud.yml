@@ -9,7 +9,7 @@ app:
       provider: META_CLOUD_API
     whatsapp-cloud-api:
       enabled: true
-      webhook-signature-required: true
+      webhook-signature-required: ${APP_WHATSAPP_CLOUD_API_WEBHOOK_SIGNATURE_REQUIRED:true}
       dry-run-enabled: false
     whatsapp-web:
       enabled: false

@@ -68,19 +68,22 @@ public class WhatsAppCloudApiMetrics {
 
 	public void incrementMessageStatus(String status) {
 		messageStatusTotal.increment();
-		statusCounters.computeIfAbsent("status_" + status, key -> Counter.builder("whatsapp_cloud_message_status_total")
-				.tag("status", status).register(meterRegistry)).increment();
+		statusCounters.computeIfAbsent("status_" + status, key -> Counter
+				.builder("whatsapp_cloud_message_status_by_status_total").tag("status", status).register(meterRegistry))
+				.increment();
 	}
 
 	public void incrementApiErrors(String errorType) {
 		apiErrorsTotal.increment();
-		errorCounters.computeIfAbsent("error_" + errorType, key -> Counter.builder("whatsapp_cloud_api_errors_total")
-				.tag("error_type", errorType).register(meterRegistry)).increment();
+		errorCounters
+				.computeIfAbsent("error_" + errorType, key -> Counter.builder("whatsapp_cloud_api_errors_by_type_total")
+						.tag("error_type", errorType).register(meterRegistry))
+				.increment();
 	}
 
 	public void incrementMessagesByType(String messageType) {
-		messageTypeCounters
-				.computeIfAbsent("type_" + messageType, key -> Counter.builder("whatsapp_cloud_messages_received_total")
+		messageTypeCounters.computeIfAbsent("type_" + messageType,
+				key -> Counter.builder("whatsapp_cloud_messages_received_by_type_total")
 						.tag("message_type", messageType).register(meterRegistry))
 				.increment();
 	}

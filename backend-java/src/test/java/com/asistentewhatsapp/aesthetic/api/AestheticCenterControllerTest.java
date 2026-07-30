@@ -11,6 +11,7 @@ import com.asistentewhatsapp.shared.exception.GlobalExceptionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -65,7 +66,8 @@ class AestheticCenterControllerTest {
 						"Tratamientos faciales", 60, BigDecimal.valueOf(34990), "Cosmetologa facial", "Mascarilla",
 						"Heridas abiertas", "Lunes a sabado", "Pedir datos minimos", "12 horas", "Usar protector solar",
 						false, false, true, OffsetDateTime.parse("2026-05-29T10:00:00Z"),
-						OffsetDateTime.parse("2026-05-29T10:00:00Z"))), 0, 50, 1, 1));
+						OffsetDateTime.parse("2026-05-29T10:00:00Z"), Collections.emptyList(),
+						Collections.emptyList())), 0, 50, 1, 1));
 
 		mockMvc.perform(get("/api/v1/esthetic/services")).andExpect(status().isOk())
 				.andExpect(jsonPath("$.items[0].name").value("Limpieza facial profunda"))

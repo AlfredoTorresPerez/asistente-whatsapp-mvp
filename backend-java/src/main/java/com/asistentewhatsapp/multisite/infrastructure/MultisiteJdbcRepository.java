@@ -302,22 +302,24 @@ public class MultisiteJdbcRepository {
 	}
 
 	public List<MultisiteChannelResponse> channels(UUID businessId) {
-		return jdbcTemplate.query("""
-				select
-				    ca.id,
-				    ca.channel_type,
-				    ca.provider_name,
-				    ca.status,
-				    ca.phone_number,
-				    ca.location_id,
-				    bl.name as location_name,
-				    ca.routing_mode,
-				    ca.active
-				from channel_account ca
-				left join business_location bl on bl.id = ca.location_id and bl.business_id = ca.business_id
-				where ca.business_id = :businessId
-				order by ca.location_id nulls first, ca.channel_type asc
-				""", new MapSqlParameterSource().addValue("businessId", businessId),
+		return jdbcTemplate.query(
+				"""
+						select
+						    ca.id,
+						    ca.channel_type,
+						    ca.provider_name,
+						    ca.status,
+						    coalesce(nullif(ca.display_phone_number, ''), nullif(ca.normalized_phone_number, ''), ca.phone_number) as phone_number,
+						    ca.location_id,
+						    bl.name as location_name,
+						    ca.routing_mode,
+						    ca.active
+						from channel_account ca
+						left join business_location bl on bl.id = ca.location_id and bl.business_id = ca.business_id
+						where ca.business_id = :businessId
+						order by ca.location_id nulls first, ca.channel_type asc
+						""",
+				new MapSqlParameterSource().addValue("businessId", businessId),
 				(rs, rowNum) -> new MultisiteChannelResponse(rs.getObject("id", UUID.class),
 						rs.getString("channel_type"), rs.getString("provider_name"), rs.getString("status"),
 						rs.getString("phone_number"), rs.getObject("location_id", UUID.class),

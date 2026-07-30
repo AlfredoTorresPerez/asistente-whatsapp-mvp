@@ -109,6 +109,8 @@ function buildServiceStatusRequest(service: AestheticServiceResponse, active: bo
     requiresInformedConsent: service.requiresInformedConsent,
     requiresPriorEvaluation: service.requiresPriorEvaluation,
     supplies: service.supplies,
+    professionalIds: service.professionalIds ?? null,
+    roomIds: service.roomIds ?? null,
   }
 }
 

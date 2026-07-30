@@ -261,6 +261,92 @@ export type AdminUserRequest = {
   temporaryPassword: string | null
 }
 
+export type ProfessionalResponse = {
+  id: string
+  fullName: string
+  displayName: string | null
+  specialty: string
+  email: string | null
+  phone: string | null
+  description: string | null
+  color: string | null
+  maxDailyBookings: number | null
+  qualificationLevel: number | null
+  certificationRef: string | null
+  certificationValidUntil: string | null
+  active: boolean
+  locationIds: string[]
+  locationNames: string[]
+  createdAt: string
+  updatedAt: string
+}
+
+export type ProfessionalRequest = {
+  fullName: string
+  displayName?: string | null
+  specialty?: string | null
+  email?: string | null
+  phone?: string | null
+  description?: string | null
+  color?: string | null
+  maxDailyBookings?: number | null
+  qualificationLevel?: number | null
+  certificationRef?: string | null
+  active?: boolean | null
+  locationIds?: string[] | null
+}
+
+export type RoomResponse = {
+  id: string
+  locationId: string
+  locationName: string
+  code: string
+  name: string
+  roomType: string
+  capacity: number
+  description: string | null
+  color: string | null
+  notes: string | null
+  active: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export type RoomRequest = {
+  code: string
+  name: string
+  roomType: string
+  capacity?: number | null
+  description?: string | null
+  color?: string | null
+  notes?: string | null
+  active?: boolean | null
+  locationId?: string | null
+  locationIds?: string[] | null
+}
+
+export type AssignmentResponse = {
+  id: string
+  serviceId: string
+  serviceName: string
+  serviceCode: string
+  professionalId: string | null
+  professionalName: string | null
+  roomId: string | null
+  roomName: string | null
+  roomCode: string | null
+  assignmentType: 'PROFESSIONAL_SERVICE' | 'ROOM_SERVICE'
+  active: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export type AssignmentRequest = {
+  serviceId: string
+  professionalId?: string | null
+  roomId?: string | null
+}
+
 export type SecurityPolicyResponse = {
   id: string
   sessionTimeoutMinutes: number
@@ -1027,6 +1113,8 @@ export type AestheticServiceResponse = {
   active: boolean
   createdAt: string
   updatedAt: string
+  professionalIds: string[]
+  roomIds: string[]
 }
 
 export type AestheticProductResponse = {
@@ -1119,7 +1207,7 @@ export type UpsertAestheticServiceRequest = {
   description: string
   durationMinutes: number
   priceBase: number
-  professionalRequired: string
+  professionalRequired?: string | null
   supplies?: string | null
   contraindications?: string | null
   availabilityRules?: string | null
@@ -1129,6 +1217,8 @@ export type UpsertAestheticServiceRequest = {
   requiresPriorEvaluation: boolean
   requiresInformedConsent: boolean
   active: boolean
+  professionalIds?: string[] | null
+  roomIds?: string[] | null
 }
 
 export type UpsertAestheticProductRequest = {

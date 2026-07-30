@@ -37,4 +37,11 @@ public final class Permissions {
 	public static final String CHANNEL_MANAGE = "CHANNEL_MANAGE";
 	public static final String CONTENT_VIEW = "CONTENT_VIEW";
 	public static final String CONTENT_MANAGE = "CONTENT_MANAGE";
+
+	public static final String PROFESSIONAL_VIEW = "PROFESSIONAL_VIEW";
+	public static final String PROFESSIONAL_MANAGE = "PROFESSIONAL_MANAGE";
+	public static final String ROOM_VIEW = "ROOM_VIEW";
+	public static final String ROOM_MANAGE = "ROOM_MANAGE";
+	public static final String ASSIGNMENT_VIEW = "ASSIGNMENT_VIEW";
+	public static final String ASSIGNMENT_MANAGE = "ASSIGNMENT_MANAGE";
 }

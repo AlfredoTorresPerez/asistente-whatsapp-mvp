@@ -22,6 +22,8 @@ import {
   listCatalogCategories,
   updateCatalogProduct,
 } from '../../../services/api/catalogEtapa8Api'
+import { listProfessionalsRequest } from '../../../services/api/professionalsApi'
+import { listRoomsRequest } from '../../../services/api/roomsApi'
 import type {
   CatalogProductResponse,
   AestheticServiceResponse,
@@ -47,6 +49,8 @@ type FormState = {
   expirationDate: string
   name: string
   price: string
+  professionalIds: string[]
+  roomIds: string[]
   professionalRequired: string
   recommendationRules: string
   requiresInformedConsent: boolean
@@ -74,6 +78,8 @@ const emptyForm: FormState = {
   expirationDate: '',
   name: '',
   price: '0',
+  professionalIds: [],
+  roomIds: [],
   professionalRequired: '',
   recommendationRules: '',
   requiresInformedConsent: false,
@@ -112,6 +118,8 @@ function fromService(service: AestheticServiceResponse): FormState {
     durationMinutes: String(service.durationMinutes),
     name: service.name,
     price: String(service.priceBase),
+    professionalIds: service.professionalIds ?? [],
+    roomIds: service.roomIds ?? [],
     professionalRequired: service.professionalRequired,
     requiresInformedConsent: service.requiresInformedConsent,
     requiresPriorEvaluation: service.requiresPriorEvaluation,
@@ -157,6 +165,16 @@ export function CatalogFormPage() {
   const productCategoriesQuery = useQuery({
     queryKey: ['catalog', 'categories'],
     queryFn: () => listCatalogCategories({ active: true, size: 100 }),
+  })
+
+  const professionalsQuery = useQuery({
+    queryKey: ['administration', 'professionals'],
+    queryFn: () => listProfessionalsRequest({ active: true, size: 200 }),
+  })
+
+  const roomsQuery = useQuery({
+    queryKey: ['administration', 'rooms'],
+    queryFn: () => listRoomsRequest({ active: true, size: 200 }),
   })
 
   const serviceQuery = useQuery({
@@ -224,10 +242,12 @@ export function CatalogFormPage() {
     durationMinutes: numberValue(form.durationMinutes),
     name: form.name.trim(),
     priceBase: numberValue(form.price),
-    professionalRequired: form.professionalRequired.trim() || 'Profesional del centro',
+    professionalRequired: nullable(form.professionalRequired),
     requiresInformedConsent: form.requiresInformedConsent,
     requiresPriorEvaluation: form.requiresPriorEvaluation,
     supplies: nullable(form.supplies),
+    professionalIds: form.professionalIds.length > 0 ? form.professionalIds : null,
+    roomIds: form.roomIds.length > 0 ? form.roomIds : null,
   })
 
   const buildProductRequest = (): UpsertCatalogProductRequest => ({
@@ -436,13 +456,104 @@ export function CatalogFormPage() {
                     type="number"
                     value={form.durationMinutes}
                   />
-                  <Input
-                    label="Profesional requerido"
-                    onChange={(event) =>
-                      setForm({ ...form, professionalRequired: event.target.value })
-                    }
-                    value={form.professionalRequired}
-                  />
+                  <div className="space-y-2">
+                    <span className="mb-2.5 block text-sm font-medium text-[#23385F]">
+                      Profesionales asignados
+                    </span>
+                    <div className="max-h-48 overflow-y-auto rounded-[14px] border border-[var(--color-border)] bg-white p-3">
+                      {professionalsQuery.isPending ? (
+                        <p className="text-sm text-slate-500">Cargando...</p>
+                      ) : (professionalsQuery.data?.items ?? []).length === 0 ? (
+                        <p className="text-sm text-slate-500">
+                          No hay profesionales activos. Créalos desde Administración &gt; Profesionales.
+                        </p>
+                      ) : (
+                        <div className="space-y-2">
+                          {(professionalsQuery.data?.items ?? []).map((prof) => {
+                            const checked = form.professionalIds.includes(prof.id)
+                            return (
+                              <label
+                                key={prof.id}
+                                className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition hover:bg-slate-50"
+                              >
+                                <input
+                                  checked={checked}
+                                  className="h-4 w-4"
+                                  onChange={() => {
+                                    setForm({
+                                      ...form,
+                                      professionalIds: checked
+                                        ? form.professionalIds.filter((id) => id !== prof.id)
+                                        : [...form.professionalIds, prof.id],
+                                    })
+                                  }}
+                                  type="checkbox"
+                                />
+                                <span
+                                  className="h-3 w-3 rounded-full"
+                                  style={{ backgroundColor: prof.color ?? '#94a3b8' }}
+                                />
+                                {prof.displayName ?? prof.fullName}
+                                {prof.specialty ? (
+                                  <span className="ml-1 text-xs text-slate-400">
+                                    · {prof.specialty}
+                                  </span>
+                                ) : null}
+                              </label>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <span className="mb-2.5 block text-sm font-medium text-[#23385F]">
+                      Cabinas / Salas asignadas
+                    </span>
+                    <div className="max-h-48 overflow-y-auto rounded-[14px] border border-[var(--color-border)] bg-white p-3">
+                      {roomsQuery.isPending ? (
+                        <p className="text-sm text-slate-500">Cargando...</p>
+                      ) : (roomsQuery.data?.items ?? []).length === 0 ? (
+                        <p className="text-sm text-slate-500">
+                          No hay cabinas activas. Créalas desde Administración &gt; Cabinas.
+                        </p>
+                      ) : (
+                        <div className="space-y-2">
+                          {(roomsQuery.data?.items ?? []).map((room) => {
+                            const checked = form.roomIds.includes(room.id)
+                            return (
+                              <label
+                                key={room.id}
+                                className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition hover:bg-slate-50"
+                              >
+                                <input
+                                  checked={checked}
+                                  className="h-4 w-4"
+                                  onChange={() => {
+                                    setForm({
+                                      ...form,
+                                      roomIds: checked
+                                        ? form.roomIds.filter((id) => id !== room.id)
+                                        : [...form.roomIds, room.id],
+                                    })
+                                  }}
+                                  type="checkbox"
+                                />
+                                <span
+                                  className="h-3 w-3 rounded-full"
+                                  style={{ backgroundColor: room.color ?? '#94a3b8' }}
+                                />
+                                {room.name}
+                                <span className="ml-1 text-xs text-slate-400">
+                                  · {room.roomType} · {room.locationName}
+                                </span>
+                              </label>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <Textarea

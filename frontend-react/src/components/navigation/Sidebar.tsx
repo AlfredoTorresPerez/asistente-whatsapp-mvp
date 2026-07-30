@@ -6,13 +6,21 @@ type SidebarProps = {
   open: boolean
   businessName: string
   role: string
+  permissions: string[]
   onClose: () => void
   onLogout: () => void
 }
 
-export function Sidebar({ businessName, onClose, onLogout, open, role }: SidebarProps) {
+export function Sidebar({
+  businessName,
+  onClose,
+  onLogout,
+  open,
+  permissions,
+  role,
+}: SidebarProps) {
   const visibleNavigationItems = PRIMARY_NAV_ITEMS.filter((item) =>
-    canAccessNavigationItem(item, role),
+    canAccessNavigationItem(item, role, permissions),
   )
 
   return (

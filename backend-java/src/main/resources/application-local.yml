@@ -14,15 +14,15 @@ app:
     include-message-body: ${APP_LOGGING_INCLUDE_MESSAGE_BODY:false}
   channels:
     whatsapp:
-      provider: DISABLED
+      provider: ${APP_WHATSAPP_CHANNEL_PROVIDER:DISABLED}
     whatsapp-web:
-      enabled: false
-      simulator-enabled: true
-      demo-fallback-enabled: true
+      enabled: ${APP_WHATSAPP_WEB_ENABLED:false}
+      simulator-enabled: ${APP_WHATSAPP_WEB_SIMULATOR_ENABLED:true}
+      demo-fallback-enabled: ${APP_WHATSAPP_WEB_DEMO_FALLBACK_ENABLED:true}
     whatsapp-cloud-api:
-      enabled: false
-      dry-run-enabled: true
-      webhook-signature-required: false
+      enabled: ${APP_WHATSAPP_CLOUD_API_ENABLED:false}
+      dry-run-enabled: ${APP_WHATSAPP_CLOUD_API_DRY_RUN_ENABLED:true}
+      webhook-signature-required: ${APP_WHATSAPP_CLOUD_API_WEBHOOK_SIGNATURE_REQUIRED:false}
   ai:
     agents:
       auto-reply-enabled: ${APP_AI_AGENTS_AUTO_REPLY_ENABLED:false}

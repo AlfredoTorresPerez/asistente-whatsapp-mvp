@@ -112,18 +112,17 @@ public class WhatsAppWebChannelJdbcRepository {
 		// Check if the new phone_number already exists for another channel_account of
 		// the same business
 		if (phoneNumber != null && !phoneNumber.isBlank()) {
-			String existingId = jdbcTemplate.queryForObject("""
+			List<String> existingIds = jdbcTemplate.queryForList("""
 					select id::text from channel_account
 					where business_id = (select business_id from channel_account where id = ?)
 					  and phone_number = ?
 					  and id <> ?
 					limit 1
 					""", String.class, channelAccountId, phoneNumber, channelAccountId);
-			if (existingId != null) {
-				// Clear the phone_number from the conflicting record first
+			if (!existingIds.isEmpty()) {
 				jdbcTemplate.update(
 						"update channel_account set phone_number = null, updated_at = current_timestamp where id = ?",
-						UUID.fromString(existingId));
+						UUID.fromString(existingIds.getFirst()));
 			}
 		}
 

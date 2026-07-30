@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -83,7 +84,60 @@ public class AestheticCenterJdbcRepository {
 				limit :limit
 				offset :offset
 				""", parameters, serviceRowMapper());
+		items = enrichServicesWithAssignments(businessId, items);
 		return new PagedResponse<>(items, page, size, totalItems, totalPages);
+	}
+
+	private List<AestheticServiceResponse> enrichServicesWithAssignments(UUID businessId,
+			List<AestheticServiceResponse> services) {
+		if (services.isEmpty()) {
+			return services;
+		}
+		List<UUID> serviceIds = services.stream().map(AestheticServiceResponse::id).toList();
+		MapSqlParameterSource batchParams = new MapSqlParameterSource().addValue("businessId", businessId)
+				.addValue("serviceIds", serviceIds);
+
+		MapSqlParameterSource professionalParams = new MapSqlParameterSource().addValue("businessId", businessId)
+				.addValue("serviceIds", serviceIds);
+		List<AssignmentIdRecord> professionalAssignments = jdbcTemplate.query("""
+				select service_id, professional_id
+				from agenda_professional_service
+				where business_id = :businessId
+				  and service_id in (:serviceIds)
+				  and active = true
+				""", professionalParams, (rs, rowNum) -> new AssignmentIdRecord(rs.getObject("service_id", UUID.class),
+				rs.getObject("professional_id", UUID.class)));
+
+		List<AssignmentIdRecord> roomAssignments = jdbcTemplate.query("""
+				select service_id, room_id
+				from agenda_room_service
+				where business_id = :businessId
+				  and service_id in (:serviceIds)
+				  and active = true
+				""", batchParams, (rs, rowNum) -> new AssignmentIdRecord(rs.getObject("service_id", UUID.class),
+				rs.getObject("room_id", UUID.class)));
+
+		java.util.Map<UUID, List<UUID>> profMap = new java.util.HashMap<>();
+		java.util.Map<UUID, List<UUID>> roomMap = new java.util.HashMap<>();
+		for (AssignmentIdRecord rec : professionalAssignments) {
+			profMap.computeIfAbsent(rec.serviceId(), k -> new ArrayList<>()).add(rec.assignedId());
+		}
+		for (AssignmentIdRecord rec : roomAssignments) {
+			roomMap.computeIfAbsent(rec.serviceId(), k -> new ArrayList<>()).add(rec.assignedId());
+		}
+
+		return services.stream().map(svc -> {
+			List<UUID> profIds = profMap.getOrDefault(svc.id(), List.of());
+			List<UUID> rmIds = roomMap.getOrDefault(svc.id(), List.of());
+			return new AestheticServiceResponse(svc.id(), svc.code(), svc.name(), svc.description(), svc.categoryCode(),
+					svc.categoryName(), svc.durationMinutes(), svc.priceBase(), svc.professionalRequired(),
+					svc.supplies(), svc.contraindications(), svc.availabilityRules(), svc.bookingRules(),
+					svc.cancellationRules(), svc.aftercareRecommendations(), svc.requiresPriorEvaluation(),
+					svc.requiresInformedConsent(), svc.active(), svc.createdAt(), svc.updatedAt(), profIds, rmIds);
+		}).toList();
+	}
+
+	private record AssignmentIdRecord(UUID serviceId, UUID assignedId) {
 	}
 
 	public AestheticServiceResponse findService(UUID businessId, UUID serviceId) {
@@ -99,7 +153,14 @@ public class AestheticCenterJdbcRepository {
 		if (items.isEmpty()) {
 			throw new ResourceNotFoundException("No se encontro el servicio estetico solicitado.");
 		}
-		return items.getFirst();
+		AestheticServiceResponse response = items.getFirst();
+		return new AestheticServiceResponse(response.id(), response.code(), response.name(), response.description(),
+				response.categoryCode(), response.categoryName(), response.durationMinutes(), response.priceBase(),
+				response.professionalRequired(), response.supplies(), response.contraindications(),
+				response.availabilityRules(), response.bookingRules(), response.cancellationRules(),
+				response.aftercareRecommendations(), response.requiresPriorEvaluation(),
+				response.requiresInformedConsent(), response.active(), response.createdAt(), response.updatedAt(),
+				findServiceProfessionalIds(businessId, serviceId), findServiceRoomIds(businessId, serviceId));
 	}
 
 	public AestheticServiceResponse insertService(UUID businessId, UpsertAestheticServiceRequest request) {
@@ -121,6 +182,7 @@ public class AestheticCenterJdbcRepository {
 						)
 						""",
 				serviceParameters(businessId, serviceId, request));
+		syncServiceAssignments(businessId, serviceId, request.professionalIds(), request.roomIds());
 		return findService(businessId, serviceId);
 	}
 
@@ -153,6 +215,7 @@ public class AestheticCenterJdbcRepository {
 		if (updated == 0) {
 			throw new ResourceNotFoundException("No se encontro el servicio estetico solicitado.");
 		}
+		syncServiceAssignments(businessId, serviceId, request.professionalIds(), request.roomIds());
 		return findService(businessId, serviceId);
 	}
 
@@ -706,7 +769,7 @@ public class AestheticCenterJdbcRepository {
 				resultSet.getString("aftercare_recommendations"), resultSet.getBoolean("requires_prior_evaluation"),
 				resultSet.getBoolean("requires_informed_consent"), resultSet.getBoolean("active"),
 				resultSet.getObject("created_at", OffsetDateTime.class),
-				resultSet.getObject("updated_at", OffsetDateTime.class));
+				resultSet.getObject("updated_at", OffsetDateTime.class), List.of(), List.of());
 	}
 
 	private RowMapper<AestheticProductResponse> productRowMapper() {
@@ -763,6 +826,68 @@ public class AestheticCenterJdbcRepository {
 						rs.getString("address"), rs.getString("commune"), rs.getString("phone"),
 						rs.getInt("professional_count"), rs.getBigDecimal("latitude"), rs.getBigDecimal("longitude"),
 						(Integer) rs.getObject("daily_booking_capacity")));
+	}
+
+	private void syncServiceAssignments(UUID businessId, UUID serviceId, List<UUID> professionalIds,
+			List<UUID> roomIds) {
+		jdbcTemplate.update(
+				"delete from agenda_professional_service where business_id = :businessId and service_id = :serviceId",
+				new MapSqlParameterSource().addValue("businessId", businessId).addValue("serviceId", serviceId));
+		jdbcTemplate.update(
+				"delete from agenda_room_service where business_id = :businessId and service_id = :serviceId",
+				new MapSqlParameterSource().addValue("businessId", businessId).addValue("serviceId", serviceId));
+
+		if (professionalIds != null) {
+			for (UUID professionalId : professionalIds) {
+				if (professionalId == null) {
+					continue;
+				}
+				jdbcTemplate
+						.update("""
+								insert into agenda_professional_service (id, business_id, service_id, professional_id, active)
+								values (:id, :businessId, :serviceId, :professionalId, true)
+								on conflict (business_id, service_id, professional_id) do update set active = true, updated_at = current_timestamp
+								""",
+								new MapSqlParameterSource().addValue("id", UUID.randomUUID())
+										.addValue("businessId", businessId).addValue("serviceId", serviceId)
+										.addValue("professionalId", professionalId));
+			}
+		}
+
+		if (roomIds != null) {
+			for (UUID roomId : roomIds) {
+				if (roomId == null) {
+					continue;
+				}
+				jdbcTemplate
+						.update("""
+								insert into agenda_room_service (id, business_id, service_id, room_id, active)
+								values (:id, :businessId, :serviceId, :roomId, true)
+								on conflict (business_id, service_id, room_id) do update set active = true, updated_at = current_timestamp
+								""",
+								new MapSqlParameterSource().addValue("id", UUID.randomUUID())
+										.addValue("businessId", businessId).addValue("serviceId", serviceId)
+										.addValue("roomId", roomId));
+			}
+		}
+	}
+
+	private List<UUID> findServiceProfessionalIds(UUID businessId, UUID serviceId) {
+		List<UUID> ids = jdbcTemplate.queryForList("""
+				select professional_id from agenda_professional_service
+				where business_id = :businessId and service_id = :serviceId and active = true
+				""", new MapSqlParameterSource().addValue("businessId", businessId).addValue("serviceId", serviceId),
+				UUID.class);
+		return ids == null ? List.of() : ids;
+	}
+
+	private List<UUID> findServiceRoomIds(UUID businessId, UUID serviceId) {
+		List<UUID> ids = jdbcTemplate.queryForList("""
+				select room_id from agenda_room_service
+				where business_id = :businessId and service_id = :serviceId and active = true
+				""", new MapSqlParameterSource().addValue("businessId", businessId).addValue("serviceId", serviceId),
+				UUID.class);
+		return ids == null ? List.of() : ids;
 	}
 
 	public record ServiceBranchRecord(UUID id, String name, String address, String commune, String phone,

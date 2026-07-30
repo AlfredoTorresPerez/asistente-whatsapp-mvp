@@ -985,14 +985,19 @@ public class AestheticCenterService {
 	}
 
 	private UpsertAestheticServiceRequest normalizeServiceRequest(UpsertAestheticServiceRequest request) {
+		String professionalRequired = request.professionalRequired();
+		if (professionalRequired == null || professionalRequired.isBlank()) {
+			professionalRequired = "Profesional del centro";
+		}
 		return new UpsertAestheticServiceRequest(normalizeCode(request.code(), request.name()),
 				upper(request.categoryCode()), trimRequired(request.name()), trimRequired(request.description()),
-				request.durationMinutes(), request.priceBase(), trimRequired(request.professionalRequired()),
+				request.durationMinutes(), request.priceBase(), trimRequired(professionalRequired),
 				normalizeOptional(request.supplies()), normalizeOptional(request.contraindications()),
 				normalizeOptional(request.availabilityRules()), normalizeOptional(request.bookingRules()),
 				normalizeOptional(request.cancellationRules()), normalizeOptional(request.aftercareRecommendations()),
 				Boolean.TRUE.equals(request.requiresPriorEvaluation()),
-				Boolean.TRUE.equals(request.requiresInformedConsent()), request.active() == null || request.active());
+				Boolean.TRUE.equals(request.requiresInformedConsent()), request.active() == null || request.active(),
+				request.professionalIds(), request.roomIds());
 	}
 
 	private UpsertAestheticProductRequest normalizeProductRequest(UpsertAestheticProductRequest request) {

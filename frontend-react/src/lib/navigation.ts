@@ -3,6 +3,7 @@ export type NavigationItem = {
   path: string
   description: string
   allowedRoles?: string[]
+  allowedPermissions?: string[]
 }
 
 export type RouteMeta = {
@@ -61,16 +62,34 @@ export const PRIMARY_NAV_ITEMS: NavigationItem[] = [
     allowedRoles: ['OWNER', 'ADMIN'],
   },
   {
-    label: 'Sedes del negocio',
+    label: 'Sedes',
     path: '/admin/locations',
     description: 'Administra sucursales, dirección, teléfono, WhatsApp y operación multisede.',
     allowedRoles: ['OWNER', 'ADMIN'],
   },
   {
-    label: 'Operación multisede',
+    label: 'Multi sede',
     path: '/admin/multisite',
     description: 'Disponibilidad, stock, profesionales, permisos y canales por sede.',
     allowedRoles: ['OWNER', 'ADMIN'],
+  },
+  {
+    label: 'Profesionales',
+    path: '/admin/professionals',
+    description: 'Gestiona profesionales, especialidades, contacto y sedes.',
+    allowedPermissions: ['PROFESSIONAL_VIEW'],
+  },
+  {
+    label: 'Cabinas',
+    path: '/admin/rooms',
+    description: 'Gestiona cabinas, salas y recursos por sede.',
+    allowedPermissions: ['ROOM_VIEW'],
+  },
+  {
+    label: 'Asignaciones',
+    path: '/admin/assignments',
+    description: 'Asigna profesionales y cabinas a servicios.',
+    allowedPermissions: ['ASSIGNMENT_VIEW'],
   },
   {
     label: 'Administración',
@@ -85,18 +104,25 @@ export const PRIMARY_NAV_ITEMS: NavigationItem[] = [
     allowedRoles: ['OWNER', 'ADMIN', 'SUPERVISOR'],
   },
   {
-    label: 'Simulador WhatsApp',
+    label: 'Simulador',
     path: '/admin/whatsapp-simulator',
     description: 'Simular mensajes entrantes de WhatsApp para pruebas.',
     allowedRoles: ['OWNER', 'ADMIN'],
   },
 ]
 
-export function canAccessNavigationItem(item: NavigationItem, role?: string | null) {
-  if (!item.allowedRoles) {
-    return true
-  }
-  return Boolean(role && item.allowedRoles.includes(role))
+export function canAccessNavigationItem(
+  item: NavigationItem,
+  role?: string | null,
+  permissions: string[] = [],
+) {
+  const allowedByRole = !item.allowedRoles || Boolean(role && item.allowedRoles.includes(role))
+  const allowedByPermission =
+    !item.allowedPermissions ||
+    permissions.includes('ALL') ||
+    item.allowedPermissions.some((permission) => permissions.includes(permission))
+
+  return allowedByRole && allowedByPermission
 }
 
 const ROUTE_METADATA: RouteMeta[] = [
@@ -307,6 +333,41 @@ const ROUTE_METADATA: RouteMeta[] = [
     path: '/admin/whatsapp-simulator',
     title: 'Simulador WhatsApp',
     description: 'Simular mensajes entrantes de WhatsApp para pruebas sin Postman.',
+  },
+  {
+    path: '/admin/professionals',
+    title: 'Profesionales',
+    description: 'Listado de profesionales del centro estetico con filtros y acciones.',
+  },
+  {
+    matcher: /^\/admin\/professionals\/[^/]+\/edit$/,
+    title: 'Editar profesional',
+    description: 'Formulario para actualizar datos del profesional.',
+  },
+  {
+    path: '/admin/professionals/new',
+    title: 'Crear profesional',
+    description: 'Formulario para alta de nuevo profesional.',
+  },
+  {
+    path: '/admin/rooms',
+    title: 'Cabinas y recursos',
+    description: 'Listado de cabinas y recursos por sede.',
+  },
+  {
+    matcher: /^\/admin\/rooms\/[^/]+\/edit$/,
+    title: 'Editar cabina',
+    description: 'Formulario para actualizar datos de la cabina.',
+  },
+  {
+    path: '/admin/rooms/new',
+    title: 'Crear cabina',
+    description: 'Formulario para alta de nueva cabina o recurso.',
+  },
+  {
+    path: '/admin/assignments',
+    title: 'Asignaciones',
+    description: 'Asignacion de profesionales y cabinas a servicios del catalogo.',
   },
   {
     path: '/admin',

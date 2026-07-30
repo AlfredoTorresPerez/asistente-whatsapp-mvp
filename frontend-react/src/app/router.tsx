@@ -2,8 +2,13 @@ import type { RouteObject } from 'react-router-dom'
 import { Navigate, createBrowserRouter } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import {
+  AdminAssignmentsPage,
   AdminContentPage,
   AdminLocationsPage,
+  AdminProfessionalFormPage,
+  AdminProfessionalsPage,
+  AdminRoomFormPage,
+  AdminRoomsPage,
   AdminSecurityPage,
   AdminUserFormPage,
   AdminUsersPage,
@@ -424,6 +429,62 @@ export const appRoutes: RouteObject[] = [
         element: (
           <RequirePermission permission="SECURITY_AUDIT_VIEW">
             <AdminSecurityPage />
+          </RequirePermission>
+        ),
+      },
+      {
+        path: 'admin/professionals',
+        element: (
+          <RequirePermission permission="PROFESSIONAL_VIEW">
+            <AdminProfessionalsPage />
+          </RequirePermission>
+        ),
+      },
+      {
+        path: 'admin/professionals/new',
+        element: (
+          <RequirePermission permission="PROFESSIONAL_MANAGE">
+            <AdminProfessionalFormPage />
+          </RequirePermission>
+        ),
+      },
+      {
+        path: 'admin/professionals/:professionalId/edit',
+        element: (
+          <RequirePermission permission="PROFESSIONAL_MANAGE">
+            <AdminProfessionalFormPage />
+          </RequirePermission>
+        ),
+      },
+      {
+        path: 'admin/rooms',
+        element: (
+          <RequirePermission permission="ROOM_VIEW">
+            <AdminRoomsPage />
+          </RequirePermission>
+        ),
+      },
+      {
+        path: 'admin/rooms/new',
+        element: (
+          <RequirePermission permission="ROOM_MANAGE">
+            <AdminRoomFormPage />
+          </RequirePermission>
+        ),
+      },
+      {
+        path: 'admin/rooms/:roomId/edit',
+        element: (
+          <RequirePermission permission="ROOM_MANAGE">
+            <AdminRoomFormPage />
+          </RequirePermission>
+        ),
+      },
+      {
+        path: 'admin/assignments',
+        element: (
+          <RequirePermission permission="ASSIGNMENT_VIEW">
+            <AdminAssignmentsPage />
           </RequirePermission>
         ),
       },

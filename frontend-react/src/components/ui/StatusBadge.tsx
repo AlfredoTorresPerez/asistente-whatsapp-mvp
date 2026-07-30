@@ -3,9 +3,10 @@ type StatusBadgeTone = 'success' | 'warning' | 'danger' | 'neutral' | 'info'
 type StatusBadgeProps = {
   label: string
   tone?: StatusBadgeTone
+  className?: string
 }
 
-export function StatusBadge({ label, tone = 'neutral' }: StatusBadgeProps) {
+export function StatusBadge({ className = '', label, tone = 'neutral' }: StatusBadgeProps) {
   const classes = {
     success: 'border-emerald-200 bg-emerald-50 text-emerald-700',
     warning: 'border-amber-200 bg-amber-50 text-amber-700',
@@ -19,6 +20,7 @@ export function StatusBadge({ label, tone = 'neutral' }: StatusBadgeProps) {
       className={[
         'inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]',
         classes,
+        className,
       ]
         .join(' ')
         .trim()}

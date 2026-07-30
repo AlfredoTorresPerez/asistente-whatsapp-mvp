@@ -944,7 +944,7 @@ public class CompleteAgendaJdbcRepository {
 		}
 		Optional<CustomerRecord> existing = findCustomerByPhone(businessId, customerPhone);
 		if (existing.isPresent()) {
-			CustomerRecord result = existing.get();
+			CustomerRecord result = updateExistingCustomerContactIfNeeded(businessId, existing.get(), customerEmail);
 			logOutput("findOrCreateCustomer", result);
 			return result;
 		}
@@ -966,6 +966,27 @@ public class CompleteAgendaJdbcRepository {
 		CustomerRecord result = new CustomerRecord(id, customerName, customerPhone, customerEmail);
 		logOutput("findOrCreateCustomer", result);
 		return result;
+	}
+
+	private CustomerRecord updateExistingCustomerContactIfNeeded(UUID businessId, CustomerRecord customer,
+			String customerEmail) {
+		String email = normalizeEmail(customerEmail);
+		if (email == null || email.equalsIgnoreCase(normalizeEmail(customer.email()))) {
+			return customer;
+		}
+		jdbcTemplate.update("""
+				update customer
+				set email = :email,
+				    updated_at = current_timestamp
+				where business_id = :businessId
+				  and id = :customerId
+				""", new MapSqlParameterSource().addValue("businessId", businessId)
+				.addValue("customerId", customer.id()).addValue("email", email));
+		return new CustomerRecord(customer.id(), customer.displayName(), customer.phone(), email);
+	}
+
+	private String normalizeEmail(String email) {
+		return email == null || email.isBlank() ? null : email.trim();
 	}
 
 	public CustomerRecord findCustomerById(UUID businessId, UUID customerId) {

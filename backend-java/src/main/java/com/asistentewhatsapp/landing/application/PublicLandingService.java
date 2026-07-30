@@ -531,7 +531,8 @@ public class PublicLandingService {
 				.orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "WHATSAPP_NOT_CONFIGURED",
 						"WhatsApp Cloud API no esta configurado para este negocio."));
 
-		String phone = channel.phoneNumber();
+		String phone = firstNonBlank(channel.phoneNumber(), channel.normalizedPhoneNumber(),
+				channel.displayPhoneNumber());
 		if (phone == null || phone.isBlank()) {
 			throw new ApiException(HttpStatus.NOT_FOUND, "NO_PHONE_NUMBER",
 					"El canal de WhatsApp no tiene un numero telefonico configurado.");
@@ -844,6 +845,15 @@ public class PublicLandingService {
 					java.util.Map.of("customerPhone", "Ingresa un telefono valido."));
 		}
 		return phone.replace(" ", "").trim();
+	}
+
+	private String firstNonBlank(String... values) {
+		for (String value : values) {
+			if (value != null && !value.isBlank()) {
+				return value;
+			}
+		}
+		return null;
 	}
 
 	private boolean isBlank(String value) {

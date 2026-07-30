@@ -22,7 +22,7 @@
   },
   "datoEsperado" : "numero_solicitud_o_correo",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 12,
+  "duracionMilisegundos" : 19,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -49,7 +49,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -76,7 +76,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 14,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -103,7 +103,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -130,7 +130,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -157,7 +157,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -240,7 +240,7 @@
   },
   "datoEsperado" : "contexto_para_ejecutivo",
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -294,7 +294,7 @@
   },
   "datoEsperado" : "contexto_para_ejecutivo",
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -321,7 +321,7 @@
   },
   "datoEsperado" : "numero_solicitud_o_correo",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -375,7 +375,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 10,
+  "duracionMilisegundos" : 15,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -402,7 +402,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 13,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -429,7 +429,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -458,7 +458,7 @@
   },
   "datoEsperado" : "siguiente_paso",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -513,7 +513,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 10,
+  "duracionMilisegundos" : 11,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -542,7 +542,7 @@
   },
   "datoEsperado" : "siguiente_paso",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -596,7 +596,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 13,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -623,7 +623,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 11,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -650,7 +650,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 11,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -677,7 +677,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 10,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -704,7 +704,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -732,7 +732,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -761,7 +761,7 @@
   },
   "datoEsperado" : "sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 21,
+  "duracionMilisegundos" : 31,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -788,7 +788,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 11,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -869,7 +869,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -950,7 +950,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -1031,7 +1031,7 @@
   },
   "datoEsperado" : "servicio_si_desea_agendar",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -1060,7 +1060,7 @@
   },
   "datoEsperado" : "servicio_si_desea_agendar",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -1114,7 +1114,7 @@
   },
   "datoEsperado" : "servicio_si_desea_agendar",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 12,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -1168,7 +1168,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -1195,7 +1195,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -1278,7 +1278,7 @@
   },
   "datoEsperado" : "servicio_si_desea_agendar",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -1334,7 +1334,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -1388,7 +1388,7 @@
   },
   "datoEsperado" : "servicio_o_producto_especifico",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -1415,7 +1415,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 10,
+  "duracionMilisegundos" : 14,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -1442,7 +1442,7 @@
   },
   "datoEsperado" : "servicio_o_producto_especifico",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -1469,7 +1469,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 15,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -1496,7 +1496,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 11,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -1550,7 +1550,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 10,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -1577,7 +1577,7 @@
   },
   "datoEsperado" : "servicio_o_producto_especifico",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -1604,7 +1604,7 @@
   },
   "datoEsperado" : "servicio_o_producto_especifico",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -1632,7 +1632,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -1659,7 +1659,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 12,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -1686,7 +1686,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 13,
+  "duracionMilisegundos" : 19,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -1767,7 +1767,7 @@
   },
   "datoEsperado" : "servicio_o_producto_especifico",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -1821,7 +1821,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 13,
+  "duracionMilisegundos" : 11,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -1848,7 +1848,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 16,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -1875,7 +1875,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -1902,7 +1902,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2010,7 +2010,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 11,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2037,7 +2037,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 19,
+  "duracionMilisegundos" : 20,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2064,7 +2064,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 13,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2092,7 +2092,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2120,7 +2120,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2174,7 +2174,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2201,7 +2201,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2228,7 +2228,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 10,
+  "duracionMilisegundos" : 12,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2282,7 +2282,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 13,
+  "duracionMilisegundos" : 15,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2309,7 +2309,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2395,7 +2395,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 13,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2423,7 +2423,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2451,7 +2451,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 16,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2508,7 +2508,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2563,7 +2563,7 @@
   },
   "datoEsperado" : "sucursal_si_necesita_horario_especifico",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2591,7 +2591,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2618,7 +2618,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2645,7 +2645,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 11,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2672,7 +2672,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2700,7 +2700,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2727,7 +2727,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 10,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2754,7 +2754,7 @@
   },
   "datoEsperado" : "sucursal_si_necesita_horario_especifico",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2781,7 +2781,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 17,
+  "duracionMilisegundos" : 15,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2809,7 +2809,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 15,
+  "duracionMilisegundos" : 16,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2836,7 +2836,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 19,
+  "duracionMilisegundos" : 15,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2863,7 +2863,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 18,
+  "duracionMilisegundos" : 12,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2890,7 +2890,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 15,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2917,7 +2917,7 @@
   },
   "datoEsperado" : "numero_solicitud_o_correo",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 34,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2944,7 +2944,7 @@
   },
   "datoEsperado" : "numero_solicitud_o_correo",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 10,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2971,7 +2971,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -2998,7 +2998,7 @@
   },
   "datoEsperado" : "numero_solicitud_o_correo",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 25,
+  "duracionMilisegundos" : 11,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3025,7 +3025,7 @@
   },
   "datoEsperado" : "numero_solicitud_o_correo",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 13,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3054,7 +3054,7 @@
   },
   "datoEsperado" : "sucursal",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 16,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3082,7 +3082,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3110,7 +3110,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3165,7 +3165,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3192,7 +3192,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3219,7 +3219,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 16,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3246,7 +3246,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3273,7 +3273,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 15,
+  "duracionMilisegundos" : 22,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3300,7 +3300,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3327,7 +3327,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 14,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3354,7 +3354,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3381,7 +3381,7 @@
   },
   "datoEsperado" : "contexto_para_ejecutivo",
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3408,7 +3408,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3462,7 +3462,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3489,7 +3489,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3517,7 +3517,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3544,7 +3544,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3571,7 +3571,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3598,7 +3598,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3625,7 +3625,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 11,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3652,7 +3652,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 12,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3679,7 +3679,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3706,7 +3706,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3733,7 +3733,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3760,7 +3760,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3787,7 +3787,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 14,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3814,7 +3814,7 @@
   },
   "datoEsperado" : "sucursal_si_necesita_horario_especifico",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3868,7 +3868,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3895,7 +3895,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -3976,7 +3976,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4003,7 +4003,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4030,7 +4030,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4057,7 +4057,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4084,7 +4084,7 @@
   },
   "datoEsperado" : "servicio_o_producto,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4111,7 +4111,7 @@
   },
   "datoEsperado" : "servicio_o_producto,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4139,7 +4139,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 17,
+  "duracionMilisegundos" : 12,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4195,7 +4195,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4222,7 +4222,7 @@
   },
   "datoEsperado" : "servicio_o_producto,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4249,7 +4249,7 @@
   },
   "datoEsperado" : "servicio_o_producto,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 10,
+  "duracionMilisegundos" : 22,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4276,7 +4276,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 19,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4304,7 +4304,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 18,
+  "duracionMilisegundos" : 17,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4332,7 +4332,7 @@
   },
   "datoEsperado" : "servicio_o_producto,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4386,7 +4386,7 @@
   },
   "datoEsperado" : "servicio_o_producto,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4413,7 +4413,7 @@
   },
   "datoEsperado" : "servicio_o_producto,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 17,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4440,7 +4440,7 @@
   },
   "datoEsperado" : "servicio_o_producto,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4494,7 +4494,7 @@
   },
   "datoEsperado" : "reserva_temporal_o_confirmada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4521,7 +4521,7 @@
   },
   "datoEsperado" : "servicio_o_producto,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 14,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4548,7 +4548,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4575,7 +4575,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4602,7 +4602,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4656,7 +4656,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4683,7 +4683,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 12,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4710,7 +4710,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 24,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4737,7 +4737,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 13,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4791,7 +4791,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4818,7 +4818,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 16,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4846,7 +4846,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 16,
+  "duracionMilisegundos" : 11,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4873,7 +4873,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4900,7 +4900,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 14,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4928,7 +4928,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 16,
+  "duracionMilisegundos" : 21,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4955,7 +4955,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 14,
+  "duracionMilisegundos" : 12,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -4982,7 +4982,7 @@
   },
   "datoEsperado" : "reserva_temporal_o_confirmada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 20,
+  "duracionMilisegundos" : 18,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5009,7 +5009,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5036,7 +5036,7 @@
   },
   "datoEsperado" : "reserva_temporal_o_confirmada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 19,
+  "duracionMilisegundos" : 11,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5063,7 +5063,7 @@
   },
   "datoEsperado" : "reserva_temporal_o_confirmada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 17,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5090,7 +5090,7 @@
   },
   "datoEsperado" : "reserva_temporal_o_confirmada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5117,7 +5117,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5171,7 +5171,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5225,7 +5225,7 @@
   },
   "datoEsperado" : "reserva_temporal_o_confirmada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5252,7 +5252,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 10,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5279,7 +5279,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 11,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5306,7 +5306,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5333,7 +5333,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 21,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5360,7 +5360,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 11,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5387,7 +5387,7 @@
   },
   "datoEsperado" : "reserva_temporal_vigente",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5414,7 +5414,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5522,7 +5522,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5549,7 +5549,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5603,7 +5603,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5630,7 +5630,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5657,7 +5657,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5711,7 +5711,7 @@
   },
   "datoEsperado" : "numero_pedido_o_solicitud,monto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5738,7 +5738,7 @@
   },
   "datoEsperado" : "numero_pedido_o_solicitud,monto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5765,7 +5765,7 @@
   },
   "datoEsperado" : "reserva_temporal_vigente",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 17,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5819,7 +5819,7 @@
   },
   "datoEsperado" : "numero_pedido_o_solicitud,monto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5873,7 +5873,7 @@
   },
   "datoEsperado" : "numero_pedido_o_solicitud,monto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5900,7 +5900,7 @@
   },
   "datoEsperado" : "numero_pedido_o_solicitud,monto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5927,7 +5927,7 @@
   },
   "datoEsperado" : "numero_pedido_o_solicitud,monto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5954,7 +5954,7 @@
   },
   "datoEsperado" : "contexto_para_ejecutivo",
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -5981,7 +5981,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6008,7 +6008,7 @@
   },
   "datoEsperado" : "numero_pedido_o_solicitud,monto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6035,7 +6035,7 @@
   },
   "datoEsperado" : "numero_pedido_o_solicitud,monto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6117,7 +6117,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6145,7 +6145,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6172,7 +6172,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6199,7 +6199,7 @@
   },
   "datoEsperado" : "numero_pedido_o_solicitud,monto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6226,7 +6226,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6280,7 +6280,7 @@
   },
   "datoEsperado" : "reserva_temporal_o_confirmada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6307,7 +6307,7 @@
   },
   "datoEsperado" : "reserva_temporal_o_confirmada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6334,7 +6334,7 @@
   },
   "datoEsperado" : "reserva_temporal_o_confirmada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 10,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6361,7 +6361,7 @@
   },
   "datoEsperado" : "tipo_seguimiento",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6388,7 +6388,7 @@
   },
   "datoEsperado" : "tipo_seguimiento",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6498,7 +6498,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6525,7 +6525,7 @@
   },
   "datoEsperado" : "tipo_seguimiento",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6552,7 +6552,7 @@
   },
   "datoEsperado" : "tipo_seguimiento",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6579,7 +6579,7 @@
   },
   "datoEsperado" : "tipo_seguimiento",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6606,7 +6606,7 @@
   },
   "datoEsperado" : "servicio_o_producto,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6633,7 +6633,7 @@
   },
   "datoEsperado" : "reserva_temporal_o_confirmada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6660,7 +6660,7 @@
   },
   "datoEsperado" : "reserva_temporal_o_confirmada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6687,7 +6687,7 @@
   },
   "datoEsperado" : "reserva_temporal_o_confirmada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6714,7 +6714,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6741,7 +6741,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6823,7 +6823,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 17,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6851,7 +6851,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6878,7 +6878,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6905,7 +6905,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6932,7 +6932,7 @@
   },
   "datoEsperado" : "reserva_temporal_o_confirmada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 10,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -6986,7 +6986,7 @@
   },
   "datoEsperado" : "reserva_temporal_o_confirmada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 10,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7040,7 +7040,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7067,7 +7067,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7094,7 +7094,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7175,7 +7175,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 16,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7202,7 +7202,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7229,7 +7229,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7283,7 +7283,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7310,7 +7310,7 @@
   },
   "datoEsperado" : "numero_solicitud_o_correo",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7337,7 +7337,7 @@
   },
   "datoEsperado" : "reserva_temporal_o_confirmada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7364,7 +7364,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 10,
+  "duracionMilisegundos" : 11,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7419,7 +7419,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7446,7 +7446,7 @@
   },
   "datoEsperado" : "servicio_o_producto_especifico",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7473,7 +7473,7 @@
   },
   "datoEsperado" : "numero_solicitud_o_correo",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7500,7 +7500,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7527,7 +7527,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7581,7 +7581,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7608,7 +7608,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7635,7 +7635,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 12,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7662,7 +7662,7 @@
   },
   "datoEsperado" : "reserva_temporal_o_confirmada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7689,7 +7689,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7716,7 +7716,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7797,7 +7797,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7852,7 +7852,7 @@
   },
   "datoEsperado" : "numero_pedido_o_solicitud,monto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7879,7 +7879,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7961,7 +7961,7 @@
   },
   "datoEsperado" : "servicio_o_producto,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -7988,7 +7988,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8016,7 +8016,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 18,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8070,7 +8070,7 @@
   },
   "datoEsperado" : "numero_pedido_o_solicitud,monto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8097,7 +8097,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8124,7 +8124,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8151,7 +8151,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 12,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8178,7 +8178,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 12,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8205,7 +8205,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8232,7 +8232,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8259,7 +8259,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8287,7 +8287,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8314,7 +8314,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8341,7 +8341,7 @@
   },
   "datoEsperado" : "servicio_o_producto,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8368,7 +8368,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8395,7 +8395,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8422,7 +8422,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8449,7 +8449,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8476,7 +8476,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 19,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8530,7 +8530,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8557,7 +8557,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8584,7 +8584,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 11,
+  "duracionMilisegundos" : 15,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8611,7 +8611,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 12,
+  "duracionMilisegundos" : 13,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8640,7 +8640,7 @@
   },
   "datoEsperado" : "siguiente_paso",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8667,7 +8667,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8694,7 +8694,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8722,7 +8722,7 @@
   },
   "datoEsperado" : "servicio_o_producto,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8830,7 +8830,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 15,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8857,7 +8857,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8884,7 +8884,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 15,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8911,7 +8911,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 13,
+  "duracionMilisegundos" : 28,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8938,7 +8938,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 12,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8965,7 +8965,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 10,
+  "duracionMilisegundos" : 13,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -8992,7 +8992,7 @@
   },
   "datoEsperado" : "numero_pedido_o_solicitud,monto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 11,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9020,7 +9020,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9049,7 +9049,7 @@
   },
   "datoEsperado" : "sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 14,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9078,7 +9078,7 @@
   },
   "datoEsperado" : "siguiente_paso",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9107,7 +9107,7 @@
   },
   "datoEsperado" : "sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 15,
+  "duracionMilisegundos" : 12,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9134,7 +9134,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9215,7 +9215,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9242,7 +9242,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9270,7 +9270,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9297,7 +9297,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 17,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9324,7 +9324,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9351,7 +9351,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9378,7 +9378,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9405,7 +9405,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9433,7 +9433,7 @@
   },
   "datoEsperado" : "contexto_para_ejecutivo",
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9460,7 +9460,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 17,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9487,7 +9487,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9570,7 +9570,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9597,7 +9597,7 @@
   },
   "datoEsperado" : "numero_pedido_o_solicitud,monto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 18,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9651,7 +9651,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9678,7 +9678,7 @@
   },
   "datoEsperado" : "contexto_para_ejecutivo",
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9705,7 +9705,7 @@
   },
   "datoEsperado" : "contexto_para_ejecutivo",
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9733,7 +9733,7 @@
   },
   "datoEsperado" : "contexto_para_ejecutivo",
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 11,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9760,7 +9760,7 @@
   },
   "datoEsperado" : "contexto_para_ejecutivo",
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9814,7 +9814,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9841,7 +9841,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9868,7 +9868,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9895,7 +9895,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9922,7 +9922,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -9949,7 +9949,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10003,7 +10003,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10030,7 +10030,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10057,7 +10057,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10138,7 +10138,7 @@
   },
   "datoEsperado" : "numero_pedido_o_solicitud,monto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10166,7 +10166,7 @@
   },
   "datoEsperado" : "contexto_para_ejecutivo",
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10193,7 +10193,7 @@
   },
   "datoEsperado" : "numero_solicitud_o_correo",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10220,7 +10220,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 10,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10247,7 +10247,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10274,7 +10274,7 @@
   },
   "datoEsperado" : "sucursal_si_necesita_horario_especifico",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10301,7 +10301,7 @@
   },
   "datoEsperado" : "sucursal_si_necesita_horario_especifico",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10328,7 +10328,7 @@
   },
   "datoEsperado" : "sucursal_si_necesita_horario_especifico",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10355,7 +10355,7 @@
   },
   "datoEsperado" : "sucursal_si_necesita_horario_especifico",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10382,7 +10382,7 @@
   },
   "datoEsperado" : "sucursal_si_necesita_horario_especifico",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10409,7 +10409,7 @@
   },
   "datoEsperado" : "sucursal_si_necesita_horario_especifico",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10436,7 +10436,7 @@
   },
   "datoEsperado" : "sucursal_si_necesita_horario_especifico",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10464,7 +10464,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10492,7 +10492,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 12,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10520,7 +10520,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10547,7 +10547,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10574,7 +10574,7 @@
   },
   "datoEsperado" : "sucursal_si_necesita_horario_especifico",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10601,7 +10601,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10628,7 +10628,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 12,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10655,7 +10655,7 @@
   },
   "datoEsperado" : "sucursal_si_necesita_horario_especifico",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10682,7 +10682,7 @@
   },
   "datoEsperado" : "servicio_o_producto,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10709,7 +10709,7 @@
   },
   "datoEsperado" : "servicio_o_producto,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10736,7 +10736,7 @@
   },
   "datoEsperado" : "servicio_o_producto,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10763,7 +10763,7 @@
   },
   "datoEsperado" : "servicio_o_producto,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 12,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10790,7 +10790,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10817,7 +10817,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10844,7 +10844,7 @@
   },
   "datoEsperado" : "servicio_o_producto,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10872,7 +10872,7 @@
   },
   "datoEsperado" : "reserva_temporal_o_confirmada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10926,7 +10926,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10953,7 +10953,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -10980,7 +10980,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11008,7 +11008,7 @@
   },
   "datoEsperado" : "numero_pedido_o_solicitud,monto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 17,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11062,7 +11062,7 @@
   },
   "datoEsperado" : "contexto_para_ejecutivo",
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11090,7 +11090,7 @@
   },
   "datoEsperado" : "contexto_para_ejecutivo",
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11118,7 +11118,7 @@
   },
   "datoEsperado" : "contexto_para_ejecutivo",
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11146,7 +11146,7 @@
   },
   "datoEsperado" : "contexto_para_ejecutivo",
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11173,7 +11173,7 @@
   },
   "datoEsperado" : "contexto_para_ejecutivo",
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11200,7 +11200,7 @@
   },
   "datoEsperado" : "contexto_para_ejecutivo",
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11228,7 +11228,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 24,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11255,7 +11255,7 @@
   },
   "datoEsperado" : "contexto_para_ejecutivo",
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11337,7 +11337,7 @@
   },
   "datoEsperado" : "contexto_para_ejecutivo",
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11364,7 +11364,7 @@
   },
   "datoEsperado" : "contexto_para_ejecutivo",
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11391,7 +11391,7 @@
   },
   "datoEsperado" : "contexto_para_ejecutivo",
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11418,7 +11418,7 @@
   },
   "datoEsperado" : "contexto_para_ejecutivo",
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11445,7 +11445,7 @@
   },
   "datoEsperado" : "tema_documental",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11472,7 +11472,7 @@
   },
   "datoEsperado" : "contexto_para_ejecutivo",
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11499,7 +11499,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 11,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11526,7 +11526,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11554,7 +11554,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11582,7 +11582,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11609,7 +11609,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 13,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11636,7 +11636,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11664,7 +11664,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11692,7 +11692,7 @@
   },
   "datoEsperado" : "servicio_o_producto,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11720,7 +11720,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11747,7 +11747,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 9,
+  "duracionMilisegundos" : 11,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11774,7 +11774,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 6,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11801,7 +11801,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11828,7 +11828,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11882,7 +11882,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11909,7 +11909,7 @@
   },
   "datoEsperado" : "reserva_temporal_vigente",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11937,7 +11937,7 @@
   },
   "datoEsperado" : "reserva_temporal_vigente",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -11992,7 +11992,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -12020,7 +12020,7 @@
   },
   "datoEsperado" : "contexto_para_ejecutivo",
   "derivacionHumana" : true,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -12048,7 +12048,7 @@
   },
   "datoEsperado" : "reserva_temporal_o_confirmada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 11,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -12075,7 +12075,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -12102,7 +12102,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -12129,7 +12129,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 10,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -12156,7 +12156,7 @@
   },
   "datoEsperado" : "reserva_temporal_o_confirmada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 10,
+  "duracionMilisegundos" : 13,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -12183,7 +12183,7 @@
   },
   "datoEsperado" : "reserva_temporal_o_confirmada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 11,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -12210,7 +12210,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 12,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -12238,7 +12238,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -12265,7 +12265,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 12,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -12292,7 +12292,7 @@
   },
   "datoEsperado" : "sucursal_si_no_fue_indicada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 10,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -12319,7 +12319,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -12346,7 +12346,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 27,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -12373,7 +12373,7 @@
   },
   "datoEsperado" : "reserva_temporal_o_confirmada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 11,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -12400,7 +12400,7 @@
   },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -12427,7 +12427,7 @@
   },
   "datoEsperado" : "servicio_o_producto_especifico",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -12454,7 +12454,7 @@
   },
   "datoEsperado" : "motivo_contacto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -12481,7 +12481,7 @@
   },
   "datoEsperado" : "motivo_o_servicio,sucursal,fecha_deseada",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 25,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "OK",
   "error" : null
 }, {
@@ -12508,7 +12508,7 @@
   },
   "datoEsperado" : "servicio_o_producto",
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 8,
+  "duracionMilisegundos" : 56,
   "resultadoTecnico" : "OK",
   "error" : null
 } ]

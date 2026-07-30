@@ -534,6 +534,8 @@ function buildServiceStatusRequest(
     requiresInformedConsent: service.requiresInformedConsent,
     requiresPriorEvaluation: service.requiresPriorEvaluation,
     supplies: service.supplies,
+    professionalIds: service.professionalIds ?? null,
+    roomIds: service.roomIds ?? null,
   }
 }
 
@@ -914,6 +916,8 @@ export function BusinessAiPage() {
           requiresInformedConsent: source?.requiresInformedConsent ?? false,
           requiresPriorEvaluation: source?.requiresPriorEvaluation ?? false,
           supplies: source?.supplies ?? null,
+          professionalIds: source?.professionalIds ?? null,
+          roomIds: source?.roomIds ?? null,
         }
 
         if (state.mode === 'edit' && state.id) {

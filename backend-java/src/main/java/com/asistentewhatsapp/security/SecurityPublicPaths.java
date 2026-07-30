@@ -12,6 +12,7 @@ public final class SecurityPublicPaths {
 			"/api/auth/reset-password", "/api/auth/reset-password/validate",
 			"/api/v1/integrations/whatsapp-web/webhook", "/api/v1/integrations/whatsapp-cloud/webhook",
 			"/api/v1/integrations/booking-payments/webhook", "/api/webhooks/whatsapp-web/messages",
+			"/reservas/confirmar/**", "/reservas/reprogramar/**", "/reservas/cancelar/**", "/reservas/pagar/**",
 			"/api/v1/public/booking-confirmations/**", "/api/v1/public/booking-reschedules/**",
 			"/api/v1/public/booking-cancellations/**", "/api/v1/public/booking-payments/**",
 			"/api/v1/public/customer-bookings/**", "/api/v1/public/landing/**", "/api/v1/public/centros/**",
