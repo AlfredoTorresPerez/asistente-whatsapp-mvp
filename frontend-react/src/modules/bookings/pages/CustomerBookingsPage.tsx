@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Button } from '../../../components/ui/Button'
 import { Card } from '../../../components/ui/Card'
@@ -93,6 +93,14 @@ export function CustomerBookingsPage({ mode }: { mode?: PageMode }) {
     return () => clearTimeout(id)
   }, [previewQuery.data])
 
+  const formRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (selectedBooking && formRef.current) {
+      formRef.current.scrollIntoView?.({ behavior: 'smooth', block: 'start' })
+    }
+  }, [selectedBooking])
+
   const cancelMutation = useMutation({
     mutationFn: (bookingId: string) =>
       cancelCustomerBookingRequest(
@@ -124,8 +132,9 @@ export function CustomerBookingsPage({ mode }: { mode?: PageMode }) {
         draft!.locationId,
         draft!.date,
       ),
-    enabled:
-      Boolean(token && selectedBookingId && draft?.date && draft?.serviceId && draft?.locationId),
+    enabled: Boolean(
+      token && selectedBookingId && draft?.date && draft?.serviceId && draft?.locationId,
+    ),
     retry: false,
   })
 
@@ -207,10 +216,9 @@ export function CustomerBookingsPage({ mode }: { mode?: PageMode }) {
           </Card>
         ) : (
           <div className="space-y-4">
-            <div className="grid gap-4">
-              {bookings.map((booking) => (
+            {bookings.map((booking) => (
+              <Fragment key={booking.bookingId}>
                 <BookingCard
-                  key={booking.bookingId}
                   booking={booking}
                   isSelected={selectedBookingId === booking.bookingId}
                   onCancel={() => {
@@ -231,256 +239,277 @@ export function CustomerBookingsPage({ mode }: { mode?: PageMode }) {
                   setCancelReason={setCancelReason}
                   mode={effectiveMode}
                 />
-              ))}
-            </div>
 
-            {selectedBooking ? (
-              <Card className="space-y-5 border-teal-200 bg-teal-50/40">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-700">
-                    Reprogramacion
-                  </p>
-                  <h2 className="mt-1 text-2xl font-semibold text-slate-950">
-                    Editar reserva seleccionada
-                  </h2>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    Modifica el servicio, la sucursal o la nueva fecha y hora. El sistema validara
-                    la disponibilidad al guardar.
-                  </p>
-                </div>
+                {selectedBookingId === booking.bookingId && selectedBooking ? (
+                  <div ref={formRef}>
+                    <Card className="space-y-5 border-teal-200 bg-teal-50/40">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-700">
+                          Reprogramacion
+                        </p>
+                        <h2 className="mt-1 text-2xl font-semibold text-slate-950">
+                          Editar reserva seleccionada
+                        </h2>
+                        <p className="mt-2 text-sm leading-6 text-slate-600">
+                          Modifica el servicio, la sucursal o la nueva fecha y hora. El sistema
+                          validara la disponibilidad al guardar.
+                        </p>
+                      </div>
 
-                {previewQuery.isPending ? (
-                  <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center">
-                    <p className="text-sm font-medium text-slate-700">
-                      Cargando datos de reprogramacion...
-                    </p>
-                  </div>
-                ) : previewQuery.isError || !preview ? (
-                  <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-center">
-                    <h3 className="text-lg font-semibold text-rose-900">
-                      No fue posible abrir la reserva
-                    </h3>
-                    <p className="mt-2 text-sm text-rose-700">
-                      {getErrorMessage(
-                        previewQuery.error,
-                        'No pudimos cargar los datos necesarios para reprogramar esta reserva.',
-                      )}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-5">
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <Info
-                        label="Cliente"
-                        value={`${preview.booking.customerName} (${preview.booking.maskedPhone})`}
-                      />
-                      <Info label="Servicio actual" value={preview.booking.serviceName} />
-                      <Info label="Fecha actual" value={formatDateTime(preview.booking.startsAt)} />
-                      <Info
-                        label="Sucursal actual"
-                        value={preview.booking.locationName ?? 'Por confirmar'}
-                      />
-                      <Info
-                        label="Profesional"
-                        value={preview.booking.professionalName ?? 'Por asignar'}
-                      />
-                      <Info label="Duracion" value={`${preview.booking.durationMinutes} minutos`} />
-                    </div>
-
-                    <div className="grid gap-5 md:grid-cols-2">
-                      <Select
-                        label="Servicio"
-                        value={draft?.serviceId ?? ''}
-                        onChange={(event) =>
-                          setDraft((current) =>
-                            current
-                              ? { ...current, serviceId: event.target.value, slotStartsAt: '' }
-                              : {
-                                  serviceId: event.target.value,
-                                  locationId:
-                                    preview.booking.locationId ?? locationOptions[0]?.id ?? '',
-                                  date: dayjs(preview.booking.startsAt).format('YYYY-MM-DD'),
-                                  slotStartsAt: '',
-                                  reason: '',
-                                },
-                          )
-                        }
-                        options={serviceOptions.map((service) => ({
-                          label: `${service.name} (${service.categoryName})`,
-                          value: service.id,
-                        }))}
-                      />
-                      <Select
-                        label="Sucursal"
-                        value={draft?.locationId ?? ''}
-                        onChange={(event) =>
-                          setDraft((current) =>
-                            current
-                              ? { ...current, locationId: event.target.value, slotStartsAt: '' }
-                              : {
-                                  serviceId:
-                                    preview.booking.serviceId ?? serviceOptions[0]?.id ?? '',
-                                  locationId: event.target.value,
-                                  date: dayjs(preview.booking.startsAt).format('YYYY-MM-DD'),
-                                  slotStartsAt: '',
-                                  reason: '',
-                                },
-                          )
-                        }
-                        options={locationOptions.map((location) => ({
-                          label: location.commune
-                            ? `${location.name} - ${location.commune}`
-                            : location.name,
-                          value: location.id,
-                        }))}
-                      />
-                    </div>
-
-                    <div className="grid gap-5 md:grid-cols-2">
-                      <Input
-                        label="Nueva fecha"
-                        type="date"
-                        value={draft?.date ?? ''}
-                        min={dayjs().format('YYYY-MM-DD')}
-                        onChange={(event) =>
-                          setDraft((current) =>
-                            current
-                              ? { ...current, date: event.target.value, slotStartsAt: '' }
-                              : {
-                                  serviceId:
-                                    preview.booking.serviceId ?? serviceOptions[0]?.id ?? '',
-                                  locationId:
-                                    preview.booking.locationId ?? locationOptions[0]?.id ?? '',
-                                  date: event.target.value,
-                                  slotStartsAt: '',
-                                  reason: '',
-                                },
-                          )
-                        }
-                      />
-                      <Textarea
-                        label="Motivo de reprogramacion"
-                        onChange={(event) =>
-                          setDraft((current) =>
-                            current
-                              ? { ...current, reason: event.target.value }
-                              : {
-                                  serviceId:
-                                    preview.booking.serviceId ?? serviceOptions[0]?.id ?? '',
-                                  locationId:
-                                    preview.booking.locationId ?? locationOptions[0]?.id ?? '',
-                                  date: dayjs(preview.booking.startsAt).format('YYYY-MM-DD'),
-                                  slotStartsAt: '',
-                                  reason: event.target.value,
-                                },
-                          )
-                        }
-                        placeholder="Opcional"
-                        rows={4}
-                        value={draft?.reason ?? ''}
-                      />
-                    </div>
-
-                    <div className="space-y-3">
-                      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-                        Horarios disponibles
-                      </p>
-                      {!draft?.date ? (
-                        <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center">
-                          <p className="text-sm text-slate-500">
-                            Selecciona una fecha para ver los horarios disponibles.
-                          </p>
-                        </div>
-                      ) : availabilityQuery.isPending ? (
+                      {previewQuery.isPending ? (
                         <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center">
                           <p className="text-sm font-medium text-slate-700">
-                            Cargando horarios...
+                            Cargando datos de reprogramacion...
                           </p>
                         </div>
-                      ) : availabilityQuery.isError ? (
+                      ) : previewQuery.isError || !preview ? (
                         <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-center">
-                          <p className="text-sm text-rose-700">
+                          <h3 className="text-lg font-semibold text-rose-900">
+                            No fue posible abrir la reserva
+                          </h3>
+                          <p className="mt-2 text-sm text-rose-700">
                             {getErrorMessage(
-                              availabilityQuery.error,
-                              'No se pudieron cargar los horarios disponibles.',
+                              previewQuery.error,
+                              'No pudimos cargar los datos necesarios para reprogramar esta reserva.',
                             )}
                           </p>
                         </div>
-                      ) : !availability || availability.slots.length === 0 ? (
-                        <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center">
-                          <p className="text-sm text-slate-500">
-                            No hay horarios disponibles para esta fecha.
-                          </p>
-                        </div>
                       ) : (
-                        <div className="flex flex-wrap gap-2">
-                          {availability.slots
-                            .filter((slot) => slot.available)
-                            .map((slot) => {
-                              const selected = draft?.slotStartsAt === slot.startsAt
-                              return (
-                                <button
-                                  key={`${slot.startsAt}-${slot.professionalId ?? 'any'}-${slot.roomId ?? 'any'}`}
-                                  type="button"
-                                  onClick={() =>
-                                    setDraft((current) =>
-                                      current ? { ...current, slotStartsAt: slot.startsAt } : null,
+                        <div className="space-y-5">
+                          <div className="grid gap-3 sm:grid-cols-2">
+                            <Info
+                              label="Cliente"
+                              value={`${preview.booking.customerName} (${preview.booking.maskedPhone})`}
+                            />
+                            <Info label="Servicio actual" value={preview.booking.serviceName} />
+                            <Info
+                              label="Fecha actual"
+                              value={formatDateTime(preview.booking.startsAt)}
+                            />
+                            <Info
+                              label="Sucursal actual"
+                              value={preview.booking.locationName ?? 'Por confirmar'}
+                            />
+                            <Info
+                              label="Profesional"
+                              value={preview.booking.professionalName ?? 'Por asignar'}
+                            />
+                            <Info
+                              label="Duracion"
+                              value={`${preview.booking.durationMinutes} minutos`}
+                            />
+                          </div>
+
+                          <div className="grid gap-5 md:grid-cols-2">
+                            <Select
+                              label="Servicio"
+                              value={draft?.serviceId ?? ''}
+                              onChange={(event) =>
+                                setDraft((current) =>
+                                  current
+                                    ? {
+                                        ...current,
+                                        serviceId: event.target.value,
+                                        slotStartsAt: '',
+                                      }
+                                    : {
+                                        serviceId: event.target.value,
+                                        locationId:
+                                          preview.booking.locationId ??
+                                          locationOptions[0]?.id ??
+                                          '',
+                                        date: dayjs(preview.booking.startsAt).format('YYYY-MM-DD'),
+                                        slotStartsAt: '',
+                                        reason: '',
+                                      },
+                                )
+                              }
+                              options={serviceOptions.map((service) => ({
+                                label: `${service.name} (${service.categoryName})`,
+                                value: service.id,
+                              }))}
+                            />
+                            <Select
+                              label="Sucursal"
+                              value={draft?.locationId ?? ''}
+                              onChange={(event) =>
+                                setDraft((current) =>
+                                  current
+                                    ? {
+                                        ...current,
+                                        locationId: event.target.value,
+                                        slotStartsAt: '',
+                                      }
+                                    : {
+                                        serviceId:
+                                          preview.booking.serviceId ?? serviceOptions[0]?.id ?? '',
+                                        locationId: event.target.value,
+                                        date: dayjs(preview.booking.startsAt).format('YYYY-MM-DD'),
+                                        slotStartsAt: '',
+                                        reason: '',
+                                      },
+                                )
+                              }
+                              options={locationOptions.map((location) => ({
+                                label: location.commune
+                                  ? `${location.name} - ${location.commune}`
+                                  : location.name,
+                                value: location.id,
+                              }))}
+                            />
+                          </div>
+
+                          <div className="grid gap-5 md:grid-cols-2">
+                            <Input
+                              label="Nueva fecha"
+                              type="date"
+                              value={draft?.date ?? ''}
+                              min={dayjs().format('YYYY-MM-DD')}
+                              onChange={(event) =>
+                                setDraft((current) =>
+                                  current
+                                    ? { ...current, date: event.target.value, slotStartsAt: '' }
+                                    : {
+                                        serviceId:
+                                          preview.booking.serviceId ?? serviceOptions[0]?.id ?? '',
+                                        locationId:
+                                          preview.booking.locationId ??
+                                          locationOptions[0]?.id ??
+                                          '',
+                                        date: event.target.value,
+                                        slotStartsAt: '',
+                                        reason: '',
+                                      },
+                                )
+                              }
+                            />
+                            <Textarea
+                              label="Motivo de reprogramacion"
+                              onChange={(event) =>
+                                setDraft((current) =>
+                                  current
+                                    ? { ...current, reason: event.target.value }
+                                    : {
+                                        serviceId:
+                                          preview.booking.serviceId ?? serviceOptions[0]?.id ?? '',
+                                        locationId:
+                                          preview.booking.locationId ??
+                                          locationOptions[0]?.id ??
+                                          '',
+                                        date: dayjs(preview.booking.startsAt).format('YYYY-MM-DD'),
+                                        slotStartsAt: '',
+                                        reason: event.target.value,
+                                      },
+                                )
+                              }
+                              placeholder="Opcional"
+                              rows={4}
+                              value={draft?.reason ?? ''}
+                            />
+                          </div>
+
+                          <div className="space-y-3">
+                            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+                              Horarios disponibles
+                            </p>
+                            {!draft?.date ? (
+                              <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center">
+                                <p className="text-sm text-slate-500">
+                                  Selecciona una fecha para ver los horarios disponibles.
+                                </p>
+                              </div>
+                            ) : availabilityQuery.isPending ? (
+                              <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center">
+                                <p className="text-sm font-medium text-slate-700">
+                                  Cargando horarios...
+                                </p>
+                              </div>
+                            ) : availabilityQuery.isError ? (
+                              <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-center">
+                                <p className="text-sm text-rose-700">
+                                  {getErrorMessage(
+                                    availabilityQuery.error,
+                                    'No se pudieron cargar los horarios disponibles.',
+                                  )}
+                                </p>
+                              </div>
+                            ) : !availability || availability.slots.length === 0 ? (
+                              <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center">
+                                <p className="text-sm text-slate-500">
+                                  No hay horarios disponibles para esta fecha.
+                                </p>
+                              </div>
+                            ) : (
+                              <div className="flex flex-wrap gap-2">
+                                {availability.slots
+                                  .filter((slot) => slot.available)
+                                  .map((slot) => {
+                                    const selected = draft?.slotStartsAt === slot.startsAt
+                                    return (
+                                      <button
+                                        key={`${slot.startsAt}-${slot.professionalId ?? 'any'}-${slot.roomId ?? 'any'}`}
+                                        type="button"
+                                        onClick={() =>
+                                          setDraft((current) =>
+                                            current
+                                              ? { ...current, slotStartsAt: slot.startsAt }
+                                              : null,
+                                          )
+                                        }
+                                        className={[
+                                          'rounded-xl border px-4 py-2 text-sm font-medium transition-colors',
+                                          selected
+                                            ? 'border-teal-500 bg-teal-50 text-teal-800'
+                                            : 'border-slate-200 bg-white text-slate-700 hover:border-teal-300 hover:bg-teal-50/50',
+                                        ].join(' ')}
+                                      >
+                                        {dayjs(slot.startsAt).format('HH:mm')}
+                                      </button>
                                     )
-                                  }
-                                  className={[
-                                    'rounded-xl border px-4 py-2 text-sm font-medium transition-colors',
-                                    selected
-                                      ? 'border-teal-500 bg-teal-50 text-teal-800'
-                                      : 'border-slate-200 bg-white text-slate-700 hover:border-teal-300 hover:bg-teal-50/50',
-                                  ].join(' ')}
-                                >
-                                  {dayjs(slot.startsAt).format('HH:mm')}
-                                </button>
-                              )
-                            })}
+                                  })}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex flex-col gap-3 border-t border-teal-200 pt-5 sm:flex-row sm:justify-end">
+                            <Button
+                              onClick={() => {
+                                setSelectedBookingId(null)
+                                setDraft(null)
+                              }}
+                              variant="secondary"
+                            >
+                              Cerrar
+                            </Button>
+                            <Button
+                              disabled={
+                                !draft?.serviceId ||
+                                !draft?.locationId ||
+                                !draft?.date ||
+                                !draft?.slotStartsAt
+                              }
+                              loading={rescheduleMutation.isPending}
+                              onClick={() => rescheduleMutation.mutate()}
+                            >
+                              Reprogramar reserva
+                            </Button>
+                          </div>
+
+                          {rescheduleMutation.isError ? (
+                            <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                              {getErrorMessage(
+                                rescheduleMutation.error,
+                                'No fue posible reprogramar la reserva. Revisa la fecha y vuelve a intentarlo.',
+                              )}
+                            </p>
+                          ) : null}
                         </div>
                       )}
-                    </div>
-
-                    <div className="flex flex-col gap-3 border-t border-teal-200 pt-5 sm:flex-row sm:justify-end">
-                      <Button
-                        onClick={() => {
-                          setSelectedBookingId(null)
-                          setDraft(null)
-                        }}
-                        variant="secondary"
-                      >
-                        Cerrar
-                      </Button>
-                      <Button
-                        disabled={
-                          !draft?.serviceId || !draft?.locationId || !draft?.date || !draft?.slotStartsAt
-                        }
-                        loading={rescheduleMutation.isPending}
-                        onClick={() => rescheduleMutation.mutate()}
-                      >
-                        Reprogramar reserva
-                      </Button>
-                    </div>
-
-                    {rescheduleMutation.isError ? (
-                      <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">
-                        {getErrorMessage(
-                          rescheduleMutation.error,
-                          'No fue posible reprogramar la reserva. Revisa la fecha y vuelve a intentarlo.',
-                        )}
-                      </p>
-                    ) : null}
+                    </Card>
                   </div>
-                )}
-              </Card>
-            ) : (
-              <Card className="border-teal-200 bg-teal-50">
-                <p className="text-sm text-teal-800">
-                  Selecciona una reserva para abrir el formulario de reprogramacion.
-                </p>
-              </Card>
-            )}
+                ) : null}
+              </Fragment>
+            ))}
           </div>
         )}
 
