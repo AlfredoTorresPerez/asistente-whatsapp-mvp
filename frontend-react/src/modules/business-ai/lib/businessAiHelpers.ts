@@ -41,6 +41,12 @@ export function getAuditTotalPages(totalItems: number, pageSize = BUSINESS_AI_AU
   return Math.max(1, Math.ceil(totalItems / pageSize))
 }
 
+export function matchesSearch(row: { title: string; category: string; description: string }, search: string) {
+  if (!search.trim()) return true
+  const normalizedSearch = search.trim().toLowerCase()
+  return [row.title, row.category, row.description].join(' ').toLowerCase().includes(normalizedSearch)
+}
+
 export function isBusinessHourRangeValid(day: BusinessHoursDay) {
   if (!day.startTime && !day.endTime) {
     return true

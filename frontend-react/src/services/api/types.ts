@@ -2085,3 +2085,68 @@ export type ContentItemImageUploadResponse = {
   imagePath: string
   imageUrl: string
 }
+
+// Business AI Settings
+export type BusinessAiSettingsResponse = {
+  id: string
+  businessId: string
+  active: boolean
+  mode: 'suggest' | 'auto'
+  tone: 'Cercano' | 'Profesional' | 'Comercial'
+  language: string
+  escalationThreshold: number
+  allowPrices: boolean
+  allowBooking: boolean
+  allowPromotions: boolean
+  requireAvailabilityCheck: boolean
+  allowedTopics: string[]
+  blockedTopics: string[]
+  activePromptVersion: number | null
+  updatedBy: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export type UpsertBusinessAiSettingsRequest = {
+  active: boolean
+  mode: 'suggest' | 'auto'
+  tone: 'Cercano' | 'Profesional' | 'Comercial'
+  language: string
+  escalationThreshold: number
+  allowPrices: boolean
+  allowBooking: boolean
+  allowPromotions: boolean
+  requireAvailabilityCheck: boolean
+  allowedTopics: string[]
+  blockedTopics: string[]
+}
+
+export type PromptTemplateResponse = {
+  id: string
+  businessId: string
+  codigo: string
+  nombre: string
+  descripcion: string
+  modulo: string
+  tipo: string
+  contenido: string
+  prioridad: number
+  activo: boolean
+  version: number
+  fechaCreacion: string
+  fechaActualizacion: string
+}
+
+export type UpsertPromptTemplateRequest = {
+  codigo: string
+  nombre: string
+  descripcion: string
+  modulo: string
+  tipo: string
+  contenido: string
+  prioridad: number
+}
+
+export type ActivatePromptRequest = {
+  promptId: string
+}

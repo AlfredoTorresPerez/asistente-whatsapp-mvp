@@ -5,11 +5,16 @@ import type {
   AestheticIntentLogResponse,
   AestheticProductResponse,
   AestheticServiceResponse,
+  ActivatePromptRequest,
+  BusinessAiSettingsResponse,
   IntentAnalysisRequest,
   IntentAnalysisResponse,
+  PromptTemplateResponse,
   UpsertAestheticBusinessRuleRequest,
   UpsertAestheticProductRequest,
   UpsertAestheticServiceRequest,
+  UpsertBusinessAiSettingsRequest,
+  UpsertPromptTemplateRequest,
   PagedResponse,
 } from './types'
 
@@ -147,4 +152,33 @@ export function listAestheticIntentLogs(params: { page?: number; size?: number }
   return apiFetch<PagedResponse<AestheticIntentLogResponse>>(
     `/esthetic/intent/logs${toQueryString(params)}`,
   )
+}
+
+export function getBusinessAiSettings() {
+  return apiFetch<BusinessAiSettingsResponse>('/business-ai/settings')
+}
+
+export function saveBusinessAiSettings(request: UpsertBusinessAiSettingsRequest) {
+  return apiFetch<BusinessAiSettingsResponse>('/business-ai/settings', {
+    method: 'PUT',
+    body: JSON.stringify(request),
+  })
+}
+
+export function getBusinessAiPrompts() {
+  return apiFetch<PromptTemplateResponse[]>('/business-ai/prompts')
+}
+
+export function createBusinessAiPrompt(request: UpsertPromptTemplateRequest) {
+  return apiFetch<PromptTemplateResponse>('/business-ai/prompts', {
+    method: 'POST',
+    body: JSON.stringify(request),
+  })
+}
+
+export function activateBusinessAiPrompt(request: ActivatePromptRequest) {
+  return apiFetch<void>('/business-ai/prompts/activate', {
+    method: 'POST',
+    body: JSON.stringify(request),
+  })
 }

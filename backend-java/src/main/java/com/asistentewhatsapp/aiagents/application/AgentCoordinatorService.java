@@ -3,12 +3,15 @@ package com.asistentewhatsapp.aiagents.application;
 import com.asistentewhatsapp.aiagents.domain.AgentIntent;
 import com.asistentewhatsapp.aiagents.domain.AgentType;
 import com.asistentewhatsapp.aiagents.infrastructure.AiAgentJdbcRepository;
+import com.asistentewhatsapp.businessai.api.BusinessAiSettingsResponse;
+import com.asistentewhatsapp.businessai.application.BusinessAiSettingsService;
 import com.asistentewhatsapp.shared.observability.LogSanitizer;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
@@ -37,15 +40,17 @@ public class AgentCoordinatorService {
 	private final EntityExtractionService entityExtractionService;
 	private final AgentRegistry agentRegistry;
 	private final AiAgentJdbcRepository aiAgentJdbcRepository;
+	private final BusinessAiSettingsService businessAiSettingsService;
 
 	public AgentCoordinatorService(AiAgentProperties properties, IntentDetectorService intentDetectorService,
 			EntityExtractionService entityExtractionService, AgentRegistry agentRegistry,
-			AiAgentJdbcRepository aiAgentJdbcRepository) {
+			AiAgentJdbcRepository aiAgentJdbcRepository, BusinessAiSettingsService businessAiSettingsService) {
 		this.properties = properties;
 		this.intentDetectorService = intentDetectorService;
 		this.entityExtractionService = entityExtractionService;
 		this.agentRegistry = agentRegistry;
 		this.aiAgentJdbcRepository = aiAgentJdbcRepository;
+		this.businessAiSettingsService = businessAiSettingsService;
 	}
 
 	@Transactional
@@ -58,6 +63,11 @@ public class AgentCoordinatorService {
 		if (!properties.enabled() || isNonActionableMessage(request.messageBody())) {
 			AiTraceLogger.warn("AI_ROUTE_SKIPPED", traceId, request.conversationId(), null, "AgentCoordinatorService",
 					"enabled=" + properties.enabled() + " nonActionable=true");
+			return Optional.empty();
+		}
+		if (!isBusinessAiActive(request.businessId())) {
+			AiTraceLogger.warn("AI_ROUTE_SKIPPED", traceId, request.conversationId(), null, "AgentCoordinatorService",
+					"reason=businessAiNotActive businessId=" + request.businessId());
 			return Optional.empty();
 		}
 
@@ -125,6 +135,11 @@ public class AgentCoordinatorService {
 		if (!properties.enabled() || isNonActionableMessage(request.messageBody())) {
 			AiTraceLogger.warn("AI_PREVIEW_SKIPPED", traceId, request.conversationId(), null, "AgentCoordinatorService",
 					"enabled=" + properties.enabled() + " nonActionable=true");
+			return Optional.empty();
+		}
+		if (!isBusinessAiActive(request.businessId())) {
+			AiTraceLogger.warn("AI_PREVIEW_SKIPPED", traceId, request.conversationId(), null, "AgentCoordinatorService",
+					"reason=businessAiNotActive businessId=" + request.businessId());
 			return Optional.empty();
 		}
 
@@ -530,5 +545,10 @@ public class AgentCoordinatorService {
 
 	public boolean autoReplyEnabled() {
 		return properties.enabled() && properties.autoReplyEnabled();
+	}
+
+	private boolean isBusinessAiActive(UUID businessId) {
+		return businessAiSettingsService.findSettingsOpt(businessId).map(BusinessAiSettingsResponse::active)
+				.orElse(false);
 	}
 }

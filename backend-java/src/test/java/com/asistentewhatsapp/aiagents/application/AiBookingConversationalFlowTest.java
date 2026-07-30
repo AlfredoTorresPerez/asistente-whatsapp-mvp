@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.asistentewhatsapp.aiagents.domain.AgentIntent;
 import com.asistentewhatsapp.aiagents.domain.AgentType;
 import com.asistentewhatsapp.aiagents.infrastructure.AiAgentJdbcRepository;
+import com.asistentewhatsapp.businessai.application.BusinessAiSettingsService;
 import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ class AiBookingConversationalFlowTest {
 	private final BusinessLocationJdbcRepository locationRepository = mockLocationRepository();
 	private final TransactionalAgendaBookingService transactionalAgendaBookingService = Mockito.mock();
 	private final AiAgentJdbcRepository aiAgentJdbcRepository = Mockito.mock();
+	private final BusinessAiSettingsService businessAiSettingsService = Mockito.mock();
 	private final EntityExtractionService extractor = new EntityExtractionService(knowledgeService, locationRepository);
 	private final AgentRegistry registry = new AgentRegistry(List.of(new ReceptionAgent(),
 			new SalesAgent(knowledgeService), new BookingAgent(knowledgeService, transactionalAgendaBookingService),
@@ -37,8 +39,9 @@ class AiBookingConversationalFlowTest {
 	AiBookingConversationalFlowTest() {
 		Mockito.when(aiAgentJdbcRepository.findConversationContext(Mockito.any(), Mockito.any()))
 				.thenReturn(Optional.empty());
+		Mockito.when(businessAiSettingsService.findSettingsOpt(Mockito.any())).thenReturn(Optional.empty());
 		coordinator = new AgentCoordinatorService(enabledProperties(), detector, extractor, registry,
-				aiAgentJdbcRepository);
+				aiAgentJdbcRepository, businessAiSettingsService);
 	}
 
 	@BeforeEach

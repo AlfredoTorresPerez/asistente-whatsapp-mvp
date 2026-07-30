@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.asistentewhatsapp.aiagents.domain.AgentIntent;
 import com.asistentewhatsapp.aiagents.domain.AgentType;
+import com.asistentewhatsapp.businessai.application.BusinessAiSettingsService;
 import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository;
 import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository.BusinessLocationRecord;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -304,6 +305,7 @@ class AiExcelMatrixOrchestratorCoverageTest {
 				"Av. Apoquindo 4567", "Santiago", "Las Condes", "+56922222222", "+56922222222", "America/Santiago",
 				null, null, null, true, OffsetDateTime.now(ZoneOffset.UTC), OffsetDateTime.now(ZoneOffset.UTC));
 		private final InMemoryAiAgentRepository contextRepository = new InMemoryAiAgentRepository();
+		private final BusinessAiSettingsService businessAiSettingsService = Mockito.mock();
 		private final AgentCoordinatorService coordinator;
 		private final IntentDetectorService detector;
 		private final EntityExtractionService extractor;
@@ -322,8 +324,9 @@ class AiExcelMatrixOrchestratorCoverageTest {
 					List.of(new ReceptionAgent(), new SalesAgent(knowledge), new BookingAgent(knowledge, transactional),
 							new PaymentsAgent(knowledge), new SupportAgent(locationRepository), new KnowledgeAgent(),
 							new FollowUpAgent(), new HumanHandoffAgent()));
+			Mockito.when(businessAiSettingsService.findSettingsOpt(Mockito.any())).thenReturn(Optional.empty());
 			this.coordinator = new AgentCoordinatorService(enabledProperties(), detector, extractor, registry,
-					contextRepository);
+					contextRepository, businessAiSettingsService);
 		}
 
 		AgentRoutingResult route(String body, UUID conversationId) {

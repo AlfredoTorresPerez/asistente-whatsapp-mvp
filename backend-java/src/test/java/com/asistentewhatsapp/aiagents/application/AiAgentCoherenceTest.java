@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.asistentewhatsapp.aiagents.domain.AgentIntent;
 import com.asistentewhatsapp.aiagents.domain.AgentType;
+import com.asistentewhatsapp.businessai.application.BusinessAiSettingsService;
 import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -32,6 +33,7 @@ class AiAgentCoherenceTest {
 			new SalesAgent(knowledgeService), new BookingAgent(knowledgeService, transactionalAgendaBookingService),
 			new PaymentsAgent(knowledgeService), new SupportAgent(locationRepository), new KnowledgeAgent(),
 			new FollowUpAgent(), new HumanHandoffAgent()));
+	private final BusinessAiSettingsService businessAiSettingsService = Mockito.mock();
 
 	private BusinessLocationJdbcRepository emptyLocationRepository() {
 		BusinessLocationJdbcRepository repository = Mockito.mock(BusinessLocationJdbcRepository.class);
@@ -160,7 +162,7 @@ class AiAgentCoherenceTest {
 	@Test
 	void nonUsefulMessageDoesNotProduceCommercialResponse() {
 		AgentCoordinatorService coordinator = new AgentCoordinatorService(enabledProperties(), detector, extractor,
-				registry, new InMemoryAiAgentRepository());
+				registry, new InMemoryAiAgentRepository(), businessAiSettingsService);
 
 		assertThat(coordinator.preview(request(""))).isEmpty();
 		assertThat(coordinator.preview(request("Mensaje recibido sin texto"))).isEmpty();
@@ -170,7 +172,7 @@ class AiAgentCoherenceTest {
 	void contextAwareBookingKeepsPreviousDataAcrossTurns() {
 		InMemoryAiAgentRepository repository = new InMemoryAiAgentRepository();
 		AgentCoordinatorService coordinator = new AgentCoordinatorService(enabledProperties(), detector, extractor,
-				registry, repository);
+				registry, repository, businessAiSettingsService);
 
 		AgentRoutingResult first = coordinator.route(request("Quiero agendar depilacion bozo")).orElseThrow();
 		assertThat(first.missingData()).contains("sucursal");
