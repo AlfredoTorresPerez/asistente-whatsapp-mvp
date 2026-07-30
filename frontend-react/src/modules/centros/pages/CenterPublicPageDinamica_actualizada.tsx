@@ -248,7 +248,7 @@ export function CenterPublicPageDinamica({ slug: slugProp }: { slug?: string } =
               aria-label={`Abrir conversación de WhatsApp con ${company.name}`}
             >
               <WhatsAppIcon className="h-4 w-4" />
-              Reservar por WhatsApp
+              Escríbenos ahora
             </button>
           </nav>
 
@@ -313,7 +313,7 @@ export function CenterPublicPageDinamica({ slug: slugProp }: { slug?: string } =
                 className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#20BD5A]"
               >
                 <WhatsAppIcon className="h-4 w-4" />
-                Reservar por WhatsApp
+                Escríbenos ahora
               </button>
             </div>
           </nav>
@@ -585,12 +585,12 @@ export function CenterPublicPageDinamica({ slug: slugProp }: { slug?: string } =
                 style={{ background: `linear-gradient(135deg, ${primary}, ${secondary})` }}
               >
                 <div className="flex flex-col md:flex-row">
-                  <div className="aspect-[4/3] md:aspect-auto md:w-2/5">
+                  <div className="min-h-[280px] md:w-2/5">
                     <LandingImage
                       src={STATIC_IMAGES.promotionPortrait}
                       fallbackSrc={DEFAULT_LANDING_IMAGE}
                       alt=""
-                      className="pointer-events-none h-full w-full"
+                      className="pointer-events-none h-full w-full object-[center_30%]"
                       width={576}
                       height={500}
                       objectFit="cover"
@@ -699,19 +699,7 @@ export function CenterPublicPageDinamica({ slug: slugProp }: { slug?: string } =
               className="overflow-hidden rounded-[2rem] shadow-sm"
               style={{ background: 'linear-gradient(135deg, #fdf2f8, #fff1f2)' }}
             >
-              <div className="flex flex-col md:flex-row md:items-center">
-                <div className="aspect-[4/3] md:aspect-auto md:w-2/5">
-                  <LandingImage
-                    src={STATIC_IMAGES.callToActionReception}
-                    fallbackSrc={DEFAULT_LANDING_IMAGE}
-                    alt=""
-                    className="pointer-events-none h-full w-full"
-                    width={644}
-                    height={324}
-                    objectFit="cover"
-                  />
-                </div>
-                <div className="flex flex-1 flex-col items-center px-6 py-8 text-center md:items-start md:px-10 md:text-left">
+              <div className="flex flex-col items-center px-6 py-10 text-center md:px-10">
                   <h2 className="text-2xl font-bold text-gray-900 md:text-3xl">
                     ¿Lista para tu mejor versión?
                   </h2>
@@ -737,7 +725,6 @@ export function CenterPublicPageDinamica({ slug: slugProp }: { slug?: string } =
                     </button>
                   </div>
                 </div>
-              </div>
             </div>
           </div>
         </section>
@@ -857,14 +844,16 @@ export function CenterPublicPageDinamica({ slug: slugProp }: { slug?: string } =
               </div>
 
               <div className="overflow-hidden rounded-2xl shadow-sm">
-                <LandingImage
-                  src={STATIC_IMAGES.map}
-                  fallbackSrc={DEFAULT_LANDING_IMAGE}
-                  alt={`Mapa de ubicación de ${company.name}`}
-                  className="w-full"
-                  width={340}
-                  height={250}
-                  objectFit="cover"
+                <iframe
+                  title={`Ubicación de ${company.name}`}
+                  src="https://www.openstreetmap.org/export/embed.html?bbox=-70.6145%2C-33.4265%2C-70.6075%2C-33.4215&amp;layer=mapnik&amp;marker=-33.4240%2C-70.6110"
+                  width="100%"
+                  height="300"
+                  className="block w-full"
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                  style={{ border: 0 }}
+                  allowFullScreen
                 />
               </div>
             </div>
@@ -965,7 +954,7 @@ export function CenterPublicPageDinamica({ slug: slugProp }: { slug?: string } =
           src={STATIC_IMAGES.whatsappFloating}
           alt=""
           aria-hidden="true"
-          className="h-full w-full rounded-full object-contain"
+          className="h-14 w-14 object-contain"
         />
       </button>
     </div>
