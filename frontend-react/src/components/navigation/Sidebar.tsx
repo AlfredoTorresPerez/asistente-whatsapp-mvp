@@ -1,5 +1,11 @@
-import { NavLink } from 'react-router-dom'
-import { PRIMARY_NAV_ITEMS, canAccessNavigationItem } from '../../lib/navigation'
+import { useCallback, useMemo, useState } from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
+import {
+  ADMIN_SUBMENU_ITEMS,
+  PRIMARY_NAV_ITEMS,
+  canAccessNavigationItem,
+  isAdminSubmenuPath,
+} from '../../lib/navigation'
 import { AppLogo } from '../ui/AppLogo'
 
 type SidebarProps = {
@@ -11,6 +17,12 @@ type SidebarProps = {
   onLogout: () => void
 }
 
+const ADMIN_PARENT_PATH = '/admin'
+
+function getAdminItem() {
+  return PRIMARY_NAV_ITEMS.find((item) => item.path === ADMIN_PARENT_PATH) ?? null
+}
+
 export function Sidebar({
   businessName,
   onClose,
@@ -19,9 +31,34 @@ export function Sidebar({
   permissions,
   role,
 }: SidebarProps) {
-  const visibleNavigationItems = PRIMARY_NAV_ITEMS.filter((item) =>
-    canAccessNavigationItem(item, role, permissions),
+  const location = useLocation()
+  const isInsideAdmin = isAdminSubmenuPath(location.pathname)
+  const [adminExpanded, setAdminExpanded] = useState(isInsideAdmin)
+
+  const visibleNavigationItems = useMemo(
+    () =>
+      PRIMARY_NAV_ITEMS.filter((item) => canAccessNavigationItem(item, role, permissions)),
+    [role, permissions],
   )
+
+  const adminItem = getAdminItem()
+  const canSeeAdmin = adminItem && canAccessNavigationItem(adminItem, role, permissions)
+
+  const visibleAdminChildren = useMemo(
+    () =>
+      canSeeAdmin
+        ? ADMIN_SUBMENU_ITEMS.filter((item) => canAccessNavigationItem(item, role, permissions))
+        : [],
+    [canSeeAdmin, role, permissions],
+  )
+
+  if (!adminExpanded && isInsideAdmin) {
+    setAdminExpanded(true)
+  }
+
+  const handleToggleAdmin = useCallback(() => {
+    setAdminExpanded((prev) => !prev)
+  }, [])
 
   return (
     <>
@@ -55,27 +92,83 @@ export function Sidebar({
         </div>
 
         <nav className="app-sidebar-nav mt-5 flex min-h-0 flex-1 flex-col gap-1 overflow-hidden lg:mt-4">
-          {visibleNavigationItems.map((item) => (
-            <NavLink
-              key={item.path}
-              end={item.path === '/admin'}
-              onClick={onClose}
-              to={item.path}
-              className={({ isActive }) =>
-                [
-                  'group flex min-h-0 items-center gap-2 rounded-[14px] px-2.5 py-1.5 text-[13px] font-medium leading-tight transition lg:gap-1.5 lg:px-2 lg:text-[12px]',
-                  isActive
-                    ? 'bg-[#3D4BFF] text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]'
-                    : 'text-white/82 hover:bg-white/8 hover:text-white',
-                ].join(' ')
-              }
-            >
-              <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white/6 text-white/90 group-[.active]:bg-white/12">
-                <NavIcon path={item.path} />
-              </span>
-              <span>{item.label}</span>
-            </NavLink>
-          ))}
+          {visibleNavigationItems.map((item) => {
+            if (item.path === ADMIN_PARENT_PATH && canSeeAdmin) {
+              return (
+                <div key={item.path}>
+                  <button
+                    aria-expanded={adminExpanded}
+                    className={[
+                      'group flex w-full min-h-0 items-center gap-2 rounded-[14px] px-2.5 py-1.5 text-[13px] font-medium leading-tight transition lg:gap-1.5 lg:px-2 lg:text-[12px]',
+                      isInsideAdmin
+                        ? 'bg-[#3D4BFF] text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]'
+                        : 'text-white/82 hover:bg-white/8 hover:text-white',
+                    ].join(' ')}
+                    onClick={handleToggleAdmin}
+                    type="button"
+                  >
+                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white/6 text-white/90 group-[.active]:bg-white/12">
+                      <AdminIcon />
+                    </span>
+                    <span className="flex-1 text-left">Administración</span>
+                    <ChevronIcon expanded={adminExpanded} />
+                  </button>
+
+                  <div
+                    className={[
+                      'grid transition-all duration-300 ease-in-out',
+                      adminExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0',
+                    ].join(' ')}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="ml-6 mt-1 flex flex-col gap-0.5 border-l border-white/12 pl-2 lg:ml-4 lg:pl-1.5">
+                        {visibleAdminChildren.map((child) => (
+                          <NavLink
+                            key={child.path}
+                            end
+                            onClick={onClose}
+                            to={child.path}
+                            className={({ isActive }) =>
+                              [
+                                'block rounded-[10px] px-2 py-1 text-[12px] font-medium leading-tight transition lg:text-[11px]',
+                                isActive
+                                  ? 'bg-white/12 text-white'
+                                  : 'text-white/70 hover:bg-white/8 hover:text-white',
+                              ].join(' ')
+                            }
+                          >
+                            {child.label}
+                          </NavLink>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            }
+
+            return (
+              <NavLink
+                key={item.path}
+                end={item.path === '/admin'}
+                onClick={onClose}
+                to={item.path}
+                className={({ isActive }) =>
+                  [
+                    'group flex min-h-0 items-center gap-2 rounded-[14px] px-2.5 py-1.5 text-[13px] font-medium leading-tight transition lg:gap-1.5 lg:px-2 lg:text-[12px]',
+                    isActive
+                      ? 'bg-[#3D4BFF] text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]'
+                      : 'text-white/82 hover:bg-white/8 hover:text-white',
+                  ].join(' ')
+                }
+              >
+                <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white/6 text-white/90 group-[.active]:bg-white/12">
+                  <NavIcon path={item.path} />
+                </span>
+                <span>{item.label}</span>
+              </NavLink>
+            )
+          })}
         </nav>
 
         <div className="app-sidebar-footer mt-3 shrink-0 space-y-2">
@@ -123,6 +216,54 @@ export function Sidebar({
         </div>
       </aside>
     </>
+  )
+}
+
+function ChevronIcon({ expanded }: { expanded: boolean }) {
+  return (
+    <svg
+      className={[
+        'h-3.5 w-3.5 text-white/60 transition-transform duration-200',
+        expanded ? 'rotate-180' : '',
+      ].join(' ')}
+      fill="none"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M6 9L12 15L18 9"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+      />
+    </svg>
+  )
+}
+
+function AdminIcon() {
+  return (
+    <svg
+      className="h-4 w-4"
+      fill="none"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M4 21C4 17.13 7.58 14 12 14C13.65 14 15.22 14.41 16.56 15.14"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.8"
+      />
+      <circle cx="19" cy="18" r="3" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M19 17V19" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
+      <path d="M18 18H20" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
+    </svg>
   )
 }
 
@@ -199,20 +340,6 @@ function NavIcon({ path }: { path: string }) {
           <path d="M16 4V8" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
         </svg>
       )
-    case '/orders':
-      return (
-        <svg {...iconProps}>
-          <path
-            d="M7 7H19L17.5 13H9L7 5H5"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.8"
-          />
-          <circle cx="10" cy="18" fill="currentColor" r="1.2" />
-          <circle cx="17" cy="18" fill="currentColor" r="1.2" />
-        </svg>
-      )
     case '/catalog':
       return (
         <svg {...iconProps}>
@@ -233,26 +360,20 @@ function NavIcon({ path }: { path: string }) {
           <path d="M18 18V13" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
         </svg>
       )
-    case '/admin/locations':
+    case '/admin/professionals':
       return (
         <svg {...iconProps}>
           <path
-            d="M5 20V8.5L12 4L19 8.5V20"
+            d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12Z"
             stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
             strokeWidth="1.8"
           />
           <path
-            d="M9 20V13H15V20"
+            d="M5 19C5 16.79 8.13 15 12 15C15.87 15 19 16.79 19 19"
             stroke="currentColor"
             strokeLinecap="round"
-            strokeLinejoin="round"
             strokeWidth="1.8"
           />
-          <path d="M9 9.5H9.01" stroke="currentColor" strokeLinecap="round" strokeWidth="2.4" />
-          <path d="M12 9.5H12.01" stroke="currentColor" strokeLinecap="round" strokeWidth="2.4" />
-          <path d="M15 9.5H15.01" stroke="currentColor" strokeLinecap="round" strokeWidth="2.4" />
         </svg>
       )
     case '/configuration':

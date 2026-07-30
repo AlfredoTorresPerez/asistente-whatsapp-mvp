@@ -4,6 +4,7 @@ export type NavigationItem = {
   description: string
   allowedRoles?: string[]
   allowedPermissions?: string[]
+  children?: NavigationItem[]
 }
 
 export type RouteMeta = {
@@ -12,6 +13,70 @@ export type RouteMeta = {
   path?: string
   matcher?: RegExp
 }
+
+export const ADMIN_SUBMENU_ITEMS: NavigationItem[] = [
+  {
+    label: 'Empresa',
+    path: '/admin/company',
+    description: 'Configuración de la empresa.',
+    allowedRoles: ['OWNER', 'ADMIN'],
+  },
+  {
+    label: 'Sucursales',
+    path: '/admin/branches',
+    description: 'Administra sucursales del negocio.',
+    allowedRoles: ['OWNER', 'ADMIN'],
+  },
+  {
+    label: 'Cabinas',
+    path: '/admin/rooms',
+    description: 'Gestiona cabinas, salas y recursos por sede.',
+    allowedRoles: ['OWNER', 'ADMIN'],
+  },
+  {
+    label: 'Servicios',
+    path: '/admin/services',
+    description: 'Servicios del catálogo comercial.',
+    allowedRoles: ['OWNER', 'ADMIN'],
+  },
+  {
+    label: 'Asignaciones',
+    path: '/admin/assignments',
+    description: 'Asigna profesionales y cabinas a servicios.',
+    allowedRoles: ['OWNER', 'ADMIN'],
+  },
+  {
+    label: 'MultiSede',
+    path: '/admin/multisite',
+    description: 'Disponibilidad, stock, profesionales, permisos y canales por sede.',
+    allowedRoles: ['OWNER', 'ADMIN'],
+  },
+  {
+    label: 'WhatsApp Web',
+    path: '/admin/whatsapp-web',
+    description: 'Conexion y estado de WhatsApp Web.',
+    allowedRoles: ['OWNER', 'ADMIN'],
+  },
+  {
+    label: 'Usuarios y Roles',
+    path: '/admin/users',
+    description: 'Listado de usuarios, filtros y resumen de roles disponibles.',
+    allowedRoles: ['OWNER', 'ADMIN'],
+  },
+  {
+    label: 'Seguridad',
+    path: '/admin/security',
+    description: 'Políticas de contraseña, sesión y bloqueo del negocio.',
+    allowedRoles: ['OWNER', 'ADMIN'],
+  },
+  {
+    label: 'Profesionales',
+    path: '/admin/professionals',
+    description: 'Gestiona profesionales, especialidades, contacto y sedes.',
+    allowedRoles: ['OWNER', 'ADMIN'],
+    allowedPermissions: ['PROFESSIONAL_VIEW'],
+  },
+]
 
 export const PRIMARY_NAV_ITEMS: NavigationItem[] = [
   {
@@ -62,46 +127,11 @@ export const PRIMARY_NAV_ITEMS: NavigationItem[] = [
     allowedRoles: ['OWNER', 'ADMIN'],
   },
   {
-    label: 'Sedes',
-    path: '/admin/locations',
-    description: 'Administra sucursales, dirección, teléfono, WhatsApp y operación multisede.',
-    allowedRoles: ['OWNER', 'ADMIN'],
-  },
-  {
-    label: 'Multi sede',
-    path: '/admin/multisite',
-    description: 'Disponibilidad, stock, profesionales, permisos y canales por sede.',
-    allowedRoles: ['OWNER', 'ADMIN'],
-  },
-  {
-    label: 'Profesionales',
-    path: '/admin/professionals',
-    description: 'Gestiona profesionales, especialidades, contacto y sedes.',
-    allowedPermissions: ['PROFESSIONAL_VIEW'],
-  },
-  {
-    label: 'Cabinas',
-    path: '/admin/rooms',
-    description: 'Gestiona cabinas, salas y recursos por sede.',
-    allowedPermissions: ['ROOM_VIEW'],
-  },
-  {
-    label: 'Asignaciones',
-    path: '/admin/assignments',
-    description: 'Asigna profesionales y cabinas a servicios.',
-    allowedPermissions: ['ASSIGNMENT_VIEW'],
-  },
-  {
     label: 'Administración',
     path: '/admin',
-    description: 'Empresa, usuarios, seguridad y WhatsApp Web.',
+    description: 'Empresa, sucursales, cabinas, servicios, asignaciones, multisede, WhatsApp Web, usuarios, seguridad y profesionales.',
     allowedRoles: ['OWNER', 'ADMIN'],
-  },
-  {
-    label: 'Configuración',
-    path: '/configuration',
-    description: 'Conexión, dispositivos, QR y preferencias de WhatsApp Web.',
-    allowedRoles: ['OWNER', 'ADMIN', 'SUPERVISOR'],
+    children: ADMIN_SUBMENU_ITEMS,
   },
   {
     label: 'Simulador',
@@ -374,13 +404,39 @@ const ROUTE_METADATA: RouteMeta[] = [
     title: 'Administración',
     description: 'Resumen de empresa, usuarios, seguridad y estado del canal.',
   },
+  {
+    path: '/admin/branches',
+    title: 'Sucursales',
+    description: 'Administración de sucursales del negocio.',
+  },
+  {
+    path: '/admin/services',
+    title: 'Servicios',
+    description: 'Servicios del catálogo comercial.',
+  },
 ]
 
 export function findNavigationItem(pathname: string) {
-  return (
-    PRIMARY_NAV_ITEMS.find(
-      (item) => pathname === item.path || pathname.startsWith(`${item.path}/`),
-    ) ?? null
+  const item = PRIMARY_NAV_ITEMS.find(
+    (item) => pathname === item.path || pathname.startsWith(`${item.path}/`),
+  )
+  if (item) return item
+
+  for (const parent of PRIMARY_NAV_ITEMS) {
+    if (parent.children) {
+      const child = parent.children.find(
+        (child) => pathname === child.path || pathname.startsWith(`${child.path}/`),
+      )
+      if (child) return child
+    }
+  }
+
+  return null
+}
+
+export function isAdminSubmenuPath(pathname: string) {
+  return ADMIN_SUBMENU_ITEMS.some(
+    (item) => pathname === item.path || pathname.startsWith(`${item.path}/`),
   )
 }
 

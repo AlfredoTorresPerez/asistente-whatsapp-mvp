@@ -1,5 +1,5 @@
 import type { RouteObject } from 'react-router-dom'
-import { Navigate, createBrowserRouter } from 'react-router-dom'
+import { Navigate, createBrowserRouter, useParams } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import {
   AdminAssignmentsPage,
@@ -10,6 +10,7 @@ import {
   AdminRoomFormPage,
   AdminRoomsPage,
   AdminSecurityPage,
+  AdminServicesPage,
   AdminUserFormPage,
   AdminUsersPage,
   AdministrationPage,
@@ -63,12 +64,13 @@ import {
   AutomationRulesPage,
 } from '../modules/rules'
 import { ReportsPage } from '../modules/reports'
-import { LandingPage } from '../modules/landing/pages/LandingPage'
 import { BeautyCenterLandingPage } from '../modules/centros/pages/BeautyCenterLandingPage'
 import { CenterPublicPage } from '../modules/centros/pages/CenterPublicPage'
+import { CenterPublicPageDinamica } from '../modules/centros/pages/CenterPublicPageDinamica_actualizada'
 import { CenterWhatsAppRedirect } from '../modules/centros/pages/CenterWhatsAppRedirect'
 
 import { PrivateRouteShell, PublicRouteShell } from './RouteShells'
+import { RequireRole } from './RequireRole'
 import { useShellSession } from '../lib/shellSession'
 
 export const appRoutes: RouteObject[] = [
@@ -83,7 +85,7 @@ export const appRoutes: RouteObject[] = [
   { path: '/centros/:slug', element: <CenterPublicPage /> },
   { path: '/centros/:slug/whatsapp', element: <CenterWhatsAppRedirect /> },
 
-  { path: '/', element: <LandingPage /> },
+  { path: '/', element: <LandingPageWrapper /> },
 
   {
     element: <PublicRouteShell />,
@@ -347,145 +349,197 @@ export const appRoutes: RouteObject[] = [
       {
         path: 'admin',
         element: (
-          <RequirePermission permission="ADMIN_MANAGE">
-            <AdministrationPage />
-          </RequirePermission>
+          <RequireRole allowedRoles={['OWNER', 'ADMIN']}>
+            <RequirePermission permission="ADMIN_MANAGE">
+              <AdministrationPage />
+            </RequirePermission>
+          </RequireRole>
         ),
       },
       {
         path: 'admin/company',
         element: (
-          <RequirePermission permission="LOCATIONS_MANAGE">
-            <CompanySettingsPage />
-          </RequirePermission>
+          <RequireRole allowedRoles={['OWNER', 'ADMIN']}>
+            <RequirePermission permission="LOCATIONS_MANAGE">
+              <CompanySettingsPage />
+            </RequirePermission>
+          </RequireRole>
         ),
       },
       {
         path: 'admin/locations',
         element: (
-          <RequirePermission permission="LOCATIONS_MANAGE">
-            <AdminLocationsPage />
-          </RequirePermission>
+          <RequireRole allowedRoles={['OWNER', 'ADMIN']}>
+            <RequirePermission permission="LOCATIONS_MANAGE">
+              <AdminLocationsPage />
+            </RequirePermission>
+          </RequireRole>
         ),
       },
       {
         path: 'admin/content',
         element: (
-          <RequirePermission permission="CONTENT_VIEW">
-            <AdminContentPage />
-          </RequirePermission>
+          <RequireRole allowedRoles={['OWNER', 'ADMIN']}>
+            <RequirePermission permission="CONTENT_VIEW">
+              <AdminContentPage />
+            </RequirePermission>
+          </RequireRole>
         ),
       },
       {
         path: 'admin/multisite',
         element: (
-          <RequirePermission permission="ADMIN_MANAGE">
-            <MultisiteOperationsPage />
-          </RequirePermission>
+          <RequireRole allowedRoles={['OWNER', 'ADMIN']}>
+            <RequirePermission permission="ADMIN_MANAGE">
+              <MultisiteOperationsPage />
+            </RequirePermission>
+          </RequireRole>
         ),
       },
       {
         path: 'admin/users',
         element: (
-          <RequirePermission permission="USERS_MANAGE">
-            <AdminUsersPage />
-          </RequirePermission>
+          <RequireRole allowedRoles={['OWNER', 'ADMIN']}>
+            <RequirePermission permission="USERS_MANAGE">
+              <AdminUsersPage />
+            </RequirePermission>
+          </RequireRole>
         ),
       },
       {
         path: 'admin/users/new',
         element: (
-          <RequirePermission permission="USERS_MANAGE">
-            <AdminUserFormPage />
-          </RequirePermission>
+          <RequireRole allowedRoles={['OWNER', 'ADMIN']}>
+            <RequirePermission permission="USERS_MANAGE">
+              <AdminUserFormPage />
+            </RequirePermission>
+          </RequireRole>
         ),
       },
       {
         path: 'admin/users/:userId/edit',
         element: (
-          <RequirePermission permission="USERS_MANAGE">
-            <AdminUserFormPage />
-          </RequirePermission>
+          <RequireRole allowedRoles={['OWNER', 'ADMIN']}>
+            <RequirePermission permission="USERS_MANAGE">
+              <AdminUserFormPage />
+            </RequirePermission>
+          </RequireRole>
         ),
       },
       {
         path: 'admin/whatsapp-web',
         element: (
-          <RequirePermission permission="WHATSAPP_CONFIG_MANAGE">
-            <WhatsAppWebConnectionPage />
-          </RequirePermission>
+          <RequireRole allowedRoles={['OWNER', 'ADMIN']}>
+            <RequirePermission permission="WHATSAPP_CONFIG_MANAGE">
+              <WhatsAppWebConnectionPage />
+            </RequirePermission>
+          </RequireRole>
         ),
       },
       {
         path: 'admin/whatsapp-simulator',
         element: (
-          <RequirePermission permission="WHATSAPP_CONFIG_MANAGE">
-            <WhatsAppSimulatorPage />
-          </RequirePermission>
+          <RequireRole allowedRoles={['OWNER', 'ADMIN']}>
+            <RequirePermission permission="WHATSAPP_CONFIG_MANAGE">
+              <WhatsAppSimulatorPage />
+            </RequirePermission>
+          </RequireRole>
         ),
       },
       {
         path: 'admin/security',
         element: (
-          <RequirePermission permission="SECURITY_AUDIT_VIEW">
-            <AdminSecurityPage />
-          </RequirePermission>
+          <RequireRole allowedRoles={['OWNER', 'ADMIN']}>
+            <RequirePermission permission="SECURITY_AUDIT_VIEW">
+              <AdminSecurityPage />
+            </RequirePermission>
+          </RequireRole>
         ),
       },
       {
         path: 'admin/professionals',
         element: (
-          <RequirePermission permission="PROFESSIONAL_VIEW">
-            <AdminProfessionalsPage />
-          </RequirePermission>
+          <RequireRole allowedRoles={['OWNER', 'ADMIN']}>
+            <RequirePermission permission="PROFESSIONAL_VIEW">
+              <AdminProfessionalsPage />
+            </RequirePermission>
+          </RequireRole>
         ),
       },
       {
         path: 'admin/professionals/new',
         element: (
-          <RequirePermission permission="PROFESSIONAL_MANAGE">
-            <AdminProfessionalFormPage />
-          </RequirePermission>
+          <RequireRole allowedRoles={['OWNER', 'ADMIN']}>
+            <RequirePermission permission="PROFESSIONAL_MANAGE">
+              <AdminProfessionalFormPage />
+            </RequirePermission>
+          </RequireRole>
         ),
       },
       {
         path: 'admin/professionals/:professionalId/edit',
         element: (
-          <RequirePermission permission="PROFESSIONAL_MANAGE">
-            <AdminProfessionalFormPage />
-          </RequirePermission>
+          <RequireRole allowedRoles={['OWNER', 'ADMIN']}>
+            <RequirePermission permission="PROFESSIONAL_MANAGE">
+              <AdminProfessionalFormPage />
+            </RequirePermission>
+          </RequireRole>
         ),
       },
       {
         path: 'admin/rooms',
         element: (
-          <RequirePermission permission="ROOM_VIEW">
-            <AdminRoomsPage />
-          </RequirePermission>
+          <RequireRole allowedRoles={['OWNER', 'ADMIN']}>
+            <RequirePermission permission="ROOM_VIEW">
+              <AdminRoomsPage />
+            </RequirePermission>
+          </RequireRole>
         ),
       },
       {
         path: 'admin/rooms/new',
         element: (
-          <RequirePermission permission="ROOM_MANAGE">
-            <AdminRoomFormPage />
-          </RequirePermission>
+          <RequireRole allowedRoles={['OWNER', 'ADMIN']}>
+            <RequirePermission permission="ROOM_MANAGE">
+              <AdminRoomFormPage />
+            </RequirePermission>
+          </RequireRole>
         ),
       },
       {
         path: 'admin/rooms/:roomId/edit',
         element: (
-          <RequirePermission permission="ROOM_MANAGE">
-            <AdminRoomFormPage />
-          </RequirePermission>
+          <RequireRole allowedRoles={['OWNER', 'ADMIN']}>
+            <RequirePermission permission="ROOM_MANAGE">
+              <AdminRoomFormPage />
+            </RequirePermission>
+          </RequireRole>
+        ),
+      },
+      {
+        path: 'admin/branches',
+        element: (
+          <RequireRole allowedRoles={['OWNER', 'ADMIN']}>
+            <AdminLocationsPage />
+          </RequireRole>
+        ),
+      },
+      {
+        path: 'admin/services',
+        element: (
+          <RequireRole allowedRoles={['OWNER', 'ADMIN']}>
+            <AdminServicesPage />
+          </RequireRole>
         ),
       },
       {
         path: 'admin/assignments',
         element: (
-          <RequirePermission permission="ASSIGNMENT_VIEW">
-            <AdminAssignmentsPage />
-          </RequirePermission>
+          <RequireRole allowedRoles={['OWNER', 'ADMIN']}>
+            <RequirePermission permission="ASSIGNMENT_VIEW">
+              <AdminAssignmentsPage />
+            </RequirePermission>
+          </RequireRole>
         ),
       },
     ],
@@ -523,4 +577,8 @@ function RequireAnyPermission({
   }
 
   return children
+}
+
+function LandingPageWrapper() {
+  return <CenterPublicPageDinamica />
 }

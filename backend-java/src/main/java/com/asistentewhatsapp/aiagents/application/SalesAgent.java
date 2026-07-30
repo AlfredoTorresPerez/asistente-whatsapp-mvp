@@ -47,6 +47,11 @@ public class SalesAgent extends AbstractAgentHandler {
 		}
 
 		if (primaryIntent == AgentIntent.PRICE_REQUEST) {
+			String categoryPrices = knowledgeService.categoryPriceResponse(request.businessId(), request.messageBody());
+			if (!categoryPrices.isBlank()) {
+				return result(request, intent, type(), entities, missing("servicio_o_producto_especifico"),
+						categoryPrices, false, null);
+			}
 			return knowledgeService.findService(request.businessId(), service)
 					.map(catalogService -> result(request, intent, type(), entities, List.<String>of(),
 							knowledgeService.servicePriceResponse(request.businessId(), catalogService), false, null))

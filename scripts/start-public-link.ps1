@@ -75,6 +75,15 @@ function Update-EnvValue {
 
 Assert-Command "docker"
 
+$RestoreScript = Join-Path $PSScriptRoot "restore-local-secrets.ps1"
+if (Test-Path $RestoreScript) {
+  Write-Step "Paso 0/5: Restaurando secretos desde Windows Credential Manager..."
+  & $RestoreScript
+  if ($LASTEXITCODE -ne 0) {
+    Write-Warning "Algunos secretos no estan en Credential Manager."
+  }
+}
+
 Write-Step "Paso 1/5: Levantando servicios locales..."
 docker compose --env-file "$EnvFile" -f $ComposeFile up -d --build
 if ($LASTEXITCODE -ne 0) { Stop-WithError "docker compose up fallo" }
@@ -109,6 +118,31 @@ Write-Step "Paso 5/5: Recreando backend y frontend con la nueva URL..."
 docker compose --env-file "$EnvFile" -f $ComposeFile up -d --force-recreate backend-java frontend-react
 if ($LASTEXITCODE -ne 0) { Stop-WithError "No se pudo recrear servicios" }
 
+Write-Step "Paso 6/6: Actualizando webhook en Meta Cloud API..."
+$webhookUrl = "$publicUrl/api/v1/integrations/whatsapp-cloud/webhook"
+$verifyToken = (Select-String -Path $EnvFile -Pattern "^APP_WHATSAPP_CLOUD_API_WEBHOOK_VERIFY_TOKEN=(.*)$" | ForEach-Object { $_.Matches.Groups[1].Value })
+$appSecret = Get-LocalSecret -Name "WHATSAPP_APP_SECRET"
+$appId = (Select-String -Path $EnvFile -Pattern "^APP_WHATSAPP_CLOUD_API_APP_ID=(.*)$" | ForEach-Object { $_.Matches.Groups[1].Value })
+if ($appSecret -and $appId -and $verifyToken) {
+  try {
+    $tokenResp = curl.exe -s -X GET "https://graph.facebook.com/v23.0/oauth/access_token?client_id=$appId&client_secret=$appSecret&grant_type=client_credentials" | ConvertFrom-Json
+    if ($tokenResp.access_token) {
+      $subResp = curl.exe -s -X POST "https://graph.facebook.com/v23.0/$appId/subscriptions" -d "access_token=$($tokenResp.access_token)&object=whatsapp_business_account&callback_url=$webhookUrl&verify_token=$verifyToken&fields=messages" | ConvertFrom-Json
+      if ($subResp.success) {
+        Write-Host "  Webhook Meta actualizado: $webhookUrl" -ForegroundColor Green
+      } else {
+        Write-Warning "  No se pudo actualizar webhook en Meta: $($subResp.error.message)"
+      }
+    } else {
+      Write-Warning "  No se pudo obtener token de app"
+    }
+  } catch {
+    Write-Warning "  Error al actualizar webhook en Meta: $_"
+  }
+} else {
+  Write-Warning "  Faltan datos para actualizar webhook (appSecret, appId o verifyToken)"
+}
+
 Write-Host ""
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host "  TUNEL PUBLICO ACTIVO" -ForegroundColor Green
@@ -117,7 +151,7 @@ Write-Host "  URL:     $publicUrl" -ForegroundColor Green
 Write-Host "  Frontend: $publicUrl" -ForegroundColor Green
 Write-Host "  API:     $publicUrl/api/v1/..." -ForegroundColor Green
 Write-Host "  Health:  $publicUrl/api/v1/health" -ForegroundColor Green
-Write-Host "  Webhook: $publicUrl/api/v1/integrations/whatsapp-cloud/webhook" -ForegroundColor Green
+Write-Host "  Webhook: $webhookUrl (registrado en Meta)" -ForegroundColor Green
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "ADVERTENCIA: Esta URL es TEMPORAL." -ForegroundColor Yellow

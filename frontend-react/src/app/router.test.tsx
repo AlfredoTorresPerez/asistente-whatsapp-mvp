@@ -75,6 +75,79 @@ function buildDashboardSummaryResponse() {
   }
 }
 
+function setupMockFetch(role: string, userId: string, userName: string, email: string) {
+  const fetchMock = vi.mocked(fetch)
+  fetchMock.mockImplementation(async (input, init) => {
+    const url = resolveRequestUrl(input as Request | string | URL)
+
+    if (url.endsWith('/auth/me')) {
+      return jsonResponse({
+        id: userId,
+        firstName: userName.split(' ')[0],
+        lastName: userName.split(' ').slice(1).join(' '),
+        email,
+        role,
+        businessId: '11111111-1111-1111-1111-111111111111',
+        businessName: 'Centro Estetico Bella',
+        timezone: 'America/Santiago',
+      })
+    }
+
+    if (url.endsWith('/users/me')) {
+      return jsonResponse({
+        id: userId,
+        firstName: userName.split(' ')[0],
+        lastName: userName.split(' ').slice(1).join(' '),
+        email,
+        phone: '+56955550101',
+        timezone: 'America/Santiago',
+        role,
+        businessName: 'Centro Estetico Bella',
+      })
+    }
+
+    if (url.includes('/notifications?') && url.includes('status=UNREAD')) {
+      return jsonResponse({
+        items: [],
+        page: 0,
+        size: 1,
+        totalItems: 0,
+        totalPages: 0,
+      })
+    }
+
+    if (url.includes('/dashboard/summary')) {
+      return jsonResponse(buildDashboardSummaryResponse())
+    }
+
+    if (url.endsWith('/auth/logout') && init?.method === 'POST') {
+      return jsonResponse({ status: 'LOGGED_OUT' })
+    }
+
+    throw new Error(`Unhandled fetch: ${String(init?.method ?? 'GET')} ${url}`)
+  })
+}
+
+function buildSession(role: string, userId: string, userName: string, email: string) {
+  return JSON.stringify({
+    accessToken: 'jwt-demo-token',
+    expiresAt: new Date(Date.now() + 900_000).toISOString(),
+    user: {
+      id: userId,
+      name: userName,
+      firstName: userName.split(' ')[0],
+      lastName: userName.split(' ').slice(1).join(' '),
+      email,
+      role,
+      businessId: '11111111-1111-1111-1111-111111111111',
+      businessName: 'Centro Estetico Bella',
+      timezone: 'America/Santiago',
+      phone: '+56955550101',
+      permissions: [],
+    },
+  })
+}
+
 describe('app shell router', () => {
   beforeEach(() => {
     window.sessionStorage.clear()
@@ -85,7 +158,125 @@ describe('app shell router', () => {
     vi.unstubAllGlobals()
   })
 
-  it('redirects private routes to login when there is no local shell session', async () => {
+  it('Caso 6: redirects unauthenticated users to login', async () => {
+    const router = createMemoryRouter(appRoutes, {
+      initialEntries: ['/admin'],
+    })
+
+    render(
+      <AppProviders>
+        <RouterProvider router={router} />
+      </AppProviders>,
+    )
+
+    expect(await screen.findByRole('heading', { name: 'Iniciar sesion' })).toBeInTheDocument()
+  })
+
+  it('Caso 1: OWNER can see admin menu items and navigate to them', async () => {
+    window.sessionStorage.setItem(
+      SHELL_SESSION_STORAGE_KEY,
+      buildSession('OWNER', 'u1', 'Dueno Test', 'owner@demo.cl'),
+    )
+    setupMockFetch('OWNER', 'u1', 'Dueno Test', 'owner@demo.cl')
+
+    const router = createMemoryRouter(appRoutes, {
+      initialEntries: ['/admin'],
+    })
+
+    render(
+      <AppProviders>
+        <RouterProvider router={router} />
+      </AppProviders>,
+    )
+
+    expect(await screen.findByText('Conversaciones abiertas')).toBeInTheDocument()
+    expect(screen.getByText('Administración')).toBeInTheDocument()
+    expect(screen.getByText('Empresa')).toBeInTheDocument()
+    expect(screen.getByText('Sucursales')).toBeInTheDocument()
+    expect(screen.getByText('Cabinas')).toBeInTheDocument()
+    expect(screen.getByText('Servicios')).toBeInTheDocument()
+    expect(screen.getByText('Asignaciones')).toBeInTheDocument()
+    expect(screen.getByText('Sedes')).toBeInTheDocument()
+    expect(screen.getByText('MultiSede')).toBeInTheDocument()
+    expect(screen.getByText('WhatsApp Web')).toBeInTheDocument()
+    expect(screen.getByText('Usuarios y Roles')).toBeInTheDocument()
+    expect(screen.getByText('Seguridad')).toBeInTheDocument()
+    expect(screen.getByText('Imágenes')).toBeInTheDocument()
+  })
+
+  it('Caso 2: ADMIN can see admin menu items', async () => {
+    window.sessionStorage.setItem(
+      SHELL_SESSION_STORAGE_KEY,
+      buildSession('ADMIN', 'u2', 'Admin Test', 'admin@demo.cl'),
+    )
+    setupMockFetch('ADMIN', 'u2', 'Admin Test', 'admin@demo.cl')
+
+    const router = createMemoryRouter(appRoutes, {
+      initialEntries: ['/admin'],
+    })
+
+    render(
+      <AppProviders>
+        <RouterProvider router={router} />
+      </AppProviders>,
+    )
+
+    expect(await screen.findByText('Conversaciones abiertas')).toBeInTheDocument()
+    expect(screen.getByText('Administración')).toBeInTheDocument()
+    expect(screen.getByText('Empresa')).toBeInTheDocument()
+    expect(screen.getByText('Sucursales')).toBeInTheDocument()
+  })
+
+  it('Caso 3: AGENT cannot see Administracion and is redirected from admin routes', async () => {
+    window.sessionStorage.setItem(
+      SHELL_SESSION_STORAGE_KEY,
+      buildSession('AGENT', 'u3', 'Agente Demo', 'agent@demo.cl'),
+    )
+    setupMockFetch('AGENT', 'u3', 'Agente Demo', 'agent@demo.cl')
+
+    const router = createMemoryRouter(appRoutes, {
+      initialEntries: ['/admin'],
+    })
+
+    render(
+      <AppProviders>
+        <RouterProvider router={router} />
+      </AppProviders>,
+    )
+
+    expect(await screen.findByText('Conversaciones abiertas')).toBeInTheDocument()
+    expect(screen.queryByText('Administración')).not.toBeInTheDocument()
+    expect(screen.queryByText('Empresa')).not.toBeInTheDocument()
+  })
+
+  it('Caso 4: SALES cannot see Administracion and is redirected from admin routes', async () => {
+    window.sessionStorage.setItem(
+      SHELL_SESSION_STORAGE_KEY,
+      buildSession('SALES', 'u4', 'Ventas Test', 'sales@demo.cl'),
+    )
+    setupMockFetch('SALES', 'u4', 'Ventas Test', 'sales@demo.cl')
+
+    const router = createMemoryRouter(appRoutes, {
+      initialEntries: ['/admin'],
+    })
+
+    render(
+      <AppProviders>
+        <RouterProvider router={router} />
+      </AppProviders>,
+    )
+
+    expect(await screen.findByText('Conversaciones abiertas')).toBeInTheDocument()
+    expect(screen.queryByText('Administración')).not.toBeInTheDocument()
+  })
+
+  it('Caso 5: SUPERVISOR cannot see Administracion', async () => {
+    window.sessionStorage.setItem(
+      SHELL_SESSION_STORAGE_KEY,
+      buildSession('SUPERVISOR', 'u5', 'Supervisor Test', 'supervisor@demo.cl'),
+    )
+    setupMockFetch('SUPERVISOR', 'u5', 'Supervisor Test', 'supervisor@demo.cl')
+
     const router = createMemoryRouter(appRoutes, {
       initialEntries: ['/dashboard'],
     })
@@ -96,7 +287,30 @@ describe('app shell router', () => {
       </AppProviders>,
     )
 
-    expect(await screen.findByRole('heading', { name: 'Iniciar sesion' })).toBeInTheDocument()
+    expect(await screen.findByText('Conversaciones abiertas')).toBeInTheDocument()
+    expect(screen.queryByText('Administración')).not.toBeInTheDocument()
+  })
+
+  it('Caso 7: admin route stays expanded on reload for authorized users', async () => {
+    window.sessionStorage.setItem(
+      SHELL_SESSION_STORAGE_KEY,
+      buildSession('OWNER', 'u1', 'Dueno Test', 'owner@demo.cl'),
+    )
+    setupMockFetch('OWNER', 'u1', 'Dueno Test', 'owner@demo.cl')
+
+    const router = createMemoryRouter(appRoutes, {
+      initialEntries: ['/admin/company'],
+    })
+
+    render(
+      <AppProviders>
+        <RouterProvider router={router} />
+      </AppProviders>,
+    )
+
+    expect(await screen.findByText('Configuración de empresa')).toBeInTheDocument()
+    expect(screen.getByText('Administración')).toBeInTheDocument()
+    expect(screen.getByText('Empresa')).toBeInTheDocument()
   })
 
   it('navigates from login to dashboard with a real backend-backed shell session', async () => {
@@ -269,92 +483,5 @@ describe('app shell router', () => {
     await user.click(within(confirmDialog).getByRole('button', { name: 'Cerrar sesion' }))
 
     expect(await screen.findByRole('heading', { name: 'Iniciar sesion' })).toBeInTheDocument()
-  })
-
-  it('hides administrative navigation and redirects direct admin routes for agent users', async () => {
-    const fetchMock = vi.mocked(fetch)
-    window.sessionStorage.setItem(
-      SHELL_SESSION_STORAGE_KEY,
-      JSON.stringify({
-        accessToken: 'jwt-demo-token',
-        expiresAt: new Date(Date.now() + 900_000).toISOString(),
-        user: {
-          id: '40000000-0000-0000-0000-000000000002',
-          name: 'Agente Demo',
-          firstName: 'Agente',
-          lastName: 'Demo',
-          email: 'agent@example.com',
-          role: 'AGENT',
-          businessId: '11111111-1111-1111-1111-111111111111',
-          businessName: 'Centro Estetico Bella',
-          timezone: 'America/Santiago',
-          phone: '+56955550101',
-        },
-      }),
-    )
-
-    fetchMock.mockImplementation(async (input) => {
-      const url = resolveRequestUrl(input as Request | string | URL)
-
-      if (url.endsWith('/auth/me')) {
-        return jsonResponse({
-          id: '40000000-0000-0000-0000-000000000002',
-          firstName: 'Agente',
-          lastName: 'Demo',
-          email: 'agent@example.com',
-          role: 'AGENT',
-          businessId: '11111111-1111-1111-1111-111111111111',
-          businessName: 'Centro Estetico Bella',
-          timezone: 'America/Santiago',
-        })
-      }
-
-      if (url.endsWith('/users/me')) {
-        return jsonResponse({
-          id: '40000000-0000-0000-0000-000000000002',
-          firstName: 'Agente',
-          lastName: 'Demo',
-          email: 'agent@example.com',
-          phone: '+56955550101',
-          timezone: 'America/Santiago',
-          role: 'AGENT',
-          businessName: 'Centro Estetico Bella',
-        })
-      }
-
-      if (url.includes('/notifications?') && url.includes('status=UNREAD')) {
-        return jsonResponse({
-          items: [],
-          page: 0,
-          size: 1,
-          totalItems: 0,
-          totalPages: 0,
-        })
-      }
-
-      if (url.includes('/dashboard/summary')) {
-        return jsonResponse(buildDashboardSummaryResponse())
-      }
-
-      throw new Error(`Unhandled fetch: GET ${url}`)
-    })
-
-    const router = createMemoryRouter(appRoutes, {
-      initialEntries: ['/admin'],
-    })
-
-    render(
-      <AppProviders>
-        <RouterProvider router={router} />
-      </AppProviders>,
-    )
-
-    expect(await screen.findByText('Conversaciones abiertas')).toBeInTheDocument()
-    expect(
-      screen.queryByRole('link', { name: /Administración|Administracion/i }),
-    ).not.toBeInTheDocument()
-    expect(
-      screen.queryByRole('link', { name: /Configuración|Configuracion/i }),
-    ).not.toBeInTheDocument()
   })
 })

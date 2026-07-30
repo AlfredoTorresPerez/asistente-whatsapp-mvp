@@ -39,6 +39,22 @@ public class SupportAgent extends AbstractAgentHandler {
 		}
 
 		String normalizedMessage = TextNormalizer.normalize(request.messageBody());
+		if (containsAny(normalizedMessage, "estacionamiento", "estacionar", "donde estacionar", "llegar en auto",
+				"acceso")) {
+			List<BusinessLocationRecord> locations = businessLocationJdbcRepository.findActive(request.businessId());
+			if (locations.size() == 1) {
+				String name = locations.getFirst().name();
+				return result(request, intent, type(), entities, List.of(),
+						"La información de estacionamiento de " + name
+								+ " depende de la ubicación exacta. Su dirección registrada es:\n"
+								+ locations.getFirst().address() + "\n\n¿Quieres que te ayude con otra cosa?",
+						false, null);
+			}
+			return result(request, intent, type(), entities, missing("sucursal_si_no_fue_indicada"),
+					"¿A qué sucursal te refieres? Para darte información más precisa sobre estacionamiento y acceso.",
+					false, null);
+		}
+
 		if (containsAny(normalizedMessage, "donde queda", "direccion", "ubicacion", "como llego", "sucursal", "sede")) {
 			LocationAnswer locationAnswer = locationResponse(request, normalizedMessage);
 			return result(request, intent, type(), entities,

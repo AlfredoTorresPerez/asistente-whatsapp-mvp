@@ -95,6 +95,22 @@ public class AiBusinessKnowledgeService {
 		return renderRule(businessId, "AI_PRICE_KNOWN_SERVICE_RESPONSE", variables);
 	}
 
+	public String categoryPriceResponse(UUID businessId, String message) {
+		List<ServiceCatalogItem> matching = matchingServicesForMessage(businessId, message);
+		if (matching.size() <= 1) {
+			return "";
+		}
+		StringBuilder sb = new StringBuilder("Estos son los precios disponibles:\n");
+		for (ServiceCatalogItem item : matching) {
+			String price = item.priceBase() == null ? "precio no configurado" : formatMoney(item.priceBase());
+			String duration = item.durationMinutes() == null ? "" : " (" + item.durationMinutes() + " min)";
+			sb.append("• ").append(displayServiceName(item.name())).append(": ").append(price).append(duration)
+					.append("\n");
+		}
+		sb.append("¿Quieres más información de alguno o te ayudo a agendar?");
+		return sb.toString().trim();
+	}
+
 	public String quoteMissingDetailResponse(UUID businessId, String category) {
 		Map<String, String> variables = new LinkedHashMap<>();
 		variables.put("category", category == null || category.isBlank() ? "el servicio" : category);
