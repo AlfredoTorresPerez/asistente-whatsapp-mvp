@@ -73,6 +73,15 @@ public class BookingConfirmationJdbcRepository {
 				.stream().findFirst();
 	}
 
+	public Optional<ConfirmationLinkRecord> findLatestActionableByConversation(UUID businessId, UUID conversationId) {
+		return queryLinks("where l.business_id = :businessId and b.conversation_id = :conversationId "
+				+ "and b.status in ('PENDIENTE_CONFIRMACION', 'CONFIRMED', 'CONFIRMADA', 'RESCHEDULED', 'REPROGRAMADA') "
+				+ "and l.status not in ('EXPIRED') order by b.created_at desc limit 1",
+				new MapSqlParameterSource().addValue("businessId", businessId).addValue("conversationId",
+						conversationId))
+				.stream().findFirst();
+	}
+
 	private List<ConfirmationLinkRecord> queryLinks(String whereClause, MapSqlParameterSource params) {
 		return jdbcTemplate.query("""
 				select l.id as link_id, l.business_id, l.booking_id, l.status as link_status,

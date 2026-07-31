@@ -44,4 +44,11 @@ public final class Permissions {
 	public static final String ROOM_MANAGE = "ROOM_MANAGE";
 	public static final String ASSIGNMENT_VIEW = "ASSIGNMENT_VIEW";
 	public static final String ASSIGNMENT_MANAGE = "ASSIGNMENT_MANAGE";
+
+	public static final String BUSINESS_AI_VIEW = "BUSINESS_AI_VIEW";
+	public static final String BUSINESS_AI_MANAGE = "BUSINESS_AI_MANAGE";
+	public static final String BUSINESS_AI_TEST = "BUSINESS_AI_TEST";
+	public static final String BUSINESS_AI_AUDIT_VIEW = "BUSINESS_AI_AUDIT_VIEW";
+	public static final String BUSINESS_AI_REVIEW = "BUSINESS_AI_REVIEW";
+	public static final String BUSINESS_AI_SEND = "BUSINESS_AI_SEND";
 }

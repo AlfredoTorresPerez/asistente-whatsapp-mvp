@@ -347,6 +347,28 @@ export type AssignmentRequest = {
   roomId?: string | null
 }
 
+export type AssignmentGroupResponse = {
+  serviceId: string
+  serviceName: string
+  serviceCode: string
+  professionals: AssignmentResponse[]
+  rooms: AssignmentResponse[]
+  professionalsCount: number
+  roomsCount: number
+  covered: boolean
+}
+
+export type AssignmentSummaryResponse = {
+  totalServices: number
+  coveredServices: number
+  partialServices: number
+  uncoveredServices: number
+}
+
+export type AssignmentActiveRequest = {
+  active: boolean
+}
+
 export type SecurityPolicyResponse = {
   id: string
   sessionTimeoutMinutes: number
@@ -2149,4 +2171,53 @@ export type UpsertPromptTemplateRequest = {
 
 export type ActivatePromptRequest = {
   promptId: string
+}
+
+export type AgentIntent =
+  | 'GREETING' | 'THANKS_OR_FAREWELL' | 'COMMERCIAL_INQUIRY'
+  | 'SERVICE_INFORMATION' | 'SERVICE_RECOMMENDATION' | 'AVAILABILITY_QUERY'
+  | 'PROFESSIONAL_QUERY' | 'LOCATION_QUERY' | 'BUSINESS_HOURS_QUERY'
+  | 'PRICE_REQUEST' | 'QUOTE_REQUEST' | 'BOOKING_REQUEST'
+  | 'BOOKING_CHANGE' | 'BOOKING_CANCEL' | 'BOOKING_STATUS'
+  | 'PAYMENT_INQUIRY' | 'PAYMENT_PROBLEM' | 'SUPPORT_GENERAL'
+  | 'TECHNICAL_MESSAGE' | 'KNOWLEDGE_QUERY' | 'FOLLOW_UP'
+  | 'COMPLAINT' | 'HUMAN_REQUEST' | 'AMBIGUOUS'
+  | 'COMMERCIAL_AND_BOOKING' | 'WAITLIST_QUERY'
+
+export type AgentType =
+  | 'RECEPTION' | 'SALES' | 'BOOKING' | 'SUPPORT'
+  | 'PAYMENTS' | 'FOLLOW_UP' | 'KNOWLEDGE' | 'HUMAN_HANDOFF'
+
+export type AgentRoutingResult = {
+  businessId: string
+  conversationId: string
+  customerId: string
+  primaryIntent: AgentIntent
+  secondaryIntent: AgentIntent | null
+  agentType: AgentType
+  extractedData: Record<string, string>
+  missingData: string[]
+  urgency: string
+  requiresHuman: boolean
+  handoffReason: string | null
+  responseToCustomer: string
+  confidence: number
+  summaryForHuman: string | null
+}
+
+export type AiPreviewRequest = {
+  message: string
+  conversationId?: string | null
+  channelAccountId?: string | null
+  customerId?: string | null
+  customerPhone?: string | null
+  customerName?: string | null
+  selectedLocationId?: string | null
+  selectedLocationName?: string | null
+}
+
+export type AiPreviewResponse = {
+  result: AgentRoutingResult | null
+  status: string
+  message: string
 }

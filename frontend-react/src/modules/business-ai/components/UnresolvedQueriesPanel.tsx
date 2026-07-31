@@ -1,5 +1,6 @@
 import { Button } from '../../../components/ui/Button'
 import { Card } from '../../../components/ui/Card'
+import type { AestheticIntentLogResponse } from '../../../services/api/types'
 
 type AuditEntry = {
   id: string
@@ -9,6 +10,7 @@ type AuditEntry = {
   updatedAt: string
   description: string
   type: string
+  log?: AestheticIntentLogResponse
 }
 
 type Props = {

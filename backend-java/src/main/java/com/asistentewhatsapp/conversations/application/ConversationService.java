@@ -205,10 +205,10 @@ public class ConversationService {
 						+ detail.locationName() + " messages=" + detail.messages().size() + " "
 						+ LogSanitizer.messageSummary("lastInbound", lastInbound));
 
-		Optional<AgentRoutingResult> routing = agentCoordinatorService
-				.preview(new AgentConversationRequest(authenticatedUser.businessId(), null, detail.id(),
-						detail.customer().id(), detail.customer().phone(), detail.customer().displayName(), lastInbound,
-						OffsetDateTime.now(ZoneOffset.UTC), detail.locationId(), detail.locationName(), traceId, true));
+		Optional<AgentRoutingResult> routing = agentCoordinatorService.preview(new AgentConversationRequest(
+				authenticatedUser.businessId(), null, detail.id(), detail.customer().id(), detail.customer().phone(),
+				detail.customer().displayName(), lastInbound, OffsetDateTime.now(ZoneOffset.UTC), detail.locationId(),
+				detail.locationName(), traceId, true, null));
 
 		if (routing.isPresent() && routing.get().agentType() == AgentType.BOOKING) {
 			AgentRoutingResult result = routing.get();
@@ -566,7 +566,7 @@ public class ConversationService {
 		Optional<AgentRoutingResult> routing = agentCoordinatorService.route(new AgentConversationRequest(
 				authenticatedUser.businessId(), null, detail.id(), detail.customer().id(), detail.customer().phone(),
 				detail.customer().displayName(), lastInbound, OffsetDateTime.now(ZoneOffset.UTC), detail.locationId(),
-				detail.locationName(), traceId, false));
+				detail.locationName(), traceId, false, "REAL_CONVERSATION"));
 
 		if (routing.isEmpty()) {
 			AiTraceLogger.warn("AI_REAL_SEND_RESULT", traceId, detail.id(), null, "ConversationService",

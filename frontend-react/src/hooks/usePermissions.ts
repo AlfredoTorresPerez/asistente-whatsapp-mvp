@@ -6,15 +6,15 @@ export function usePermissions() {
   const permissions = user?.permissions ?? []
 
   const hasPermission = (permission: string): boolean => {
-    return permissions.includes(permission)
+    return permissions.includes('ALL') || permissions.includes(permission)
   }
 
   const hasAnyPermission = (...permissionsToCheck: string[]): boolean => {
-    return permissionsToCheck.some((p) => permissions.includes(p))
+    return permissions.includes('ALL') || permissionsToCheck.some((p) => permissions.includes(p))
   }
 
   const hasAllPermissions = (...permissionsToCheck: string[]): boolean => {
-    return permissionsToCheck.every((p) => permissions.includes(p))
+    return permissions.includes('ALL') || permissionsToCheck.every((p) => permissions.includes(p))
   }
 
   return {

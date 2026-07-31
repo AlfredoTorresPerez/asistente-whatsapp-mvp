@@ -226,7 +226,7 @@ public class WhatsAppWebWebhookService {
 				companyPhone.isBlank() ? channelAccount.phoneNumber() : companyPhone, channelAccount.lastQrCode(),
 				occurredAt);
 
-		if (agentCoordinatorService.autoReplyEnabled()) {
+		if (agentCoordinatorService.autoReplyEnabled(channelAccount.businessId())) {
 			boolean enqueued = aiReplyOutboxJdbcRepository.enqueue(new AiReplyOutboxJdbcRepository.InboundAiReplyJob(
 					channelAccount.businessId(), channelAccount.id(), effectiveConversation.id(), customer.id(),
 					inboundMessageId, normalizedPhone, customer.displayName(), body, effectiveConversation.locationId(),

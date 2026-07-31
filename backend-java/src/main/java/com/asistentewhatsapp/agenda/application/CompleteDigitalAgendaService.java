@@ -581,7 +581,7 @@ public class CompleteDigitalAgendaService {
 	private void validateConsentRequirements(ServiceRecord service, Boolean informedConsentAccepted,
 			LocalDate customerBirthDate, String guardianName, String guardianPhone, OffsetDateTime startsAt,
 			LocationRecord location) {
-		if (service.requiresInformedConsent() && !Boolean.TRUE.equals(informedConsentAccepted)) {
+		if (service.requiresInformedConsent() && Boolean.FALSE.equals(informedConsentAccepted)) {
 			throw validationError("informedConsentAccepted",
 					"Debes aceptar el consentimiento informado para este servicio.");
 		}

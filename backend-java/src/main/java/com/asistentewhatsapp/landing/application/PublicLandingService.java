@@ -719,7 +719,7 @@ public class PublicLandingService {
 	private void validateConsentRequirements(CompleteAgendaJdbcRepository.ServiceRecord service,
 			Boolean informedConsentAccepted, LocalDate customerBirthDate, String guardianName, String guardianPhone,
 			OffsetDateTime startsAt, LocationRecord location) {
-		if (service.requiresInformedConsent() && !Boolean.TRUE.equals(informedConsentAccepted)) {
+		if (service.requiresInformedConsent() && Boolean.FALSE.equals(informedConsentAccepted)) {
 			throw new ApiException(HttpStatus.BAD_REQUEST, "PUBLIC_BOOKING_VALIDATION_ERROR",
 					"La solicitud de reserva contiene datos invalidos.", java.util.Map.of("informedConsentAccepted",
 							"Debes aceptar el consentimiento informado para este servicio."));

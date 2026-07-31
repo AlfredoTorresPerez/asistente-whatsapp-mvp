@@ -325,7 +325,14 @@ export const appRoutes: RouteObject[] = [
       {
         path: 'business-ai',
         element: (
-          <RequirePermission permission="REPORTS_VIEW">
+          <RequirePermission permission="BUSINESS_AI_VIEW" fallback={
+            <section className="mx-auto max-w-[1440px] px-4 py-6">
+              <div className="mt-20 flex flex-col items-center gap-4 text-center">
+                <h1 className="text-2xl font-semibold text-gray-800">Acceso denegado</h1>
+                <p className="text-gray-500">No tienes permisos para acceder a esta sección.</p>
+              </div>
+            </section>
+          }>
             <BusinessAiPage />
           </RequirePermission>
         ),
@@ -551,11 +558,11 @@ export const router = createBrowserRouter(appRoutes)
 
 // Componente para verificar permisos granulares
 // eslint-disable-next-line react-refresh/only-export-components
-function RequirePermission({ permission, children }: { permission: string; children: ReactNode }) {
+function RequirePermission({ permission, children, fallback }: { permission: string; children: ReactNode; fallback?: ReactNode }) {
   const { user } = useShellSession()
 
   if (!user || !user.permissions?.includes(permission)) {
-    return <Navigate replace to="/dashboard" />
+    return fallback ?? <Navigate replace to="/dashboard" />
   }
 
   return children

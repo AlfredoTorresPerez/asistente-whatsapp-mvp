@@ -43,7 +43,7 @@ export function LandingImage({
       alt={alt}
       className={className}
       loading={loading}
-      fetchPriority={fetchPriority}
+      fetchpriority={fetchPriority}
       width={width}
       height={height}
       style={{

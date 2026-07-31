@@ -58,3 +58,55 @@ export function isBusinessHourRangeValid(day: BusinessHoursDay) {
 
   return day.startTime < day.endTime
 }
+
+type BuildPromptConfig = {
+  active: boolean
+  mode: 'suggest' | 'auto'
+  tone: 'Cercano' | 'Profesional' | 'Comercial'
+  language: string
+  escalationThreshold: string
+  allowBooking: boolean
+  allowPrices: boolean
+  allowPromotions: boolean
+  requireAvailabilityCheck: boolean
+}
+
+export function buildPrompt(config: BuildPromptConfig, assistantPrompt: string) {
+  const toneText =
+    config.tone === 'Profesional'
+      ? 'formal, claro y técnicamente preciso'
+      : config.tone === 'Comercial'
+        ? 'orientado a venta, persuasivo y entusiasta'
+        : 'cercano, cálido y con un toque humano'
+
+  const modeText =
+    config.mode === 'auto'
+      ? 'Modo de operación: AUTO. El asistente puede responder automáticamente cuando su confianza es alta.'
+      : 'Modo de operación: SUGERIR. El asistente solo sugiere respuestas para aprobación humana; nunca responde por sí mismo.'
+
+  const languageText =
+    config.language === 'en'
+      ? 'Responde en inglés.'
+      : config.language === 'pt'
+        ? 'Responde en portugués.'
+        : 'Responde en español.'
+
+  const scopeLines = [
+    config.allowBooking ? '- Gestionar citas, reservas, reprogramaciones y cancelaciones.' : '- No gestionar citas ni reservas.',
+    config.allowPrices ? '- Informar precios y cotizaciones.' : '- No informar precios ni cotizaciones.',
+    config.allowPromotions ? '- Informar promociones vigentes.' : '- No promocionar ofertas ni descuentos.',
+  ]
+
+  return `${assistantPrompt.trim()}
+
+Configuración operativa del negocio:
+- Tono de atención: ${toneText}.
+- ${languageText}
+- ${modeText}
+- Umbral de confianza para responder: ${config.escalationThreshold}%.
+- ${config.requireAvailabilityCheck ? 'Debe consultar la agenda digital antes de confirmar disponibilidad.' : 'Puede responder sin consultar la agenda digital.'}
+- Alcance permitido:
+${scopeLines.join('\n')}
+- Si el mensaje está fuera del alcance permitido o la confianza es menor al umbral, deriva a atención humana.
+`
+}

@@ -91,15 +91,17 @@ public class AiAgentJdbcRepository {
 				    extracted_data,
 				    missing_data,
 				    response_to_customer,
+				    source,
 				    created_at
 				) values (
 				    gen_random_uuid(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-				    cast(? as jsonb), cast(? as jsonb), ?, current_timestamp
+				    cast(? as jsonb), cast(? as jsonb), ?, ?, current_timestamp
 				)
 				""", result.businessId(), result.conversationId(), result.customerId(), result.primaryIntent().name(),
 				result.secondaryIntent() == null ? null : result.secondaryIntent().name(), result.agentType().name(),
 				result.confidence(), result.urgency(), result.requiresHuman(), result.handoffReason(),
-				toJson(result.extractedData()), toJson(result.missingData()), result.responseToCustomer());
+				toJson(result.extractedData()), toJson(result.missingData()), result.responseToCustomer(),
+				result.source());
 	}
 
 	public void insertHumanHandoff(AgentRoutingResult result) {

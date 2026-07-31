@@ -81,7 +81,7 @@ public class WhatsAppInboundMessageService {
 
 		repository.updateConversationInboundActivity(conversation.id(), bodyText, occurredAt);
 
-		if (agentCoordinatorService.autoReplyEnabled()) {
+		if (agentCoordinatorService.autoReplyEnabled(businessId)) {
 			boolean enqueued = aiReplyOutboxJdbcRepository
 					.enqueue(new AiReplyOutboxJdbcRepository.InboundAiReplyJob(businessId, channelAccountId,
 							conversation.id(), customer.id(), inboundMessageId, normalizedPhone, customer.displayName(),

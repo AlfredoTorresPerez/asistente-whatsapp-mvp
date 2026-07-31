@@ -180,7 +180,7 @@ public class AgentCoordinatorService {
 						+ result.confidence() + " missing=" + result.missingData() + " containsLink="
 						+ containsLink(result.responseToCustomer()) + " "
 						+ LogSanitizer.responseSummary(result.responseToCustomer()));
-		if (properties.auditEnabled()) {
+		if (properties.auditEnabled() && !request.dryRun()) {
 			aiAgentJdbcRepository.upsertConversationContext(result);
 		}
 		return Optional.of(result);
@@ -543,12 +543,18 @@ public class AgentCoordinatorService {
 		return normalized.equals("mensaje recibido sin texto") || normalized.equals("mensaje recibido sin texto.");
 	}
 
-	public boolean autoReplyEnabled() {
-		return properties.enabled() && properties.autoReplyEnabled();
+	public boolean autoReplyEnabled(UUID businessId) {
+		return properties.enabled() && properties.autoReplyEnabled() && isBusinessAiActive(businessId)
+				&& isBusinessAiModeAutomatic(businessId);
 	}
 
 	private boolean isBusinessAiActive(UUID businessId) {
 		return businessAiSettingsService.findSettingsOpt(businessId).map(BusinessAiSettingsResponse::active)
 				.orElse(false);
+	}
+
+	private boolean isBusinessAiModeAutomatic(UUID businessId) {
+		return businessAiSettingsService.findSettingsOpt(businessId)
+				.map(settings -> "auto".equalsIgnoreCase(settings.mode())).orElse(false);
 	}
 }

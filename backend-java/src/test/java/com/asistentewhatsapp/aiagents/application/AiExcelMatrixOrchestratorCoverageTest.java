@@ -320,10 +320,14 @@ class AiExcelMatrixOrchestratorCoverageTest {
 			TransactionalAgendaBookingService transactional = transactionalAgendaBookingService();
 			this.detector = new IntentDetectorService();
 			this.extractor = new EntityExtractionService(knowledge, locationRepository);
-			this.registry = new AgentRegistry(
-					List.of(new ReceptionAgent(), new SalesAgent(knowledge), new BookingAgent(knowledge, transactional),
-							new PaymentsAgent(knowledge), new SupportAgent(locationRepository), new KnowledgeAgent(),
-							new FollowUpAgent(), new HumanHandoffAgent()));
+			this.registry = new AgentRegistry(List.of(new ReceptionAgent(), new SalesAgent(knowledge),
+					new BookingAgent(knowledge, transactional, Mockito.mock(
+							com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository.class),
+							Mockito.mock(com.asistentewhatsapp.bookings.application.BookingConfirmationService.class),
+							Mockito.mock(
+									com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository.class)),
+					new PaymentsAgent(knowledge), new SupportAgent(locationRepository), new KnowledgeAgent(),
+					new FollowUpAgent(), new HumanHandoffAgent()));
 			Mockito.when(businessAiSettingsService.findSettingsOpt(Mockito.any())).thenReturn(Optional.empty());
 			this.coordinator = new AgentCoordinatorService(enabledProperties(), detector, extractor, registry,
 					contextRepository, businessAiSettingsService);

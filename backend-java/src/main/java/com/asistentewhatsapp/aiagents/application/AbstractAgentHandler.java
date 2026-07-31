@@ -13,7 +13,7 @@ abstract class AbstractAgentHandler implements AgentHandler {
 		return new AgentRoutingResult(request.businessId(), request.conversationId(), request.customerId(),
 				intent.primaryIntent(), intent.secondaryIntent(), agentType, entities, missingData, intent.urgency(),
 				requiresHuman, handoffReason, response, intent.confidence(),
-				summary(request, intent, agentType, entities, handoffReason));
+				summary(request, intent, agentType, entities, handoffReason), request.source());
 	}
 
 	protected List<String> missing(String... values) {

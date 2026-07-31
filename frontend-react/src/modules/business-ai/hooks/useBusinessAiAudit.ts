@@ -5,12 +5,13 @@ import { listAestheticIntentLogs } from '../../../services/api/aestheticApi'
 import { PAGE_SIZE } from '../lib/constants'
 import { getAuditTotalPages, paginateAuditLogs, sortAuditLogsDescending } from '../lib/businessAiHelpers'
 
-export function useBusinessAiAudit() {
+export function useBusinessAiAudit(enabled = true) {
   const [auditPage, setAuditPage] = useState(0)
 
   const logsQuery = useQuery({
     queryKey: ['business-ai', 'intent-logs'],
     queryFn: () => listAestheticIntentLogs({ size: PAGE_SIZE }),
+    enabled,
     placeholderData: keepPreviousData,
   })
 

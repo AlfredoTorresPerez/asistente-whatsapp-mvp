@@ -130,7 +130,7 @@ public class AiReplyOutboxProcessor {
 	}
 
 	private boolean processJob(AiReplyOutboxJdbcRepository.AiReplyOutboxJob job) {
-		if (!agentCoordinatorService.autoReplyEnabled()) {
+		if (!agentCoordinatorService.autoReplyEnabled(job.businessId())) {
 			outboxRepository.markSkipped(job.id(), "AI_AUTO_REPLY_DISABLED", OffsetDateTime.now(ZoneOffset.UTC));
 			AiTraceLogger.warn("AI_OUTBOX_JOB_SKIPPED", job.traceId(), job.conversationId(), job.inboundMessageId(),
 					"AiReplyOutboxProcessor", "reason=AI_AUTO_REPLY_DISABLED");
@@ -154,7 +154,7 @@ public class AiReplyOutboxProcessor {
 		AgentConversationRequest request = new AgentConversationRequest(job.businessId(), job.channelAccountId(),
 				job.conversationId(), job.customerId(), job.recipientPhone(), job.customerDisplayName(),
 				job.messageBody(), OffsetDateTime.now(ZoneOffset.UTC), job.locationId(), job.locationName(),
-				job.traceId(), false);
+				job.traceId(), false, "REAL_CONVERSATION");
 
 		agentCoordinatorService.route(request)
 				.ifPresent(result -> sendAiResponse(job, conversation.assignedUserId(), result));

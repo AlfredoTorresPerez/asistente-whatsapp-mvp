@@ -1,13 +1,16 @@
 import { useCallback, useMemo, useState } from 'react'
 import { useBeforeUnload } from 'react-router-dom'
-import { Button } from '../../../components/ui/Button'
 import { Card } from '../../../components/ui/Card'
 import { PageHeader } from '../../../components/ui/PageHeader'
+import { usePermissions } from '../../../hooks/usePermissions'
+import type { AgentIntent } from '../../../services/api/types'
+import { useShellSession } from '../../../lib/shellSession'
 import { useBusinessAiSettings } from '../hooks/useBusinessAiSettings'
 import { useBusinessAiPreview } from '../hooks/useBusinessAiPreview'
 import { useBusinessAiMetrics } from '../hooks/useBusinessAiMetrics'
 import { useBusinessAiAudit } from '../hooks/useBusinessAiAudit'
 import { useBusinessKnowledgeHealth } from '../hooks/useBusinessKnowledgeHealth'
+import { useBusinessReadiness } from '../hooks/useBusinessReadiness'
 import { BusinessAiMetrics } from '../components/BusinessAiMetrics'
 import { BusinessAiOverview } from '../components/BusinessAiOverview'
 import { AssistantGeneralSettings } from '../components/AssistantGeneralSettings'
@@ -16,16 +19,24 @@ import { AssistantTestPanel } from '../components/AssistantTestPanel'
 import { BusinessInformationSummary } from '../components/BusinessInformationSummary'
 import { UnresolvedQueriesPanel } from '../components/UnresolvedQueriesPanel'
 import { BusinessAiAdvancedSettings } from '../components/BusinessAiAdvancedSettings'
-import { ContentEditorModal } from '../components/ContentEditorModal'
 import { KnowledgeBaseModal } from '../components/KnowledgeBaseModal'
 
 type Section = 'general' | 'test' | 'info' | 'audit' | 'advanced'
 
 export function BusinessAiPage() {
+  const session = useShellSession()
+  const { hasPermission } = usePermissions()
+  const userPerms = session.user?.permissions ?? []
+  const canManage = hasPermission('BUSINESS_AI_MANAGE')
+  const canTest = hasPermission('BUSINESS_AI_TEST')
+  const canViewAudit = hasPermission('BUSINESS_AI_AUDIT_VIEW')
+  const canViewInfo = hasPermission('BUSINESS_AI_VIEW')
+
   const settings = useBusinessAiSettings()
-  const preview = useBusinessAiPreview()
-  const audit = useBusinessAiAudit()
-  const knowledge = useBusinessKnowledgeHealth(audit.logs)
+  const preview = useBusinessAiPreview(userPerms)
+  const audit = useBusinessAiAudit(canViewAudit)
+  const knowledge = useBusinessKnowledgeHealth(audit.logs, userPerms)
+  const readiness = useBusinessReadiness(userPerms)
   const { metrics } = useBusinessAiMetrics(settings.config.active, audit.logs)
 
   const hasUnsaved = settings.hasUnsavedSettings || settings.hasUnsavedPrompt
@@ -36,45 +47,17 @@ export function BusinessAiPage() {
   )
 
   const [activeSection, setActiveSection] = useState<Section>('general')
-  const [rowToToggle, setRowToToggle] = useState<{ row: any; active: boolean } | null>(null)
 
-  const handleEditRow = useCallback((row: any) => {
-    if (row.type === 'audit') {
-      preview.setPreviewResponse(row.description)
-      preview.setAnalysisResult({
-        intencion: row.category,
-        confianza: row.log?.confidence ?? 0,
-        respuestaSugerida: row.description,
-        mensajeUsuario: row.title,
-      } as any)
-      setActiveSection('test')
-      return
-    }
-    knowledge.setEditor({
-      open: true,
-      mode: 'edit',
-      type: row.type,
-      id: row.id,
-      title: row.title,
-      description: row.description,
-      categoryCode: row.category,
-      ruleType: row.ruleType ?? '',
-      price: row.service?.priceBase?.toString() ?? row.product?.price?.toString() ?? '',
-      durationMinutes: row.service?.durationMinutes?.toString() ?? '',
-      stock: row.product?.stock?.toString() ?? '',
-      priority: row.rule?.priority?.toString() ?? '50',
-      active: row.status === 'active',
-      source: row,
-    })
-  }, [preview, knowledge])
-
-  const sections = useMemo(() => [
-    { label: 'Configuración general', value: 'general' as const },
-    { label: 'Probar asistente', value: 'test' as const },
-    { label: 'Información del negocio', value: 'info' as const },
-    { label: 'Consultas por revisar', value: 'audit' as const },
-    { label: 'Configuración avanzada', value: 'advanced' as const },
-  ], [])
+  const sections = useMemo(() => {
+    const items: { label: string; value: Section }[] = [
+      { label: 'Configuración general', value: 'general' },
+    ]
+    if (canTest) items.push({ label: 'Probar asistente', value: 'test' })
+    if (canViewInfo) items.push({ label: 'Información del negocio', value: 'info' })
+    if (canViewAudit) items.push({ label: 'Consultas por revisar', value: 'audit' })
+    if (canManage) items.push({ label: 'Configuración avanzada', value: 'advanced' })
+    return items
+  }, [canManage, canTest, canViewAudit, canViewInfo])
 
   if (settings.isLoading) {
     return (
@@ -110,7 +93,7 @@ export function BusinessAiPage() {
       <BusinessAiOverview
         active={settings.config.active}
         lastModifiedAt={
-          settings.activePrompt?.updatedAt ?? settings.settingsQuery.data?.updatedAt
+          settings.activePrompt?.fechaActualizacion ?? settings.settingsQuery.data?.updatedAt
         }
       />
 
@@ -141,7 +124,7 @@ export function BusinessAiPage() {
               escalationThreshold={settings.config.escalationThreshold}
               onActiveChange={(v) => settings.setConfig({ ...settings.config, active: v })}
               onModeChange={(v) => settings.setConfig({ ...settings.config, mode: v })}
-              onToneChange={(v) => settings.setConfig({ ...settings.config, tone: v })}
+              onToneChange={(v) => settings.setConfig({ ...settings.config, tone: v as 'Cercano' | 'Profesional' | 'Comercial' })}
               onLanguageChange={(v) => settings.setConfig({ ...settings.config, language: v })}
               onEscalationThresholdChange={(v) =>
                 settings.setConfig({ ...settings.config, escalationThreshold: v })
@@ -177,53 +160,32 @@ export function BusinessAiPage() {
             onScenarioChange={preview.setScenario}
             onRun={() => preview.runScenario(preview.scenario)}
             isAnalyzing={preview.isAnalyzing}
-            analysisResult={preview.analysisResult}
+            routingResult={preview.routingResult}
             previewEditable={preview.previewEditable}
-            previewResponse={preview.previewResponse}
-            onPreviewResponseChange={preview.setPreviewResponse}
+            editableResponse={preview.editableResponse}
+            onEditableResponseChange={preview.setEditableResponse}
             onToggleEdit={() => preview.setPreviewEditable(!preview.previewEditable)}
             conversations={preview.conversations}
             conversationSearch={preview.conversationSearch}
             onConversationSearchChange={preview.setConversationSearch}
             selectedConversationId={preview.selectedConversationId}
             onSelectedConversationChange={preview.setSelectedConversationId}
-            onApprove={preview.approveAndSend}
+            selectedConversation={preview.selectedConversation}
+            onSend={preview.confirmSend}
             isSending={preview.isSending}
+            canSend={preview.canSend}
+            showSendConfirm={preview.showSendConfirm}
+            onShowSendConfirm={preview.setShowSendConfirm}
           />
         )}
 
         {activeSection === 'info' && (
           <BusinessInformationSummary
-            activeTab={knowledge.activeTab}
-            onTabChange={(tab) => {
-              knowledge.setActiveTab(tab as any)
-              knowledge.setKnowledgePage(0)
-            }}
-            tabs={knowledge.tabs}
-            rows={knowledge.rows}
-            paginatedRows={knowledge.paginatedRows}
-            page={knowledge.knowledgePage}
-            totalPages={knowledge.totalPages}
-            onPageChange={knowledge.setKnowledgePage}
-            search={knowledge.search}
-            onSearchChange={knowledge.setSearch}
-            statusFilter={knowledge.statusFilter}
-            onStatusFilterChange={knowledge.setStatusFilter}
-            onAdd={() => {
-              const type =
-                knowledge.activeTab === 'products' ? 'product'
-                  : knowledge.activeTab === 'rules' || knowledge.activeTab === 'policies' ? 'rule'
-                    : 'service'
-              knowledge.setEditor({
-                open: true, mode: 'create', type, title: '', description: '',
-                categoryCode: '', ruleType: '', price: '', durationMinutes: '',
-                stock: '', priority: '50', active: true,
-              })
-            }}
-            onEdit={handleEditRow}
-            onToggleStatus={(row) => setRowToToggle({ row, active: row.status !== 'active' })}
-            isLoading={knowledge.isKnowledgeLoading}
-            onOpenFullBase={() => knowledge.setShowBaseModal(true)}
+            summaryCards={readiness.summaryCards}
+            readinessChecks={readiness.readinessChecks}
+            passedCount={readiness.passedCount}
+            totalChecks={readiness.totalChecks}
+            isLoading={readiness.isLoading}
           />
         )}
 
@@ -231,11 +193,11 @@ export function BusinessAiPage() {
           <UnresolvedQueriesPanel
             entries={audit.paginatedLogs.map((log) => ({
               id: log.id,
-              title: log.title ?? log.description,
-              category: log.category,
-              status: log.status,
-              updatedAt: log.updatedAt,
-              description: log.description,
+              title: log.intent,
+              category: log.intent,
+              status: log.requiresHumanHandoff ? 'pending' : 'resolved',
+              updatedAt: log.createdAt,
+              description: log.sourceMessage,
               type: 'audit',
               log,
             }))}
@@ -244,13 +206,27 @@ export function BusinessAiPage() {
             totalLogs={audit.totalLogs}
             onPageChange={audit.setAuditPage}
             onSelectEntry={(entry) => {
-              preview.setPreviewResponse(entry.description)
-              preview.setAnalysisResult({
-                intencion: entry.category,
-                confianza: (entry as any).log?.confidence ?? 0,
-                respuestaSugerida: entry.description,
-                mensajeUsuario: entry.title,
-              } as any)
+              preview.setScenario(entry.title)
+              preview.setPreviewResponse({
+                result: {
+                  businessId: '',
+                  conversationId: '',
+                  customerId: '',
+                  primaryIntent: (entry.category ?? 'HUMAN_REQUEST') as AgentIntent,
+                  secondaryIntent: null,
+                  agentType: 'HUMAN_HANDOFF',
+                  extractedData: {},
+                  missingData: [],
+                  urgency: 'normal',
+                  requiresHuman: entry.log?.requiresHumanHandoff ?? false,
+                  handoffReason: entry.log?.handoffReason ?? null,
+                  responseToCustomer: entry.description,
+                  confidence: entry.log?.confidence ?? 0,
+                  summaryForHuman: null,
+                },
+                status: 'OK',
+                message: 'Cargado desde historial',
+              })
               setActiveSection('test')
             }}
             isLoading={audit.isLoading}
@@ -261,24 +237,15 @@ export function BusinessAiPage() {
           <BusinessAiAdvancedSettings
             assistantPrompt={settings.assistantPrompt}
             onAssistantPromptChange={settings.setAssistantPrompt}
-            activePrompt={settings.activePrompt}
+            activePrompt={settings.activePrompt ?? null}
             prompts={settings.promptsQuery.data ?? []}
             onSavePrompt={() => settings.savePromptMutation.mutate()}
             isSavingPrompt={settings.savePromptMutation.isPending}
             hasChanges={settings.hasUnsavedPrompt}
+            routingResult={preview.routingResult}
           />
         )}
       </div>
-
-      <ContentEditorModal
-        editor={knowledge.editor}
-        onClose={() => knowledge.setEditor({ ...knowledge.editor, open: false })}
-        onChange={knowledge.setEditor}
-        onSave={() => knowledge.saveEditorMutation.mutate(knowledge.editor)}
-        isSaving={knowledge.saveEditorMutation.isPending}
-        serviceCategories={knowledge.serviceCategories}
-        productCategories={knowledge.productCategories}
-      />
 
       <KnowledgeBaseModal
         open={knowledge.showBaseModal}

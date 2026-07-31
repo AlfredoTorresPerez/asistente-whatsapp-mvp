@@ -223,7 +223,10 @@ services:
     depends_on:
       frontend-react:
         condition: service_healthy
-    command: tunnel --no-autoupdate --url http://frontend-react:5173
+    # Túnel estable (URL fija): definir CF_TUNNEL_COMMAND en .env.local, ej:
+    #   CF_TUNNEL_COMMAND=tunnel --no-autoupdate run --token <TOKEN_DE_CLOUDFLARE_DASHBOARD>
+    # Sin esa variable usa el quick tunnel temporal trycloudflare.com
+    command: ${CF_TUNNEL_COMMAND:-tunnel --no-autoupdate --url http://frontend-react:5173}
     networks:
       - asistente-local
 

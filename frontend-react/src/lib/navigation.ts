@@ -119,6 +119,7 @@ export const PRIMARY_NAV_ITEMS: NavigationItem[] = [
     label: 'IA del Negocio',
     path: '/business-ai',
     description: 'Orquestacion, confianza, respuestas sugeridas y escalamiento humano.',
+    allowedPermissions: ['BUSINESS_AI_VIEW'],
   },
   {
     label: 'Reportes',
@@ -132,12 +133,6 @@ export const PRIMARY_NAV_ITEMS: NavigationItem[] = [
     description: 'Empresa, sucursales, cabinas, servicios, asignaciones, multisede, WhatsApp Web, usuarios, seguridad y profesionales.',
     allowedRoles: ['OWNER', 'ADMIN'],
     children: ADMIN_SUBMENU_ITEMS,
-  },
-  {
-    label: 'Simulador',
-    path: '/admin/whatsapp-simulator',
-    description: 'Simular mensajes entrantes de WhatsApp para pruebas.',
-    allowedRoles: ['OWNER', 'ADMIN'],
   },
 ]
 

@@ -433,12 +433,6 @@ export function CenterPublicPageDinamica({ slug: slugProp }: { slug?: string } =
                             </span>
                           )}
                         </div>
-                        <button
-                          onClick={() => handleWhatsAppRedirect('servicio', s.id)}
-                          className="mt-4 w-full rounded-xl bg-gray-50 py-2.5 text-xs font-semibold text-gray-600 transition hover:bg-[#25D366] hover:text-white"
-                        >
-                          Consultar por WhatsApp
-                        </button>
                       </div>
                     </article>
                   )
@@ -467,12 +461,6 @@ export function CenterPublicPageDinamica({ slug: slugProp }: { slug?: string } =
                       {s.description && (
                         <p className="mt-2 flex-1 text-sm text-gray-500">{s.description}</p>
                       )}
-                      <button
-                        onClick={() => handleWhatsAppRedirect('servicio', s.id)}
-                        className="mt-4 w-full rounded-xl bg-gray-50 py-2.5 text-xs font-semibold text-gray-600 transition hover:bg-[#25D366] hover:text-white"
-                      >
-                        Consultar por WhatsApp
-                      </button>
                     </div>
                   </article>
                 ))}
@@ -492,13 +480,6 @@ export function CenterPublicPageDinamica({ slug: slugProp }: { slug?: string } =
                 {cfg.aboutText && (
                   <p className="mt-4 text-base leading-relaxed text-gray-600">{cfg.aboutText}</p>
                 )}
-                <button
-                  onClick={() => handleWhatsAppRedirect('contacto')}
-                  className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-[#25D366] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#20BD5A]"
-                >
-                  <WhatsAppIcon className="h-4 w-4" />
-                  Contactar ahora
-                </button>
               </div>
               <div className="order-1 md:order-2">
                 <div className="aspect-[4/3] overflow-hidden rounded-[2.5rem] bg-pink-50 shadow-lg">
@@ -693,41 +674,7 @@ export function CenterPublicPageDinamica({ slug: slugProp }: { slug?: string } =
           </section>
         )}
 
-        <section className="py-16 md:py-24" style={{ backgroundColor: '#fdfaf7' }}>
-          <div className="mx-auto max-w-6xl px-4">
-            <div
-              className="overflow-hidden rounded-[2rem] shadow-sm"
-              style={{ background: 'linear-gradient(135deg, #fdf2f8, #fff1f2)' }}
-            >
-              <div className="flex flex-col items-center px-6 py-10 text-center md:px-10">
-                  <h2 className="text-2xl font-bold text-gray-900 md:text-3xl">
-                    ¿Lista para tu mejor versión?
-                  </h2>
-                  <p className="mt-3 max-w-md text-base text-gray-600">
-                    Agenda tu evaluación y comienza hoy tu transformación.
-                  </p>
-                  <div className="mt-6 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-                    <button
-                      type="button"
-                      onClick={() => handleAgendaRedirect()}
-                      className="inline-flex items-center justify-center gap-2 rounded-2xl bg-pink-500 px-6 py-3 font-bold text-white shadow transition hover:bg-pink-600"
-                    >
-                      <CalendarIcon className="h-5 w-5" />
-                      Agenda en línea
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleWhatsAppRedirect('llamado')}
-                      className="inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-[#25D366] bg-white px-6 py-3 font-bold text-[#20BD5A] transition hover:bg-green-50"
-                    >
-                      <WhatsAppIcon className="h-5 w-5" />
-                      Escríbenos por WhatsApp
-                    </button>
-                  </div>
-                </div>
-            </div>
-          </div>
-        </section>
+
 
         <section
           id="contacto"

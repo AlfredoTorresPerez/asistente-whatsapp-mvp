@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import java.util.UUID;
 
 @RestController
@@ -29,26 +30,27 @@ public class AiAdminController {
 		this.agentCoordinatorService = agentCoordinatorService;
 	}
 
-	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'ADMIN_MANAGE')")
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BUSINESS_AI_AUDIT_VIEW')")
 	@GetMapping("/outbox/stats")
-	public AiReplyOutboxProcessor.AiOutboxStats getOutboxStats(AuthenticatedUser authenticatedUser) {
+	public AiReplyOutboxProcessor.AiOutboxStats getOutboxStats(
+			@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
 		AdminAccessGuard.requireOwnerAdminOrSupervisor(authenticatedUser);
 		return outboxProcessor.getStats();
 	}
 
-	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'ADMIN_MANAGE')")
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BUSINESS_AI_TEST')")
 	@PostMapping("/preview")
-	public AiPreviewResponse preview(@RequestBody AiPreviewRequest request, AuthenticatedUser authenticatedUser) {
+	public AiPreviewResponse preview(@RequestBody AiPreviewRequest request,
+			@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
 		AdminAccessGuard.requireOwnerAdminOrSupervisor(authenticatedUser);
 
 		AgentConversationRequest agentRequest = new AgentConversationRequest(authenticatedUser.businessId(),
-				request.channelAccountId() != null
-						? request.channelAccountId()
-						: UUID.fromString("11111111-1111-1111-1111-111111111111"),
+				request.channelAccountId(),
 				request.conversationId() != null ? request.conversationId() : UUID.randomUUID(),
 				request.customerId() != null ? request.customerId() : UUID.randomUUID(), request.customerPhone(),
-				request.customerName(), request.message(), java.time.OffsetDateTime.now(java.time.ZoneOffset.UTC), null,
-				null, AiTraceLogger.newTraceId("AI-PREVIEW"), false);
+				request.customerName(), request.message(), java.time.OffsetDateTime.now(java.time.ZoneOffset.UTC),
+				request.selectedLocationId(), request.selectedLocationName(), AiTraceLogger.newTraceId("AI-PREVIEW"),
+				true, null);
 
 		var result = agentCoordinatorService.preview(agentRequest);
 		if (result.isEmpty()) {
@@ -59,7 +61,7 @@ public class AiAdminController {
 	}
 
 	public record AiPreviewRequest(String message, UUID conversationId, UUID channelAccountId, UUID customerId,
-			String customerPhone, String customerName) {
+			String customerPhone, String customerName, UUID selectedLocationId, String selectedLocationName) {
 	}
 
 	public record AiPreviewResponse(AgentRoutingResult result, String status, String message) {

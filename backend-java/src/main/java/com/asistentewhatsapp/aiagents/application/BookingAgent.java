@@ -2,7 +2,16 @@ package com.asistentewhatsapp.aiagents.application;
 
 import com.asistentewhatsapp.aiagents.domain.AgentIntent;
 import com.asistentewhatsapp.aiagents.domain.AgentType;
+import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository;
+import com.asistentewhatsapp.bookings.api.PublicBookingConfirmationResponse;
+import com.asistentewhatsapp.bookings.application.BookingConfirmationService;
+import com.asistentewhatsapp.bookings.application.BookingStateMachine;
+import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository;
+import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository.ConfirmationLinkRecord;
 import com.asistentewhatsapp.shared.observability.LogSanitizer;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -14,11 +23,19 @@ public class BookingAgent extends AbstractAgentHandler {
 
 	private final AiBusinessKnowledgeService knowledgeService;
 	private final TransactionalAgendaBookingService transactionalAgendaBookingService;
+	private final BookingConfirmationJdbcRepository confirmationRepository;
+	private final BookingConfirmationService bookingConfirmationService;
+	private final CompleteAgendaJdbcRepository agendaRepository;
 
 	public BookingAgent(AiBusinessKnowledgeService knowledgeService,
-			TransactionalAgendaBookingService transactionalAgendaBookingService) {
+			TransactionalAgendaBookingService transactionalAgendaBookingService,
+			BookingConfirmationJdbcRepository confirmationRepository,
+			BookingConfirmationService bookingConfirmationService, CompleteAgendaJdbcRepository agendaRepository) {
 		this.knowledgeService = knowledgeService;
 		this.transactionalAgendaBookingService = transactionalAgendaBookingService;
+		this.confirmationRepository = confirmationRepository;
+		this.bookingConfirmationService = bookingConfirmationService;
+		this.agendaRepository = agendaRepository;
 	}
 
 	@Override
@@ -179,11 +196,16 @@ public class BookingAgent extends AbstractAgentHandler {
 			return result(request, intent, type(), entities, missingData, response, false, null);
 		}
 
+		Optional<String> chatConfirmation = handleChatBookingConfirmation(request, entities, traceId);
+		if (chatConfirmation.isPresent()) {
+			return result(request, intent, type(), entities, List.of(), chatConfirmation.get(), false, null);
+		}
+
 		Optional<String> transactionalResponse = transactionalAgendaBookingService.createTemporaryBookingLink(
 				request.businessId(), request.customerId(), request.conversationId(), request.customerDisplayName(),
 				request.customerPhone(), request.messageBody(), value(entities, "servicio_o_producto"),
 				value(entities, "sede"), firstNonBlank(value(entities, "fecha"), value(entities, "fecha_relativa")),
-				value(entities, "hora"), false, false, traceId, request.conversationId());
+				value(entities, "hora"), false, request.dryRun(), traceId, request.conversationId());
 		String response = transactionalResponse.orElse(
 				"Tengo los datos principales, pero no pude validar la disponibilidad en agenda. ¿Quieres que lo intente nuevamente o te derive con una persona?");
 		traceLinkDecision(request, traceId, intent, entities, "CREATE_TEMPORARY_BOOKING",
@@ -355,6 +377,137 @@ public class BookingAgent extends AbstractAgentHandler {
 
 	private String safe(String value, String fallback) {
 		return value == null || value.isBlank() ? fallback : value.trim();
+	}
+
+	private Optional<String> handleChatBookingConfirmation(AgentConversationRequest request,
+			Map<String, String> entities, String traceId) {
+		String hora = value(entities, "hora");
+		if (hora.isBlank()) {
+			return Optional.empty();
+		}
+		Optional<ConfirmationLinkRecord> pending = confirmationRepository
+				.findLatestActionableByConversation(request.businessId(), request.conversationId());
+		if (pending.isEmpty()) {
+			return Optional.empty();
+		}
+		ConfirmationLinkRecord link = pending.get();
+		Optional<ZoneId> zone = resolveBookingZone(request.businessId(), link);
+		if (zone.isEmpty()) {
+			return Optional.empty();
+		}
+		if (!matchesRequestedSlot(link, hora, entities, zone.get())) {
+			return Optional.empty();
+		}
+		String token = tokenFromUrl(link.confirmationUrl());
+		if (token.isBlank()) {
+			return Optional.empty();
+		}
+		if (BookingStateMachine.CONFIRMED.equals(BookingStateMachine.canonical(link.bookingStatus()))) {
+			AiTraceLogger.info("CHAT_BOOKING_ALREADY_CONFIRMED", traceId, request.conversationId(), link.bookingId(),
+					"BookingAgent", "bookingId=" + link.bookingId() + " status=" + link.bookingStatus());
+			return Optional.of(chatBookingStatusResponse(link, zone.get(), true));
+		}
+		try {
+			PublicBookingConfirmationResponse confirmed = bookingConfirmationService.confirm(token);
+			AiTraceLogger.info("CHAT_BOOKING_CONFIRMED", traceId, request.conversationId(), link.bookingId(),
+					"BookingAgent", "bookingId=" + link.bookingId() + " status=" + confirmed.bookingStatus()
+							+ " source=CHAT_CONFIRMATION");
+			return Optional.of(chatBookingStatusResponse(link, zone.get(), false));
+		} catch (RuntimeException exception) {
+			AiTraceLogger.warn("CHAT_BOOKING_CONFIRMATION_FAILED", traceId, request.conversationId(), link.bookingId(),
+					"BookingAgent", "errorType=" + exception.getClass().getSimpleName() + " functionalMessage="
+							+ LogSanitizer.sanitizeFreeText(exception.getMessage()));
+			return Optional.of(
+					"⚠️ No pude confirmar la reserva por este medio.\n\nPuedes tocar el enlace de confirmación que te envié para confirmarla, o te derivo con una persona del equipo.");
+		}
+	}
+
+	private boolean matchesRequestedSlot(ConfirmationLinkRecord link, String hora, Map<String, String> entities,
+			ZoneId zone) {
+		LocalTime requestedTime = parseHora(hora);
+		if (requestedTime == null) {
+			return false;
+		}
+		LocalTime slotTime = link.startsAt().atZoneSameInstant(zone).toLocalTime();
+		if (!requestedTime.equals(slotTime)) {
+			return false;
+		}
+		LocalDate slotDate = link.startsAt().atZoneSameInstant(zone).toLocalDate();
+		String fecha = firstNonBlank(value(entities, "fecha"), value(entities, "fecha_relativa"));
+		if (fecha.isBlank()) {
+			return false;
+		}
+		if ("hoy".equalsIgnoreCase(fecha.trim()) || "el dia de hoy".equalsIgnoreCase(fecha.trim())) {
+			return slotDate.equals(LocalDate.now(zone));
+		}
+		LocalDate requestedDate = parseFecha(fecha);
+		return requestedDate != null && requestedDate.equals(slotDate);
+	}
+
+	private Optional<ZoneId> resolveBookingZone(UUID businessId, ConfirmationLinkRecord link) {
+		if (link.locationId() == null) {
+			return Optional.empty();
+		}
+		try {
+			CompleteAgendaJdbcRepository.LocationRecord location = agendaRepository.findLocation(businessId,
+					link.locationId());
+			if (location == null || location.timezone() == null || location.timezone().isBlank()) {
+				return Optional.empty();
+			}
+			return Optional.of(ZoneId.of(location.timezone()));
+		} catch (RuntimeException exception) {
+			return Optional.empty();
+		}
+	}
+
+	private LocalTime parseHora(String hora) {
+		String normalized = hora.trim().toLowerCase(java.util.Locale.ROOT).replace("hrs", "").replace(" horas", "")
+				.replace("am", "").replace("pm", "").trim();
+		try {
+			return LocalTime.parse(normalized);
+		} catch (RuntimeException first) {
+			try {
+				return LocalTime.of(Integer.parseInt(normalized), 0);
+			} catch (RuntimeException second) {
+				return null;
+			}
+		}
+	}
+
+	private LocalDate parseFecha(String fecha) {
+		String normalized = fecha.trim();
+		try {
+			return LocalDate.parse(normalized);
+		} catch (RuntimeException first) {
+			try {
+				return LocalDate.parse(normalized, java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+			} catch (RuntimeException second) {
+				return null;
+			}
+		}
+	}
+
+	private String tokenFromUrl(String confirmationUrl) {
+		if (confirmationUrl == null || confirmationUrl.isBlank()) {
+			return "";
+		}
+		int index = confirmationUrl.lastIndexOf('/');
+		return index >= 0 && index + 1 < confirmationUrl.length() ? confirmationUrl.substring(index + 1).trim() : "";
+	}
+
+	private String chatBookingStatusResponse(ConfirmationLinkRecord link, ZoneId zone, boolean alreadyConfirmed) {
+		String fecha = link.startsAt().atZoneSameInstant(zone).toLocalDate()
+				.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+		String hora = link.startsAt().atZoneSameInstant(zone).toLocalTime().toString();
+		String header = alreadyConfirmed ? "✅ *Reserva ya confirmada*" : "✅ *Reserva confirmada*";
+		String intro = alreadyConfirmed
+				? "Tu reserva ya estaba confirmada. La dejamos tal cual:"
+				: "Perfecto, tu reserva quedó confirmada:";
+		return header + "\n\n" + intro + "\n\n" + "*Servicio:* " + safe(link.serviceName(), "No especificado") + "\n"
+				+ "*Sucursal:* " + safe(link.locationName(), "No especificada") + "\n" + "*Fecha:* " + fecha + "\n"
+				+ "*Hora:* " + hora + "\n" + "*Profesional:* " + safe(link.professionalName(), "A asignar") + "\n"
+				+ "*Cabina:* " + safe(link.roomName(), "A asignar") + "\n\n"
+				+ "¡Te esperamos! Recuerda llegar unos minutos antes. El consentimiento informado se firma en el centro antes de la sesión.";
 	}
 
 }

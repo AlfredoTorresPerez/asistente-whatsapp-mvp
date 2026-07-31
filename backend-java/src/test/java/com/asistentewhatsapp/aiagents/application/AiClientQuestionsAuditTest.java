@@ -886,8 +886,13 @@ class AiClientQuestionsAuditTest {
 			IntentDetectorService detector = new IntentDetectorService();
 			EntityExtractionService extractor = new EntityExtractionService(knowledge, locations);
 			AgentRegistry registry = new AgentRegistry(List.of(new ReceptionAgent(), new SalesAgent(knowledge),
-					new BookingAgent(knowledge, transactional), new PaymentsAgent(knowledge),
-					new SupportAgent(locations), new KnowledgeAgent(), new FollowUpAgent(), new HumanHandoffAgent()));
+					new BookingAgent(knowledge, transactional, Mockito.mock(
+							com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository.class),
+							Mockito.mock(com.asistentewhatsapp.bookings.application.BookingConfirmationService.class),
+							Mockito.mock(
+									com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository.class)),
+					new PaymentsAgent(knowledge), new SupportAgent(locations), new KnowledgeAgent(),
+					new FollowUpAgent(), new HumanHandoffAgent()));
 			Mockito.when(businessAiSettingsService.findSettingsOpt(Mockito.any())).thenReturn(Optional.empty());
 			this.coordinator = new AgentCoordinatorService(enabledProperties(), detector, extractor, registry,
 					contextRepository, businessAiSettingsService);

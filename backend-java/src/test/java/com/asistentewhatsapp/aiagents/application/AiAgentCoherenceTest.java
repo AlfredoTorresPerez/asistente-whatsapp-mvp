@@ -30,7 +30,11 @@ class AiAgentCoherenceTest {
 	private final IntentDetectorService detector = new IntentDetectorService();
 	private final EntityExtractionService extractor = new EntityExtractionService(knowledgeService, locationRepository);
 	private final AgentRegistry registry = new AgentRegistry(List.of(new ReceptionAgent(),
-			new SalesAgent(knowledgeService), new BookingAgent(knowledgeService, transactionalAgendaBookingService),
+			new SalesAgent(knowledgeService),
+			new BookingAgent(knowledgeService, transactionalAgendaBookingService,
+					Mockito.mock(com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository.class),
+					Mockito.mock(com.asistentewhatsapp.bookings.application.BookingConfirmationService.class),
+					Mockito.mock(com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository.class)),
 			new PaymentsAgent(knowledgeService), new SupportAgent(locationRepository), new KnowledgeAgent(),
 			new FollowUpAgent(), new HumanHandoffAgent()));
 	private final BusinessAiSettingsService businessAiSettingsService = Mockito.mock();
@@ -61,7 +65,10 @@ class AiAgentCoherenceTest {
 
 	@Test
 	void bookingAgentDoesNotAskServiceAgainWhenServiceDateAndTimeAreKnown() {
-		BookingAgent agent = new BookingAgent(knowledgeService, transactionalAgendaBookingService);
+		BookingAgent agent = new BookingAgent(knowledgeService, transactionalAgendaBookingService,
+				Mockito.mock(com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository.class),
+				Mockito.mock(com.asistentewhatsapp.bookings.application.BookingConfirmationService.class),
+				Mockito.mock(com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository.class));
 		Map<String, String> entities = new LinkedHashMap<>();
 		entities.put("servicio_o_producto", "Depilacion bozo");
 		entities.put("fecha_relativa", "mañana");

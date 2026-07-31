@@ -16,6 +16,8 @@ import type {
   UpsertBusinessAiSettingsRequest,
   UpsertPromptTemplateRequest,
   PagedResponse,
+  AiPreviewRequest,
+  AiPreviewResponse,
 } from './types'
 
 const toQueryString = (params: Record<string, string | number | boolean | null | undefined>) => {
@@ -178,6 +180,13 @@ export function createBusinessAiPrompt(request: UpsertPromptTemplateRequest) {
 
 export function activateBusinessAiPrompt(request: ActivatePromptRequest) {
   return apiFetch<void>('/business-ai/prompts/activate', {
+    method: 'POST',
+    body: JSON.stringify(request),
+  })
+}
+
+export function previewAiRequest(request: AiPreviewRequest) {
+  return apiFetch<AiPreviewResponse>('/ai/preview', {
     method: 'POST',
     body: JSON.stringify(request),
   })

@@ -1,16 +1,14 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { keepPreviousData, useState } from 'react'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMemo, useState } from 'react'
 import { useToast } from '../../../lib/toast'
-import {
-  analyzeAestheticIntent,
-} from '../../../services/api/aestheticApi'
+import { previewAiRequest } from '../../../services/api/aestheticApi'
 import {
   getConversationsRequest,
   sendConversationMessageRequest,
 } from '../../../services/api/conversationsApi'
-import type { IntentAnalysisResponse } from '../../../services/api/types'
+import type { AgentRoutingResult, AiPreviewResponse } from '../../../services/api/types'
 
-export function useBusinessAiPreview() {
+export function useBusinessAiPreview(userPermissions: string[] = []) {
   const queryClient = useQueryClient()
   const { showToast } = useToast()
 
@@ -19,9 +17,12 @@ export function useBusinessAiPreview() {
   )
   const [conversationSearch, setConversationSearch] = useState('')
   const [selectedConversationId, setSelectedConversationId] = useState('')
-  const [analysisResult, setAnalysisResult] = useState<IntentAnalysisResponse | null>(null)
+  const [previewResponse, setPreviewResponse] = useState<AiPreviewResponse | null>(null)
   const [previewEditable, setPreviewEditable] = useState(false)
-  const [previewResponse, setPreviewResponse] = useState('')
+  const [editableResponse, setEditableResponse] = useState('')
+  const [showSendConfirm, setShowSendConfirm] = useState(false)
+
+  const canSend = userPermissions.includes('ALL') || userPermissions.includes('BUSINESS_AI_SEND') || userPermissions.includes('CONVERSATIONS_REPLY')
 
   const conversationsQuery = useQuery({
     queryKey: ['business-ai', 'conversations', conversationSearch],
@@ -37,8 +38,19 @@ export function useBusinessAiPreview() {
 
   const conversations = conversationsQuery.data?.items ?? []
 
+  const selectedConversation = useMemo(
+    () => conversations.find((c) => c.id === selectedConversationId) ?? null,
+    [conversations, selectedConversationId],
+  )
+
+  const routingResult: AgentRoutingResult | null = previewResponse?.result ?? null
+
   const analyzeMutation = useMutation({
-    mutationFn: analyzeAestheticIntent,
+    mutationFn: (message: string) =>
+      previewAiRequest({
+        message,
+        conversationId: selectedConversationId || null,
+      }),
     onError: (error) => {
       showToast({
         description: error instanceof Error ? error.message : 'No se pudo ejecutar la prueba.',
@@ -47,32 +59,34 @@ export function useBusinessAiPreview() {
       })
     },
     onSuccess: (result) => {
-      setAnalysisResult(result)
-      setPreviewResponse(result.respuestaSugerida)
-      void queryClient.invalidateQueries({ queryKey: ['business-ai', 'intent-logs'] })
-      showToast({
-        description: `Intención detectada: ${result.intencion}.`,
-        title: 'Prueba ejecutada',
-        tone: 'success',
-      })
+      setPreviewResponse(result)
+      setEditableResponse(result.result?.responseToCustomer ?? '')
+      if (result.result) {
+        showToast({
+          description: `Intención: ${formatIntent(result.result.primaryIntent)}. ${result.result.requiresHuman ? 'Requiere derivación humana.' : 'Puede responder automáticamente.'}`,
+          title: 'Prueba ejecutada',
+          tone: 'success',
+        })
+      }
     },
   })
 
-  const sendApprovedMutation = useMutation({
+  const sendMutation = useMutation({
     mutationFn: ({ body, conversationId }: { body: string; conversationId: string }) =>
       sendConversationMessageRequest(conversationId, { body }),
     onError: (error) => {
       showToast({
-        description: error instanceof Error ? error.message : 'No se pudo enviar la respuesta aprobada al cliente.',
-        title: 'No se pudo enviar',
+        description: error instanceof Error ? error.message : 'No se pudo enviar la respuesta.',
+        title: 'Error al enviar',
         tone: 'error',
       })
     },
     onSuccess: () => {
+      setShowSendConfirm(false)
       void queryClient.invalidateQueries({ queryKey: ['business-ai', 'conversations'] })
       void queryClient.invalidateQueries({ queryKey: ['conversations'] })
       showToast({
-        description: 'La respuesta aprobada fue enviada y registrada en la conversación seleccionada.',
+        description: 'La respuesta fue enviada y registrada en la conversación.',
         title: 'Respuesta enviada',
         tone: 'success',
       })
@@ -88,10 +102,10 @@ export function useBusinessAiPreview() {
       })
       return
     }
-    analyzeMutation.mutate({ message: message.trim() })
+    analyzeMutation.mutate(message.trim())
   }
 
-  const approveAndSend = () => {
+  const confirmSend = () => {
     if (!selectedConversationId) {
       showToast({
         description: 'Selecciona una conversación para enviar la respuesta.',
@@ -100,7 +114,16 @@ export function useBusinessAiPreview() {
       })
       return
     }
-    if (!previewResponse.trim()) {
+    if (!canSend) {
+      showToast({
+        description: 'No tienes permiso para enviar mensajes a conversaciones.',
+        title: 'Permiso denegado',
+        tone: 'error',
+      })
+      return
+    }
+    const body = previewEditable ? editableResponse : (routingResult?.responseToCustomer ?? '')
+    if (!body.trim()) {
       showToast({
         description: 'No hay respuesta para enviar.',
         title: 'Respuesta vacía',
@@ -108,10 +131,7 @@ export function useBusinessAiPreview() {
       })
       return
     }
-    sendApprovedMutation.mutate({
-      body: previewResponse,
-      conversationId: selectedConversationId,
-    })
+    sendMutation.mutate({ body: body.trim(), conversationId: selectedConversationId })
   }
 
   return {
@@ -121,18 +141,28 @@ export function useBusinessAiPreview() {
     setConversationSearch,
     selectedConversationId,
     setSelectedConversationId,
-    analysisResult,
-    setAnalysisResult,
-    previewEditable,
-    setPreviewEditable,
+    selectedConversation,
     previewResponse,
     setPreviewResponse,
+    routingResult,
+    previewEditable,
+    setPreviewEditable,
+    editableResponse,
+    setEditableResponse,
     conversations,
-    analyzeMutation,
-    sendApprovedMutation,
     runScenario,
-    approveAndSend,
+    confirmSend,
+    showSendConfirm,
+    setShowSendConfirm,
     isAnalyzing: analyzeMutation.isPending,
-    isSending: sendApprovedMutation.isPending,
+    isSending: sendMutation.isPending,
+    canSend,
   }
+}
+
+function formatIntent(intent: string): string {
+  return intent
+    .toLowerCase()
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase())
 }

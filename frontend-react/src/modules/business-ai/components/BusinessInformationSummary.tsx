@@ -1,180 +1,137 @@
-import { Button } from '../../../components/ui/Button'
+import { Link } from 'react-router-dom'
 import { Card } from '../../../components/ui/Card'
-import { StatusBadge } from '../../../components/ui/StatusBadge'
-
-type KnowledgeRow = {
-  id: string
-  title: string
-  category: string
-  status: string
-  updatedAt: string
-  description: string
-  type: string
-}
-
-type Tab = { label: string; value: string }
+import type { SummaryCard, ReadinessCheck } from '../hooks/useBusinessReadiness'
 
 type Props = {
-  activeTab: string
-  onTabChange: (tab: string) => void
-  tabs: readonly Tab[]
-  rows: KnowledgeRow[]
-  paginatedRows: KnowledgeRow[]
-  page: number
-  totalPages: number
-  onPageChange: (page: number) => void
-  search: string
-  onSearchChange: (v: string) => void
-  statusFilter: string
-  onStatusFilterChange: (v: string) => void
-  onAdd: () => void
-  onEdit: (row: KnowledgeRow) => void
-  onToggleStatus: (row: KnowledgeRow) => void
+  summaryCards: SummaryCard[]
+  readinessChecks: ReadinessCheck[]
+  passedCount: number
+  totalChecks: number
   isLoading: boolean
-  onOpenFullBase: () => void
+}
+
+function SummaryCardView({ card }: { card: SummaryCard }) {
+  const hasIssues = card.warnings.length > 0
+  return (
+    <div className="flex flex-col gap-1 rounded-lg border border-gray-200 p-4 transition-colors hover:border-gray-300">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium text-gray-700">{card.label}</span>
+        <span className={`inline-flex h-6 min-w-[24px] items-center justify-center rounded-full px-2 text-xs font-semibold ${
+          card.activeCount > 0
+            ? 'bg-green-50 text-green-700'
+            : 'bg-gray-100 text-gray-500'
+        }`}>
+          {card.activeCount}/{card.count}
+        </span>
+      </div>
+      {hasIssues && (
+        <div className="flex flex-wrap gap-1">
+          {card.warnings.map((w, i) => (
+            <span key={i} className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[11px] text-amber-700">
+              {w}
+            </span>
+          ))}
+        </div>
+      )}
+      <Link
+        to={card.adminLink}
+        className="mt-1 text-xs font-medium text-blue-600 hover:text-blue-800 hover:underline"
+      >
+        {card.adminLabel} →
+      </Link>
+    </div>
+  )
+}
+
+function ReadinessCheckRow({ check }: { check: ReadinessCheck }) {
+  return (
+    <div className="flex items-start gap-3 rounded-lg border border-gray-100 p-3 transition-colors hover:bg-gray-50">
+      <span className={`mt-0.5 text-sm ${check.passed ? 'text-green-500' : 'text-red-400'}`}>
+        {check.passed ? '✓' : '✗'}
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className={`text-sm font-medium ${check.passed ? 'text-gray-700' : 'text-gray-900'}`}>
+          {check.label}
+        </p>
+        {check.detail && (
+          <p className="mt-0.5 text-xs text-gray-500">{check.detail}</p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+const EMOJI_MAP: Record<string, string> = {
+  services: '💇',
+  products: '🧴',
+  promotions: '🏷️',
+  locations: '🏢',
+  professionals: '👤',
+  rooms: '🚪',
+  schedules: '🕐',
+  policies: '📋',
 }
 
 export function BusinessInformationSummary({
-  activeTab,
-  onTabChange,
-  tabs,
-  rows,
-  paginatedRows,
-  page,
-  totalPages,
-  onPageChange,
-  search,
-  onSearchChange,
-  statusFilter,
-  onStatusFilterChange,
-  onAdd,
-  onEdit,
-  onToggleStatus,
+  summaryCards,
+  readinessChecks,
+  passedCount,
+  totalChecks,
   isLoading,
-  onOpenFullBase,
 }: Props) {
+  if (isLoading) {
+    return (
+      <Card className="p-4">
+        <h2 className="text-lg font-semibold">Información del negocio</h2>
+        <div className="mt-4 flex justify-center py-8 text-gray-400">Cargando...</div>
+      </Card>
+    )
+  }
+
   return (
-    <Card className="p-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      <Card className="p-4">
         <div>
           <h2 className="text-lg font-semibold">Información del negocio</h2>
           <p className="mt-1 text-xs text-gray-500">
-            Catálogo de servicios, productos, reglas y políticas que el asistente conoce sobre tu negocio.
+            Resumen de la información que el asistente conoce sobre tu negocio. Para editar, usa los mantenedores oficiales.
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="secondary" size="sm" onClick={onOpenFullBase}>
-            Ver todo
-          </Button>
-          <Button size="sm" onClick={onAdd}>
-            Agregar
-          </Button>
-        </div>
-      </div>
 
-      <div className="mt-3 flex gap-1 border-b border-gray-200">
-        {tabs.map((tab) => (
-          <button
-            key={tab.value}
-            onClick={() => onTabChange(tab.value)}
-            className={`px-3 py-2 text-sm font-medium transition-colors ${
-              activeTab === tab.value
-                ? 'border-b-2 border-blue-500 text-blue-600'
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="mt-3 flex gap-2">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Buscar..."
-          className="flex-1 rounded border border-gray-300 px-3 py-2 text-sm"
-        />
-        <select
-          value={statusFilter}
-          onChange={(e) => onStatusFilterChange(e.target.value)}
-          className="rounded border border-gray-300 px-3 py-2 text-sm"
-        >
-          <option value="all">Todos</option>
-          <option value="active">Activos</option>
-          <option value="inactive">Inactivos</option>
-        </select>
-      </div>
-
-      {isLoading ? (
-        <div className="mt-4 flex justify-center py-8 text-gray-400">Cargando...</div>
-      ) : rows.length === 0 ? (
-        <div className="mt-4 flex justify-center py-8 text-gray-400">
-          No hay información disponible en esta sección.
-        </div>
-      ) : (
-        <div className="mt-3 space-y-2">
-          {paginatedRows.map((row) => (
-            <div
-              key={row.id}
-              className="flex items-start justify-between rounded-lg border border-gray-100 p-3 transition-colors hover:bg-gray-50"
-            >
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium">{row.title}</p>
-                {row.description && (
-                  <p className="mt-0.5 line-clamp-2 text-xs text-gray-500">{row.description}</p>
-                )}
-                <div className="mt-1 flex items-center gap-2">
-                  <StatusBadge status={row.status} />
-                  <span className="text-xs text-gray-400">{row.category}</span>
-                  <span className="text-xs text-gray-400">{row.updatedAt}</span>
-                </div>
-              </div>
-              <div className="ml-3 flex gap-1">
-                <Button variant="secondary" size="sm" onClick={() => onEdit(row)}>
-                  Editar
-                </Button>
-                {row.type !== 'audit' && (
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => onToggleStatus(row)}
-                  >
-                    {row.status === 'active' ? 'Desactivar' : 'Activar'}
-                  </Button>
-                )}
-              </div>
-            </div>
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {summaryCards.map((card) => (
+            <SummaryCardView key={card.key} card={card} />
           ))}
+        </div>
+      </Card>
 
-          <div className="flex items-center justify-between pt-2 text-sm text-gray-500">
-            <span>
-              {rows.length > 0
-                ? `Mostrando ${page * 10 + 1}-${Math.min((page + 1) * 10, rows.length)} de ${rows.length}`
-                : 'Sin resultados'}
-            </span>
-            <div className="flex gap-1">
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={page === 0}
-                onClick={() => onPageChange(page - 1)}
-              >
-                Anterior
-              </Button>
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={page >= totalPages - 1}
-                onClick={() => onPageChange(page + 1)}
-              >
-                Siguiente
-              </Button>
-            </div>
+      <Card className="p-4">
+        <h2 className="text-lg font-semibold">Preparación del asistente</h2>
+        <p className="mt-1 text-sm text-gray-600">
+          {passedCount} de {totalChecks} verificaciones correctas.
+        </p>
+
+        <div className="mt-1">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
+            <div
+              className={`h-full rounded-full transition-all ${
+                passedCount === totalChecks
+                  ? 'bg-green-500'
+                  : passedCount >= totalChecks / 2
+                    ? 'bg-amber-400'
+                    : 'bg-red-400'
+              }`}
+              style={{ width: `${totalChecks > 0 ? (passedCount / totalChecks) * 100 : 0}%` }}
+            />
           </div>
         </div>
-      )}
-    </Card>
+
+        <div className="mt-4 space-y-2">
+          {readinessChecks.map((check) => (
+            <ReadinessCheckRow key={check.key} check={check} />
+          ))}
+        </div>
+      </Card>
+    </div>
   )
 }
