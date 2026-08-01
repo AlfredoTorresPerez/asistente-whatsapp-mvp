@@ -30,7 +30,8 @@ public class WhatsAppChannelJdbcRepository {
 				from channel_account
 				where business_id = ?
 				  and channel_type = 'WHATSAPP'
-				order by created_at asc
+				  and provider_name in ('META_CLOUD_API', 'SIMULATED')
+				order by created_at desc
 				limit 1
 				""", new ChannelAccountRowMapper(), businessId);
 		return items.stream().findFirst();
@@ -106,7 +107,10 @@ public class WhatsAppChannelJdbcRepository {
 				    updated_at
 				) values (?, ?, ?, 'WHATSAPP', 'META_CLOUD_API', ?, ?, ?, 'CENTRALIZED', 'SIMULATED', true,
 				          'REGISTERED', 'CONNECTED', 'VERIFIED', 'SIMULATED', now(), now())
-				on conflict (business_id, phone_number) do update set
+				on conflict (business_id) where provider_name = 'META_CLOUD_API'
+				                              and routing_mode = 'CENTRALIZED'
+				                              and active = true
+				do update set
 				    session_key = excluded.session_key,
 				    phone_number_id = excluded.phone_number_id,
 				    status = excluded.status,

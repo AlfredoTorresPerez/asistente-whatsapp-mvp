@@ -94,7 +94,7 @@ public class WhatsAppChannelSimulatorController {
 		String sessionKey = request.sessionKey() != null && !request.sessionKey().isBlank()
 				? request.sessionKey()
 				: "simulated";
-		repository.upsertSimulatedChannelAccount(businessId, sessionKey, "56900000000", phoneNumberId, "SIMULATED");
+		repository.upsertSimulatedChannelAccount(businessId, sessionKey, "56900000000", phoneNumberId, "CONNECTED");
 		return repository.findChannelAccountByPhoneNumberId(phoneNumberId)
 				.orElseThrow(() -> new IllegalStateException("No se pudo crear el canal simulado."));
 	}

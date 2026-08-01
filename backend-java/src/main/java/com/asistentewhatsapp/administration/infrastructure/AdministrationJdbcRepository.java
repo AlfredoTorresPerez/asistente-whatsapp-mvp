@@ -54,6 +54,8 @@ public class AdministrationJdbcRepository {
 				        from channel_account
 				        where business_id = ?
 				          and channel_type = 'WHATSAPP'
+				          and provider_name in ('META_CLOUD_API', 'SIMULATED')
+				        order by created_at desc
 				        limit 1
 				    ),
 				    'DISCONNECTED'
