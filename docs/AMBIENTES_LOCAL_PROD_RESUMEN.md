@@ -6,12 +6,9 @@ Usa:
 
 - backend Java 21 + Spring Boot
 - frontend React + TypeScript + Vite
-- PostgreSQL 16 Alpine
-- whatsapp-web.js
-- Puppeteer
-- Chromium
-- Xvfb
-- noVNC
+- PostgreSQL 16 (puerto 5433)
+- mailpit para correo (1025/8025)
+- canal WhatsApp con proveedor `SIMULATED` embebido en el backend (sin Chromium, sin Xvfb, sin noVNC, sin servicio externo ni QR)
 
 Archivo principal:
 
@@ -19,10 +16,13 @@ Archivo principal:
 docker compose --env-file .env.local.example -f docker-compose.local.yml up --build
 ```
 
-El servicio local de WhatsApp expone:
+Servicios locales:
 
-- API interna: http://localhost:3001
-- visor visual: http://localhost:6080/vnc.html?autoconnect=true&resize=scale
+- Frontend: http://localhost:5173
+- Backend: http://localhost:8080
+- PostgreSQL: localhost:5433
+
+No existe servicio en el puerto 3001.
 
 ## Produccion
 
@@ -30,8 +30,8 @@ Usa el puerto abstracto `CanalWhatsApp`.
 
 Implementaciones:
 
-- `WhatsAppWebAdapter`: implementacion local basada en whatsapp-web.js.
-- `WhatsAppCloudApiAdapter`: implementacion productiva/futura para WhatsApp Cloud API.
+- `SimulatedWhatsAppProvider`: implementacion embebida para local/demo (proveedor `SIMULATED`).
+- Proveedor `META_CLOUD_API`: implementacion productiva para WhatsApp Cloud API de Meta.
 
 Archivo principal:
 
@@ -39,22 +39,22 @@ Archivo principal:
 docker compose --env-file .env.production -f docker-compose.prod.yml up --build
 ```
 
-En produccion no se levanta Chromium, Xvfb, noVNC ni whatsapp-web.js.
+En produccion no se levanta Chromium, Xvfb ni noVNC; el canal usa la Cloud API de Meta.
 
 ## Seleccion de proveedor
 
-Variables relevantes:
+La variable `APP_WHATSAPP_CHANNEL_PROVIDER` selecciona el proveedor (default `SIMULATED`). El arranque falla rapido si el proveedor configurado no tiene bean disponible.
+
+Para local (default):
 
 ```env
-APP_WHATSAPP_CHANNEL_PROVIDER=WEB
-APP_WHATSAPP_WEB_ENABLED=true
-APP_WHATSAPP_CLOUD_API_ENABLED=false
+APP_WHATSAPP_CHANNEL_PROVIDER=SIMULATED
 ```
 
-Para produccion futura:
+Para produccion:
 
 ```env
-APP_WHATSAPP_CHANNEL_PROVIDER=CLOUD_API
-APP_WHATSAPP_WEB_ENABLED=false
-APP_WHATSAPP_CLOUD_API_ENABLED=true
+APP_WHATSAPP_CHANNEL_PROVIDER=META_CLOUD_API
 ```
+
+No existen variables de entorno del antiguo modelo de adaptador web.

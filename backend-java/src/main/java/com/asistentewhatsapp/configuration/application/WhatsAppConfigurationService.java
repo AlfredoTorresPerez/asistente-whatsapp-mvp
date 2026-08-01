@@ -1,7 +1,7 @@
 package com.asistentewhatsapp.configuration.application;
 
-import com.asistentewhatsapp.administration.api.WhatsAppWebStatusResponse;
-import com.asistentewhatsapp.administration.application.WhatsAppWebAdministrationService;
+import com.asistentewhatsapp.administration.api.WhatsAppChannelStatusResponse;
+import com.asistentewhatsapp.administration.application.WhatsAppChannelAdministrationService;
 import com.asistentewhatsapp.configuration.api.WhatsAppConfigurationChannelResponse;
 import com.asistentewhatsapp.configuration.api.WhatsAppConfigurationLinkedDeviceResponse;
 import com.asistentewhatsapp.configuration.api.WhatsAppConfigurationPreferencesRequest;
@@ -26,12 +26,12 @@ public class WhatsAppConfigurationService {
 	private static final String LOCAL_LOCATION = "Ambiente local";
 
 	private final WhatsAppConfigurationJdbcRepository repository;
-	private final WhatsAppWebAdministrationService whatsAppWebAdministrationService;
+	private final WhatsAppChannelAdministrationService whatsAppChannelAdministrationService;
 
 	public WhatsAppConfigurationService(WhatsAppConfigurationJdbcRepository repository,
-			WhatsAppWebAdministrationService whatsAppWebAdministrationService) {
+			WhatsAppChannelAdministrationService whatsAppChannelAdministrationService) {
 		this.repository = repository;
-		this.whatsAppWebAdministrationService = whatsAppWebAdministrationService;
+		this.whatsAppChannelAdministrationService = whatsAppChannelAdministrationService;
 	}
 
 	@Transactional
@@ -42,20 +42,18 @@ public class WhatsAppConfigurationService {
 		WhatsAppConfigurationJdbcRepository.ChannelAccountDetailRecord channelAccount = repository
 				.findChannelAccount(authenticatedUser.businessId())
 				.orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "WHATSAPP_CHANNEL_NOT_FOUND",
-						"No se encontro el canal WhatsApp Web para la empresa actual."));
+						"No se encontro el canal WhatsApp para la empresa actual."));
 		WhatsAppConfigurationJdbcRepository.PreferencesRecord preferences = repository
 				.findOrCreatePreferences(authenticatedUser.businessId());
-		WhatsAppWebStatusResponse status = whatsAppWebAdministrationService.getStatus(authenticatedUser);
+		WhatsAppChannelStatusResponse status = whatsAppChannelAdministrationService.getStatus(authenticatedUser);
 		String resolvedPhone = firstNotBlank(status.phoneNumber(), channelAccount.phoneNumber());
 		OffsetDateTime lastSynchronizationAt = firstNotNull(status.lastEventAt(), channelAccount.lastEventAt(),
 				channelAccount.updatedAt());
 
-		return new WhatsAppConfigurationResponse(status.sessionStatus(), resolvedPhone,
+		return new WhatsAppConfigurationResponse(status.connectionStatus(), resolvedPhone,
 				firstNotBlank(business.businessName(), business.companyName()), lastSynchronizationAt,
-				calculateActiveSessionHours(status.sessionStatus(), channelAccount.connectedAt()),
-				resolveConnectedFrom(status.adapterReachable()),
-				firstNotBlank(status.qrCode(), channelAccount.lastQrCode()), status.adapterReachable(),
-				firstNotBlank(status.adapterMode(), channelAccount.providerName()), status.warningMessage(),
+				calculateActiveSessionHours(status.connectionStatus(), channelAccount.connectedAt()),
+				resolveConnectedFrom(status.provider()), null, status.active(), status.adapterMode(), status.message(),
 				toPreferencesResponse(preferences),
 				toMainChannel(channelAccount, resolvedPhone, preferences.outOfHoursMessage()),
 				toLinkedDevices(channelAccount, status, lastSynchronizationAt), toSessionHistory(channelAccount,
@@ -71,19 +69,13 @@ public class WhatsAppConfigurationService {
 
 	@Transactional
 	public WhatsAppConfigurationResponse connect(AuthenticatedUser authenticatedUser) {
-		whatsAppWebAdministrationService.connect(authenticatedUser);
-		return getConfiguration(authenticatedUser);
-	}
-
-	@Transactional
-	public WhatsAppConfigurationResponse refreshQr(AuthenticatedUser authenticatedUser) {
-		whatsAppWebAdministrationService.refreshQr(authenticatedUser);
+		whatsAppChannelAdministrationService.connect(authenticatedUser);
 		return getConfiguration(authenticatedUser);
 	}
 
 	@Transactional
 	public WhatsAppConfigurationResponse disconnect(AuthenticatedUser authenticatedUser) {
-		whatsAppWebAdministrationService.disconnect(authenticatedUser);
+		whatsAppChannelAdministrationService.disconnect(authenticatedUser);
 		return getConfiguration(authenticatedUser);
 	}
 
@@ -106,11 +98,11 @@ public class WhatsAppConfigurationService {
 
 	private List<WhatsAppConfigurationLinkedDeviceResponse> toLinkedDevices(
 			WhatsAppConfigurationJdbcRepository.ChannelAccountDetailRecord channelAccount,
-			WhatsAppWebStatusResponse status, OffsetDateTime lastSynchronizationAt) {
+			WhatsAppChannelStatusResponse status, OffsetDateTime lastSynchronizationAt) {
 		List<WhatsAppConfigurationLinkedDeviceResponse> devices = new ArrayList<>();
-		devices.add(new WhatsAppConfigurationLinkedDeviceResponse(channelAccount.id().toString(), "Sesion principal",
-				"Administrador", LOCAL_LOCATION, resolveBrowser(status.adapterMode()),
-				toDeviceStatus(status.sessionStatus()), lastSynchronizationAt));
+		devices.add(new WhatsAppConfigurationLinkedDeviceResponse(channelAccount.id().toString(), "Canal principal",
+				"Administrador", LOCAL_LOCATION, resolveChannelType(status.provider()),
+				toDeviceStatus(status.connectionStatus()), lastSynchronizationAt));
 		return devices;
 	}
 
@@ -127,7 +119,7 @@ public class WhatsAppConfigurationService {
 
 		return events.stream()
 				.map(event -> new WhatsAppConfigurationSessionHistoryResponse(event.deliveryId(),
-						toEventTitle(event.eventType(), event.processingStatus()), "Adaptador WhatsApp Web",
+						toEventTitle(event.eventType(), event.processingStatus()), "Canal WhatsApp",
 						toEventTone(event.eventType(), event.processingStatus()), event.receivedAt()))
 				.toList();
 	}
@@ -140,23 +132,21 @@ public class WhatsAppConfigurationService {
 		return Math.max(hours, 0L);
 	}
 
-	private String resolveConnectedFrom(boolean adapterReachable) {
-		return adapterReachable ? "Docker local / whatsapp-web.js" : "Base local sin adaptador activo";
+	private String resolveConnectedFrom(String provider) {
+		return switch (firstNotBlank(provider, "SIMULATED")) {
+			case "META_CLOUD_API" -> "WhatsApp Cloud API de Meta";
+			default -> "Modo simulado local";
+		};
 	}
 
 	private String resolveChannelType(String providerName) {
-		if ("WHATSAPP_WEB".equals(providerName)) {
-			return "WhatsApp Web local";
+		if ("META_CLOUD_API".equals(providerName)) {
+			return "WhatsApp Cloud API (Meta)";
+		}
+		if ("SIMULATED".equals(providerName)) {
+			return "Modo simulado";
 		}
 		return firstNotBlank(providerName, "WhatsApp");
-	}
-
-	private String resolveBrowser(String adapterMode) {
-		String mode = firstNotBlank(adapterMode, "EXPERIMENTAL");
-		if (mode.contains("WHATSAPP_WEBJS") || mode.contains("EXPERIMENTAL")) {
-			return "Chromium / whatsapp-web.js";
-		}
-		return mode;
 	}
 
 	private String toDeviceStatus(String sessionStatus) {
@@ -173,7 +163,6 @@ public class WhatsAppConfigurationService {
 		return switch (firstNotBlank(eventType, "EVENT")) {
 			case "MESSAGE_RECEIVED" -> "Mensaje recibido" + suffix;
 			case "MESSAGE_ACK_UPDATED" -> "Entrega actualizada" + suffix;
-			case "QR_UPDATED" -> "QR generado" + suffix;
 			case "SESSION_STATUS_CHANGED" -> "Estado de sesion actualizado" + suffix;
 			default -> "Evento del canal" + suffix;
 		};
@@ -184,7 +173,6 @@ public class WhatsAppConfigurationService {
 			return "danger";
 		}
 		return switch (firstNotBlank(eventType, "EVENT")) {
-			case "QR_UPDATED" -> "info";
 			case "SESSION_STATUS_CHANGED" -> "success";
 			case "MESSAGE_RECEIVED", "MESSAGE_ACK_UPDATED" -> "neutral";
 			default -> "warning";

@@ -2,15 +2,15 @@
 
 ## Objetivo
 
-Mostrar el MVP como una demostracion tecnica controlada de un asistente WhatsApp para un centro estetico, con backend Java, frontend React, PostgreSQL y un adaptador local de WhatsApp Web desacoplado por `CanalWhatsApp`.
+Mostrar el MVP como una demostracion tecnica controlada de un asistente WhatsApp para un centro estetico, con backend Java, frontend React y PostgreSQL. El canal de WhatsApp es nativo del backend: proveedor `SIMULATED` (embebido, default local) o `META_CLOUD_API` (WhatsApp Cloud API de Meta). No existe servicio Node externo, QR ni Chromium.
 
 Este MVP no esta listo para produccion.
 
 ## Alcance real del MVP
 
-Incluye login JWT, dashboard, conversaciones, envio manual de mensajes, prospectos, agenda, catalogo, pedidos, estado del canal WhatsApp Web local, noVNC y simulacion local de mensaje entrante.
+Incluye login JWT, dashboard, conversaciones, envio manual de mensajes, prospectos, agenda, catalogo, pedidos, estado del canal WhatsApp (simulado o Cloud API) y simulacion local de mensaje entrante.
 
-La arquitectura conserva `CanalWhatsApp` como abstraccion central. En local se usa `WhatsAppWebAdapter`; en produccion futura debe usarse `WhatsAppCloudApiAdapter` o un proveedor oficial.
+La arquitectura conserva `CanalWhatsApp` como abstraccion central. En local el proveedor es `SIMULATED` (embebido en Spring Boot); en produccion se usa `META_CLOUD_API` via `WhatsAppCloudApiAdapter`.
 
 ## Que si mostrar
 
@@ -18,9 +18,8 @@ La arquitectura conserva `CanalWhatsApp` como abstraccion central. En local se u
 - Dashboard con datos semilla.
 - Lista y detalle de conversaciones.
 - Envio manual de mensaje desde una conversacion.
-- Estado del adaptador WhatsApp Web local.
-- noVNC para visualizar Chromium y el QR si aplica.
-- Simulacion de mensaje entrante si WhatsApp Web no conecta.
+- Estado del canal WhatsApp (proveedor, conexion, eventos recientes) en `/admin/whatsapp-channel`.
+- Simulacion de mensaje entrante via `/admin/whatsapp-simulator` o `POST /api/v1/test/whatsapp-inbound`.
 - Creacion de prospecto desde conversacion.
 - Creacion de cita o pedido desde conversacion.
 
@@ -29,7 +28,7 @@ La arquitectura conserva `CanalWhatsApp` como abstraccion central. En local se u
 - El MVP como solucion productiva final.
 - Automatizaciones productivas sin supervision.
 - Seguridad avanzada, usuarios/roles administrativos o reportes como modulos completos.
-- WhatsApp Web como integracion oficial o recomendada para produccion.
+- El canal simulado como integracion productiva.
 - Estados de entrega, plantillas, firma de proveedor oficial u observabilidad avanzada como terminados.
 
 ## Arranque local
@@ -54,8 +53,7 @@ Para reuniones, construir las imagenes previamente.
 
 - frontend: http://localhost:5173
 - backend health: http://localhost:8080/actuator/health
-- whatsapp health: http://localhost:3001/health
-- noVNC: http://localhost:6080/vnc.html?autoconnect=true&resize=scale
+- API docs: http://localhost:8080/swagger-ui/index.html
 
 ## Credenciales demo
 
@@ -80,14 +78,14 @@ No usar estas credenciales en produccion.
 6. Crear una nueva reserva desde una conversacion.
 7. Generar link de pago para la reserva (modo SIMULATED).
 8. Abrir el link de pago publico en `/reservas/pagar/{paymentId}`.
-9. Ir a Administracion > Conexion WhatsApp Web (mostrar estado).
-10. Simular mensaje entrante (ver abajo) si WhatsApp Web no conecta.
+9. Ir a Administracion > Canal de WhatsApp (mostrar estado del proveedor simulado).
+10. Simular mensaje entrante (ver abajo) con `POST /api/v1/test/whatsapp-inbound`.
 11. Crear prospecto desde la conversacion.
 12. Crear pedido desde la conversacion.
 
 ## Simulacion de mensaje entrante
 
-Si WhatsApp Web no conecta, usar el endpoint local interno:
+Con el proveedor `SIMULATED` (default local), usar el endpoint de simulacion:
 
 ```powershell
 $body = @{
@@ -98,13 +96,12 @@ $body = @{
 
 Invoke-RestMethod `
   -Method Post `
-  -Uri "http://localhost:8080/internal/demo/incoming-message" `
-  -Headers @{ "X-Demo-Internal-Token" = "dev-demo-internal-token" } `
+  -Uri "http://localhost:8080/api/v1/test/whatsapp-inbound" `
   -ContentType "application/json" `
   -Body $body
 ```
 
-El endpoint requiere `APP_DEMO_INTERNAL_TOKEN`. En produccion no debe habilitarse.
+Tambien disponible desde la UI en `/admin/whatsapp-simulator`. El mensaje se procesa con el mismo flujo que un mensaje real entrante (evento de canal, conversacion, IA si esta habilitada).
 
 ## Recuperacion de contrasena
 
@@ -112,8 +109,8 @@ El flujo local puede generar enlace/token en log si no existe correo real. El to
 
 ## Problemas conocidos
 
-- `whatsapp-web.js` es una integracion no oficial.
-- `WhatsAppCloudApiAdapter` existe como esqueleto tecnico y punto de extension, no como integracion productiva completa.
+- El canal simulado no entrega mensajes fuera del proceso local: sirve para demo y desarrollo.
+- `WhatsAppCloudApiAdapter` requiere credenciales Meta reales (token, phone_number_id, webhook verificado) para operar fuera de dry-run.
 - La demo depende de conectividad externa para la primera construccion.
 - Faltan validacion de webhook oficial, firma del proveedor oficial, estados de entrega completos, plantillas aprobadas y observabilidad avanzada.
 - Para reuniones, construir imagenes previamente.
@@ -124,4 +121,4 @@ El flujo local puede generar enlace/token en log si no existe correo real. El to
 docker compose --env-file .env.production.example -f docker-compose.prod.yml config
 ```
 
-El compose productivo no debe depender de `whatsapp-web-service`, Chromium, Xvfb ni noVNC.
+El compose productivo usa `APP_WHATSAPP_CHANNEL_PROVIDER=META_CLOUD_API` y no incluye servicios externos de canal.

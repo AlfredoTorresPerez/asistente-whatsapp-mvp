@@ -346,7 +346,7 @@ Campos principales:
 
 ### whatsapp_web_sessions
 
-Estado de la sesion conectada al adaptador experimental.
+Historial de sesion del canal WhatsApp nativo. La tabla existe en la BD real y no se elimina; ya no refleja estado de un adaptador externo, sino la sesion del canal con proveedor `META_CLOUD_API` o `SIMULATED`.
 
 Campos principales:
 
@@ -366,7 +366,7 @@ Restricciones:
 
 ### whatsapp_web_events
 
-Registro de eventos recibidos desde `whatsapp-web-service`.
+Registro de eventos del canal WhatsApp (proveedor `META_CLOUD_API` o `SIMULATED`).
 
 Campos principales:
 
@@ -538,4 +538,4 @@ erDiagram
 - Un pedido debe tener al menos un `order_item`.
 - Una cita debe programarse en fecha futura al crear o reprogramar.
 - Una regla de automatizacion en modo prueba nunca llama al canal real.
-- `whatsapp_web_sessions` no reemplaza la fuente de verdad del negocio; solo refleja estado del adaptador.
+- `whatsapp_web_sessions` no reemplaza la fuente de verdad del negocio; solo refleja historial de sesion del canal.

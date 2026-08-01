@@ -14,16 +14,15 @@ Cuando exista ambiguedad entre documentos, el orden de decision es:
 4. `docs/DATA_MODEL.md`
 5. `docs/UI_COMPONENTS.md`
 6. `docs/NAVIGATION_MAP.md`
-7. `docs/WHATSAPP_WEB_ADAPTER.md`
-8. `docs/TASKS_PHASE_1.md`
+7. `docs/TASKS_PHASE_1.md`
 
 ## Alcance funcional de Fase 1
 
 - Aplicacion web interna para operar conversaciones de WhatsApp.
 - Gestion basica de prospectos, citas, pedidos, catalogo y usuarios.
 - Reglas de automatizacion simples sobre eventos definidos.
-- Integracion con un unico numero de WhatsApp por empresa mediante `whatsapp-web-service`.
-- `whatsapp-web-service` se usa solo como adaptador experimental para demos, validacion temprana y pilotos controlados.
+- Integracion con un unico numero de WhatsApp por empresa mediante el canal nativo del backend.
+- El canal soporta dos proveedores: `META_CLOUD_API` (WhatsApp Cloud API de Meta, webhook firmado `X-Hub-Signature-256`) y `SIMULATED` (proveedor simulado embebido, default local). No existe servicio externo ni QR.
 - Una sola empresa por despliegue.
 - Interfaz de usuario en espanol.
 - Identificadores de codigo, nombres de clases, paquetes, tablas y campos en ingles.
@@ -31,7 +30,7 @@ Cuando exista ambiguedad entre documentos, el orden de decision es:
 ## Fuera de alcance en Fase 1
 
 - Multiempresa dentro de la misma instancia.
-- Mas de una sesion WhatsApp Web activa por empresa.
+- Mas de un canal WhatsApp activo por empresa.
 - Mensajes multimedia, notas de voz, documentos o stickers.
 - Bots con IA generativa, NLP avanzado o intenciones libres.
 - Workflows visuales complejos con ramas multiples.
@@ -66,7 +65,7 @@ Cuando exista ambiguedad entre documentos, el orden de decision es:
 
 ### Integraciones y soporte
 
-- `whatsapp-web-service` como servicio Node separado, no embebido en Java.
+- Canal WhatsApp nativo del backend, sin servicio externo: proveedores `META_CLOUD_API` y `SIMULATED` (embebido) seleccionados con `APP_WHATSAPP_CHANNEL_PROVIDER`.
 - Docker Compose para levantar dependencias locales.
 - Redis opcional para cache liviano, rate limit y colas simples de reintento.
 
@@ -81,10 +80,10 @@ Cuando exista ambiguedad entre documentos, el orden de decision es:
 
 1. El frontend consume exclusivamente el backend Java.
 2. El backend Java es la fuente de verdad de negocio.
-3. `whatsapp-web-service` es un adaptador de canal, no una fuente de verdad funcional.
-4. Las actualizaciones de mensajes entrantes llegan desde `whatsapp-web-service` al backend via webhook firmado.
+3. El canal WhatsApp es nativo del backend y no es una fuente de verdad funcional.
+4. Los mensajes entrantes llegan por el canal: webhook firmado `X-Hub-Signature-256` de Cloud API, o simulacion local via `POST /api/v1/test/whatsapp-inbound`.
 5. La UI actualiza datos por polling en endpoints REST.
-6. El backend Java depende de interfaces internas; nunca depende del SDK o runtime de WhatsApp Web dentro del dominio.
+6. El backend Java depende de interfaces internas (`CanalWhatsApp`); nunca depende de un servicio externo ni de sesiones de dispositivo con QR.
 
 ### Estructura esperada del repositorio
 
@@ -92,7 +91,6 @@ Cuando exista ambiguedad entre documentos, el orden de decision es:
 /
 |-- backend-java/
 |-- frontend-react/
-|-- whatsapp-web-service/
 |-- docs/
 |-- docker-compose.yml
 `-- README.md
@@ -108,7 +106,8 @@ backend-java/src/main/java/com/asistentewhatsapp/
 |-- channels/
 |   |-- domain/
 |   |-- application/
-|   `-- infrastructure/whatsapp-web/
+|   |-- infrastructure/whatsappcloud/
+|   `-- infrastructure/simulated/
 |-- conversations/
 |-- automation/
 |-- leads/
@@ -155,7 +154,7 @@ frontend-react/src/
 - Catalog
 - Automation Rules
 - Administration
-- WhatsApp Web Connection
+- WhatsApp Channel
 
 ## Comandos contractuales
 
@@ -171,9 +170,6 @@ pnpm --dir frontend-react lint
 ./backend-java/mvnw spring-boot:run
 ./backend-java/mvnw test
 ./backend-java/mvnw verify
-
-pnpm --dir whatsapp-web-service install
-pnpm --dir whatsapp-web-service dev
 
 docker compose up --build
 docker compose down
@@ -204,7 +200,7 @@ docker compose down
   - conversaciones activas: 15 segundos;
   - notificaciones: 30 segundos;
   - dashboard: 30 segundos;
-  - estado WhatsApp Web: 15 segundos.
+  - estado del canal WhatsApp: 15 segundos.
 - Cancelar en formularios vuelve a la pantalla de origen sin persistir.
 - Guardar exitoso siempre muestra `Toast` de confirmacion o redireccion con estado de exito.
 - Sidebar fija en escritorio y colapsable en movil.
@@ -223,9 +219,9 @@ docker compose down
   - cambio de contrasena;
   - creacion y edicion de reglas;
   - registro de pagos;
-  - cambios de sesion WhatsApp Web.
+  - cambios de estado del canal WhatsApp.
 - Los mensajes salientes a WhatsApp deben pasar por una cola de salida o patron outbox sencillo para tolerar reintentos.
-- El backend nunca expone directamente secretos de `whatsapp-web-service`.
+- El backend nunca expone directamente secretos del canal (App Secret, token de acceso de Cloud API).
 
 ## Reglas de datos
 
@@ -245,7 +241,7 @@ docker compose down
 - Politicas de contrasena configurables desde administracion.
 - Autorizacion por rol fijo en Fase 1: `OWNER`, `ADMIN`, `AGENT`, `SALES`.
 - Toda llamada privada requiere `Authorization: Bearer <token>`.
-- Webhooks de `whatsapp-web-service` deben firmarse con HMAC.
+- El webhook del canal Cloud API debe verificar la firma `X-Hub-Signature-256` (HMAC-SHA256 del body con App Secret) en tiempo constante.
 
 ## Regla de UX para Fase 1
 

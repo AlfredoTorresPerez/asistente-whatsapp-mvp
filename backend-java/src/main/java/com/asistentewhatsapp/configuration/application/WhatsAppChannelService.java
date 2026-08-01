@@ -157,7 +157,7 @@ public class WhatsAppChannelService {
 		String providerType = record.providerName();
 		boolean isCloud = WhatsAppChannelStatus.PROVIDER_META_CLOUD_API.equals(providerType);
 
-		String providerLabel = isCloud ? "Meta WhatsApp Cloud API" : "WhatsApp Web Local";
+		String providerLabel = isCloud ? "Meta WhatsApp Cloud API" : "Modo simulado local";
 
 		MetaCloudConfig cloudConfig = null;
 		if (isCloud) {
@@ -261,7 +261,7 @@ public class WhatsAppChannelService {
 			return "Sistema";
 		return switch (eventType) {
 			case "MESSAGE_RECEIVED", "MESSAGE_SENT", "DELIVERY_ERROR" -> "WhatsApp";
-			case "QR_UPDATED", "SESSION_STATUS_CHANGED", "MESSAGE_ACK_UPDATED" -> "Adaptador WhatsApp Web";
+			case "QR_UPDATED", "SESSION_STATUS_CHANGED", "MESSAGE_ACK_UPDATED" -> "Canal WhatsApp";
 			default -> "Sistema";
 		};
 	}

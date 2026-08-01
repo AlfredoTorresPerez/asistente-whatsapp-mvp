@@ -173,7 +173,7 @@ def add_callout(doc: Document, label: str, text: str, fill: str = "F8FAFC") -> N
 def add_matrix(doc: Document) -> None:
     headers = ["Area", "Estado", "Que esta bien", "Que esta mal", "Que falta", "Riesgo", "Prioridad"]
     rows = [
-        ["Funcional", "Riesgoso", "Login, dashboard, conversaciones, administracion, IA y WhatsApp Web existen.",
+        ["Funcional", "Riesgoso", "Login, dashboard, conversaciones, administracion, IA y canal de WhatsApp existen.",
          "No todo esta validado end-to-end hoy.", "Guion demo y pruebas manuales cerradas.", "Medio", "Alta"],
         ["Tecnico", "Riesgoso", "Docker levanta healthy; backend inicia; DB migra a v14.",
          "Tests backend fallan; frontend build/test/lint fallan.", "tsconfig.json, config Vitest, limpieza lint.", "Alto", "Alta"],
@@ -282,8 +282,8 @@ def build() -> None:
     )
     add_para(doc, "Estado general: el MVP funciona como demo local controlada, pero no esta listo para produccion.")
     add_para(doc, "Nivel de preparacion para cliente: medio. Se puede mostrar si se controla el recorrido y se evitan promesas de automatizacion completa.")
-    add_para(doc, "Principales fortalezas: stack Docker healthy, backend Spring Boot activo, PostgreSQL con migraciones aplicadas hasta v14, frontend disponible en localhost:5173, modulo IA del Negocio, administracion, conversaciones, catalogo, agenda y WhatsApp Web experimental.")
-    add_para(doc, "Principales debilidades: backend tests fallan, frontend build falla por ausencia de tsconfig.json, frontend tests fallan por configuracion Vitest/jsdom, lint falla con errores React Hooks, WhatsApp Web es experimental.")
+    add_para(doc, "Principales fortalezas: stack Docker healthy, backend Spring Boot activo, PostgreSQL con migraciones aplicadas hasta v14, frontend disponible en localhost:5173, modulo IA del Negocio, administracion, conversaciones, catalogo, agenda y canal de WhatsApp (simulado o Cloud API).")
+    add_para(doc, "Principales debilidades: backend tests fallan, frontend build falla por ausencia de tsconfig.json, frontend tests fallan por configuracion Vitest/jsdom, lint falla con errores React Hooks, el canal WhatsApp depende de simulador o Cloud API de Meta.")
 
     add_heading(doc, "2. Matriz de evaluacion")
     add_matrix(doc)
@@ -293,11 +293,11 @@ def build() -> None:
         doc,
         ["Evidencia", "Resultado", "Lectura"],
         [
-            ["Docker Compose local", "Servicios backend, frontend, postgres y whatsapp-web healthy.", "Apto para demo local tras levantar el stack."],
+            ["Docker Compose local", "Servicios backend, frontend y postgres healthy.", "Apto para demo local tras levantar el stack."],
             ["HTTP backend", "GET /api/v1/health respondio UP.", "Backend disponible."],
             ["HTTP frontend", "localhost:5173 respondio 200.", "Interfaz disponible."],
             ["Flyway", "14 migraciones validadas, schema en version 14.", "Base de datos consistente en el entorno actual."],
-            ["Logs WhatsApp Web", "Ignora notification_template y mensajes salientes propios.", "Reduce ruido y riesgo de duplicidad."],
+            ["Logs del canal WhatsApp", "Ignora notification_template y mensajes salientes propios.", "Reduce ruido y riesgo de duplicidad."],
             ["Backend tests", "14 tests ejecutados; 1 falla en coherencia IA.", "No esta limpio para release."],
             ["Frontend build", "Falla por ausencia de tsconfig.json.", "Build productivo no verificable localmente."],
             ["Frontend tests", "Fallan por document/describe no definidos.", "Vitest requiere configuracion jsdom/globals."],
@@ -313,7 +313,7 @@ def build() -> None:
         "PostgreSQL valida migraciones y conserva el esquema en version v14.",
         "Frontend responde y permite preparar una demostracion visual.",
         "Existe modulo IA del Negocio y rutas principales de administracion.",
-        "WhatsApp Web experimental tiene filtros para mensajes inutiles y mensajes propios.",
+        "El canal WhatsApp tiene filtros para mensajes inutiles y mensajes propios.",
         "La auto-respuesta IA esta desactivada por defecto, lo cual reduce riesgo en demo.",
         "El dominio del centro estetico esta modelado con servicios, catalogo, agenda y conversaciones.",
     ])
@@ -326,7 +326,7 @@ def build() -> None:
         "El lint frontend falla por patrones React Hooks en catalogo, conversaciones y reglas.",
         "El contenedor frontend usa Vite dev server; no representa un despliegue productivo real.",
         "Los logs de Spring muestran password generado de desarrollo; debe revisarse antes de produccion.",
-        "WhatsApp Web via whatsapp-web.js debe tratarse como experimental, no como canal productivo garantizado.",
+        "El canal WhatsApp via Cloud API de Meta es el camino productivo; el simulador queda solo para desarrollo.",
     ])
 
     add_heading(doc, "6. Que falta")
@@ -347,7 +347,7 @@ def build() -> None:
         ["Nivel", "Riesgos", "Mitigacion"],
         [
             ["Critico", "Mostrarlo como produccion o activar auto-respuesta real sin validacion.", "Presentarlo solo como demo controlada; mantener auto-reply apagado."],
-            ["Critico", "Prometer estabilidad de WhatsApp Web experimental.", "Explicar que para produccion se recomienda WhatsApp Cloud API."],
+            ["Critico", "Prometer estabilidad del canal simulado.", "Explicar que para produccion se recomienda WhatsApp Cloud API."],
             ["Medio", "Cliente tecnico pregunta por QA y aparecen tests fallidos.", "Tener respuesta honesta: la demo valida valor, la etapa siguiente limpia CI y pruebas."],
             ["Medio", "QR o sesion WhatsApp no esta lista durante la reunion.", "Preparar simulacion o verificar sesion antes de iniciar."],
             ["Menor", "Logs de mensajes ignorados parecen errores.", "Explicar que son filtros esperados del adaptador."],
@@ -359,7 +359,7 @@ def build() -> None:
     add_numbered(doc, [
         "Verificar docker compose ps y health checks antes de la reunion.",
         "Probar login demo y navegacion privada.",
-        "Probar Dashboard, Conversaciones, IA del Negocio, Administracion y WhatsApp Web.",
+        "Probar Dashboard, Conversaciones, IA del Negocio, Administracion y el canal de WhatsApp.",
         "Preparar QR o simulacion; no improvisar conexion real.",
         "Mantener APP_AI_AGENTS_AUTO_REPLY_ENABLED=false.",
         "Corregir o documentar internamente el test de coherencia IA fallido.",
@@ -385,7 +385,7 @@ def build() -> None:
             ["Operacion", "Conversaciones, historial, envio manual y estado visual.", "Mensajes reales no preparados."],
             ["IA", "IA del Negocio, respuestas sugeridas, auditoria y modo supervisado.", "Auto-respuesta real sin aprobacion humana."],
             ["Centro estetico", "Catalogo, servicios, precios y agenda como contexto comercial.", "Confirmar disponibilidad sin validacion."],
-            ["Administracion", "Usuarios, seguridad y WhatsApp Web.", "Prometer SLA de WhatsApp Web experimental."],
+            ["Administracion", "Usuarios, seguridad y canal de WhatsApp.", "Prometer SLA de WhatsApp Web experimental."],
         ],
         [1.0, 2.75, 2.6],
     )
@@ -417,7 +417,7 @@ def build() -> None:
         ["Pregunta posible", "Respuesta recomendada"],
         [
             ["Esto ya responde automaticamente en produccion?", "En esta demo esta en modo supervisado. La auto-respuesta se activa despues de validar calidad, agenda y reglas de negocio."],
-            ["WhatsApp Web es el canal definitivo?", "Para demo y pilotos controlados usamos WhatsApp Web experimental; para produccion recomendamos WhatsApp Cloud API."],
+            ["WhatsApp Web es el canal definitivo?", "El simulador cubre demo y desarrollo; para produccion se usa WhatsApp Cloud API de Meta."],
             ["Puede confirmar horas automaticamente?", "Puede guiar la agenda, pero la confirmacion final debe validar disponibilidad real antes de comprometer horario."],
             ["La IA inventa precios o servicios?", "El objetivo es responder desde catalogo y reglas del negocio; antes de produccion se amplian pruebas para evitar invenciones."],
             ["Que falta para produccion?", "QA automatizado limpio, canal productivo, seguridad, monitoreo, backups, secretos y pruebas end-to-end."],
@@ -428,7 +428,7 @@ def build() -> None:
     doc.add_section(WD_SECTION_START.NEW_PAGE)
     add_heading(doc, "Anexo: checklist rapido previo a la demo")
     add_bullets(doc, [
-        "Confirmar que backend, frontend, postgres y whatsapp-web esten healthy.",
+        "Confirmar que backend, frontend y postgres esten healthy.",
         "Abrir http://localhost:5173 y validar login.",
         "Confirmar que /api/v1/health responde UP.",
         "Revisar que el QR o simulador este preparado.",

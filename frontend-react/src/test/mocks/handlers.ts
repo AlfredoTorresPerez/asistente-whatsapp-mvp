@@ -63,26 +63,29 @@ export const handlers = [
   http.post(wc('/configuration/whatsapp/connect'), () =>
     HttpResponse.json({ status: 'CONNECTING' }),
   ),
-  http.post(wc('/configuration/whatsapp/refresh-qr'), () =>
-    HttpResponse.json({ qrBase64: 'data:image/png;base64,iVBORw0KGgo=' }),
-  ),
   http.post(wc('/configuration/whatsapp/disconnect'), () =>
     HttpResponse.json({ status: 'DISCONNECTED' }),
   ),
-  http.get(wc('/whatsapp-web/status'), () =>
+  http.get(wc('/whatsapp-channel/status'), () =>
     HttpResponse.json({
-      status: 'DISCONNECTED',
-      qrCode: null,
+      provider: 'SIMULATED',
+      connectionStatus: 'DISCONNECTED',
       phoneNumber: null,
-      businessName: null,
+      phoneNumberId: null,
+      adapterMode: 'SIMULATED',
+      lastEventAt: null,
+      active: true,
+      recentEventCount: 0,
+      recentErrorCount: 0,
+      recentEvents: [],
+      message: null,
     }),
   ),
-  http.post(wc('/whatsapp-web/connect'), () => HttpResponse.json({ status: 'CONNECTING' })),
-  http.post(wc('/whatsapp-web/disconnect'), () => HttpResponse.json({ status: 'DISCONNECTED' })),
-  http.post(wc('/whatsapp-web/refresh-qr'), () =>
-    HttpResponse.json({ qrBase64: 'data:image/png;base64,iVBORw0KGgo=' }),
+  http.post(wc('/whatsapp-channel/connect'), () => HttpResponse.json({ status: 'CONNECTING' })),
+  http.post(wc('/whatsapp-channel/disconnect'), () =>
+    HttpResponse.json({ status: 'DISCONNECTED' }),
   ),
-  http.post(wc('/whatsapp-web/test-message'), () =>
+  http.post(wc('/whatsapp-channel/test-message'), () =>
     HttpResponse.json({ status: 'SENT', messageId: 'test-msg-1' }),
   ),
   http.post(wc('/test/whatsapp-inbound'), () => HttpResponse.json({ status: 'PROCESSED' })),

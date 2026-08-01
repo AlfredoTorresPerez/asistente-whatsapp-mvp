@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "app.channels.whatsapp")
 public class WhatsAppChannelProperties {
 
-	private Provider provider = Provider.WEB;
+	private Provider provider = Provider.SIMULATED;
 
 	public Provider getProvider() {
 		return provider;
@@ -16,6 +16,6 @@ public class WhatsAppChannelProperties {
 	}
 
 	public enum Provider {
-		WEB, WHATSAPP_WEB, CLOUD_API, META_CLOUD_API, DISABLED
+		META_CLOUD_API, SIMULATED
 	}
 }

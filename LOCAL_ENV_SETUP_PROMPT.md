@@ -102,7 +102,6 @@ docker inspect asistente-backend --format '{{json .Config.Env}}' | python -c "im
 
 | Perfil | Comando | Qué agrega |
 |---|---|---|
-| `whatsapp` | `--profile whatsapp` | whatsapp-web-service con Puppeteer + Chromium |
 | `public-link` | `--profile public-link` | Cloudflare Tunnel (trycloudflare.com) |
 | `monitoring` | `--profile monitoring` | Prometheus + Grafana |
 | `https` | `--profile https` | Caddy con HTTPS local autofirmado |

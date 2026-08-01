@@ -19,7 +19,7 @@ function conversation(
     unreadCount: 0,
     lastMessagePreview: 'Hola, quiero consultar por limpieza facial',
     lastMessageAt: '2026-06-05T12:00:00Z',
-    channelType: 'WHATSAPP_WEB',
+    channelType: 'WHATSAPP',
     assignedUserId: null,
     assignedUserName: null,
     prospectId: null,

@@ -6,7 +6,7 @@ import com.asistentewhatsapp.channels.application.ChannelDispatchRequest;
 import com.asistentewhatsapp.channels.application.ChannelDispatchResponse;
 import com.asistentewhatsapp.channels.application.ChannelDispatchService;
 import com.asistentewhatsapp.channels.domain.MessageChannelType;
-import com.asistentewhatsapp.channels.infrastructure.whatsappweb.WhatsAppWebChannelJdbcRepository;
+import com.asistentewhatsapp.channels.infrastructure.WhatsAppChannelJdbcRepository;
 import com.asistentewhatsapp.shared.observability.LogSanitizer;
 import java.time.Duration;
 import java.time.Instant;
@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 public class AiReplyOutboxProcessor {
 
 	private final AiReplyOutboxJdbcRepository outboxRepository;
-	private final WhatsAppWebChannelJdbcRepository channelRepository;
+	private final WhatsAppChannelJdbcRepository channelRepository;
 	private final AestheticCenterService aestheticCenterService;
 	private final AgentCoordinatorService agentCoordinatorService;
 	private final ChannelDispatchService channelDispatchService;
@@ -37,7 +37,7 @@ public class AiReplyOutboxProcessor {
 	private final JdbcTemplate jdbcTemplate;
 
 	public AiReplyOutboxProcessor(AiReplyOutboxJdbcRepository outboxRepository,
-			WhatsAppWebChannelJdbcRepository channelRepository, AestheticCenterService aestheticCenterService,
+			WhatsAppChannelJdbcRepository channelRepository, AestheticCenterService aestheticCenterService,
 			AgentCoordinatorService agentCoordinatorService, ChannelDispatchService channelDispatchService,
 			AiAgentProperties properties, JdbcTemplate jdbcTemplate,
 			@Value("${app.ai.agents.outbox-batch-size:10}") int batchSize,
@@ -137,7 +137,7 @@ public class AiReplyOutboxProcessor {
 			return false;
 		}
 
-		WhatsAppWebChannelJdbcRepository.ConversationRecord conversation = channelRepository
+		WhatsAppChannelJdbcRepository.ConversationRecord conversation = channelRepository
 				.findConversationById(job.businessId(), job.conversationId()).orElseThrow(
 						() -> new IllegalStateException("No se encontro la conversacion asociada a la cola de IA."));
 

@@ -7,7 +7,7 @@
 
 - Docker Desktop (Windows) con WSL2 habilitado
 - Git
-- Puerto 5173, 8080, 5433, 3001, 5005, 6080 disponibles
+- Puertos 5173, 8080, 5433, 5005 disponibles
 - Conexion a internet (para builds iniciales y DNS)
 
 ## Comando para Levantar la Aplicacion
@@ -26,9 +26,7 @@ docker compose -f docker-compose.local.yml up -d --build
 | 5173   | Frontend (React)   | http://localhost:5173                   |
 | 8080   | Backend (Spring)   | http://localhost:8080/api/v1/health     |
 | 5433   | PostgreSQL         | jdbc:postgresql://localhost:5433        |
-| 3001   | WhatsApp Web API   | http://localhost:3001/health            |
 | 5005   | JDWP (Debug)       | IDE remote debug                        |
-| 6080   | VNC (WhatsApp Web) | http://localhost:6080/vnc.html          |
 
 ## URLs de la Aplicacion
 
@@ -149,8 +147,8 @@ docker compose exec postgres psql -U assistant -d asistente_whatsapp
 ### Error: "Port already in use"
 Cerrar otro servicio en el puerto o cambiar la configuracion en `docker-compose.local.yml`.
 
-### Error: "WhatsApp Web service not healthy"
-Revisar logs con `docker compose logs whatsapp-web-service`. El servicio es opcional para la demo.
+### Error: "WhatsApp channel not available"
+El canal de WhatsApp es nativo del backend: con `APP_WHATSAPP_CHANNEL_PROVIDER=SIMULATED` no requiere conexión externa ni QR. Verificar logs con `docker compose logs backend-java`.
 
 ### Error: "Backend fails to start"
 Revisar logs con `docker compose logs backend-java`. Posibles causas:
@@ -174,7 +172,7 @@ Revisar logs con `docker compose logs backend-java`. Posibles causas:
 | Reprogramacion           | Real          | Publica e interna, con validacion de disponibilidad        |
 | Cancelacion              | Real          | Con motivo opcional y actualizacion de estado              |
 | Confirmacion por link    | Real          | Enlace publico con token hash                              |
-| Envio de WhatsApp        | Simulado      | Usa canal WEB, no envia mensajes reales sin QR escaneado   |
+| Envio de WhatsApp        | Simulado      | Canal nativo `SIMULATED`, no envia mensajes reales; en produccion usa la Cloud API de Meta |
 | Envio de email           | Simulado      | No requiere credenciales SMTP reales                       |
 | Pagos                    | Simulado      | Proveedor SIMULATED, sin integracion real                  |
 | Calendario Google        | Deshabilitado | No requiere cuenta Google para demo                        |

@@ -14,11 +14,7 @@ app:
     include-message-body: ${APP_LOGGING_INCLUDE_MESSAGE_BODY:false}
   channels:
     whatsapp:
-      provider: ${APP_WHATSAPP_CHANNEL_PROVIDER:DISABLED}
-    whatsapp-web:
-      enabled: ${APP_WHATSAPP_WEB_ENABLED:false}
-      simulator-enabled: ${APP_WHATSAPP_WEB_SIMULATOR_ENABLED:true}
-      demo-fallback-enabled: ${APP_WHATSAPP_WEB_DEMO_FALLBACK_ENABLED:true}
+      provider: ${APP_WHATSAPP_CHANNEL_PROVIDER:SIMULATED}
     whatsapp-cloud-api:
       enabled: ${APP_WHATSAPP_CLOUD_API_ENABLED:false}
       dry-run-enabled: ${APP_WHATSAPP_CLOUD_API_DRY_RUN_ENABLED:true}

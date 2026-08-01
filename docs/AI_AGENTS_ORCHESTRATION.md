@@ -1,6 +1,6 @@
 # Orquestador multiagente para WhatsApp
 
-Este refactor agrega un módulo incremental `aiagents` sin romper la estructura existente del monolito ni el contrato local con `whatsapp-web-service`.
+Este refactor agrega un módulo incremental `aiagents` sin romper la estructura existente del monolito ni el contrato local del canal WhatsApp (proveedor `SIMULATED` o `META_CLOUD_API`).
 
 ## Objetivo
 
@@ -25,19 +25,18 @@ Convertir cada mensaje entrante de WhatsApp en una decisión operativa trazable:
 - `KNOWLEDGE`: documentos, políticas, FAQ y catálogo autorizado.
 - `HUMAN_HANDOFF`: reclamos, urgencias, solicitudes humanas y casos sensibles.
 
-## Integración con WhatsApp Web local
+## Integración con el canal WhatsApp
 
-El punto de integración se mantiene en:
+El mensaje entrante llega por el canal nativo del backend:
 
-```text
-backend-java/src/main/java/com/asistentewhatsapp/channels/infrastructure/whatsappweb/WhatsAppWebWebhookService.java
-```
+- proveedor `SIMULATED`: `POST /api/v1/test/whatsapp-inbound` (local);
+- proveedor `META_CLOUD_API`: webhook `POST /api/v1/integrations/whatsapp-cloud/webhook` firmado con `X-Hub-Signature-256`.
 
 Flujo actual:
 
 ```text
-whatsapp-web-service
-  -> webhook MESSAGE_RECEIVED
+canal (simulado o Cloud API)
+  -> mensaje entrante
   -> persistencia de customer / conversation / inbound message
   -> análisis estético existente
   -> AgentCoordinatorService
@@ -46,7 +45,7 @@ whatsapp-web-service
   -> respuesta automática opcional
 ```
 
-El adaptador Node `whatsapp-web-service` no fue reemplazado ni renombrado.
+El canal es nativo del backend; no existe servicio Node externo ni sesión de dispositivo.
 
 ## Variables de entorno
 
@@ -80,7 +79,7 @@ Tablas:
 - `human_handoff_request`
 - `ai_agent_metric_daily`
 
-## Prueba local con whatsapp-web-service
+## Prueba local con el canal simulado
 
 Levantar ambiente:
 
@@ -91,9 +90,8 @@ docker compose -f docker-compose.local.yml up --build
 Simular mensaje entrante:
 
 ```bash
-curl -i -X POST "http://localhost:3001/api/v1/messages/simulate-inbound" \
+curl -i -X POST "http://localhost:8080/api/v1/test/whatsapp-inbound" \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: dev-whatsapp-web-key" \
   -d '{"from":"56911112222","body":"Hola, quiero saber el precio y agendar para mañana"}'
 ```
 
@@ -114,9 +112,8 @@ limit 5;
 Probar derivación humana:
 
 ```bash
-curl -i -X POST "http://localhost:3001/api/v1/messages/simulate-inbound" \
+curl -i -X POST "http://localhost:8080/api/v1/test/whatsapp-inbound" \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: dev-whatsapp-web-key" \
   -d '{"from":"56911112222","body":"Estoy molesto, quiero hablar con un ejecutivo ahora"}'
 ```
 
@@ -164,8 +161,8 @@ aiagents/
 ## Decisiones de refactor
 
 - No se eliminó el módulo `aesthetic`; se mantiene y convive con el nuevo coordinador.
-- No se modificó el contrato de headers HMAC del webhook local.
-- No se renombró `whatsapp-web-service`.
+- No se modificó la verificación de firma `X-Hub-Signature-256` del webhook Cloud API.
+- El canal no requiere servicio externo; la simulación local se hace con `POST /api/v1/test/whatsapp-inbound`.
 - No se agregó LangChain4j ni pgvector aún para evitar cambios pesados en el MVP local.
 - La detección inicial es por reglas determinísticas en español, preparada para reemplazo posterior por OpenAI/RAG.
 - La respuesta automática queda detrás de feature flag.

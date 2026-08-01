@@ -660,12 +660,12 @@
 
 - Ruta: `/admin`
 - Tipo: pagina privada
-- Componentes visibles: cards de configuracion, resumen de empresa, usuarios y WhatsApp Web
-- Botones: `Configuracion de empresa`, `Usuarios y roles`, `Conexion WhatsApp Web`, `Seguridad`
+- Componentes visibles: cards de configuracion, resumen de empresa, usuarios y canal WhatsApp
+- Botones: `Configuracion de empresa`, `Usuarios y roles`, `Canal de WhatsApp`, `Seguridad`
 - Campos: ninguno
 - Validaciones: no aplica
 - Acciones: navegar a submodulos administrativos
-- Destino de cada accion: `Configuracion de empresa` -> `/admin/company`; `Usuarios y roles` -> `/admin/users`; `Conexion WhatsApp Web` -> `/admin/whatsapp-web`; `Seguridad` -> `/admin/security`
+- Destino de cada accion: `Configuracion de empresa` -> `/admin/company`; `Usuarios y roles` -> `/admin/users`; `Canal de WhatsApp` -> `/admin/whatsapp-channel`; `Seguridad` -> `/admin/security`
 - Endpoint asociado: `GET /api/v1/admin/summary`
 - Estado vacio: no aplica
 - Estado de carga: skeleton de cards
@@ -746,20 +746,20 @@
 - Comportamiento al cancelar: vuelve al listado
 - Comportamiento al guardar: actualiza usuario, muestra toast y vuelve al listado
 
-## 42. Conexion WhatsApp Web
+## 42. Canal de WhatsApp
 
-- Ruta: `/admin/whatsapp-web`
+- Ruta: `/admin/whatsapp-channel`
 - Tipo: pagina privada
-- Componentes visibles: estado de sesion, QR, telefono vinculado, ultimos eventos, acciones de conexion
-- Botones: `Conectar`, `Refrescar QR`, `Desconectar`, `Reintentar`
-- Campos: ninguno
-- Validaciones: no aplica
-- Acciones: iniciar sesion WhatsApp Web, refrescar QR, desconectar, volver a consultar estado
-- Destino de cada accion: todas permanecen en `/admin/whatsapp-web`
-- Endpoint asociado: `GET /api/v1/whatsapp-web/status`, `POST /api/v1/whatsapp-web/connect`, `POST /api/v1/whatsapp-web/refresh-qr`, `POST /api/v1/whatsapp-web/disconnect`
-- Estado vacio: mostrar `EmptyState` con CTA `Conectar` cuando no exista sesion inicializada
-- Estado de carga: spinner sobre tarjeta de estado y placeholder del QR
-- Estado de error: `ErrorState` o banner contextual si el servicio no responde
+- Componentes visibles: estado del canal (proveedor, conexion), telefono vinculado, ultimos eventos, acciones de conexion
+- Botones: `Conectar`, `Desconectar`, `Enviar mensaje de prueba`, `Reintentar`
+- Campos: formulario de mensaje de prueba (`recipientPhone`, `body`)
+- Validaciones: `recipientPhone` y `body` requeridos
+- Acciones: conectar, desconectar, enviar mensaje de prueba, volver a consultar estado
+- Destino de cada accion: todas permanecen en `/admin/whatsapp-channel`
+- Endpoint asociado: `GET /api/v1/whatsapp-channel/status`, `POST /api/v1/whatsapp-channel/connect`, `POST /api/v1/whatsapp-channel/disconnect`, `POST /api/v1/whatsapp-channel/test-message`
+- Estado vacio: mostrar `EmptyState` con CTA `Conectar` cuando no exista canal inicializado
+- Estado de carga: spinner sobre tarjeta de estado
+- Estado de error: `ErrorState` o banner contextual si el canal no responde
 - Estado sin conexion: banner offline y acciones bloqueadas
 - Comportamiento al cancelar: cierra dialogos de confirmacion
 - Comportamiento al guardar: no aplica; acciones exitosas actualizan el estado en la misma ruta

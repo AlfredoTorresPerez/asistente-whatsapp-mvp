@@ -21,7 +21,7 @@ Empresa B → WABA propia → 1 número central → N sucursales
 |---|---|---|
 | Propósito | Vincular un dispositivo a WhatsApp Web | Que el cliente abra WhatsApp y envíe un mensaje |
 | Para qué sirve | Recibir/Enviar mensajes vía Web | Iniciar conversación con el número central |
-| Aplica a | WHATSAPP_WEB | META_CLOUD_API |
+| Aplica a | SIMULATED | META_CLOUD_API |
 | Formato | Imagen generada por WhatsApp | URL `https://wa.me/{numero}?text={mensaje}` |
 | Es sesión | Sí, autentica la conexión | No, solo abre WhatsApp |
 
@@ -31,7 +31,7 @@ Empresa B → WABA propia → 1 número central → N sucursales
 
 | Ambiente | Perfil | Proveedor | Uso |
 |---|---|---|---|
-| local | `local` (default) | WEB o META_CLOUD_API | Desarrollo, pruebas simuladas |
+| local | `local` (default) | SIMULATED o META_CLOUD_API | Desarrollo, pruebas simuladas |
 | qa | `qa` | META_CLOUD_API | Validación con Meta real |
 | production | `production` | META_CLOUD_API | Producción real |
 
@@ -194,7 +194,7 @@ Endpoint: `GET /api/v1/business-locations/{locationId}/commercial-qr`
 
 1. **Nunca** copiar `.env` entre ambientes.
 2. Cada ambiente tiene su propia Meta App (o al menos sus propios secrets).
-3. En local se puede usar `dry-run=true` o WhatsApp Web.
+3. En local se puede usar `dry-run=true` o el proveedor `SIMULATED`.
 4. QA y producción usan `META_CLOUD_API` con sus propias credenciales de tenant.
 5. Las migraciones Flyway son las mismas para todos los ambientes.
 

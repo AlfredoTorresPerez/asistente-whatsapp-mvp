@@ -196,12 +196,10 @@ describe('app shell router', () => {
     expect(screen.getByText('Cabinas')).toBeInTheDocument()
     expect(screen.getByText('Servicios')).toBeInTheDocument()
     expect(screen.getByText('Asignaciones')).toBeInTheDocument()
-    expect(screen.getByText('Sedes')).toBeInTheDocument()
     expect(screen.getByText('MultiSede')).toBeInTheDocument()
-    expect(screen.getByText('WhatsApp Web')).toBeInTheDocument()
+    expect(screen.getByText('Canal de WhatsApp')).toBeInTheDocument()
     expect(screen.getByText('Usuarios y Roles')).toBeInTheDocument()
     expect(screen.getByText('Seguridad')).toBeInTheDocument()
-    expect(screen.getByText('Imágenes')).toBeInTheDocument()
   })
 
   it('Caso 2: ADMIN can see admin menu items', async () => {

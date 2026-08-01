@@ -9,8 +9,8 @@ Descomponer Fase 1 en tareas pequenas, ordenadas y verificables. Ninguna tarea d
 | ID | Etapa | Objetivo | Entregable verificable | Verificacion |
 | --- | --- | --- | --- | --- |
 | T00 | Congelamiento contractual | Dejar esta carpeta `docs/` como fuente de verdad inicial. | Documentacion aprobada. | Revision manual de consistencia entre pantallas, API y datos. |
-| T01 | Bootstrap del monorepo | Crear `frontend-react`, `backend-java`, `whatsapp-web-service` y `docker-compose.yml`. | Repositorio compila en vacio con comandos base. | `pnpm --dir frontend-react build` y `./backend-java/mvnw test`. |
-| T02 | Infra local | Levantar PostgreSQL, `backend-java`, `frontend-react` y `whatsapp-web-service`. | `docker compose up` funcional con healthchecks. | Ver estados `healthy`, `http://localhost:8080/actuator/health`, `http://localhost:5173` y `http://localhost:3001/health`. |
+| T01 | Bootstrap del monorepo | Crear `frontend-react`, `backend-java` y `docker-compose.yml`. | Repositorio compila en vacio con comandos base. | `pnpm --dir frontend-react build` y `./backend-java/mvnw test`. |
+| T02 | Infra local | Levantar PostgreSQL, `backend-java` y `frontend-react`. | `docker compose up` funcional con healthchecks. | Ver estados `healthy`, `http://localhost:8080/actuator/health` y `http://localhost:5173`. |
 | T03 | Design tokens y layouts | Implementar `PublicLayout`, `AppLayout`, `Sidebar`, `Topbar` y estados globales. | Shell navegable con rutas placeholder. | Navegacion entre `/login` y `/dashboard` sin datos reales. |
 | T04 | Autenticacion backend | Login, refresh, logout, forgot/reset password. | Endpoints `auth` operativos con validaciones. | Tests de `login`, `forgot-password`, `reset-password`. |
 | T05 | Autenticacion frontend | Formularios de acceso y recuperacion conectados al backend. | Flujo completo desde `/login` a `/dashboard`. | Prueba manual del ciclo login -> logout. |
@@ -23,7 +23,7 @@ Descomponer Fase 1 en tareas pequenas, ordenadas y verificables. Ninguna tarea d
 | T12 | Agenda | Listado, detalle, alta y reprogramacion de citas. | `/appointments*` funcional. | Crear cita, reprogramar y marcar completada. |
 | T13 | Pedidos y pagos | Listado, alta, detalle y registro de pagos. | `/orders*` funcional. | Crear pedido, registrar pago y recalcular saldo. |
 | T14 | Conversaciones base | Listado, detalle, nueva conversacion y composer. | `/conversations*` funcional. | Crear conversacion y enviar mensaje saliente simulado. |
-| T15 | Integracion WhatsApp Web | Conectar backend Java con `whatsapp-web-service`. | Estado de sesion, QR y recepcion de mensajes. | Recibir mensaje real y crear/actualizar conversacion. |
+| T15 | Canal WhatsApp nativo | Conectar backend Java al canal WhatsApp nativo (proveedores `META_CLOUD_API` y `SIMULATED`). | Estado del canal, envio/recepcion de mensajes (simulador o Cloud API). | Recibir mensaje (simulado vía `POST /api/v1/test/whatsapp-inbound` o webhook Cloud API) y crear/actualizar conversacion. |
 | T16 | Flujos desde conversacion | Crear prospecto, pedido y cita desde detalle de conversacion. | Formularios contextuales enlazados. | Cada accion crea entidad y vuelve al flujo correcto. |
 | T17 | Reglas de automatizacion | Listado, alta, edicion y prueba de reglas. | `/automation-rules*` funcional. | Ejecutar prueba sobre mensaje simulado. |
 | T18 | Reportes basicos | Resumen comercial con filtros y graficos. | `/reports` funcional. | Cambiar rango y validar coherencia con datos base. |

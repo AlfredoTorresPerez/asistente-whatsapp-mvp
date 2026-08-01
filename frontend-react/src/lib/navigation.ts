@@ -52,9 +52,9 @@ export const ADMIN_SUBMENU_ITEMS: NavigationItem[] = [
     allowedRoles: ['OWNER', 'ADMIN'],
   },
   {
-    label: 'WhatsApp Web',
-    path: '/admin/whatsapp-web',
-    description: 'Conexion y estado de WhatsApp Web.',
+    label: 'Canal de WhatsApp',
+    path: '/admin/whatsapp-channel',
+    description: 'Conexion y estado del canal de WhatsApp.',
     allowedRoles: ['OWNER', 'ADMIN'],
   },
   {
@@ -130,7 +130,7 @@ export const PRIMARY_NAV_ITEMS: NavigationItem[] = [
   {
     label: 'Administración',
     path: '/admin',
-    description: 'Empresa, sucursales, cabinas, servicios, asignaciones, multisede, WhatsApp Web, usuarios, seguridad y profesionales.',
+    description: 'Empresa, sucursales, cabinas, servicios, asignaciones, multisede, canal de WhatsApp, usuarios, seguridad y profesionales.',
     allowedRoles: ['OWNER', 'ADMIN'],
     children: ADMIN_SUBMENU_ITEMS,
   },
@@ -311,7 +311,7 @@ const ROUTE_METADATA: RouteMeta[] = [
   {
     path: '/configuration',
     title: 'Configuración',
-    description: 'Conexión, dispositivos, QR y preferencias de WhatsApp Web.',
+    description: 'Conexión, estado, preferencias y modo de operacion del canal de WhatsApp.',
   },
   {
     path: '/admin/company',
@@ -345,9 +345,9 @@ const ROUTE_METADATA: RouteMeta[] = [
     description: 'Listado de usuarios, filtros y resumen de roles disponibles.',
   },
   {
-    path: '/admin/whatsapp-web',
-    title: 'Conexión WhatsApp Web',
-    description: 'Vista del estado del adaptador experimental desacoplado.',
+    path: '/admin/whatsapp-channel',
+    title: 'Canal de WhatsApp',
+    description: 'Conexion y estado del canal de WhatsApp.',
   },
   {
     path: '/admin/security',

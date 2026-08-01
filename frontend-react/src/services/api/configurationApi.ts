@@ -24,13 +24,6 @@ export function connectWhatsAppConfigurationRequest() {
   })
 }
 
-export function refreshWhatsAppConfigurationQrRequest() {
-  return apiFetch<WhatsAppConfigurationResponse>('/configuration/whatsapp/refresh-qr', {
-    body: JSON.stringify({}),
-    method: 'POST',
-  })
-}
-
 export function disconnectWhatsAppConfigurationRequest() {
   return apiFetch<WhatsAppConfigurationResponse>('/configuration/whatsapp/disconnect', {
     body: JSON.stringify({}),

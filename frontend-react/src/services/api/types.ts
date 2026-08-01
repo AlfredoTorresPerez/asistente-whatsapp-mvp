@@ -219,7 +219,7 @@ export type AdminSummaryResponse = {
     total: number
     active: number
   }
-  whatsappWeb: {
+  whatsapp: {
     status: string
   }
   security: {
@@ -413,7 +413,7 @@ export type CompanySettingsResponse = {
   address: string | null
 }
 
-export type WhatsAppWebRecentEventResponse = {
+export type WhatsAppChannelRecentEvent = {
   deliveryId: string
   eventType: string
   processingStatus: string
@@ -421,39 +421,33 @@ export type WhatsAppWebRecentEventResponse = {
   processedAt: string | null
 }
 
-export type WhatsAppWebStatusResponse = {
-  sessionStatus: string
+export type WhatsAppChannelStatusResponse = {
+  provider: string
+  connectionStatus: string
   phoneNumber: string | null
-  qrCode: string | null
+  phoneNumberId: string | null
+  adapterMode: string | null
   lastEventAt: string | null
-  adapterReachable: boolean
-  adapterMode: string
-  warningMessage: string
-  recentEvents: WhatsAppWebRecentEventResponse[]
+  active: boolean
+  recentEventCount: number
+  recentErrorCount: number
+  recentEvents: WhatsAppChannelRecentEvent[]
+  message: string | null
 }
 
-export type WhatsAppWebQrResponse = {
-  qrCode: string | null
-  sessionStatus: string
-  expiresAt: string | null
-  lastQrAt: string | null
-}
-
-export type WhatsAppWebActionResponse = {
-  sessionStatus: string
+export type WhatsAppChannelActionResponse = {
+  connectionStatus: string
   phoneNumber: string | null
-  qrCode: string | null
   acceptedAt: string
-  adapterReachable: boolean
-  adapterMode: string
+  provider: string
 }
 
-export type WhatsAppWebTestMessageRequest = {
+export type WhatsAppChannelTestMessageRequest = {
   recipientPhone: string
   body: string
 }
 
-export type WhatsAppWebTestMessageResponse = {
+export type WhatsAppChannelTestMessageResponse = {
   conversationId: string
   messageId: string
   externalMessageId: string
@@ -1898,19 +1892,6 @@ export type WhatsAppChannelValidateResponse = {
   providerType: string
   message: string
   warnings: string[]
-}
-
-export type WhatsAppChannelTestMessageRequest = {
-  recipientPhone: string
-  body: string
-}
-
-export type WhatsAppChannelTestMessageResponse = {
-  conversationId: string
-  messageId: string
-  externalMessageId: string | null
-  deliveryStatus: string
-  acceptedAt: string | null
 }
 
 // Meta Embedded Signup onboarding types

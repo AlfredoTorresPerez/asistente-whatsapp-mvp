@@ -33,7 +33,6 @@ public final class Permissions {
 	public static final String AUTOMATION_MANAGE = "AUTOMATION_MANAGE";
 	public static final String ADMIN_MANAGE = "ADMIN_MANAGE";
 	public static final String SECURITY_MANAGE = "SECURITY_MANAGE";
-	public static final String WHATSAPP_WEB_MANAGE = "WHATSAPP_WEB_MANAGE";
 	public static final String CHANNEL_MANAGE = "CHANNEL_MANAGE";
 	public static final String CONTENT_VIEW = "CONTENT_VIEW";
 	public static final String CONTENT_MANAGE = "CONTENT_MANAGE";

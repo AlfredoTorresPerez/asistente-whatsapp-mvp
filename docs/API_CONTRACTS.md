@@ -243,7 +243,7 @@ Definir los contratos REST de Fase 1 para frontend, backend Java y adaptaciones 
 
 | Metodo | Ruta | Auth | Response |
 | --- | --- | --- | --- |
-| `GET` | `/api/v1/admin/summary` | privada, roles `OWNER` o `ADMIN` | `{ "company": { "id": "uuid", "companyName": "Demo Spa" }, "users": { "total": 8, "active": 7 }, "whatsapp-web": { "status": "CONNECTED" }, "security": { "sessionTimeoutMinutes": 30 } }` |
+| `GET` | `/api/v1/admin/summary` | privada, roles `OWNER` o `ADMIN` | `{ "company": { "id": "uuid", "companyName": "Demo Spa" }, "users": { "total": 8, "active": 7 }, "whatsapp": { "status": "CONNECTED" }, "security": { "sessionTimeoutMinutes": 30 } }` |
 
 ### Company
 
@@ -269,24 +269,31 @@ Definir los contratos REST de Fase 1 para frontend, backend Java y adaptaciones 
 | `GET` | `/api/v1/admin/security` | privada, rol `OWNER` | sin body | `{ "sessionTimeoutMinutes": 30, "passwordMinLength": 8, "requireUppercase": true, "requireNumber": true, "requireSymbol": false, "maxFailedLoginAttempts": 5 }` |
 | `PATCH` | `/api/v1/admin/security` | privada, rol `OWNER` | mismo body que `GET` | mismo response que `GET` |
 
-## WhatsApp Web control expuesto al frontend
+## Control del canal WhatsApp expuesto al frontend
 
-Estos endpoints son del backend Java hacia el frontend. El backend habla internamente con `whatsapp-web-service`; la UI nunca consume el servicio Node de forma directa.
-
-| Metodo | Ruta | Auth | Request | Response |
-| --- | --- | --- | --- | --- |
-| `GET` | `/api/v1/whatsapp-web/status` | privada, roles `OWNER` o `ADMIN` | sin body | `{ "sessionStatus": "CONNECTED", "phoneNumber": "+56911112222", "qrCode": null, "lastEventAt": "2026-05-23T20:15:30Z", "adapterReachable": true }` |
-| `POST` | `/api/v1/whatsapp-web/connect` | privada, roles `OWNER` o `ADMIN` | sin body | `{ "sessionStatus": "QR_PENDING", "qrCode": "base64-or-token", "acceptedAt": "..." }` |
-| `POST` | `/api/v1/whatsapp-web/refresh-qr` | privada, roles `OWNER` o `ADMIN` | sin body | `{ "sessionStatus": "QR_PENDING", "qrCode": "base64-or-token", "acceptedAt": "..." }` |
-| `POST` | `/api/v1/whatsapp-web/disconnect` | privada, roles `OWNER` o `ADMIN` | sin body | `{ "sessionStatus": "DISCONNECTED", "acceptedAt": "..." }` |
-
-## Integracion interna WhatsApp Web -> backend
+Estos endpoints son del backend Java hacia el frontend. El canal es nativo del backend (proveedor `META_CLOUD_API` o `SIMULATED`, configurado con `APP_WHATSAPP_CHANNEL_PROVIDER`); la UI nunca consume un servicio externo. No existe QR ni sesion de dispositivo.
 
 | Metodo | Ruta | Auth | Request | Response |
 | --- | --- | --- | --- | --- |
-| `POST` | `/api/v1/integrations/whatsapp-web/webhook` | HMAC | `{ "eventType": "MESSAGE_RECEIVED", "deliveryId": "uuid", "occurredAt": "...", "payload": { ... } }` | `{ "status": "ACCEPTED" }` |
+| `GET` | `/api/v1/whatsapp-channel/status` | privada, roles `OWNER` o `ADMIN` | sin body | `{ "provider": "SIMULATED", "connectionStatus": "CONNECTED", "phoneNumber": "+56911112222", "phoneNumberId": null, "adapterMode": "SIMULATED", "lastEventAt": "2026-05-23T20:15:30Z", "active": true, "recentEventCount": 3, "recentErrorCount": 0, "recentEvents": [ ... ], "message": "..." }` |
+| `POST` | `/api/v1/whatsapp-channel/connect` | privada, roles `OWNER` o `ADMIN` | sin body | mismo shape que `status` |
+| `POST` | `/api/v1/whatsapp-channel/disconnect` | privada, roles `OWNER` o `ADMIN` | sin body | mismo shape que `status` |
+| `POST` | `/api/v1/whatsapp-channel/test-message` | privada, roles `OWNER` o `ADMIN` | `{ "recipientPhone": "+56911112222", "body": "Mensaje de prueba" }` | `{ "messageId": "uuid", "status": "SENT" }` |
 
-### Integracion WhatsApp Cloud API
+Los cuatro endpoints tambien estan disponibles bajo el alias `/api/channels/whatsapp-channel/...`.
+
+### Configuracion del canal
+
+| Metodo | Ruta | Auth | Request | Response |
+| --- | --- | --- | --- | --- |
+| `GET` | `/api/v1/configuration/whatsapp` | privada, roles `OWNER`, `ADMIN` o `SUPERVISOR` | sin body | configuracion actual del canal |
+| `PATCH` | `/api/v1/configuration/whatsapp/preferences` | privada, roles `OWNER` o `ADMIN` | preferencias del canal | configuracion actualizada |
+| `POST` | `/api/v1/configuration/whatsapp/connect` | privada, roles `OWNER` o `ADMIN` | sin body | `{ "status": "ACCEPTED" }` |
+| `POST` | `/api/v1/configuration/whatsapp/disconnect` | privada, roles `OWNER` o `ADMIN` | sin body | `{ "status": "ACCEPTED" }` |
+
+No existe `/refresh-qr`.
+
+## Mensajes entrantes al canal
 
 | Metodo | Ruta | Auth | Request | Response |
 | --- | --- | --- | --- | --- |
@@ -297,18 +304,13 @@ Estos endpoints son del backend Java hacia el frontend. El backend habla interna
 
 - `X-Hub-Signature-256` (HMAC-SHA256 del body con App Secret)
 
-### Headers requeridos del webhook WhatsApp Web
+## Simulador de mensajes entrantes
 
-- `X-WhatsApp-Web-Timestamp`
-- `X-WhatsApp-Web-Signature`
-- `X-WhatsApp-Web-Delivery-Id`
+En local (proveedor `SIMULATED`) se simulan mensajes entrantes sin Meta ni sesion de dispositivo:
 
-### Event types del webhook WhatsApp Web
-
-- `SESSION_STATUS_CHANGED`
-- `QR_UPDATED`
-- `MESSAGE_RECEIVED`
-- `MESSAGE_ACK_UPDATED`
+| Metodo | Ruta | Auth | Request | Response |
+| --- | --- | --- | --- | --- |
+| `POST` | `/api/v1/test/whatsapp-inbound` | simulacion local | `{ "from": "+56911112222", "body": "Hola, quiero una reserva" }` | `{ "status": "ACCEPTED" }` |
 
 ## Reglas de negocio reflejadas en API
 

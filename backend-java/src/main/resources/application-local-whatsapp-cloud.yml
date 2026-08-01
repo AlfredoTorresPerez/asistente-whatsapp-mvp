@@ -11,8 +11,6 @@ app:
       enabled: true
       webhook-signature-required: ${APP_WHATSAPP_CLOUD_API_WEBHOOK_SIGNATURE_REQUIRED:true}
       dry-run-enabled: false
-    whatsapp-web:
-      enabled: false
 
   booking-confirmation:
     dispatch-whatsapp: ${APP_BOOKING_CONFIRMATION_DISPATCH_WHATSAPP:true}

@@ -6,7 +6,7 @@ El MVP demuestra un asistente de WhatsApp para centro estetico con:
 
 - **Landing page publica** con servicios por categoria y sucursales.
 - **Wizard de reserva publico** en 5 pasos: servicio → sucursal → fecha/hora → datos del cliente → confirmacion.
-- **Notificacion por WhatsApp** con enlace de confirmacion (adaptador experimental WhatsApp Web).
+- **Notificacion por WhatsApp** con enlace de confirmacion (canal simulado embebido en el backend).
 - **Notificacion por email** con template HTML premium.
 - **Confirmacion, reprogramacion y cancelacion** desde enlace publico.
 - **Panel interno de agenda** con vista semanal, filtros y acciones operativas.
@@ -16,8 +16,8 @@ El MVP demuestra un asistente de WhatsApp para centro estetico con:
 
 | Aspecto | Motivo |
 |---------|--------|
-| Alta disponibilidad de WhatsApp Web | Adaptador experimental, no productivo |
-| Entrega garantizada de mensajes | Depende del estado de la sesion WhatsApp Web |
+| Alta disponibilidad del canal | El canal local es un proveedor simulado, no productivo |
+| Entrega garantizada de mensajes | En local solo se simula; produccion usa WhatsApp Cloud API |
 | Respuesta automatica IA | `APP_AI_AGENTS_AUTO_REPLY_ENABLED=false` por defecto |
 | WhatsApp Cloud API | Requiere credenciales de Meta Business |
 | Certificado SSL / HTTPS en local | Solo accesible via `localhost` |
@@ -30,7 +30,7 @@ El MVP demuestra un asistente de WhatsApp para centro estetico con:
 | Backend | Java 21 / Spring Boot 3.x / Flyway |
 | Frontend | React 18 / TypeScript / Vite / Tailwind |
 | Base de datos | PostgreSQL 16 |
-| WhatsApp | `whatsapp-web-service` (Node.js + whatsapp-web.js) |
+| WhatsApp | Canal simulado embebido (Spring), proveedor `SIMULATED` |
 | Contenedores | Docker Compose |
 | Pagos | SIMULATED (no real) |
 | IA agente | Desactivada por defecto en demo |
@@ -53,11 +53,11 @@ El MVP demuestra un asistente de WhatsApp para centro estetico con:
 - [ ] `cd frontend-react && corepack pnpm lint` — 0 errores.
 - [ ] `cd frontend-react && corepack pnpm test` — todos los tests pasan.
 - [ ] `cd frontend-react && corepack pnpm build` — build exitoso.
-- [ ] `cd whatsapp-web-service && corepack pnpm check` — sin errores.
+- [ ] `APP_WHATSAPP_CHANNEL_PROVIDER=SIMULATED` en `.env.local` — canal simulado activo.
 - [ ] `docker compose -f docker-compose.local.yml up -d` — todos los contenedores healthy.
 - [ ] `http://localhost:5173/` — landing page carga.
 - [ ] `http://localhost:5173/reservar` — wizard de reserva carga.
-- [ ] Sesion WhatsApp Web escaneada y CONNECTED en `http://localhost:6080`.
+- [ ] `POST http://localhost:8080/api/v1/test/whatsapp-inbound` — mensaje entrante simulado procesado.
 - [ ] Email SMTP configurado (o simulado) segun `.env.local`.
 
 ## Comandos de validacion
@@ -77,9 +77,10 @@ corepack pnpm test
 # Frontend build
 corepack pnpm build
 
-# WhatsApp web service check
-cd whatsapp-web-service
-corepack pnpm check
+# Canal simulado: mensaje entrante de prueba
+curl -i -X POST "http://localhost:8080/api/v1/test/whatsapp-inbound" \
+  -H "Content-Type: application/json" \
+  -d '{"from":"56911112222","body":"Hola, quiero agendar una reserva"}'
 
 # Docker compose config validation
 docker compose -f docker-compose.local.yml config
@@ -120,7 +121,7 @@ El script crea una copia temporal excluyendo `.git`, `.idea`, `node_modules`, `t
 ## Riesgos pendientes
 
 1. **Tunel ephemeral**: `trycloudflare.com` cambia cada vez que se reinicia el contenedor. Los enlaces de confirmacion anteriores quedan rotos.
-2. **WhatsApp Web experimental**: La sesion requiere escaneo manual de QR tras cada reinicio si no se persiste la sesion.
+2. **Canal simulado**: en local no hay entrega real de WhatsApp; la simulacion usa `POST /api/v1/test/whatsapp-inbound` con el proveedor `SIMULATED`.
 3. **Pagos simulados**: No hay integracion real con Mercado Pago ni otro proveedor.
 4. **IA desactivada**: La auto-respuesta del orquestador multiagente esta desactivada por defecto. Habilitar solo para pruebas especificas.
 5. **Email SMTP**: Las credenciales de Gmail deben configurarse manualmente en `.env.local`. Sin ellas, el email se simula en consola.

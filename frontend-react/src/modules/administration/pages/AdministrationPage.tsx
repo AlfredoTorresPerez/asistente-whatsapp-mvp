@@ -14,14 +14,12 @@ import type { AdminSummaryResponse } from '../../../services/api/types'
 import { AdminContentPage } from './AdminContentPage'
 
 type AdminArea =
-  'company' | 'locations' | 'multisite' | 'whatsapp-web' | 'users' | 'security' | 'content'
+  'company' | 'locations' | 'multisite' | 'whatsapp-channel' | 'users' | 'security' | 'content'
 
-function getWhatsAppWebTone(status: string) {
+function getWhatsAppChannelTone(status: string) {
   switch (status) {
     case 'CONNECTED':
       return 'success'
-    case 'QR_PENDING':
-      return 'warning'
     case 'ERROR':
       return 'danger'
     default:
@@ -29,12 +27,10 @@ function getWhatsAppWebTone(status: string) {
   }
 }
 
-function toWhatsAppWebLabel(status: string) {
+function toWhatsAppChannelLabel(status: string) {
   switch (status) {
     case 'CONNECTED':
       return 'Conectado'
-    case 'QR_PENDING':
-      return 'QR requerido'
     case 'ERROR':
       return 'Error'
     case 'DISCONNECTED':
@@ -67,19 +63,19 @@ export function AdministrationPage() {
             <Link to="/admin/multisite">
               <Button variant="secondary">Operacion multisede</Button>
             </Link>
-            <Link to="/admin/whatsapp-web">
-              <Button variant="secondary">Conexion WhatsApp Web</Button>
+            <Link to="/admin/whatsapp-channel">
+              <Button variant="secondary">Canal de WhatsApp</Button>
             </Link>
           </>
         }
-        description="Centro de configuracion inicial del negocio, con resumen de empresa, acceso a WhatsApp Web experimental y atajos a seguridad y usuarios."
+        description="Centro de configuracion inicial del negocio, con resumen de empresa, acceso al canal de WhatsApp y atajos a seguridad y usuarios."
         eyebrow="Administración"
         title="Administración"
       />
 
       {adminSummaryQuery.isPending && !summary ? (
         <LoadingState
-          message="Cargando el resumen administrativo del negocio y el estado del canal experimental."
+          message="Cargando el resumen administrativo del negocio y el estado del canal de WhatsApp."
           variant="page"
         />
       ) : null}
@@ -108,13 +104,13 @@ export function AdministrationPage() {
             <SummaryCard
               badge={
                 <StatusBadge
-                  label={toWhatsAppWebLabel(summary.whatsappWeb.status)}
-                  tone={getWhatsAppWebTone(summary.whatsappWeb.status)}
+                  label={toWhatsAppChannelLabel(summary.whatsapp.status)}
+                  tone={getWhatsAppChannelTone(summary.whatsapp.status)}
                 />
               }
-              label="Estado WhatsApp Web"
-              value="Canal experimental"
-              note="Adaptador desacoplado para demos, validacion temprana y pilotos controlados."
+              label="Canal de WhatsApp"
+              value="Canal activo"
+              note="Conexion por proveedor simulado o Cloud API segun configuracion del ambiente."
             />
             <SummaryCard
               label="Timeout de sesion"
@@ -130,8 +126,8 @@ export function AdministrationPage() {
           ) : null}
           {activeArea === 'locations' ? <LocationsAdminPanel /> : null}
           {activeArea === 'multisite' ? <MultisiteAdminPanel /> : null}
-          {activeArea === 'whatsapp-web' ? (
-            <WhatsAppAdminPanel status={summary.whatsappWeb.status} />
+          {activeArea === 'whatsapp-channel' ? (
+            <WhatsAppAdminPanel status={summary.whatsapp.status} />
           ) : null}
           {activeArea === 'users' ? (
             <UsersAdminPanel activeUsers={summary.users.active} totalUsers={summary.users.total} />
@@ -202,13 +198,13 @@ function AdminAreaTabs({
     {
       badge: (
         <StatusBadge
-          label={toWhatsAppWebLabel(summary.whatsappWeb.status)}
-          tone={getWhatsAppWebTone(summary.whatsappWeb.status)}
+          label={toWhatsAppChannelLabel(summary.whatsapp.status)}
+          tone={getWhatsAppChannelTone(summary.whatsapp.status)}
         />
       ),
-      description: 'Estado, QR, reconexion y pruebas del canal',
-      label: 'Conexion WhatsApp Web',
-      value: 'whatsapp-web',
+      description: 'Estado, reconexion y pruebas del canal',
+      label: 'Canal de WhatsApp',
+      value: 'whatsapp-channel',
     },
     {
       badge: <StatusBadge label={`${summary.users.active}/${summary.users.total}`} tone="info" />,
@@ -363,17 +359,17 @@ function WhatsAppAdminPanel({ status }: { status: string }) {
       <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="p-5">
           <div className="flex flex-wrap items-center gap-2">
-            <StatusBadge label="Experimental" tone="warning" />
-            <StatusBadge label={toWhatsAppWebLabel(status)} tone={getWhatsAppWebTone(status)} />
+            <StatusBadge label="Canal" tone="info" />
+            <StatusBadge label={toWhatsAppChannelLabel(status)} tone={getWhatsAppChannelTone(status)} />
           </div>
-          <h2 className="mt-3 text-xl font-semibold text-slate-950">Conexion WhatsApp Web</h2>
+          <h2 className="mt-3 text-xl font-semibold text-slate-950">Canal de WhatsApp</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-            Controla el estado del adaptador desacoplado, generacion de QR, reconexion y pruebas de
-            envio. Mantiene la operacion separada para demos y validaciones controladas.
+            Controla el estado del canal, reconexion y pruebas de envio. Opera con proveedor
+            simulado para desarrollo o con Cloud API de Meta para produccion.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Link to="/admin/whatsapp-web">
-              <Button>Abrir conexion</Button>
+            <Link to="/admin/whatsapp-channel">
+              <Button>Abrir canal</Button>
             </Link>
           </div>
         </div>
@@ -381,7 +377,7 @@ function WhatsAppAdminPanel({ status }: { status: string }) {
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-700">
             Estado del canal
           </p>
-          <p className="mt-4 text-2xl font-semibold text-slate-950">{toWhatsAppWebLabel(status)}</p>
+          <p className="mt-4 text-2xl font-semibold text-slate-950">{toWhatsAppChannelLabel(status)}</p>
           <p className="mt-2 text-sm leading-6 text-slate-700">
             Para produccion, prioriza Cloud API o modo de simulacion controlado segun configuracion
             del ambiente.

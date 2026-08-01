@@ -17,27 +17,24 @@ El MVP queda orientado a una demo controlada de centro estetico. La operacion di
 
 ## No prometer a cliente
 
-- Alta disponibilidad de WhatsApp Web.
-- Entrega garantizada usando el adaptador experimental de WhatsApp Web.
+- Alta disponibilidad del canal WhatsApp.
+- Entrega garantizada usando el proveedor simulado local.
 - Integracion productiva completa con WhatsApp Cloud API si faltan credenciales reales.
 - Automatizaciones o respuestas de IA sin supervision humana.
 
-## WhatsApp Web vs Cloud API
+## Proveedores del canal WhatsApp
 
-`WEB` usa el adaptador experimental basado en WhatsApp Web. Debe limitarse a local, demo o validacion temprana.
+`SIMULATED` es el proveedor embebido en el backend, default en local. Se usa para demos y validacion temprana sin sesion de dispositivo ni QR.
 
-`CLOUD_API` es la ruta productiva esperada. Requiere `APP_WHATSAPP_CLOUD_API_PHONE_NUMBER_ID` y `APP_WHATSAPP_CLOUD_API_ACCESS_TOKEN`.
-
-`DISABLED` desactiva el canal WhatsApp y hace fallar el despacho con un error explicito.
+`META_CLOUD_API` es la ruta productiva esperada. Requiere `APP_WHATSAPP_CLOUD_API_PHONE_NUMBER_ID` y `APP_WHATSAPP_CLOUD_API_ACCESS_TOKEN`.
 
 ## Variables obligatorias por ambiente
 
 - `APP_ENVIRONMENT`: `local`, `demo`, `test`, `dev` o `production`.
 - `APP_JWT_SECRET`: obligatorio y robusto fuera de ambientes locales.
 - `APP_DB_URL`, `APP_DB_USERNAME`, `APP_DB_PASSWORD`.
-- `APP_WHATSAPP_CHANNEL_PROVIDER`: `WEB`, `CLOUD_API` o `DISABLED`.
+- `APP_WHATSAPP_CHANNEL_PROVIDER`: `SIMULATED` (local/demo) o `META_CLOUD_API` (produccion).
 - Para Cloud API: `APP_WHATSAPP_CLOUD_API_PHONE_NUMBER_ID` y `APP_WHATSAPP_CLOUD_API_ACCESS_TOKEN`.
-- Para Web local: `APP_WHATSAPP_WEB_ENABLED=true`, `APP_WHATSAPP_WEB_BASE_URL`, `APP_WHATSAPP_WEB_API_KEY`.
 
 ## Matriz minima de roles
 
@@ -68,7 +65,7 @@ No cargar datos demo en produccion salvo que el ambiente haya sido creado explic
 
 1. Definir secretos reales en el entorno.
 2. Usar `APP_ENVIRONMENT=production`.
-3. Usar `APP_WHATSAPP_CHANNEL_PROVIDER=CLOUD_API` o `DISABLED`.
+3. Usar `APP_WHATSAPP_CHANNEL_PROVIDER=META_CLOUD_API` en produccion.
 4. Mantener `APP_WHATSAPP_CLOUD_API_DRY_RUN_ENABLED=false` salvo pruebas controladas.
 5. Validar `docker compose -f docker-compose.prod.yml config`.
 

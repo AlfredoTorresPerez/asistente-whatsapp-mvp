@@ -25,7 +25,7 @@ import com.asistentewhatsapp.channels.application.ChannelDispatchRequest;
 import com.asistentewhatsapp.channels.application.ChannelDispatchResponse;
 import com.asistentewhatsapp.channels.application.ChannelDispatchService;
 import com.asistentewhatsapp.channels.domain.MessageChannelType;
-import com.asistentewhatsapp.channels.infrastructure.whatsappweb.WhatsAppWebChannelJdbcRepository;
+import com.asistentewhatsapp.channels.infrastructure.WhatsAppChannelJdbcRepository;
 import com.asistentewhatsapp.security.application.AuditService;
 import com.asistentewhatsapp.security.application.AuditMetadata;
 import com.asistentewhatsapp.security.application.TokenHashService;
@@ -74,7 +74,7 @@ public class BookingConfirmationService {
 	private final AuditService auditService;
 	private final ChannelDispatchService channelDispatchService;
 	private final CompleteAgendaJdbcRepository completeAgendaJdbcRepository;
-	private final WhatsAppWebChannelJdbcRepository whatsAppWebChannelJdbcRepository;
+	private final WhatsAppChannelJdbcRepository whatsAppWebChannelJdbcRepository;
 	private final BookingEmailService bookingEmailService;
 	private final BookingPaymentService bookingPaymentService;
 	private final CalendarSyncService calendarSyncService;
@@ -88,7 +88,7 @@ public class BookingConfirmationService {
 	public BookingConfirmationService(BookingConfirmationJdbcRepository repository,
 			BookingConfirmationProperties properties, TokenHashService tokenHashService, AuditService auditService,
 			ChannelDispatchService channelDispatchService, CompleteAgendaJdbcRepository completeAgendaJdbcRepository,
-			WhatsAppWebChannelJdbcRepository whatsAppWebChannelJdbcRepository, BookingEmailService bookingEmailService,
+			WhatsAppChannelJdbcRepository whatsAppWebChannelJdbcRepository, BookingEmailService bookingEmailService,
 			BookingPaymentService bookingPaymentService, CalendarSyncService calendarSyncService,
 			BookingConfirmationNotificationsService notificationsService,
 			ReminderSchedulingService reminderSchedulingService,
@@ -619,16 +619,8 @@ public class BookingConfirmationService {
 		auditService.record(booking.businessId(), null, "BOOKING_CONFIRMATION_EMAIL_SENT", "BOOKING",
 				booking.bookingId(), "Correo de confirmacion pendiente generado o simulado.");
 		try {
-			AppointmentConfirmationEmailDTO dto = new AppointmentConfirmationEmailDTO();
-			dto.setPatientName(booking.customerName());
-			dto.setServiceName(booking.serviceName() != null ? booking.serviceName() : booking.subject());
-			dto.setProfessionalName(booking.professionalName());
-			dto.setBranchName(booking.locationName() != null ? booking.locationName() : booking.location());
-			dto.setEmail(booking.customerEmail());
-			dto.setAppointmentDate(booking.startsAt().toLocalDate().toString());
-			dto.setAppointmentTime(booking.startsAt().toLocalTime().toString());
-			dto.setConfirmationUrl(confirmationUrl);
-			dto.setBookingStatus(booking.bookingStatus());
+			AppointmentConfirmationEmailDTO dto = notificationsService.buildConfirmationEmailDto(booking,
+					confirmationUrl);
 			transactionalEmailService.sendBookingConfirmationEmail(dto);
 		} catch (Exception e) {
 			LOGGER.warn("PENDING_CONFIRMATION_TRANSACTIONAL_EMAIL_FAILED bookingId={} reason={}", booking.bookingId(),
@@ -646,16 +638,7 @@ public class BookingConfirmationService {
 		bookingEmailService.sendBookingEmail(link.businessId(), link.bookingId(), link.customerEmail(),
 				"BOOKING_CONFIRMED", "Tu reserva esta confirmada", body);
 		try {
-			AppointmentConfirmationEmailDTO dto = new AppointmentConfirmationEmailDTO();
-			dto.setPatientName(link.customerName());
-			dto.setServiceName(link.serviceName() != null ? link.serviceName() : link.subject());
-			dto.setProfessionalName(link.professionalName());
-			dto.setBranchName(link.locationName() != null ? link.locationName() : link.location());
-			dto.setEmail(link.customerEmail());
-			dto.setAppointmentDate(link.startsAt().toLocalDate().toString());
-			dto.setAppointmentTime(link.startsAt().toLocalTime().toString());
-			dto.setConfirmationUrl(link.confirmationUrl());
-			dto.setBookingStatus(link.bookingStatus());
+			AppointmentConfirmationEmailDTO dto = notificationsService.buildConfirmationEmailDto(link);
 			transactionalEmailService.sendBookingConfirmationEmail(dto);
 		} catch (Exception e) {
 			LOGGER.warn("CONFIRMED_TRANSACTIONAL_EMAIL_FAILED bookingId={} reason={}", link.bookingId(),

@@ -10,7 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-@Repository
+@Repository("whatsAppChannelConfigurationJdbcRepository")
 public class WhatsAppChannelJdbcRepository {
 
 	private final JdbcTemplate jdbcTemplate;

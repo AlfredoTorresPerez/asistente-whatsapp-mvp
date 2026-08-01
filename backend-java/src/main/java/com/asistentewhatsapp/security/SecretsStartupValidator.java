@@ -26,7 +26,6 @@ public class SecretsStartupValidator implements ApplicationRunner {
 
 		String[][] secretsToCheck = {{"APP_DB_PASSWORD", "Base de datos"}, {"APP_JWT_SECRET", "JWT"},
 				{"APP_MERCADOPAGO_ACCESS_TOKEN", "MercadoPago"},
-				{"APP_WHATSAPP_WEB_WEBHOOK_SECRET", "WhatsApp Web webhook"},
 				{"APP_BOOKING_PAYMENT_WEBHOOK_SECRET", "Pagos webhook"},};
 
 		boolean cloudApiEnabled = "true"

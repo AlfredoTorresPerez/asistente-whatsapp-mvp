@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0 (2026-08-01)
+
+### Eliminado
+- `whatsapp-web-service` (servicio Node/Express con `whatsapp-web.js`, Puppeteer/Chromium, QR y puerto 3001): eliminado de repositorio, composes, scripts, UI, docs y configuración. El canal de WhatsApp es nativo del backend con proveedores `META_CLOUD_API` (WhatsApp Cloud API de Meta, webhook firmado `X-Hub-Signature-256`) y `SIMULATED` (embebido, default local). Ver informe completo en `docs/INFORME_ELIMINACION_WHATSAPP_WEB.md`.
+
+### Corregido
+- Referencias residuales a `whatsapp-web-service` en documentación de raíz y `docs/` actualizadas a la realidad actual.
+
 ## 0.1.0 (2026-07-15)
 
 ### Agregado
@@ -24,11 +32,11 @@
 - No se agregaron secretos ni credenciales reales.
 
 ### Brechas conocidas diferidas
-- `whatsapp-web-service` cobertura de pruebas: 1 test (8 líneas). No se modifica por decisión del propietario.
+- `whatsapp-web-service` (eliminado en 0.2.0, 2026-08-01): cobertura de pruebas en ese momento, 1 test (8 líneas). No se modificó por decisión del propietario.
 - `start-visual.sh` faltante en Dockerfile: referenciado pero no existe. No se crea ni elimina por decisión del propietario.
 - `format:check` reporta 156 archivos con estilo preexistente (no reformateados para evitar cambios masivos).
 
 ### Versiones
 - Backend: `0.0.1-SNAPSHOT`
 - Frontend: `0.1.0`
-- WhatsApp Web Service: `0.4.0` (no modificado)
+- WhatsApp Web Service: `0.4.0` (eliminado en 0.2.0, 2026-08-01)

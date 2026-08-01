@@ -14,11 +14,10 @@ import {
   validateWhatsAppChannelRequest,
 } from '../../../services/api/whatsappChannelApi'
 import {
-  connectWhatsAppConfigurationRequest,
-  disconnectWhatsAppConfigurationRequest,
-  getWhatsAppConfigurationRequest,
-  refreshWhatsAppConfigurationQrRequest,
-  updateWhatsAppConfigurationPreferencesRequest,
+connectWhatsAppConfigurationRequest,
+disconnectWhatsAppConfigurationRequest,
+getWhatsAppConfigurationRequest,
+updateWhatsAppConfigurationPreferencesRequest,
 } from '../../../services/api/configurationApi'
 import {
   completeOnboardingRequest,
@@ -108,7 +107,7 @@ function toStatusTone(status: string): BadgeTone {
 }
 
 const PROVIDER_META_CLOUD_API = 'META_CLOUD_API'
-const PROVIDER_WHATSAPP_WEB = 'WHATSAPP_WEB'
+const PROVIDER_SIMULATED = 'SIMULATED'
 
 export function ConfigurationPage() {
   const { showToast } = useToast()
@@ -125,13 +124,13 @@ export function ConfigurationPage() {
   const channel = channelQuery.data
 
   const isMetaCloudApi = channel?.providerType === PROVIDER_META_CLOUD_API
-  const isWhatsAppWeb = channel?.providerType === PROVIDER_WHATSAPP_WEB
+  const isSimulated = channel?.providerType === PROVIDER_SIMULATED
   const hasChannel = !!channel?.providerType
 
   const legacyConfigQuery = useQuery({
     queryKey: legacyConfigQueryKey,
     queryFn: getWhatsAppConfigurationRequest,
-    enabled: isWhatsAppWeb,
+    enabled: isSimulated,
     refetchInterval: 30_000,
   })
   const legacyConfig = legacyConfigQuery.data
@@ -212,7 +211,7 @@ export function ConfigurationPage() {
       queryClient.setQueryData(legacyConfigQueryKey, response)
       showToast({
         title: 'Vinculacion solicitada',
-        description: 'Se solicito iniciar la sesion WhatsApp Web.',
+        description: 'Se solicito iniciar la sesion del canal.',
         tone: 'success',
       })
     },
@@ -225,32 +224,13 @@ export function ConfigurationPage() {
     },
   })
 
-  const refreshQrMutation = useMutation({
-    mutationFn: refreshWhatsAppConfigurationQrRequest,
-    onSuccess: (response) => {
-      queryClient.setQueryData(legacyConfigQueryKey, response)
-      showToast({
-        title: 'QR actualizado',
-        description: 'Se solicito un nuevo codigo QR.',
-        tone: 'success',
-      })
-    },
-    onError: () => {
-      showToast({
-        title: 'No fue posible generar QR',
-        description: 'Verifica el adaptador local.',
-        tone: 'error',
-      })
-    },
-  })
-
   const disconnectMutation = useMutation({
     mutationFn: disconnectWhatsAppConfigurationRequest,
     onSuccess: (response) => {
       queryClient.setQueryData(legacyConfigQueryKey, response)
       showToast({
         title: 'Sesion desconectada',
-        description: 'Se cerro la sesion WhatsApp Web.',
+        description: 'Se cerro la sesion del canal.',
         tone: 'success',
       })
     },
@@ -477,7 +457,7 @@ export function ConfigurationPage() {
               {isMetaCloudApi ? (
                 <CloudApiHeader channel={channel} />
               ) : (
-                <WhatsAppWebHeader channel={channel} />
+                <SimulatedChannelHeader channel={channel} />
               )}
 
               <div className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
@@ -545,22 +525,14 @@ export function ConfigurationPage() {
                 </div>
               ) : null}
 
-              {isWhatsAppWeb && legacyConfig ? (
+              {isSimulated && legacyConfig ? (
                 <>
                   <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
-                    <QrConnectionCard
-                      qrCode={legacyConfig.qrCode}
-                      onRefreshQr={() => refreshQrMutation.mutate()}
-                      refreshLoading={refreshQrMutation.isPending}
-                    />
                     <PreferencesCard
                       disabled={updatePreferencesMutation.isPending}
                       onToggle={handlePreferenceToggle}
                       preferences={legacyConfig.preferences}
                     />
-                  </div>
-
-                  <div className="grid gap-4 xl:grid-cols-[1fr_1fr]">
                     <MainChannelCard
                       channelName={legacyConfig.mainChannel.channelName}
                       channelType={legacyConfig.mainChannel.channelType}
@@ -568,16 +540,17 @@ export function ConfigurationPage() {
                       businessHours={legacyConfig.mainChannel.businessHours}
                       active={legacyConfig.mainChannel.automaticResponsesEnabled}
                     />
-                    <SessionHistoryCard
-                      history={channel.recentEvents.map((e) => ({
-                        id: e.id,
-                        title: e.title,
-                        actor: e.actor,
-                        tone: e.tone as 'success' | 'warning' | 'danger' | 'neutral' | 'info',
-                        occurredAt: e.occurredAt,
-                      }))}
-                    />
                   </div>
+
+                  <SessionHistoryCard
+                    history={channel.recentEvents.map((e) => ({
+                      id: e.id,
+                      title: e.title,
+                      actor: e.actor,
+                      tone: e.tone as 'success' | 'warning' | 'danger' | 'neutral' | 'info',
+                      occurredAt: e.occurredAt,
+                    }))}
+                  />
 
                   <div className="flex flex-wrap gap-3">
                     <Button
@@ -585,13 +558,6 @@ export function ConfigurationPage() {
                       onClick={() => connectMutation.mutate()}
                     >
                       Conectar
-                    </Button>
-                    <Button
-                      loading={refreshQrMutation.isPending}
-                      onClick={() => refreshQrMutation.mutate()}
-                      variant="secondary"
-                    >
-                      Refrescar QR
                     </Button>
                     <Button
                       loading={disconnectMutation.isPending}
@@ -656,7 +622,7 @@ export function ConfigurationPage() {
         />
       ) : null}
 
-      {isWhatsAppWeb ? <CalendarSection /> : null}
+      {isSimulated ? <CalendarSection /> : null}
     </section>
   )
 }
@@ -690,20 +656,20 @@ function CloudApiHeader({ channel }: { channel: WhatsAppChannelResponse }) {
   )
 }
 
-function WhatsAppWebHeader({ channel }: { channel: WhatsAppChannelResponse }) {
+function SimulatedChannelHeader({ channel }: { channel: WhatsAppChannelResponse }) {
   const sessionStatus = channel.operationalStatus === 'CONNECTED' ? 'CONNECTED' : 'DISCONNECTED'
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-[24px] border border-emerald-100 bg-white px-4 py-3 shadow-[0_12px_32px_rgba(15,23,42,0.04)]">
       <div>
-        <p className="text-sm font-semibold text-slate-950">Configuracion de WhatsApp Web</p>
+        <p className="text-sm font-semibold text-slate-950">Configuracion del canal</p>
         <p className="text-xs text-slate-500">
-          Conecta el telefono de la empresa y administra la sesion activa.
+          Canal en modo simulado local para desarrollo y pruebas sin WhatsApp real.
         </p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <StatusBadge label={toStatusLabel(sessionStatus)} tone={toStatusTone(sessionStatus)} />
         <StatusBadge
-          label="API local"
+          label="Modo simulado"
           tone={channel.operationalStatus === 'CONNECTED' ? 'success' : 'warning'}
         />
       </div>
@@ -833,87 +799,6 @@ function MetaConfigDetailCard({ channel }: { channel: WhatsAppChannelResponse })
         ) : null}
       </div>
     </Card>
-  )
-}
-
-function QrConnectionCard({
-  qrCode,
-  onRefreshQr,
-  refreshLoading,
-}: {
-  qrCode: string | null
-  onRefreshQr: () => void
-  refreshLoading: boolean
-}) {
-  return (
-    <Card className="space-y-5">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="text-sm font-semibold text-slate-950">Vincular nuevo dispositivo</p>
-          <p className="mt-1 text-xs text-slate-500">
-            Escanea el codigo desde WhatsApp en tu telefono.
-          </p>
-        </div>
-        <Button loading={refreshLoading} onClick={onRefreshQr} size="sm">
-          Generar QR
-        </Button>
-      </div>
-      <div className="grid gap-5 md:grid-cols-[180px_minmax(0,1fr)]">
-        <QrBlock qrCode={qrCode} />
-        <ol className="space-y-3 text-sm text-slate-700">
-          {[
-            'Abre WhatsApp en tu telefono',
-            'Toca Menu > Dispositivos vinculados',
-            'Toca Vincular un dispositivo',
-            'Escanea este codigo QR',
-          ].map((step, index) => (
-            <li className="flex gap-3" key={step}>
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-xs font-bold text-emerald-700">
-                {index + 1}
-              </span>
-              <span className="pt-1">{step}</span>
-            </li>
-          ))}
-        </ol>
-      </div>
-      <div className="rounded-[18px] border border-emerald-100 bg-emerald-50 px-4 py-3 text-xs leading-5 text-emerald-800">
-        Este codigo QR es personal y temporal. No lo compartas con nadie.
-      </div>
-    </Card>
-  )
-}
-
-function QrBlock({ qrCode }: { qrCode: string | null }) {
-  if (qrCode?.startsWith('data:image')) {
-    return (
-      <div className="rounded-[24px] border border-slate-200 bg-white p-3">
-        <img alt="QR WhatsApp Web" className="h-auto w-full rounded-[16px]" src={qrCode} />
-      </div>
-    )
-  }
-  if (qrCode) {
-    return (
-      <div className="rounded-[24px] border border-slate-200 bg-white p-4">
-        <p className="max-h-[160px] overflow-auto break-all font-mono text-xs leading-5 text-slate-700">
-          {qrCode}
-        </p>
-      </div>
-    )
-  }
-  return (
-    <div className="grid h-[180px] grid-cols-7 gap-1 rounded-[24px] border border-dashed border-slate-300 bg-white p-4">
-      {Array.from({ length: 49 }).map((_, index) => (
-        <span
-          className={[
-            'rounded-[4px]',
-            index % 3 === 0 || index % 7 === 1 || index === 12 || index === 36
-              ? 'bg-slate-900'
-              : 'bg-slate-100',
-          ].join(' ')}
-          key={index}
-        />
-      ))}
-    </div>
   )
 }
 

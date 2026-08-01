@@ -5,7 +5,7 @@ Alcance: aplicacion de reservas por WhatsApp, enlaces publicos, agenda, reprogra
 
 ## 1. Resumen ejecutivo
 
-La aplicacion no es un cascaron: existe una implementacion amplia con backend Java/Spring Boot, frontend React/Vite, servicio Node para WhatsApp Web, migraciones Flyway sobre PostgreSQL, adaptadores WhatsApp Web/Cloud, agenda digital, enlaces publicos de confirmacion/reprogramacion/cancelacion, recordatorios y auditoria basica.
+La aplicacion no es un cascaron: existe una implementacion amplia con backend Java/Spring Boot, frontend React/Vite, canal WhatsApp nativo del backend (proveedores `META_CLOUD_API` y `SIMULATED`; el antiguo servicio Node `whatsapp-web-service` fue eliminado), migraciones Flyway sobre PostgreSQL, agenda digital, enlaces publicos de confirmacion/reprogramacion/cancelacion, recordatorios y auditoria basica.
 
 El estado actual es funcionalmente avanzado, pero no alcanza aun un nivel robusto de produccion para reservas transaccionales. Las brechas mas importantes estan en la proteccion contra doble reserva, normalizacion de estados, reglas de transicion, pagos asociados a reserva, auditoria enriquecida y pruebas concurrentes.
 
@@ -17,9 +17,9 @@ Stack detectado:
 
 - Backend: Java 21, Spring Boot 3.5.14, Spring Security, Spring MVC, Spring JDBC/JPA, Flyway, PostgreSQL.
 - Frontend: React 18, TypeScript, Vite, React Router, TanStack Query, React Hook Form, Zod.
-- WhatsApp: servicio Node/Express con `whatsapp-web.js`, firma HMAC hacia backend, modo WhatsApp Web experimental; backend tambien contiene adaptador Cloud API configurable.
+- WhatsApp: canal nativo del backend con proveedores `META_CLOUD_API` (WhatsApp Cloud API de Meta, webhook firmado `X-Hub-Signature-256`) y `SIMULATED` (embebido, default local). El antiguo servicio Node/Express `whatsapp-web-service` con `whatsapp-web.js` y QR fue eliminado.
 - Persistencia: PostgreSQL con migraciones `V1` a `V32`.
-- Infra: `docker-compose.yml` con PostgreSQL, backend, frontend y servicio WhatsApp Web.
+- Infra: `docker-compose.yml` con PostgreSQL, backend y frontend (sin servicio externo de WhatsApp).
 - Pruebas: JUnit/Spring backend, Vitest frontend configurado, pruebas de canales/IA/repositorios.
 
 Modulos relevantes:
@@ -29,13 +29,13 @@ Modulos relevantes:
 - IA transaccional WhatsApp: `backend-java/src/main/java/com/asistentewhatsapp/aiagents`.
 - Canales WhatsApp: `backend-java/src/main/java/com/asistentewhatsapp/channels`.
 - Frontend de agenda/reservas publicas: `frontend-react/src/modules/agenda`, `frontend-react/src/modules/bookings`.
-- Servicio WhatsApp Web: `whatsapp-web-service/src/server.js`.
+- Servicio WhatsApp Web: eliminado (2026-08-01); el canal es nativo del backend (`META_CLOUD_API`/`SIMULATED`).
 
 Evidencia de verificacion:
 
 - `backend-java`: `mvn test` exitoso, 279 tests, 0 fallos.
 - `frontend-react`: no se ejecuto `pnpm test` porque no existe `node_modules` en el entorno local.
-- `whatsapp-web-service`: `node --check src/server.js` exitoso.
+- `whatsapp-web-service`: eliminado (2026-08-01); el canal es nativo del backend.
 
 ## 3. Matriz de trazabilidad
 
@@ -51,7 +51,7 @@ Evidencia de verificacion:
 | H. Pagos/senal de reserva | Parcial | `booking` tiene `requires_deposit`, `deposit_amount`, `payment_status`; pagos reales estan modelados para `orders`. | Alto | Falta entidad/transaccion de pago de reserva, webhook de proveedor, idempotencia de pago, firma y reglas pago-vs-expiracion. |
 | I. Estados canonicos de reserva | Parcial | Conviven `REQUESTED`, `TEMPORARY`, `PENDIENTE_CONFIRMACION`, `CONFIRMED`, `REPROGRAMADA`, `CANCELADA`, `EXPIRADA`, etc. | Alto | Definir enum canonico unico, migrar aliases y crear maquina de estados. |
 | J. Auditoria | Parcial | `audit_log` y `booking_status_history`; muchos `auditService.record`. | Medio | `AuditService` guarda metadata `{}`; historial no contiene IP, user-agent, message id, link id, version o payload de decision. |
-| K. WhatsApp desacoplado e idempotente | Parcialmente implementado | Servicio Node firma HMAC; backend tiene canal Web/Cloud y log de eventos; V16/V32 agregan idempotencia parcial. | Medio | Completar deduplicacion por mensaje entrante/saliente y asociar eventos a acciones de reserva con trace end-to-end. |
+| K. WhatsApp desacoplado e idempotente | Parcialmente implementado | El canal nativo del backend (Cloud API con firma `X-Hub-Signature-256` o simulador embebido) registra log de eventos; V16/V32 agregan idempotencia parcial. | Medio | Completar deduplicacion por mensaje entrante/saliente y asociar eventos a acciones de reserva con trace end-to-end. |
 | L. Frontend de reserva/agenda | Parcialmente implementado | Paginas de agenda, confirmacion, reprogramacion, cancelacion, detalle de cita y API client. | Medio | Estados inconsistentes con backend; falta verificacion automatizada ejecutada en este entorno. |
 | M. Pruebas de calidad | Parcial | Backend pasa 279 tests. Hay tests de repositorio/canales/IA. | Alto | Faltan pruebas concurrentes/integracion DB para doble reserva, confirmacion simultanea, expiracion, pagos y reintentos WhatsApp. |
 
@@ -158,7 +158,7 @@ Impacto:
 ### WhatsApp/IA
 
 - Existen flujos transaccionales para crear reserva temporal, cancelar y reprogramar desde WhatsApp.
-- El servicio Node firma webhooks con HMAC y el backend registra eventos.
+- El canal Cloud API verifica la firma `X-Hub-Signature-256`; el proveedor simulado embebido registra eventos; el backend registra eventos de canal.
 - Falta garantizar idempotencia completa por mensaje entrante y saliente asociada a la accion de reserva.
 - Hay evidencia de inconsistencia documental/test-data: la matriz QA indica que cancelacion no ejecuta flujo transaccional completo, mientras el codigo actual si llama a `completeDigitalAgendaService.cancel`.
 
@@ -220,7 +220,7 @@ Impacto:
 7. Endurecer WhatsApp:
    - Deduplicar mensajes entrantes por `external_message_id`/delivery id.
    - Deduplicar acciones de reserva generadas por IA con idempotency key semantica.
-   - Confirmar que Cloud API sea el modo productivo y WhatsApp Web quede marcado como experimental/local.
+    - Usar `META_CLOUD_API` como modo productivo y `SIMULATED` en local; el antiguo WhatsApp Web fue eliminado.
 
 ## 7. Plan por fases
 

@@ -94,7 +94,7 @@ export const mockWhatsAppConfig = {
   ],
   mainChannel: {
     name: 'WhatsApp Principal',
-    type: 'WHATSAPP_WEB',
+    type: 'WHATSAPP',
     phoneNumber: '+56999900001',
     businessHours: 'Lun-Vie 09:00-18:00',
     autoReplyEnabled: true,

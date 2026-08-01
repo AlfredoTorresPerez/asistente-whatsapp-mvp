@@ -7,17 +7,13 @@
   Usa --env-file .env.local si existe.
 .PARAMETER Volumes
   Elimina tambien los volumenes (borra la base de datos).
-.PARAMETER Profile
-  Perfil Docker Compose a detener.
 .EXAMPLE
   .\scripts\local-stop.ps1
   .\scripts\local-stop.ps1 -Volumes
-  .\scripts\local-stop.ps1 -Profile whatsapp
 #>
 
 param(
-  [switch]$Volumes,
-  [string]$Profile = ""
+  [switch]$Volumes
 )
 
 $ROOT = Split-Path -Parent $PSScriptRoot
@@ -37,10 +33,6 @@ if (Test-Path $EnvFile) {
 }
 
 $cmd += " -f `"$ComposeFile`""
-
-if ($Profile) {
-  $cmd += " --profile $Profile"
-}
 
 $cmd += " down"
 

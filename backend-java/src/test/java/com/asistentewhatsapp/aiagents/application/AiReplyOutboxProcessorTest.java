@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 import com.asistentewhatsapp.aesthetic.application.AestheticCenterService;
 import com.asistentewhatsapp.aiagents.infrastructure.AiReplyOutboxJdbcRepository;
 import com.asistentewhatsapp.channels.application.ChannelDispatchService;
-import com.asistentewhatsapp.channels.infrastructure.whatsappweb.WhatsAppWebChannelJdbcRepository;
+import com.asistentewhatsapp.channels.infrastructure.WhatsAppChannelJdbcRepository;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,7 +18,7 @@ class AiReplyOutboxProcessorTest {
 	@Test
 	void processDueJobsDoesNotProcessAnythingWhenNoJobsAreClaimed() {
 		AiReplyOutboxJdbcRepository outboxRepository = mock(AiReplyOutboxJdbcRepository.class);
-		WhatsAppWebChannelJdbcRepository channelRepository = mock(WhatsAppWebChannelJdbcRepository.class);
+		WhatsAppChannelJdbcRepository channelRepository = mock(WhatsAppChannelJdbcRepository.class);
 		AestheticCenterService aestheticCenterService = mock(AestheticCenterService.class);
 		AgentCoordinatorService agentCoordinatorService = mock(AgentCoordinatorService.class);
 		ChannelDispatchService channelDispatchService = mock(ChannelDispatchService.class);

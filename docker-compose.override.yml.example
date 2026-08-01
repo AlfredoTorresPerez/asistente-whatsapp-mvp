@@ -25,16 +25,3 @@ services:
   # frontend-react:
   #   build:
   #     target: production
-
-  # ---------------------------------------------------------------------------
-  # Volumenes con ownership uid/gid fijo (Linux)
-  # En Linux, el usuario node dentro del contenedor whatsapp-web-service tiene
-  # uid=1000. Si los bind mounts se crean como root, los permisos fallan.
-  # Solucion: crear los directorios con uid=1000 en el host:
-  #   mkdir -p .docker/volumes/whatsapp-session .docker/volumes/whatsapp-cache
-  #   sudo chown -R 1000:1000 .docker/volumes/whatsapp-session .docker/volumes/whatsapp-cache
-  # ---------------------------------------------------------------------------
-  # whatsapp-web-service:
-  #   volumes:
-  #     - whatsapp-webjs-session-data:/app/.wwebjs_auth
-  #     - whatsapp-webjs-cache-data:/app/.wwebjs_cache

@@ -74,7 +74,7 @@ public class AdministrationJdbcRepository {
 				new AdminSummaryResponse.CompanySummary(companyProjection.id(), companyProjection.companyName()),
 				new AdminSummaryResponse.UsersSummary(((Number) usersProjection.get("total")).longValue(),
 						((Number) usersProjection.get("active")).longValue()),
-				new AdminSummaryResponse.WhatsAppWebSummary(
+				new AdminSummaryResponse.WhatsAppChannelSummary(
 						whatsAppWebStatus == null ? "DISCONNECTED" : whatsAppWebStatus),
 				new AdminSummaryResponse.SecuritySummary(sessionTimeoutMinutes == null ? 30 : sessionTimeoutMinutes));
 	}

@@ -55,15 +55,10 @@ public class ChannelDispatchService {
 
 	private CanalWhatsApp resolveWhatsAppChannel() {
 		WhatsAppChannelProperties.Provider provider = whatsAppChannelProperties.getProvider();
-		if (provider == WhatsAppChannelProperties.Provider.DISABLED) {
-			throw new UnsupportedMessagingChannelException("El canal WhatsApp esta deshabilitado por configuracion.");
-		}
 
 		WhatsAppChannelProvider domainProvider = switch (provider) {
-			case WEB, WHATSAPP_WEB -> WhatsAppChannelProvider.WHATSAPP_WEB;
-			case CLOUD_API, META_CLOUD_API -> WhatsAppChannelProvider.META_CLOUD_API;
-			case DISABLED -> throw new UnsupportedMessagingChannelException(
-					"El canal WhatsApp esta deshabilitado por configuracion.");
+			case META_CLOUD_API -> WhatsAppChannelProvider.META_CLOUD_API;
+			case SIMULATED -> WhatsAppChannelProvider.SIMULATED;
 		};
 
 		CanalWhatsApp channel = whatsAppChannels.get(domainProvider);

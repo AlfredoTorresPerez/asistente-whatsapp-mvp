@@ -10,11 +10,10 @@ import type {
   SecurityPolicyRequest,
   SecurityPolicyResponse,
   StatusResponse,
-  WhatsAppWebActionResponse,
-  WhatsAppWebQrResponse,
-  WhatsAppWebStatusResponse,
-  WhatsAppWebTestMessageRequest,
-  WhatsAppWebTestMessageResponse,
+  WhatsAppChannelActionResponse,
+  WhatsAppChannelStatusResponse,
+  WhatsAppChannelTestMessageRequest,
+  WhatsAppChannelTestMessageResponse,
 } from './types'
 
 export function getAdminSummaryRequest() {
@@ -84,37 +83,26 @@ export function updateCompanySettingsRequest(payload: CompanySettingsRequest) {
   })
 }
 
-export function getWhatsAppWebStatusRequest() {
-  return apiFetch<WhatsAppWebStatusResponse>('/whatsapp-web/status')
+export function getWhatsAppChannelStatusRequest() {
+  return apiFetch<WhatsAppChannelStatusResponse>('/whatsapp-channel/status')
 }
 
-export function getWhatsAppWebQrRequest() {
-  return apiFetch<WhatsAppWebQrResponse>('/whatsapp-web/qr')
-}
-
-export function connectWhatsAppWebRequest() {
-  return apiFetch<WhatsAppWebActionResponse>('/whatsapp-web/connect', {
+export function connectWhatsAppChannelRequest() {
+  return apiFetch<WhatsAppChannelActionResponse>('/whatsapp-channel/connect', {
     body: JSON.stringify({}),
     method: 'POST',
   })
 }
 
-export function refreshWhatsAppWebQrRequest() {
-  return apiFetch<WhatsAppWebActionResponse>('/whatsapp-web/refresh-qr', {
+export function disconnectWhatsAppChannelRequest() {
+  return apiFetch<WhatsAppChannelActionResponse>('/whatsapp-channel/disconnect', {
     body: JSON.stringify({}),
     method: 'POST',
   })
 }
 
-export function disconnectWhatsAppWebRequest() {
-  return apiFetch<WhatsAppWebActionResponse>('/whatsapp-web/disconnect', {
-    body: JSON.stringify({}),
-    method: 'POST',
-  })
-}
-
-export function sendWhatsAppWebTestMessageRequest(payload: WhatsAppWebTestMessageRequest) {
-  return apiFetch<WhatsAppWebTestMessageResponse>('/whatsapp-web/test-message', {
+export function sendWhatsAppChannelTestMessageRequest(payload: WhatsAppChannelTestMessageRequest) {
+  return apiFetch<WhatsAppChannelTestMessageResponse>('/whatsapp-channel/test-message', {
     body: JSON.stringify(payload),
     method: 'POST',
   })

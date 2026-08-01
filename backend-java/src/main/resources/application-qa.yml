@@ -5,10 +5,6 @@ app:
   logging:
     include-message-body: ${APP_LOGGING_INCLUDE_MESSAGE_BODY:false}
   channels:
-    whatsapp-web:
-      enabled: ${APP_WHATSAPP_WEB_ENABLED:false}
-      simulator-enabled: false
-      demo-fallback-enabled: false
     whatsapp-cloud-api:
       dry-run-enabled: ${APP_WHATSAPP_CLOUD_API_DRY_RUN_ENABLED:false}
   ai:

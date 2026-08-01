@@ -2,7 +2,7 @@ package com.asistentewhatsapp.channels.application;
 
 import com.asistentewhatsapp.channels.domain.WhatsAppDeliveryStatus;
 import com.asistentewhatsapp.channels.domain.WhatsAppDeliveryStatusEvent;
-import com.asistentewhatsapp.channels.infrastructure.whatsappweb.WhatsAppWebChannelJdbcRepository;
+import com.asistentewhatsapp.channels.infrastructure.WhatsAppChannelJdbcRepository;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -19,9 +19,9 @@ public class WhatsAppDeliveryStatusService {
 			WhatsAppDeliveryStatus.SENT, 0, WhatsAppDeliveryStatus.DELIVERED, 1, WhatsAppDeliveryStatus.READ, 2,
 			WhatsAppDeliveryStatus.FAILED, 3, WhatsAppDeliveryStatus.DELETED, 4);
 
-	private final WhatsAppWebChannelJdbcRepository repository;
+	private final WhatsAppChannelJdbcRepository repository;
 
-	public WhatsAppDeliveryStatusService(WhatsAppWebChannelJdbcRepository repository) {
+	public WhatsAppDeliveryStatusService(WhatsAppChannelJdbcRepository repository) {
 		this.repository = repository;
 	}
 

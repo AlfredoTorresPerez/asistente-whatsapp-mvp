@@ -43,8 +43,7 @@ public class BookingConfirmationProperties {
 		}
 		String sanitized = value.trim();
 		String[] accidentalEnvKeys = {"VITE_API_BASE_URL=", "APP_BOOKING_CONFIRMATION_EXPIRATION_MINUTES=", "TZ=",
-				"JAVA_TOOL_OPTIONS=", "SPRING_JACKSON_TIME_ZONE=", "APP_TIME_ZONE=",
-				"WHATSAPP_WEB_COMPANY_PHONE_NUMBER="};
+				"JAVA_TOOL_OPTIONS=", "SPRING_JACKSON_TIME_ZONE=", "APP_TIME_ZONE="};
 		for (String key : accidentalEnvKeys) {
 			int index = sanitized.indexOf(key);
 			if (index > 0) {

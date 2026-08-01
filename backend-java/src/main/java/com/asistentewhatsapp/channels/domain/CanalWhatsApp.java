@@ -5,9 +5,9 @@ package com.asistentewhatsapp.channels.domain;
  * WhatsApp.
  *
  * <p>
- * Ambiente local: implementacion WhatsAppWebAdapter con whatsapp-web.js.
- * Ambiente productivo: implementacion WhatsAppCloudApiAdapter, habilitable por
- * configuracion.
+ * Implementaciones: WhatsAppCloudApiAdapter (WhatsApp Cloud API de Meta, modo
+ * productivo) y SimulatedWhatsAppProvider (modo simulado local, sin red ni
+ * credenciales).
  */
 public interface CanalWhatsApp extends MessagingChannel {
 

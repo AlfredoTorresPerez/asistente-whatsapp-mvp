@@ -13,7 +13,7 @@ import com.asistentewhatsapp.channels.infrastructure.whatsappcloud.WhatsAppCloud
 import com.asistentewhatsapp.channels.infrastructure.whatsappcloud.WhatsAppCloudWebhookPayload.ErrorInfo;
 import com.asistentewhatsapp.channels.infrastructure.whatsappcloud.WhatsAppCloudWebhookPayload.Status;
 import com.asistentewhatsapp.channels.infrastructure.whatsappcloud.WhatsAppCloudWebhookPayload.Value;
-import com.asistentewhatsapp.channels.infrastructure.whatsappweb.WhatsAppWebChannelJdbcRepository;
+import com.asistentewhatsapp.channels.infrastructure.WhatsAppChannelJdbcRepository;
 import com.asistentewhatsapp.shared.exception.ApiException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
@@ -37,12 +37,12 @@ public class WhatsAppCloudWebhookParser {
 	private static final Logger LOG = LoggerFactory.getLogger(WhatsAppCloudWebhookParser.class);
 
 	private final ObjectMapper objectMapper;
-	private final WhatsAppWebChannelJdbcRepository repository;
+	private final WhatsAppChannelJdbcRepository repository;
 	private final WhatsAppInboundMessageService inboundMessageService;
 	private final WhatsAppDeliveryStatusService deliveryStatusService;
 	private final WhatsAppCloudApiMetrics metrics;
 
-	public WhatsAppCloudWebhookParser(ObjectMapper objectMapper, WhatsAppWebChannelJdbcRepository repository,
+	public WhatsAppCloudWebhookParser(ObjectMapper objectMapper, WhatsAppChannelJdbcRepository repository,
 			WhatsAppInboundMessageService inboundMessageService, WhatsAppDeliveryStatusService deliveryStatusService,
 			WhatsAppCloudApiMetrics metrics) {
 		this.objectMapper = objectMapper;
@@ -80,7 +80,7 @@ public class WhatsAppCloudWebhookParser {
 
 				String phoneNumberId = value.metadata() != null ? value.metadata().phoneNumberId() : null;
 
-				WhatsAppWebChannelJdbcRepository.ChannelAccountRecord channelAccount = resolveChannelAccount(
+				WhatsAppChannelJdbcRepository.ChannelAccountRecord channelAccount = resolveChannelAccount(
 						phoneNumberId);
 
 				if (channelAccount == null) {
@@ -108,8 +108,8 @@ public class WhatsAppCloudWebhookParser {
 	}
 
 	private void processMessageIdempotent(Message message, Value value,
-			WhatsAppWebChannelJdbcRepository.ChannelAccountRecord channelAccount, UUID businessId,
-			UUID channelAccountId, String rawBody) {
+			WhatsAppChannelJdbcRepository.ChannelAccountRecord channelAccount, UUID businessId, UUID channelAccountId,
+			String rawBody) {
 		String idempotencyKey = message.id() != null ? message.id() : computeHash(message);
 		OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
 
@@ -125,8 +125,8 @@ public class WhatsAppCloudWebhookParser {
 	}
 
 	private void processStatusIdempotent(Status status,
-			WhatsAppWebChannelJdbcRepository.ChannelAccountRecord channelAccount, UUID businessId,
-			UUID channelAccountId, String rawBody) {
+			WhatsAppChannelJdbcRepository.ChannelAccountRecord channelAccount, UUID businessId, UUID channelAccountId,
+			String rawBody) {
 		String stableKey = status.id() + "-" + status.status() + "-"
 				+ (status.timestamp() != null ? status.timestamp() : "0");
 		String idempotencyKey = "STATUS_" + computeHash(stableKey);
@@ -143,9 +143,9 @@ public class WhatsAppCloudWebhookParser {
 		processStatus(status, channelAccount, businessId, channelAccountId);
 	}
 
-	private WhatsAppWebChannelJdbcRepository.ChannelAccountRecord resolveChannelAccount(String phoneNumberId) {
+	private WhatsAppChannelJdbcRepository.ChannelAccountRecord resolveChannelAccount(String phoneNumberId) {
 		if (phoneNumberId != null && !phoneNumberId.isBlank()) {
-			Optional<WhatsAppWebChannelJdbcRepository.ChannelAccountRecord> byPhoneNumberId = repository
+			Optional<WhatsAppChannelJdbcRepository.ChannelAccountRecord> byPhoneNumberId = repository
 					.findChannelAccountByPhoneNumberId(phoneNumberId);
 			if (byPhoneNumberId.isPresent()) {
 				return byPhoneNumberId.get();
@@ -156,8 +156,8 @@ public class WhatsAppCloudWebhookParser {
 	}
 
 	private void processMessage(Message message, Value value,
-			WhatsAppWebChannelJdbcRepository.ChannelAccountRecord channelAccount, UUID businessId,
-			UUID channelAccountId, String idempotencyKey) {
+			WhatsAppChannelJdbcRepository.ChannelAccountRecord channelAccount, UUID businessId, UUID channelAccountId,
+			String idempotencyKey) {
 		metrics.incrementMessagesReceived();
 
 		String from = message.from();
@@ -181,7 +181,7 @@ public class WhatsAppCloudWebhookParser {
 
 	private WhatsAppInboundMessageEvent parseMessage(Message message, String from, String messageId,
 			OffsetDateTime timestamp, String contactName,
-			WhatsAppWebChannelJdbcRepository.ChannelAccountRecord channelAccount) {
+			WhatsAppChannelJdbcRepository.ChannelAccountRecord channelAccount) {
 		String body = null;
 		WhatsAppMessageType messageType = WhatsAppMessageType.UNKNOWN;
 		String contextMessageId = null;
@@ -304,7 +304,7 @@ public class WhatsAppCloudWebhookParser {
 				contactName, null, null, null, null, contextMessageId, metadata.isEmpty() ? null : metadata);
 	}
 
-	private void processStatus(Status status, WhatsAppWebChannelJdbcRepository.ChannelAccountRecord channelAccount,
+	private void processStatus(Status status, WhatsAppChannelJdbcRepository.ChannelAccountRecord channelAccount,
 			UUID businessId, UUID channelAccountId) {
 		String statusStr = status.status();
 		String externalMessageId = status.id();

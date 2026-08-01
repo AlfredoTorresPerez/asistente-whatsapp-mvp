@@ -65,7 +65,6 @@ try {
 } catch {
   Write-Host "`n==========================================" -ForegroundColor Yellow
   Write-Host "  BLOQUEO CONOCIDO Y DIFERIDO POR DECISION DEL PROPIETARIO" -ForegroundColor Yellow
-  Write-Host "  whatsapp-web-service y start-visual.sh excluidos" -ForegroundColor Yellow
   Write-Host "==========================================" -ForegroundColor Yellow
   exit 1
 }

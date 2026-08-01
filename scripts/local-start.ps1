@@ -5,16 +5,15 @@
 .DESCRIPTION
   Usa docker-compose.local.yml con --env-file .env.local.
   Servicios: postgres, backend-java, frontend-react.
-  Opcional: --profile whatsapp, --profile monitoring, --profile https.
+  Opcional: --profile monitoring, --profile https.
 .PARAMETER Profile
-  Perfil opcional de Docker Compose (whatsapp, monitoring, https).
+  Perfil opcional de Docker Compose (monitoring, https).
 .PARAMETER Build
   Reconstruye imagenes antes de levantar.
 .PARAMETER Detach
   Modo detached (background). Default: $true.
 .EXAMPLE
   .\scripts\local-start.ps1
-  .\scripts\local-start.ps1 -Profile whatsapp
   .\scripts\local-start.ps1 -Build
 #>
 

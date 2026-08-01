@@ -1,5 +1,7 @@
 # Prompt de corrección y validación del MVP de Asistente WhatsApp
 
+> **Documento histórico** (v23.4.10). Las referencias al adaptador experimental de WhatsApp Web y a `whatsapp-web-service` describen el estado en esa fecha; el servicio externo fue eliminado el 2026-08-01 y el canal es nativo del backend (`META_CLOUD_API`/`SIMULATED`).
+
 Actúa como orquestador técnico senior y auditor de implementación para un MVP de asistente de WhatsApp para negocios, usando como caso principal un centro estético.
 
 ## Contexto

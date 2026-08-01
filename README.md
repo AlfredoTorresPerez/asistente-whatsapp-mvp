@@ -55,7 +55,7 @@ Docker:
 
 ```powershell
 docker compose -f docker-compose.local.yml ps
-docker compose -f docker-compose.local.yml logs --tail=200 backend-java frontend-react whatsapp-web-service
+docker compose -f docker-compose.local.yml logs --tail=200 backend-java frontend-react
 ```
 
 ## Flujo de pagos

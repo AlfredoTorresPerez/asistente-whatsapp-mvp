@@ -87,10 +87,10 @@ public class SecurityConfig {
 						.requestMatchers(HttpMethod.GET, "/api/v1/configuration/whatsapp/**")
 						.hasAnyRole("OWNER", "ADMIN", "SUPERVISOR").requestMatchers("/api/v1/configuration/whatsapp/**")
 						.hasAnyRole("OWNER", "ADMIN")
-						.requestMatchers(HttpMethod.GET, "/api/v1/whatsapp-web/status",
-								"/api/channels/whatsapp-web/status")
+						.requestMatchers(HttpMethod.GET, "/api/v1/whatsapp-channel/status",
+								"/api/channels/whatsapp-channel/status")
 						.hasAnyRole("OWNER", "ADMIN", "SUPERVISOR")
-						.requestMatchers("/api/v1/whatsapp-web/**", "/api/channels/whatsapp-web/**")
+						.requestMatchers("/api/v1/whatsapp-channel/**", "/api/channels/whatsapp-channel/**")
 						.hasAnyRole("OWNER", "ADMIN").requestMatchers("/api/v1/security/**", "/api/security/**")
 						.hasAnyRole("OWNER", "ADMIN")
 						.requestMatchers("/api/v1/security/audit-log", "/api/security/audit-log")

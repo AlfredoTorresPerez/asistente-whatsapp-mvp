@@ -13,7 +13,7 @@ import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepo
 import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository.ConfirmationLinkRecord;
 import com.asistentewhatsapp.calendar.application.CalendarSyncService;
 import com.asistentewhatsapp.channels.application.ChannelDispatchService;
-import com.asistentewhatsapp.channels.infrastructure.whatsappweb.WhatsAppWebChannelJdbcRepository;
+import com.asistentewhatsapp.channels.infrastructure.WhatsAppChannelJdbcRepository;
 import com.asistentewhatsapp.security.application.AuditService;
 import com.asistentewhatsapp.security.application.TokenHashService;
 import com.asistentewhatsapp.shared.email.TransactionalEmailService;
@@ -35,8 +35,8 @@ class BookingConfirmationServiceCalendarTest {
 	private final AuditService auditService = mock(AuditService.class);
 	private final ChannelDispatchService channelDispatchService = mock(ChannelDispatchService.class);
 	private final CompleteAgendaJdbcRepository completeAgendaJdbcRepository = mock(CompleteAgendaJdbcRepository.class);
-	private final WhatsAppWebChannelJdbcRepository whatsAppWebChannelJdbcRepository = mock(
-			WhatsAppWebChannelJdbcRepository.class);
+	private final WhatsAppChannelJdbcRepository whatsAppWebChannelJdbcRepository = mock(
+			WhatsAppChannelJdbcRepository.class);
 	private final BookingEmailService bookingEmailService = mock(BookingEmailService.class);
 	private final BookingPaymentService bookingPaymentService = mock(BookingPaymentService.class);
 	private final CalendarSyncService calendarSyncService = mock(CalendarSyncService.class);

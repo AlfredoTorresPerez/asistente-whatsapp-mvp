@@ -44,12 +44,6 @@ public class WhatsAppConfigurationController {
 	}
 
 	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
-	@PostMapping(path = "/refresh-qr")
-	public WhatsAppConfigurationResponse refreshQr(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-		return whatsAppConfigurationService.refreshQr(authenticatedUser);
-	}
-
-	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'WHATSAPP_CONFIG_MANAGE')")
 	@PostMapping(path = "/disconnect")
 	public WhatsAppConfigurationResponse disconnect(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
 		return whatsAppConfigurationService.disconnect(authenticatedUser);

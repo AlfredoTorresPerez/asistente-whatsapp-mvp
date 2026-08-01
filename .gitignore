@@ -25,12 +25,6 @@ outputs/
 .env.qa
 .env.production
 
-# WhatsApp sessions
-whatsapp-web-service/.wwebjs_auth/
-whatsapp-web-service/.wwebjs_cache/
-whatsapp-web-service/sessions/
-whatsapp-web-service/.sessions/
-
 # Backend logs
 backend-java/logs/
 

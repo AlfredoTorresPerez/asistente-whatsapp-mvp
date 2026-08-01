@@ -6,11 +6,11 @@
 |------|---------|------------|-------------------|
 | **Demo base** (sin WhatsApp real) | `docker compose -f docker-compose.local.yml up -d` | Solo Docker | Desactivada por defecto |
 | **Demo con túnel público** | `docker compose -f docker-compose.local.yml --profile public-link up -d` | + Cloudflare Tunnel automático | Desactivada por defecto |
-| **Demo con WhatsApp Web** | `docker compose -f docker-compose.local.yml --profile whatsapp up -d` | + Escanear QR en /admin/whatsapp-web | Desactivada por defecto |
-| **Debug auto-respuesta IA** | `APP_AI_AGENTS_AUTO_REPLY_ENABLED=true` + modo WhatsApp | + Sesión WhatsApp CONNECTED | Activar manualmente en `.env.local` |
+| **Demo con canal simulado** | `APP_WHATSAPP_CHANNEL_PROVIDER=SIMULATED` (default) + simular mensajes en `/admin/whatsapp-simulator` | Solo Docker | Desactivada por defecto |
+| **Demo con Cloud API** | `APP_WHATSAPP_CHANNEL_PROVIDER=META_CLOUD_API` + credenciales Meta | + Token de acceso y webhook Meta | Activar manualmente en `.env.local` |
 
 > **Importante:** La auto-respuesta IA (`APP_AI_AGENTS_AUTO_REPLY_ENABLED`) está desactivada por defecto en entorno local.
-> Para probarla, ver `docs/DEBUGGING_AUTO_REPLY_LOCAL.md`.
+> Para probarla, simula un mensaje entrante en `/admin/whatsapp-simulator` (equivale a `POST /api/v1/test/whatsapp-inbound`).
 
 ## Gestión de Secretos (Windows Credential Manager)
 
@@ -47,13 +47,15 @@ Frontend: http://localhost:5173
 Backend:  http://localhost:8080
 API Doc:  http://localhost:8080/swagger-ui.html
 
-## Con WhatsApp Web
+## Con Canal Simulado
+
+El canal de WhatsApp en local usa el proveedor `SIMULATED` embebido en el backend (sin servicio externo, sin QR):
 
 ```bash
-# Incluye whatsapp-web-service (Puppeteer + Chromium)
-docker compose -f docker-compose.local.yml --profile whatsapp up -d
-
-# Escanear QR desde la UI: http://localhost:5173/admin/whatsapp-web
+# Simular un mensaje entrante (equivalente a la UI /admin/whatsapp-simulator)
+curl -X POST http://localhost:8080/api/v1/test/whatsapp-inbound \
+  -H "Content-Type: application/json" \
+  -d '{"sessionKey":"demo","from":"+56950954580","body":"Hola, quiero agendar una hora"}'
 ```
 
 ## Con Túnel Público (trycloudflare.com)
@@ -112,7 +114,6 @@ docker compose -f docker-compose.local.yml --profile public-link stop public-tun
 | postgres | 5433 | 5432 | — | PostgreSQL 16 |
 | backend-java | 8080 | 8080 | — | Spring Boot 3 |
 | frontend-react | 5173 | 5173 | — | Vite dev server |
-| whatsapp-web-service | 3001 | 3001 | `whatsapp` | whatsapp-web.js + Chromium |
 | public-tunnel | — | — | `public-link` | Cloudflare Tunnel (trycloudflare.com) |
 
 ## Comandos Útiles
@@ -121,12 +122,10 @@ docker compose -f docker-compose.local.yml --profile public-link stop public-tun
 # PowerShell (recomendado)
 .\scripts\store-local-secrets.ps1  # guardar/actualizar secretos en Credential Manager
 .\scripts\local-start.ps1           # levantar servicios base (restaura secretos)
-.\scripts\local-start.ps1 -Profile whatsapp   # levantar con WhatsApp Web
 .\scripts\local-start.ps1 -Build    # reconstruir imágenes y levantar
 # Nota: local-start.ps1 restaura automáticamente los secretos desde Credential Manager
 
 .\scripts\dev.ps1 up              # levantar servicios base (sin restaurar secretos)
-.\scripts\dev.ps1 up:whatsapp     # levantar con WhatsApp Web
 .\scripts\dev.ps1 logs            # seguir logs
 .\scripts\dev.ps1 down            # detener (preserva volúmenes)
 .\scripts\dev.ps1 reset           # borrar volúmenes + rebuild + up
@@ -136,7 +135,6 @@ docker compose -f docker-compose.local.yml --profile public-link stop public-tun
 # npm (desde frontend-react/)
 cd frontend-react
 pnpm run docker:up                # levantar servicios base
-pnpm run docker:up:whatsapp       # levantar con WhatsApp Web
 pnpm run docker:logs              # seguir logs
 pnpm run docker:down              # detener
 pnpm run docker:reset             # borrar volúmenes + rebuild + up
@@ -147,7 +145,6 @@ pnpm run docker:ps                # estado de servicios
 #   .\scripts\restore-local-secrets.ps1
 # (setea las variables de entorno que docker compose heredará)
 docker compose --env-file .env.local -f docker-compose.local.yml up -d
-docker compose --env-file .env.local -f docker-compose.local.yml --profile whatsapp up -d
 docker compose --env-file .env.local -f docker-compose.local.yml --profile public-link up -d
 docker compose --env-file .env.local -f docker-compose.local.yml logs -f --tail=100
 docker compose --env-file .env.local -f docker-compose.local.yml down
@@ -177,23 +174,10 @@ services:
 | Volumen | Directorio Host (bind mount) | Propósito |
 |---------|-----------------------------|-----------|
 | postgres-data | volumen Docker anónimo | Datos persistentes de PostgreSQL |
-| whatsapp-webjs-session-data | `.docker/volumes/whatsapp-session` | Sesión autenticada de WhatsApp Web |
-| whatsapp-webjs-cache-data | `.docker/volumes/whatsapp-cache` | Cache de whatsapp-web.js |
-
-Los volúmenes de WhatsApp Web se crean automáticamente como bind mounts en
-`.docker/volumes/`. En Linux, si el usuario `node` (uid=1000) no puede escribir,
-ejecuta:
-
-```bash
-mkdir -p .docker/volumes/whatsapp-session .docker/volumes/whatsapp-cache
-sudo chown -R 1000:1000 .docker/volumes/whatsapp-session .docker/volumes/whatsapp-cache
-```
-
-En Docker Desktop (Windows/Mac) los permisos se manejan automáticamente.
 
 ## Documentación Relacionada
 
-- `docs/DEBUGGING_AUTO_REPLY_LOCAL.md` — Debug del flujo auto-reply IA
+- `docs/AMBIENTES_WHATSAPP.md` — Proveedores de canal (SIMULATED / Cloud API)
 - `CHECKLIST_DEMO_LOCAL.md` — Checklist para demo funcional
 - `DEMO_GUIDE.md` — Guía de demo
 
@@ -204,4 +188,3 @@ En Docker Desktop (Windows/Mac) los permisos se manejan automáticamente.
 | `scripts/start-public-link.ps1` | Inicia túnel, detecta URL, actualiza `.env.local` |
 | `scripts/stop-public-link.ps1` | Detiene solo el túnel (servicios locales continúan) |
 | `scripts/check-public-link.ps1` | Verifica estado y validez del túnel |
-| `scripts/start_mvp_public_link.ps1` | (Legado) Versión anterior, migrar a start-public-link.ps1 |

@@ -11,7 +11,6 @@
 #   backend-java     8080:8080
 #   frontend-react   5173:5173
 #   mailpit          1025:1025 (SMTP), 8025:8025 (Web UI)
-#   whatsapp-web     (deshabilitado - solo META_CLOUD_API)
 # =============================================================================
 
 networks:
@@ -75,9 +74,8 @@ services:
       # Perfil de Spring — local incluye local-base (seguro, sin externos)
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-local}
 
-      # WhatsApp — WHATSAPP_WEB + simulador por defecto en local-base
-      APP_WHATSAPP_CHANNEL_PROVIDER: ${APP_WHATSAPP_CHANNEL_PROVIDER:-WHATSAPP_WEB}
-      APP_WHATSAPP_WEB_ENABLED: ${APP_WHATSAPP_WEB_ENABLED:-true}
+      # WhatsApp — proveedor simulado por defecto en local-base
+      APP_WHATSAPP_CHANNEL_PROVIDER: ${APP_WHATSAPP_CHANNEL_PROVIDER:-SIMULATED}
       APP_WHATSAPP_CLOUD_API_ENABLED: ${APP_WHATSAPP_CLOUD_API_ENABLED:-false}
       APP_WHATSAPP_CLOUD_API_DRY_RUN_ENABLED: ${APP_WHATSAPP_CLOUD_API_DRY_RUN_ENABLED:-true}
       # Las siguientes se activan solo si APP_WHATSAPP_CLOUD_API_ENABLED=true

@@ -4,7 +4,7 @@ import com.asistentewhatsapp.aiagents.application.AgentCoordinatorService;
 import com.asistentewhatsapp.aiagents.application.AiTraceLogger;
 import com.asistentewhatsapp.aiagents.infrastructure.AiReplyOutboxJdbcRepository;
 import com.asistentewhatsapp.channels.domain.WhatsAppInboundMessageEvent;
-import com.asistentewhatsapp.channels.infrastructure.whatsappweb.WhatsAppWebChannelJdbcRepository;
+import com.asistentewhatsapp.channels.infrastructure.WhatsAppChannelJdbcRepository;
 import com.asistentewhatsapp.security.infrastructure.AuditLogJdbcRepository;
 import com.asistentewhatsapp.shared.observability.LogSanitizer;
 import java.time.OffsetDateTime;
@@ -21,12 +21,12 @@ public class WhatsAppInboundMessageService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(WhatsAppInboundMessageService.class);
 
-	private final WhatsAppWebChannelJdbcRepository repository;
+	private final WhatsAppChannelJdbcRepository repository;
 	private final AuditLogJdbcRepository auditLogJdbcRepository;
 	private final AgentCoordinatorService agentCoordinatorService;
 	private final AiReplyOutboxJdbcRepository aiReplyOutboxJdbcRepository;
 
-	public WhatsAppInboundMessageService(WhatsAppWebChannelJdbcRepository repository,
+	public WhatsAppInboundMessageService(WhatsAppChannelJdbcRepository repository,
 			AuditLogJdbcRepository auditLogJdbcRepository, AgentCoordinatorService agentCoordinatorService,
 			AiReplyOutboxJdbcRepository aiReplyOutboxJdbcRepository) {
 		this.repository = repository;
@@ -50,19 +50,19 @@ public class WhatsAppInboundMessageService {
 						+ " externalMessageIdMasked=" + LogSanitizer.maskExternalId(event.externalMessageId()) + " "
 						+ LogSanitizer.messageSummary("message", bodyText));
 
-		WhatsAppWebChannelJdbcRepository.CustomerRecord customer = repository
+		WhatsAppChannelJdbcRepository.CustomerRecord customer = repository
 				.findCustomerByPhone(businessId, normalizedPhone)
-				.orElseGet(() -> new WhatsAppWebChannelJdbcRepository.CustomerRecord(
+				.orElseGet(() -> new WhatsAppChannelJdbcRepository.CustomerRecord(
 						repository.insertCustomer(businessId, normalizedPhone, displayName), displayName,
 						normalizedPhone, normalizedPhone));
 
 		UUID assignedUserId = repository.findLatestConversation(businessId, channelAccountId, customer.id())
-				.map(WhatsAppWebChannelJdbcRepository.ConversationRecord::assignedUserId)
+				.map(WhatsAppChannelJdbcRepository.ConversationRecord::assignedUserId)
 				.or(() -> repository.findFirstActiveUserId(businessId)).orElse(null);
 
-		WhatsAppWebChannelJdbcRepository.ConversationRecord conversation = repository
+		WhatsAppChannelJdbcRepository.ConversationRecord conversation = repository
 				.findLatestConversation(businessId, channelAccountId, customer.id()).orElseGet(
-						() -> new WhatsAppWebChannelJdbcRepository.ConversationRecord(
+						() -> new WhatsAppChannelJdbcRepository.ConversationRecord(
 								repository.insertConversation(businessId, channelAccountId, customer.id(),
 										assignedUserId, customer.displayName(), normalizedPhone, occurredAt),
 								assignedUserId, 0, null, null));

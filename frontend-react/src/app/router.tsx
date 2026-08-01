@@ -16,7 +16,7 @@ import {
   AdministrationPage,
   CompanySettingsPage,
   WhatsAppSimulatorPage,
-  WhatsAppWebConnectionPage,
+  WhatsAppChannelPage,
 } from '../modules/administration'
 import {
   AppointmentDetailPage,
@@ -434,11 +434,11 @@ export const appRoutes: RouteObject[] = [
         ),
       },
       {
-        path: 'admin/whatsapp-web',
+        path: 'admin/whatsapp-channel',
         element: (
           <RequireRole allowedRoles={['OWNER', 'ADMIN']}>
             <RequirePermission permission="WHATSAPP_CONFIG_MANAGE">
-              <WhatsAppWebConnectionPage />
+              <WhatsAppChannelPage />
             </RequirePermission>
           </RequireRole>
         ),

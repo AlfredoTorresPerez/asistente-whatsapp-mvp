@@ -2,7 +2,7 @@ package com.asistentewhatsapp.channels.infrastructure.whatsappcloud;
 
 import com.asistentewhatsapp.channels.application.WhatsAppDeliveryStatusService;
 import com.asistentewhatsapp.channels.application.WhatsAppInboundMessageService;
-import com.asistentewhatsapp.channels.infrastructure.whatsappweb.WhatsAppWebChannelJdbcRepository;
+import com.asistentewhatsapp.channels.infrastructure.WhatsAppChannelJdbcRepository;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.*;
 class WhatsAppCloudWebhookParserTest {
 
 	@Mock
-	private WhatsAppWebChannelJdbcRepository repository;
+	private WhatsAppChannelJdbcRepository repository;
 	@Mock
 	private WhatsAppInboundMessageService inboundMessageService;
 	@Mock
@@ -40,7 +40,7 @@ class WhatsAppCloudWebhookParserTest {
 
 	private final UUID businessId = UUID.randomUUID();
 	private final UUID channelAccountId = UUID.randomUUID();
-	private final WhatsAppWebChannelJdbcRepository.ChannelAccountRecord accountRecord = new WhatsAppWebChannelJdbcRepository.ChannelAccountRecord(
+	private final WhatsAppChannelJdbcRepository.ChannelAccountRecord accountRecord = new WhatsAppChannelJdbcRepository.ChannelAccountRecord(
 			channelAccountId, businessId, "cloud-session", "CONNECTED", "56911112222", null, null,
 			OffsetDateTime.now());
 

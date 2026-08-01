@@ -29,6 +29,6 @@ public final class WhatsAppChannelStatus {
 	public static final String CREDENTIAL_EXPIRED = "EXPIRED";
 	public static final String CREDENTIAL_INVALID = "INVALID";
 
-	public static final String PROVIDER_WHATSAPP_WEB = "WHATSAPP_WEB";
+	public static final String PROVIDER_SIMULATED = "SIMULATED";
 	public static final String PROVIDER_META_CLOUD_API = "META_CLOUD_API";
 }

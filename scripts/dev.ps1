@@ -5,7 +5,6 @@
 
 .PARAMETER Command
     up          - Inicia postgres + backend + frontend
-    up:whatsapp - Inicia todos los servicios incluido WhatsApp Web
     logs        - Sigue logs de todos los servicios
     down        - Detiene servicios (sin borrar volúmenes)
     reset       - Borra volúmenes, reconstruye y levanta
@@ -15,13 +14,12 @@
 
 .EXAMPLE
     .\scripts\dev.ps1 up
-    .\scripts\dev.ps1 up:whatsapp
     .\scripts\dev.ps1 logs
 #>
 
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('up', 'up:whatsapp', 'logs', 'down', 'reset', 'ps', 'build', 'restart')]
+    [ValidateSet('up', 'logs', 'down', 'reset', 'ps', 'build', 'restart')]
     [string]$Command = 'up'
 )
 
@@ -37,10 +35,6 @@ switch ($Command) {
     'up' {
         Write-Host "=== Levantando servicios: postgres, backend, frontend ===" -ForegroundColor Cyan
         docker compose -f $ComposeFile up -d
-    }
-    'up:whatsapp' {
-        Write-Host "=== Levantando todos los servicios (incluye WhatsApp Web) ===" -ForegroundColor Cyan
-        docker compose -f $ComposeFile --profile whatsapp up -d
     }
     'logs' {
         docker compose -f $ComposeFile logs -f --tail=100

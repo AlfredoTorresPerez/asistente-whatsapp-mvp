@@ -20,25 +20,26 @@ import static org.mockito.Mockito.when;
 class ChannelDispatchServiceTest {
 
 	@Test
-	void dispatchUsesExplicitWebProvider() {
-		CanalWhatsApp webChannel = whatsAppChannel(WhatsAppChannelProvider.WHATSAPP_WEB, "web-1", "SENT");
+	void dispatchUsesExplicitSimulatedProvider() {
+		CanalWhatsApp simulatedChannel = whatsAppChannel(WhatsAppChannelProvider.SIMULATED, "sim-1", "SIMULATED");
 		CanalWhatsApp cloudChannel = whatsAppChannel(WhatsAppChannelProvider.META_CLOUD_API, "cloud-1", "SENT");
-		WhatsAppChannelProperties properties = properties(WhatsAppChannelProperties.Provider.WEB);
-		ChannelDispatchService service = new ChannelDispatchService(List.of(webChannel, cloudChannel),
-				List.of(webChannel, cloudChannel), properties);
+		WhatsAppChannelProperties properties = properties(WhatsAppChannelProperties.Provider.SIMULATED);
+		ChannelDispatchService service = new ChannelDispatchService(List.of(simulatedChannel, cloudChannel),
+				List.of(simulatedChannel, cloudChannel), properties);
 
 		ChannelDispatchResponse response = service.dispatch(request());
 
-		assertThat(response.externalMessageId()).isEqualTo("web-1");
+		assertThat(response.externalMessageId()).isEqualTo("sim-1");
+		assertThat(response.status()).isEqualTo("SIMULATED");
 	}
 
 	@Test
-	void dispatchUsesExplicitCloudProvider() {
-		CanalWhatsApp webChannel = whatsAppChannel(WhatsAppChannelProvider.WHATSAPP_WEB, "web-1", "SENT");
+	void dispatchUsesExplicitMetaCloudApiProvider() {
+		CanalWhatsApp simulatedChannel = whatsAppChannel(WhatsAppChannelProvider.SIMULATED, "sim-1", "SIMULATED");
 		CanalWhatsApp cloudChannel = whatsAppChannel(WhatsAppChannelProvider.META_CLOUD_API, "cloud-1", "SENT");
 		WhatsAppChannelProperties properties = properties(WhatsAppChannelProperties.Provider.META_CLOUD_API);
-		ChannelDispatchService service = new ChannelDispatchService(List.of(webChannel, cloudChannel),
-				List.of(webChannel, cloudChannel), properties);
+		ChannelDispatchService service = new ChannelDispatchService(List.of(simulatedChannel, cloudChannel),
+				List.of(simulatedChannel, cloudChannel), properties);
 
 		ChannelDispatchResponse response = service.dispatch(request());
 
@@ -47,34 +48,13 @@ class ChannelDispatchServiceTest {
 
 	@Test
 	void dispatchFailsWhenConfiguredProviderIsMissing() {
-		CanalWhatsApp webChannel = whatsAppChannel(WhatsAppChannelProvider.WHATSAPP_WEB, "web-1", "SENT");
+		CanalWhatsApp simulatedChannel = whatsAppChannel(WhatsAppChannelProvider.SIMULATED, "sim-1", "SIMULATED");
 		WhatsAppChannelProperties properties = properties(WhatsAppChannelProperties.Provider.META_CLOUD_API);
-		ChannelDispatchService service = new ChannelDispatchService(List.of(webChannel), List.of(webChannel),
-				properties);
+		ChannelDispatchService service = new ChannelDispatchService(List.of(simulatedChannel),
+				List.of(simulatedChannel), properties);
 
 		assertThatThrownBy(() -> service.dispatch(request())).isInstanceOf(UnsupportedMessagingChannelException.class)
 				.hasMessageContaining("META_CLOUD_API");
-	}
-
-	@Test
-	void dispatchFailsWhenWhatsAppProviderIsDisabled() {
-		CanalWhatsApp webChannel = whatsAppChannel(WhatsAppChannelProvider.WHATSAPP_WEB, "web-1", "SENT");
-		ChannelDispatchService service = new ChannelDispatchService(List.of(webChannel), List.of(webChannel),
-				properties(WhatsAppChannelProperties.Provider.DISABLED));
-
-		assertThatThrownBy(() -> service.dispatch(request())).isInstanceOf(UnsupportedMessagingChannelException.class)
-				.hasMessageContaining("deshabilitado");
-	}
-
-	@Test
-	void dispatchPersistsSimulatedStatusFromProvider() {
-		CanalWhatsApp webChannel = whatsAppChannel(WhatsAppChannelProvider.WHATSAPP_WEB, "sim-1", "SIMULATED");
-		ChannelDispatchService service = new ChannelDispatchService(List.of(webChannel), List.of(webChannel),
-				properties(WhatsAppChannelProperties.Provider.WEB));
-
-		ChannelDispatchResponse response = service.dispatch(request());
-
-		assertThat(response.status()).isEqualTo("SIMULATED");
 	}
 
 	private CanalWhatsApp whatsAppChannel(WhatsAppChannelProvider provider, String externalMessageId, String status) {

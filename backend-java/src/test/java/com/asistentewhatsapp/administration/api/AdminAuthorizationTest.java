@@ -54,11 +54,10 @@ class AdminAuthorizationTest {
 
 		mockMvc.perform(get("/api/v1/security/audit-log")).andExpect(status().isForbidden());
 
-		mockMvc.perform(post("/api/v1/whatsapp-web/connect")).andExpect(status().isForbidden());
+		mockMvc.perform(post("/api/v1/whatsapp-channel/connect")).andExpect(status().isForbidden());
 
-		mockMvc.perform(
-				post("/api/channels/whatsapp-web/test-message").contentType(MediaType.APPLICATION_JSON).content("{}"))
-				.andExpect(status().isForbidden());
+		mockMvc.perform(post("/api/channels/whatsapp-channel/test-message").contentType(MediaType.APPLICATION_JSON)
+				.content("{}")).andExpect(status().isForbidden());
 	}
 
 	@Test

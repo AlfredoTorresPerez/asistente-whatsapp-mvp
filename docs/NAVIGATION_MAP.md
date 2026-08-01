@@ -179,7 +179,7 @@ Este documento describe la matriz de navegacion de Fase 1. Su funcion es dejar e
 | `/reports` | tarjeta o grafico | `Ver agenda` | `route` | `/appointments` | Puede arrastrar rango. |
 | `/admin` | tarjeta | `Configuracion de empresa` | `route` | `/admin/company` | Configuracion corporativa. |
 | `/admin` | tarjeta | `Usuarios y roles` | `route` | `/admin/users` | Gestion de usuarios. |
-| `/admin` | tarjeta | `Conexion WhatsApp Web` | `route` | `/admin/whatsapp-web` | Estado del canal experimental. |
+| `/admin` | tarjeta | `Canal de WhatsApp` | `route` | `/admin/whatsapp-channel` | Estado del canal WhatsApp. |
 | `/admin` | tarjeta | `Seguridad` | `route` | `/admin/security` | Politicas de seguridad. |
 | `/admin/company` | boton | `Guardar cambios` | `same-route` | `/admin/company` | Muestra toast. |
 | `/admin/company` | boton | `Cancelar` | `route` | `/admin` | Sin persistencia. |
@@ -192,12 +192,12 @@ Este documento describe la matriz de navegacion de Fase 1. Su funcion es dejar e
 | `/admin/users/new` | boton | `Cancelar` | `route` | `/admin/users` | Sin persistencia. |
 | `/admin/users/:userId/edit` | boton | `Guardar cambios` | `route` | `/admin/users` | Vuelve al listado. |
 | `/admin/users/:userId/edit` | boton | `Cancelar` | `route` | `/admin/users` | Sin persistencia. |
-| `/admin/whatsapp-web` | boton | `Conectar` | `same-route` | `/admin/whatsapp-web` | Solicita nueva sesion o QR. |
-| `/admin/whatsapp-web` | boton | `Refrescar QR` | `same-route` | `/admin/whatsapp-web` | Pide nuevo QR. |
-| `/admin/whatsapp-web` | boton | `Desconectar` | `modal` | `modal://confirm-disconnect-whatsapp-web` | Confirmacion obligatoria. |
-| `/admin/whatsapp-web` | boton | `Reintentar` | `same-route` | `/admin/whatsapp-web` | Reconsulta estado del servicio. |
-| `modal://confirm-disconnect-whatsapp-web` | boton | `Confirmar desconexion` | `same-route` | `/admin/whatsapp-web` | Ejecuta corte de sesion. |
-| `modal://confirm-disconnect-whatsapp-web` | boton | `Cancelar` | `same-route` | `/admin/whatsapp-web` | Cierra modal. |
+| `/admin/whatsapp-channel` | boton | `Conectar` | `same-route` | `/admin/whatsapp-channel` | Activa el canal con el proveedor configurado. |
+| `/admin/whatsapp-channel` | boton | `Enviar mensaje de prueba` | `same-route` | `/admin/whatsapp-channel` | Envia mensaje de prueba por el canal. |
+| `/admin/whatsapp-channel` | boton | `Desconectar` | `modal` | `modal://confirm-disconnect-whatsapp-channel` | Confirmacion obligatoria. |
+| `/admin/whatsapp-channel` | boton | `Reintentar` | `same-route` | `/admin/whatsapp-channel` | Reconsulta estado del canal. |
+| `modal://confirm-disconnect-whatsapp-channel` | boton | `Confirmar desconexion` | `same-route` | `/admin/whatsapp-channel` | Desconecta el canal. |
+| `modal://confirm-disconnect-whatsapp-channel` | boton | `Cancelar` | `same-route` | `/admin/whatsapp-channel` | Cierra modal. |
 | `/admin/security` | boton | `Guardar cambios` | `same-route` | `/admin/security` | Muestra toast. |
 | `/admin/security` | boton | `Cancelar` | `route` | `/admin` | Sin persistencia. |
 

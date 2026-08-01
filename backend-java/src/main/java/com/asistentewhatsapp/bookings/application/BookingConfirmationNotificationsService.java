@@ -1,16 +1,25 @@
 package com.asistentewhatsapp.bookings.application;
 
+import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository;
+import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository.ServiceRecord;
+import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository.ConfirmationBookingRecord;
 import com.asistentewhatsapp.bookings.infrastructure.BookingConfirmationJdbcRepository.ConfirmationLinkRecord;
 import com.asistentewhatsapp.calendar.application.CalendarSyncService;
 import com.asistentewhatsapp.channels.application.ChannelDispatchRequest;
 import com.asistentewhatsapp.channels.application.ChannelDispatchService;
 import com.asistentewhatsapp.channels.domain.MessageChannelType;
+import com.asistentewhatsapp.cloudapi.onboarding.MetaOnboardingRepository;
+import com.asistentewhatsapp.cloudapi.onboarding.MetaOnboardingRepository.ChannelAccountRecord;
+import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository;
+import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository.BusinessLocationRecord;
 import com.asistentewhatsapp.security.application.AuditService;
 import com.asistentewhatsapp.security.application.AuditMetadata;
 import com.asistentewhatsapp.shared.email.AppointmentConfirmationEmailDTO;
 import com.asistentewhatsapp.shared.email.TransactionalEmailService;
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.time.OffsetDateTime;
+import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,16 +38,24 @@ public class BookingConfirmationNotificationsService {
 	private final CalendarSyncService calendarSyncService;
 	private final ChannelDispatchService channelDispatchService;
 	private final TransactionalEmailService transactionalEmailService;
+	private final CompleteAgendaJdbcRepository agendaRepository;
+	private final BusinessLocationJdbcRepository locationRepository;
+	private final MetaOnboardingRepository metaOnboardingRepository;
 
 	public BookingConfirmationNotificationsService(ReminderSchedulingService reminderSchedulingService,
 			BookingEmailService bookingEmailService, AuditService auditService, CalendarSyncService calendarSyncService,
-			ChannelDispatchService channelDispatchService, TransactionalEmailService transactionalEmailService) {
+			ChannelDispatchService channelDispatchService, TransactionalEmailService transactionalEmailService,
+			CompleteAgendaJdbcRepository agendaRepository, BusinessLocationJdbcRepository locationRepository,
+			MetaOnboardingRepository metaOnboardingRepository) {
 		this.reminderSchedulingService = reminderSchedulingService;
 		this.bookingEmailService = bookingEmailService;
 		this.auditService = auditService;
 		this.calendarSyncService = calendarSyncService;
 		this.channelDispatchService = channelDispatchService;
 		this.transactionalEmailService = transactionalEmailService;
+		this.agendaRepository = agendaRepository;
+		this.locationRepository = locationRepository;
+		this.metaOnboardingRepository = metaOnboardingRepository;
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -116,7 +133,7 @@ public class BookingConfirmationNotificationsService {
 				+ dateStr + " " + timeStr + "\n" + "Te esperamos!";
 	}
 
-	private AppointmentConfirmationEmailDTO buildConfirmationEmailDto(ConfirmationLinkRecord link) {
+	public AppointmentConfirmationEmailDTO buildConfirmationEmailDto(ConfirmationLinkRecord link) {
 		AppointmentConfirmationEmailDTO dto = new AppointmentConfirmationEmailDTO();
 		dto.setPatientName(link.customerName());
 		dto.setServiceName(link.serviceName() != null ? link.serviceName() : link.subject());
@@ -127,7 +144,63 @@ public class BookingConfirmationNotificationsService {
 		dto.setAppointmentTime(link.startsAt().toLocalTime().toString());
 		dto.setConfirmationUrl(link.confirmationUrl());
 		dto.setBookingStatus(link.bookingStatus());
+		enrichWithCatalogData(dto, link.businessId(), link.locationId(), link.serviceId(), link.durationMinutes());
 		return dto;
+	}
+
+	public AppointmentConfirmationEmailDTO buildConfirmationEmailDto(ConfirmationBookingRecord booking,
+			String confirmationUrl) {
+		AppointmentConfirmationEmailDTO dto = new AppointmentConfirmationEmailDTO();
+		dto.setPatientName(booking.customerName());
+		dto.setServiceName(booking.serviceName() != null ? booking.serviceName() : booking.subject());
+		dto.setProfessionalName(booking.professionalName());
+		dto.setBranchName(booking.locationName() != null ? booking.locationName() : booking.location());
+		dto.setEmail(booking.customerEmail());
+		dto.setAppointmentDate(booking.startsAt().toLocalDate().toString());
+		dto.setAppointmentTime(booking.startsAt().toLocalTime().toString());
+		dto.setConfirmationUrl(confirmationUrl);
+		dto.setBookingStatus(booking.bookingStatus());
+		enrichWithCatalogData(dto, booking.businessId(), booking.locationId(), booking.serviceId(),
+				booking.durationMinutes());
+		return dto;
+	}
+
+	private void enrichWithCatalogData(AppointmentConfirmationEmailDTO dto, UUID businessId, UUID locationId,
+			UUID serviceId, int durationMinutes) {
+		dto.setDuration(formatDuration(durationMinutes));
+		ServiceRecord service = serviceId != null
+				? agendaRepository.findService(businessId, locationId, serviceId)
+				: null;
+		if (service != null && service.priceBase() != null) {
+			NumberFormat clpFormat = NumberFormat.getIntegerInstance(new Locale("es", "CL"));
+			dto.setPrice("$" + clpFormat.format(service.priceBase()));
+		}
+		BusinessLocationRecord locationRecord = locationId != null
+				? locationRepository.findActiveById(businessId, locationId)
+				: null;
+		if (locationRecord != null && locationRecord.address() != null && !locationRecord.address().isBlank()) {
+			dto.setAddress(locationRecord.address());
+		}
+		String channelPhone = metaOnboardingRepository.findCloudApiChannel(businessId)
+				.map(ChannelAccountRecord::phoneNumber).orElse(null);
+		String displayPhone = channelPhone != null
+				? channelPhone
+				: (locationRecord != null && locationRecord.phone() != null ? locationRecord.phone() : null);
+		if (displayPhone != null && !displayPhone.isBlank()) {
+			dto.setPhone(displayPhone);
+		}
+	}
+
+	private String formatDuration(int minutes) {
+		if (minutes < 60) {
+			return minutes + " min";
+		}
+		int hours = minutes / 60;
+		int remaining = minutes % 60;
+		if (remaining == 0) {
+			return hours + "h";
+		}
+		return hours + "h " + remaining + "min";
 	}
 
 	private String normalizePhoneForWhatsApp(String phone) {
