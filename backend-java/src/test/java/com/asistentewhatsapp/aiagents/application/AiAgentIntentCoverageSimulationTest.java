@@ -348,6 +348,11 @@ class AiAgentIntentCoverageSimulationTest {
 					new EntityAlias("esta semana", "fecha_relativa", "esta semana", 100));
 		}
 
+		@Override
+		public List<IntentExpression> findActiveIntentExpressions(UUID businessId) {
+			return List.of();
+		}
+
 		private ResponseRule rule(String code, String template, Map<String, Object> payload) {
 			return new ResponseRule(code, template, payload);
 		}

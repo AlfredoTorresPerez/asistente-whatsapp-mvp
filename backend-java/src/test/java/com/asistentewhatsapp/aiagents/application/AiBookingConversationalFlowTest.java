@@ -456,5 +456,10 @@ class AiBookingConversationalFlowTest {
 		public List<EntityAlias> findActiveEntityAliases(UUID businessId) {
 			return List.of(new EntityAlias("facial", "servicio_o_producto", "Limpieza facial profunda", 120));
 		}
+
+		@Override
+		public List<IntentExpression> findActiveIntentExpressions(UUID businessId) {
+			return List.of();
+		}
 	}
 }

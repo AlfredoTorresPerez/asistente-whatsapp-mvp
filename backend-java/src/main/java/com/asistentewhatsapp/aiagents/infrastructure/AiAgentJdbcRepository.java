@@ -1,10 +1,11 @@
 package com.asistentewhatsapp.aiagents.infrastructure;
 
 import com.asistentewhatsapp.aiagents.application.AgentRoutingResult;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.asistentewhatsapp.aiagents.domain.AgentIntent;
 import com.asistentewhatsapp.aiagents.domain.AgentType;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -102,6 +103,52 @@ public class AiAgentJdbcRepository {
 				result.confidence(), result.urgency(), result.requiresHuman(), result.handoffReason(),
 				toJson(result.extractedData()), toJson(result.missingData()), result.responseToCustomer(),
 				result.source());
+	}
+
+	public UUID insertMessageAnalysis(MessageAnalysisRecord analysis) {
+		return jdbcTemplate.queryForObject("""
+				insert into ai_message_analysis (
+				    id,
+				    business_id,
+				    conversation_id,
+				    customer_id,
+				    channel_account_id,
+				    detector_type,
+				    language,
+				    country_code,
+				    message_normalized,
+				    message_tokens,
+				    ambiguity_score,
+				    payload
+				) values (
+				    gen_random_uuid(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, cast(? as jsonb)
+				)
+				returning id
+				""", UUID.class, analysis.businessId(), analysis.conversationId(), analysis.customerId(),
+				analysis.channelAccountId(), analysis.detectorType(), analysis.language(), analysis.countryCode(),
+				analysis.messageNormalized(), analysis.messageTokens(), analysis.ambiguityScore(),
+				toJson(analysis.payload()));
+	}
+
+	public void insertDetectedIntent(UUID messageAnalysisId, DetectedIntentRecord detected) {
+		jdbcTemplate.update(
+				"""
+						insert into ai_detected_intent (
+						    id,
+						    message_analysis_id,
+						    business_id,
+						    intent_id,
+						    rank,
+						    is_primary,
+						    confidence,
+						    method_source,
+						    matched_expression
+						) values (
+						    gen_random_uuid(), ?, ?, (select id from ai_intent where code = ? and business_id is null), ?, ?, ?, ?, ?
+						)
+						""",
+				messageAnalysisId, detected.businessId(), detected.intentCode(), detected.rank(), detected.isPrimary(),
+				detected.confidence(), detected.methodSource(), detected.matchedExpression());
 	}
 
 	public void insertHumanHandoff(AgentRoutingResult result) {
@@ -209,6 +256,15 @@ public class AiAgentJdbcRepository {
 
 	public record ConversationContextSnapshot(AgentType activeAgent, AgentIntent primaryIntent,
 			AgentIntent secondaryIntent, Map<String, String> extractedData, List<String> missingData) {
+	}
+
+	public record MessageAnalysisRecord(UUID businessId, UUID conversationId, UUID customerId, UUID channelAccountId,
+			String detectorType, String language, String countryCode, String messageNormalized, int messageTokens,
+			BigDecimal ambiguityScore, Map<String, String> payload) {
+	}
+
+	public record DetectedIntentRecord(UUID businessId, String intentCode, int rank, boolean isPrimary,
+			double confidence, String methodSource, String matchedExpression) {
 	}
 
 	private String deriveConversationState(AgentRoutingResult result) {

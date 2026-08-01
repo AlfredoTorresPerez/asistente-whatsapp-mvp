@@ -1092,6 +1092,11 @@ class AiClientQuestionsAuditTest {
 			return loaded;
 		}
 
+		@Override
+		public List<IntentExpression> findActiveIntentExpressions(UUID businessId) {
+			return List.of();
+		}
+
 		private ResponseRule rule(String code, String template, Map<String, Object> payload) {
 			return new ResponseRule(code, template, payload);
 		}

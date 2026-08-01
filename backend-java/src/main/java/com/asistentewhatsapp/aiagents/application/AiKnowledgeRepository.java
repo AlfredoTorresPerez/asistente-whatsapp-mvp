@@ -14,6 +14,8 @@ public interface AiKnowledgeRepository {
 
 	List<EntityAlias> findActiveEntityAliases(UUID businessId);
 
+	List<IntentExpression> findActiveIntentExpressions(UUID businessId);
+
 	record ServiceCatalogItem(String code, String name, String categoryCode, Integer durationMinutes,
 			BigDecimal priceBase) {
 	}
@@ -22,5 +24,9 @@ public interface AiKnowledgeRepository {
 	}
 
 	record EntityAlias(String alias, String entityKey, String entityValue, Integer priority) {
+	}
+
+	record IntentExpression(String code, String expressionNormalized, String expressionType, Integer priority,
+			BigDecimal confidenceBase, boolean requiresHuman, BigDecimal minimumConfidence) {
 	}
 }

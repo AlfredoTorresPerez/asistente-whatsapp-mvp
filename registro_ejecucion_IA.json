@@ -14,7 +14,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 7,
+  "duracionMilisegundos" : 12,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -33,7 +33,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -109,7 +109,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -147,7 +147,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -166,7 +166,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -185,7 +185,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -204,7 +204,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -223,7 +223,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -242,7 +242,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -261,7 +261,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -280,7 +280,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -299,7 +299,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -318,7 +318,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -337,7 +337,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -356,7 +356,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -375,7 +375,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -394,7 +394,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -413,7 +413,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -432,7 +432,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -451,7 +451,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -470,7 +470,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -489,7 +489,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -508,7 +508,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -527,7 +527,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -546,7 +546,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -565,7 +565,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -584,7 +584,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -603,7 +603,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -622,7 +622,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -660,7 +660,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -679,7 +679,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -698,7 +698,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -717,7 +717,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -736,7 +736,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -755,7 +755,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -774,7 +774,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -793,7 +793,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -850,7 +850,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -869,7 +869,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -888,7 +888,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -907,7 +907,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -945,7 +945,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -964,7 +964,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -983,7 +983,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1002,7 +1002,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1021,7 +1021,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1040,7 +1040,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1059,7 +1059,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1078,7 +1078,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1097,7 +1097,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 14,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1116,7 +1116,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 11,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1135,7 +1135,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1154,7 +1154,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1173,7 +1173,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1192,7 +1192,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 18,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1211,7 +1211,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 10,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1230,7 +1230,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1249,7 +1249,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1268,7 +1268,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1287,7 +1287,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1306,7 +1306,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 8,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1325,7 +1325,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1344,7 +1344,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1363,7 +1363,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1382,7 +1382,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1401,7 +1401,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1420,7 +1420,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1439,7 +1439,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1458,7 +1458,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1477,7 +1477,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1496,7 +1496,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1515,7 +1515,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1534,7 +1534,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1553,7 +1553,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1572,7 +1572,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 9,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1591,7 +1591,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1610,7 +1610,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1629,7 +1629,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1648,7 +1648,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1667,7 +1667,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 18,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1686,7 +1686,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1705,7 +1705,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1724,7 +1724,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1743,7 +1743,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1762,7 +1762,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1781,7 +1781,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1800,7 +1800,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1819,7 +1819,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1838,7 +1838,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1876,7 +1876,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1895,7 +1895,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1914,7 +1914,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1933,7 +1933,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1952,7 +1952,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1971,7 +1971,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -1990,7 +1990,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2009,7 +2009,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2028,7 +2028,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2066,7 +2066,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2085,7 +2085,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2104,7 +2104,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2123,7 +2123,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2142,7 +2142,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2161,7 +2161,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2180,7 +2180,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2199,7 +2199,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2218,7 +2218,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2237,7 +2237,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2275,7 +2275,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2294,7 +2294,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2313,7 +2313,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2332,7 +2332,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2351,7 +2351,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2370,7 +2370,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2389,7 +2389,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2408,7 +2408,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2427,7 +2427,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2446,7 +2446,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2465,7 +2465,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2484,7 +2484,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2503,7 +2503,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2522,7 +2522,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2541,7 +2541,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2560,7 +2560,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2617,7 +2617,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2636,7 +2636,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2655,7 +2655,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2674,7 +2674,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2693,7 +2693,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2712,7 +2712,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2731,7 +2731,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2750,7 +2750,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2769,7 +2769,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2788,7 +2788,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2807,7 +2807,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2826,7 +2826,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2845,7 +2845,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2864,7 +2864,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2883,7 +2883,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2921,7 +2921,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2940,7 +2940,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2959,7 +2959,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2978,7 +2978,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -2997,7 +2997,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3016,7 +3016,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 15,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3035,7 +3035,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3054,7 +3054,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3073,7 +3073,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3092,7 +3092,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3111,7 +3111,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3130,7 +3130,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3149,7 +3149,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3168,7 +3168,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3187,7 +3187,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3206,7 +3206,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3225,7 +3225,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3244,7 +3244,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3263,7 +3263,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3282,7 +3282,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3339,7 +3339,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3358,7 +3358,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3377,7 +3377,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3396,7 +3396,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3415,7 +3415,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3434,7 +3434,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 6,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3453,7 +3453,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3472,7 +3472,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3491,7 +3491,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3510,7 +3510,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3529,7 +3529,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3548,7 +3548,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3567,7 +3567,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3586,7 +3586,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3605,7 +3605,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3624,7 +3624,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3643,7 +3643,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3662,7 +3662,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3681,7 +3681,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3700,7 +3700,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3719,7 +3719,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3738,7 +3738,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3757,7 +3757,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3795,7 +3795,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3814,7 +3814,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3833,7 +3833,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3852,7 +3852,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3871,7 +3871,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3890,7 +3890,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3909,7 +3909,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3928,7 +3928,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3947,7 +3947,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -3966,7 +3966,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4004,7 +4004,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4023,7 +4023,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4042,7 +4042,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4061,7 +4061,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4080,7 +4080,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4099,7 +4099,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4118,7 +4118,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4137,7 +4137,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4156,7 +4156,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4175,7 +4175,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4194,7 +4194,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4213,7 +4213,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4232,7 +4232,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4251,7 +4251,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4270,7 +4270,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4289,7 +4289,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4308,7 +4308,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4327,7 +4327,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4346,7 +4346,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4365,7 +4365,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4384,7 +4384,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4403,7 +4403,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4422,7 +4422,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4460,7 +4460,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4479,7 +4479,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4498,7 +4498,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4517,7 +4517,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 11,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4536,7 +4536,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4555,7 +4555,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4574,7 +4574,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4593,7 +4593,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4612,7 +4612,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4631,7 +4631,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4669,7 +4669,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4688,7 +4688,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4707,7 +4707,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4726,7 +4726,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4745,7 +4745,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4764,7 +4764,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4783,7 +4783,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4802,7 +4802,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4821,7 +4821,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4840,7 +4840,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4878,7 +4878,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4897,7 +4897,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4935,7 +4935,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4973,7 +4973,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -4992,7 +4992,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5011,7 +5011,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5030,7 +5030,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5049,7 +5049,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5068,7 +5068,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5106,7 +5106,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5144,7 +5144,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5163,7 +5163,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5182,7 +5182,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5201,7 +5201,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5220,7 +5220,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5258,7 +5258,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5353,7 +5353,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5391,7 +5391,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5410,7 +5410,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5429,7 +5429,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5448,7 +5448,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5467,7 +5467,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5486,7 +5486,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5505,7 +5505,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5543,7 +5543,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5562,7 +5562,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5581,7 +5581,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5600,7 +5600,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 7,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5619,7 +5619,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5638,7 +5638,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5657,7 +5657,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5676,7 +5676,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5695,7 +5695,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5714,7 +5714,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5733,7 +5733,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5752,7 +5752,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5771,7 +5771,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5790,7 +5790,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5809,7 +5809,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5828,7 +5828,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5847,7 +5847,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5866,7 +5866,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5904,7 +5904,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5942,7 +5942,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5961,7 +5961,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5980,7 +5980,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 5,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -5999,7 +5999,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6018,7 +6018,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6037,7 +6037,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6056,7 +6056,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6075,7 +6075,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6094,7 +6094,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6113,7 +6113,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6132,7 +6132,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6170,7 +6170,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6189,7 +6189,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6208,7 +6208,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6227,7 +6227,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6246,7 +6246,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6265,7 +6265,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6303,7 +6303,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6322,7 +6322,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6341,7 +6341,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6360,7 +6360,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6379,7 +6379,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6398,7 +6398,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6417,7 +6417,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6436,7 +6436,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6474,7 +6474,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6493,7 +6493,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6512,7 +6512,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6531,7 +6531,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6550,7 +6550,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6569,7 +6569,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6588,7 +6588,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6607,7 +6607,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6683,7 +6683,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6702,7 +6702,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 1,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6721,7 +6721,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6740,7 +6740,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6759,7 +6759,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6778,7 +6778,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6797,7 +6797,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6816,7 +6816,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6835,7 +6835,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6873,7 +6873,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6892,7 +6892,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6911,7 +6911,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6930,7 +6930,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6949,7 +6949,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -6968,7 +6968,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7006,7 +7006,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7025,7 +7025,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7044,7 +7044,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7063,7 +7063,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7082,7 +7082,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7101,7 +7101,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7120,7 +7120,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7139,7 +7139,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7158,7 +7158,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7177,7 +7177,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7196,7 +7196,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7215,7 +7215,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7253,7 +7253,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7272,7 +7272,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7291,7 +7291,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7310,7 +7310,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7329,7 +7329,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7348,7 +7348,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7367,7 +7367,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7386,7 +7386,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7405,7 +7405,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7424,7 +7424,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7443,7 +7443,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7462,7 +7462,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7481,7 +7481,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7500,7 +7500,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 5,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7519,7 +7519,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7538,7 +7538,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7557,7 +7557,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7576,7 +7576,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7595,7 +7595,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7614,7 +7614,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7633,7 +7633,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7652,7 +7652,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7671,7 +7671,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7690,7 +7690,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7709,7 +7709,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7728,7 +7728,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7747,7 +7747,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7766,7 +7766,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7785,7 +7785,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7804,7 +7804,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7823,7 +7823,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7842,7 +7842,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7861,7 +7861,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7880,7 +7880,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7899,7 +7899,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7918,7 +7918,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7937,7 +7937,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7956,7 +7956,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7975,7 +7975,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -7994,7 +7994,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 0,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8013,7 +8013,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8032,7 +8032,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8051,7 +8051,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8070,7 +8070,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8089,7 +8089,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8108,7 +8108,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8127,7 +8127,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8146,7 +8146,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8184,7 +8184,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8203,7 +8203,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8241,7 +8241,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8260,7 +8260,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8279,7 +8279,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8298,7 +8298,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8317,7 +8317,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8336,7 +8336,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8355,7 +8355,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 4,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8393,7 +8393,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 22,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8431,7 +8431,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8450,7 +8450,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 3,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8469,7 +8469,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 4,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8507,7 +8507,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 3,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8564,7 +8564,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8583,7 +8583,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8602,7 +8602,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 1,
+  "duracionMilisegundos" : 2,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {
@@ -8697,7 +8697,7 @@
   "entidadesDetectadas" : { },
   "datoEsperado" : null,
   "derivacionHumana" : false,
-  "duracionMilisegundos" : 2,
+  "duracionMilisegundos" : 1,
   "resultadoTecnico" : "ERROR",
   "error" : "NoSuchElementException: No value present"
 }, {

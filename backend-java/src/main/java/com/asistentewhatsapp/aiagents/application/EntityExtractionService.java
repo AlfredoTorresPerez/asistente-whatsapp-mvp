@@ -1,13 +1,19 @@
 package com.asistentewhatsapp.aiagents.application;
 
+import com.asistentewhatsapp.aiagents.infrastructure.CanonicalEntityJdbcRepository.CanonicalEntityRecord;
 import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository;
 import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository.BusinessLocationRecord;
 import com.asistentewhatsapp.shared.observability.LogSanitizer;
+import java.math.BigDecimal;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -47,11 +53,20 @@ public class EntityExtractionService {
 
 	private final AiBusinessKnowledgeService knowledgeService;
 	private final BusinessLocationJdbcRepository businessLocationJdbcRepository;
+	private final CanonicalEntityService canonicalEntityService;
 
 	public EntityExtractionService(AiBusinessKnowledgeService knowledgeService,
 			BusinessLocationJdbcRepository businessLocationJdbcRepository) {
+		this(knowledgeService, businessLocationJdbcRepository, null);
+	}
+
+	@Autowired
+	public EntityExtractionService(AiBusinessKnowledgeService knowledgeService,
+			BusinessLocationJdbcRepository businessLocationJdbcRepository,
+			CanonicalEntityService canonicalEntityService) {
 		this.knowledgeService = knowledgeService;
 		this.businessLocationJdbcRepository = businessLocationJdbcRepository;
+		this.canonicalEntityService = canonicalEntityService;
 	}
 
 	public Map<String, String> extract(AgentConversationRequest request) {
@@ -71,6 +86,8 @@ public class EntityExtractionService {
 		addNameIfFound(entities, NAME_PATTERN.matcher(message));
 
 		String normalized = normalizedForTrace;
+		applyCanonicalEntities(entities, request, normalized);
+		applyCanonicalAliases(entities, request, normalized);
 		applyDatabaseAliases(entities, request, normalized);
 		applyServiceCatalogInference(entities, request, message);
 		applyWeekdayRelativeDates(entities, normalized);
@@ -100,6 +117,112 @@ public class EntityExtractionService {
 
 	private String firstNonBlank(String first, String second) {
 		return first != null && !first.isBlank() ? first : (second == null ? "" : second);
+	}
+
+	private void applyCanonicalEntities(Map<String, String> entities, AgentConversationRequest request,
+			String normalizedMessage) {
+		if (canonicalEntityService == null || request.businessId() == null) {
+			return;
+		}
+		List<CanonicalEntityRecord> catalog = canonicalEntityService.findActive(request.businessId());
+		for (CanonicalEntityRecord entity : catalog) {
+			if (entity.canonicalName() == null || entity.canonicalName().isBlank()
+					|| !normalizedMessage.contains(entity.canonicalName())) {
+				continue;
+			}
+			String displayName = entity.displayName() == null || entity.displayName().isBlank()
+					? entity.canonicalName()
+					: entity.displayName();
+			applyCanonicalByType(entities, request, entity, displayName);
+		}
+	}
+
+	private void applyCanonicalAliases(Map<String, String> entities, AgentConversationRequest request,
+			String normalizedMessage) {
+		if (canonicalEntityService == null || request.businessId() == null) {
+			return;
+		}
+		for (CanonicalEntityService.AliasMatch match : canonicalEntityService.resolveAliases(request.businessId(),
+				normalizedMessage)) {
+			applyAliasMatch(entities, request, match);
+		}
+	}
+
+	private void applyAliasMatch(Map<String, String> entities, AgentConversationRequest request,
+			CanonicalEntityService.AliasMatch match) {
+		String key = switch (match.entityType()) {
+			case "SERVICE" -> "servicio_o_producto";
+			case "PROFESSIONAL" -> "profesional";
+			case "LOCATION" -> "sede";
+			case "RELATIVE_DATE" -> "fecha_relativa";
+			case "PREFERENCE" -> "preferencia_horaria";
+			default -> null;
+		};
+		if (key == null || entities.containsKey(key)) {
+			return;
+		}
+		entities.put(key, match.displayName());
+		markResolution(entities, key, match.canonicalEntityId(), match.matchedAlias(), match.confidence());
+		if ("SERVICE".equals(match.entityType())) {
+			knowledgeService.findService(request.businessId(), match.displayName()).ifPresent(service -> {
+				if (service.code() != null) {
+					entities.putIfAbsent("servicio_codigo", service.code());
+				}
+			});
+		} else if ("LOCATION".equals(match.entityType()) && "business_location".equals(match.referenceType())
+				&& match.referenceId() != null) {
+			entities.putIfAbsent("sede_id", match.referenceId().toString());
+		}
+	}
+
+	private void markResolution(Map<String, String> entities, String key, UUID canonicalId, String matchedAlias,
+			BigDecimal confidence) {
+		if (canonicalId != null) {
+			entities.put(key + "_canonical_id", canonicalId.toString());
+			entities.put(key + "_resolution", matchedAlias == null || matchedAlias.isBlank() ? "DATABASE" : "ALIAS");
+		}
+		if (matchedAlias != null && !matchedAlias.isBlank()) {
+			entities.put(key + "_matched_alias", matchedAlias);
+		}
+		if (confidence != null) {
+			entities.put(key + "_confidence", confidence.toPlainString());
+		}
+	}
+
+	private void applyCanonicalByType(Map<String, String> entities, AgentConversationRequest request,
+			CanonicalEntityRecord entity, String displayName) {
+		switch (entity.entityType()) {
+			case "SERVICE" -> {
+				entities.putIfAbsent("servicio_o_producto", displayName);
+				markResolution(entities, "servicio_o_producto", entity.id(), null, null);
+				Optional<AiKnowledgeRepository.ServiceCatalogItem> service = knowledgeService
+						.findService(request.businessId(), displayName);
+				if (service.isPresent() && service.get().code() != null) {
+					entities.putIfAbsent("servicio_codigo", service.get().code());
+				}
+			}
+			case "PROFESSIONAL" -> {
+				entities.putIfAbsent("profesional", displayName);
+				markResolution(entities, "profesional", entity.id(), null, null);
+			}
+			case "LOCATION" -> {
+				entities.putIfAbsent("sede", displayName);
+				markResolution(entities, "sede", entity.id(), null, null);
+				if ("business_location".equals(entity.referenceType()) && entity.referenceId() != null) {
+					entities.putIfAbsent("sede_id", entity.referenceId().toString());
+				}
+			}
+			case "RELATIVE_DATE" -> {
+				entities.putIfAbsent("fecha_relativa", displayName);
+				markResolution(entities, "fecha_relativa", entity.id(), null, null);
+			}
+			case "PREFERENCE" -> {
+				entities.putIfAbsent("preferencia_horaria", displayName);
+				markResolution(entities, "preferencia_horaria", entity.id(), null, null);
+			}
+			default -> {
+			}
+		}
 	}
 
 	private void applyDatabaseAliases(Map<String, String> entities, AgentConversationRequest request,

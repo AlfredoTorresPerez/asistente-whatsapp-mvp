@@ -77,6 +77,31 @@ public class JdbcAiKnowledgeRepository implements AiKnowledgeRepository {
 						rs.getString("entity_value"), rs.getInt("priority")));
 	}
 
+	@Override
+	public List<IntentExpression> findActiveIntentExpressions(UUID businessId) {
+		return jdbcTemplate.query("""
+				select e.expression_normalized,
+				       e.expression_type,
+				       e.priority,
+				       e.confidence_base,
+				       i.code,
+				       i.requires_human,
+				       i.minimum_confidence
+				from ai_intent_expression e
+				join ai_intent i
+				  on i.id = e.intent_id
+				 and i.active = true
+				where e.active = true
+				  and (e.business_id = :businessId or e.business_id is null)
+				  and (e.valid_from is null or e.valid_from <= current_timestamp)
+				  and (e.valid_until is null or e.valid_until >= current_timestamp)
+				order by e.priority desc, length(e.expression_normalized) desc
+				""", new MapSqlParameterSource().addValue("businessId", businessId),
+				(rs, rowNum) -> new IntentExpression(rs.getString("code"), rs.getString("expression_normalized"),
+						rs.getString("expression_type"), rs.getInt("priority"), rs.getBigDecimal("confidence_base"),
+						rs.getBoolean("requires_human"), rs.getBigDecimal("minimum_confidence")));
+	}
+
 	private Map<String, Object> readPayload(String payload) {
 		try {
 			return objectMapper.readValue(payload, MAP_TYPE);

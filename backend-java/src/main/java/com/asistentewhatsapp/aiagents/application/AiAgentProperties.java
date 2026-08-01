@@ -42,6 +42,8 @@ public class AiAgentProperties {
 
 	private long outboxRetryMaxDelayMs = 900000;
 
+	private long intentCatalogCacheTtlSeconds = 300;
+
 	public boolean enabled() {
 		return enabled;
 	}
@@ -120,5 +122,13 @@ public class AiAgentProperties {
 
 	public void setOutboxRetryMaxDelayMs(long outboxRetryMaxDelayMs) {
 		this.outboxRetryMaxDelayMs = outboxRetryMaxDelayMs;
+	}
+
+	public long getIntentCatalogCacheTtlSeconds() {
+		return intentCatalogCacheTtlSeconds;
+	}
+
+	public void setIntentCatalogCacheTtlSeconds(long intentCatalogCacheTtlSeconds) {
+		this.intentCatalogCacheTtlSeconds = intentCatalogCacheTtlSeconds;
 	}
 }

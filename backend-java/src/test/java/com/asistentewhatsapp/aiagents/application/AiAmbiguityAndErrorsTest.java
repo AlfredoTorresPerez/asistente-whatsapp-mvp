@@ -187,5 +187,10 @@ class AiAmbiguityAndErrorsTest {
 		public List<EntityAlias> findActiveEntityAliases(UUID businessId) {
 			return List.of();
 		}
+
+		@Override
+		public List<IntentExpression> findActiveIntentExpressions(UUID businessId) {
+			return List.of();
+		}
 	}
 }

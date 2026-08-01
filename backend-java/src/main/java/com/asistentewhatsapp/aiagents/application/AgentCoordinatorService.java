@@ -41,16 +41,29 @@ public class AgentCoordinatorService {
 	private final AgentRegistry agentRegistry;
 	private final AiAgentJdbcRepository aiAgentJdbcRepository;
 	private final BusinessAiSettingsService businessAiSettingsService;
+	private final MessageAnalysisService messageAnalysisService;
+	private final DetectedEntityService detectedEntityService;
 
 	public AgentCoordinatorService(AiAgentProperties properties, IntentDetectorService intentDetectorService,
 			EntityExtractionService entityExtractionService, AgentRegistry agentRegistry,
 			AiAgentJdbcRepository aiAgentJdbcRepository, BusinessAiSettingsService businessAiSettingsService) {
+		this(properties, intentDetectorService, entityExtractionService, agentRegistry, aiAgentJdbcRepository,
+				businessAiSettingsService, null, null);
+	}
+
+	@org.springframework.beans.factory.annotation.Autowired
+	public AgentCoordinatorService(AiAgentProperties properties, IntentDetectorService intentDetectorService,
+			EntityExtractionService entityExtractionService, AgentRegistry agentRegistry,
+			AiAgentJdbcRepository aiAgentJdbcRepository, BusinessAiSettingsService businessAiSettingsService,
+			MessageAnalysisService messageAnalysisService, DetectedEntityService detectedEntityService) {
 		this.properties = properties;
 		this.intentDetectorService = intentDetectorService;
 		this.entityExtractionService = entityExtractionService;
 		this.agentRegistry = agentRegistry;
 		this.aiAgentJdbcRepository = aiAgentJdbcRepository;
 		this.businessAiSettingsService = businessAiSettingsService;
+		this.messageAnalysisService = messageAnalysisService;
+		this.detectedEntityService = detectedEntityService;
 	}
 
 	@Transactional
@@ -119,6 +132,12 @@ public class AgentCoordinatorService {
 			aiAgentJdbcRepository.upsertConversationContext(result);
 			aiAgentJdbcRepository.insertDecisionLog(result);
 			aiAgentJdbcRepository.incrementMetric(result);
+			if (messageAnalysisService != null) {
+				UUID analysisId = messageAnalysisService.record(request, resolvedIntent, entities);
+				if (detectedEntityService != null) {
+					detectedEntityService.record(analysisId, request, entities);
+				}
+			}
 			if (result.requiresHuman()) {
 				aiAgentJdbcRepository.insertHumanHandoff(result);
 			}

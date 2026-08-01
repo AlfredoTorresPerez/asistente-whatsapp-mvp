@@ -1,16 +1,21 @@
 package com.asistentewhatsapp.aiagents.application;
 
+import com.asistentewhatsapp.aiagents.application.AiKnowledgeRepository.IntentExpression;
 import com.asistentewhatsapp.aiagents.domain.AgentIntent;
 import com.asistentewhatsapp.shared.observability.LogSanitizer;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class IntentDetectorService {
 
 	private final ConversationSpecCatalog conversationSpecCatalog;
+	private final IntentExpressionService intentExpressionService;
 
 	private static final Pattern EXPLICIT_TIME_PATTERN = Pattern
 			.compile("\\b(?:a\\s+las\\s+)?(?:[01]?\\d|2[0-3])(?::[0-5]\\d)?\\s*(?:hrs?|horas?)?\\b");
@@ -161,18 +166,26 @@ public class IntentDetectorService {
 			"puede orientarme");
 
 	public IntentDetectorService() {
-		this(new ConversationSpecCatalog());
+		this(new ConversationSpecCatalog(), null);
 	}
 
 	public IntentDetectorService(ConversationSpecCatalog conversationSpecCatalog) {
+		this(conversationSpecCatalog, null);
+	}
+
+	@Autowired
+	public IntentDetectorService(ConversationSpecCatalog conversationSpecCatalog,
+			IntentExpressionService intentExpressionService) {
 		this.conversationSpecCatalog = conversationSpecCatalog == null
 				? new ConversationSpecCatalog()
 				: conversationSpecCatalog;
+		this.intentExpressionService = intentExpressionService;
 	}
 
 	public IntentDetectionResult detect(AgentConversationRequest request) {
 		String traceId = AiTraceLogger.traceId(request);
 		String text = normalize(request.messageBody());
+		String rawText = normalizeRaw(request.messageBody());
 		AiTraceLogger.info("MESSAGE_NORMALIZED", traceId, request.conversationId(), null, "IntentDetectorService",
 				LogSanitizer.messageSummary("message", request.messageBody()) + " normalizedLength=" + text.length());
 		boolean isQuestionText = isQuestion(text);
@@ -221,6 +234,12 @@ public class IntentDetectorService {
 		Optional<IntentDetectionResult> negatedAgendaActionInformation = detectNegatedAgendaActionInformation(text);
 		if (negatedAgendaActionInformation.isPresent()) {
 			return negatedAgendaActionInformation.get();
+		}
+
+		Optional<IntentDetectionResult> databaseCatalogIntent = detectFromDatabaseCatalog(request, text, rawText,
+				traceId);
+		if (databaseCatalogIntent.isPresent()) {
+			return databaseCatalogIntent.get();
 		}
 
 		if (!isInfoQueryNotAction(text) && containsAny(text, CANCEL_BOOKING_WORDS)) {
@@ -408,6 +427,79 @@ public class IntentDetectorService {
 						.find()
 				|| Pattern.compile("\\b(?:una|cita|turno|hora)\\s+(?:para|porfa|xfav?|por\\s+favor)\\b").matcher(text)
 						.find();
+	}
+
+	private Optional<IntentDetectionResult> detectFromDatabaseCatalog(AgentConversationRequest request, String text,
+			String rawText, String traceId) {
+		if (intentExpressionService == null || request.businessId() == null) {
+			return Optional.empty();
+		}
+		List<IntentExpression> expressions = intentExpressionService.findActive(request.businessId());
+		for (IntentExpression expression : expressions) {
+			AgentIntent mapped = mapCatalogCodeToAgentIntent(expression.code());
+			if (mapped == null) {
+				continue;
+			}
+			boolean matches = isOrthographicError(expression)
+					? rawText.contains(expression.expressionNormalized())
+					: text.contains(expression.expressionNormalized());
+			if (!matches) {
+				continue;
+			}
+			double confidence = toDouble(expression.confidenceBase(), 0.85);
+			if (confidence < toDouble(expression.minimumConfidence(), 0.0)) {
+				continue;
+			}
+			AiTraceLogger.info("INTENT_DB_CATALOG", traceId, request.conversationId(), null, "IntentDetectorService",
+					"intent=" + mapped + " expressionType=" + expression.expressionType() + " confidence=" + confidence
+							+ " source=DATABASE");
+			return Optional.of(new IntentDetectionResult(mapped, null, confidence, "bajo", expression.requiresHuman(),
+					"intencion desde catalogo BD (ai_intent_expression)", "DATABASE"));
+		}
+		return Optional.empty();
+	}
+
+	private boolean isOrthographicError(IntentExpression expression) {
+		return "ORTHOGRAPHIC_ERROR".equals(expression.expressionType());
+	}
+
+	private double toDouble(BigDecimal value, double fallback) {
+		return value == null ? fallback : value.doubleValue();
+	}
+
+	private static AgentIntent mapCatalogCodeToAgentIntent(String code) {
+		if (code == null) {
+			return null;
+		}
+		return CATALOG_CODE_TO_INTENT.get(code);
+	}
+
+	private static final Map<String, AgentIntent> CATALOG_CODE_TO_INTENT = Map.ofEntries(
+			Map.entry("BOOKING_CREATE", AgentIntent.BOOKING_REQUEST),
+			Map.entry("BOOKING_RESCHEDULE", AgentIntent.BOOKING_CHANGE),
+			Map.entry("BOOKING_CANCEL", AgentIntent.BOOKING_CANCEL),
+			Map.entry("BOOKING_AVAILABILITY", AgentIntent.AVAILABILITY_QUERY),
+			Map.entry("BOOKING_STATUS", AgentIntent.BOOKING_STATUS),
+			Map.entry("SERVICE_INFORMATION", AgentIntent.SERVICE_INFORMATION),
+			Map.entry("SERVICE_PRICE", AgentIntent.PRICE_REQUEST),
+			Map.entry("BUSINESS_HOURS", AgentIntent.BUSINESS_HOURS_QUERY),
+			Map.entry("BUSINESS_LOCATION", AgentIntent.LOCATION_QUERY),
+			Map.entry("PAYMENT_INFORMATION", AgentIntent.PAYMENT_INQUIRY),
+			Map.entry("PAYMENT_STATUS", AgentIntent.PAYMENT_INQUIRY), Map.entry("GREETING", AgentIntent.GREETING),
+			Map.entry("THANKS", AgentIntent.THANKS_OR_FAREWELL), Map.entry("GOODBYE", AgentIntent.THANKS_OR_FAREWELL),
+			Map.entry("HUMAN_REQUEST", AgentIntent.HUMAN_REQUEST),
+			Map.entry("COMMERCIAL_INQUIRY", AgentIntent.COMMERCIAL_INQUIRY),
+			Map.entry("SERVICE_RECOMMENDATION", AgentIntent.SERVICE_RECOMMENDATION),
+			Map.entry("PROFESSIONAL_QUERY", AgentIntent.PROFESSIONAL_QUERY),
+			Map.entry("QUOTE_REQUEST", AgentIntent.QUOTE_REQUEST),
+			Map.entry("PAYMENT_PROBLEM", AgentIntent.PAYMENT_PROBLEM),
+			Map.entry("SUPPORT_GENERAL", AgentIntent.SUPPORT_GENERAL),
+			Map.entry("TECHNICAL_MESSAGE", AgentIntent.TECHNICAL_MESSAGE),
+			Map.entry("KNOWLEDGE_QUERY", AgentIntent.KNOWLEDGE_QUERY), Map.entry("FOLLOW_UP", AgentIntent.FOLLOW_UP),
+			Map.entry("COMPLAINT", AgentIntent.COMPLAINT), Map.entry("WAITLIST_QUERY", AgentIntent.WAITLIST_QUERY));
+
+	private String normalizeRaw(String value) {
+		return TextNormalizer.normalize(value);
 	}
 
 	private Optional<IntentDetectionResult> detectNegatedAgendaActionInformation(String text) {
