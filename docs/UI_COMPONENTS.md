@@ -28,7 +28,7 @@
 | `LoadingState` | Placeholder o skeleton de espera. | `variant`, `message?` | `page`, `card`, `table`, `detail` | Debe conservar estructura visual de la vista final. |
 | `ErrorState` | Estado de error recuperable. | `title`, `description`, `onRetry?` | `page`, `card`, `inline` | Mostrar lenguaje accionable, no trazas tecnicas. |
 | `OfflineBanner` | Aviso global de conectividad perdida. | `visible`, `message?` | `warning`, `error` | Siempre visible arriba del contenido privado. |
-| `ConfirmDialog` | Confirmacion previa a accion sensible. | `open`, `title`, `description`, `confirmLabel`, `cancelLabel`, `onConfirm`, `onCancel` | `danger`, `neutral` | Obligatorio en cierres de sesion, eliminaciones y desconexion WhatsApp Web. |
+| `ConfirmDialog` | Confirmacion previa a accion sensible. | `open`, `title`, `description`, `confirmLabel`, `cancelLabel`, `onConfirm`, `onCancel` | `danger`, `neutral` | Obligatorio en cierres de sesion, eliminaciones y desconexion del canal WhatsApp. |
 | `Toast` | Feedback efimero de exito, alerta o error. | `title`, `description?`, `tone` | `success`, `warning`, `error`, `info` | Debe autocerrarse y permitir cierre manual. |
 
 ## Tokens base

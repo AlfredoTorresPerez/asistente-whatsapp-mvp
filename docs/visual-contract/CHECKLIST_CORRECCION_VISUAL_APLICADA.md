@@ -39,7 +39,7 @@ Aplicacion del prompt de homologacion visual sobre el frontend React del proyect
 - Prospectos
 - Agenda
 - Administracion
-- WhatsApp Web
+- Canal WhatsApp
 
 ## Pantallas corregidas en esta intervencion
 

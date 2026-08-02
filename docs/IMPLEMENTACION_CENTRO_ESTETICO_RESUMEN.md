@@ -8,7 +8,7 @@
 - Se agregaron endpoints REST bajo `/api/v1/esthetic`.
 - Se agrego cliente OpenAI configurable y deshabilitado por defecto.
 - Se agrego clasificador deterministico de respaldo para operar sin clave externa.
-- Se integro el analisis de intencion al webhook de WhatsApp Web despues de persistir mensajes entrantes.
+- Se integro el analisis de intencion al webhook del canal WhatsApp despues de persistir mensajes entrantes.
 - Se agregaron tipos y cliente de API en frontend React para consumir el modulo estetico.
 - Se agregaron pruebas de controlador para listado de servicios y analisis de intencion.
 

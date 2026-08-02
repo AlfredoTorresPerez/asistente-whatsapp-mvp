@@ -25,8 +25,8 @@ Definir los contratos REST de Fase 1 para frontend, backend Java y adaptaciones 
 - Privados:
   - todos los demas endpoints del frontend.
 - Integracion interna:
-  - `POST /api/v1/integrations/whatsapp-web/webhook`
-  - protegido por HMAC, no por JWT de usuario.
+  - `POST /api/v1/integrations/whatsapp-cloud/webhook`
+  - protegido por HMAC (`X-Hub-Signature-256`), no por JWT de usuario.
 
 ## Formato de error
 

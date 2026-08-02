@@ -113,10 +113,10 @@ docker compose -f docker-compose.local.yml down
 
 ```powershell
 # Windows
-powershell -File scripts\package_demo_clean.ps1
+powershell -File scripts\local-package.ps1
 ```
 
-El script crea una copia temporal excluyendo `.git`, `.idea`, `node_modules`, `target`, `dist`, `.env`, sesiones WhatsApp, caches y artefactos de build. El ZIP se genera en el directorio padre del workspace.
+El script empaqueta JAR del backend, build del frontend y configuración excluyendo `.git`, `.idea`, `node_modules`, `target`, `dist`, `.env`, sesiones WhatsApp, caches y artefactos de build.
 
 ## Riesgos pendientes
 

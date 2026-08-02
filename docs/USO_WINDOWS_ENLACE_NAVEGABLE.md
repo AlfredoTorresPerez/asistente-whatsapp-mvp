@@ -1,9 +1,9 @@
 # Uso en Windows para enlace navegable
 
-Este proyecto incluye dos formas de iniciar el enlace navegable:
+Este proyecto incluye dos formas de iniciar el enlace navegable (tunel publico):
 
-- `scripts/start_mvp_public_link.sh` para Linux, macOS, Git Bash o WSL.
-- `scripts/start_mvp_public_link.ps1` para PowerShell en Windows.
+- `scripts/start-public-link.ps1` para PowerShell en Windows.
+- Para detenerlo: `scripts/stop-public-link.ps1`; para verificar la URL publica: `scripts/check-public-link.ps1`.
 
 ## Ejecutar desde PowerShell
 
@@ -11,7 +11,7 @@ Desde la raiz del proyecto:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-.\scripts\start_mvp_public_link.ps1
+.\scripts\start-public-link.ps1
 ```
 
 ## Validar URL configurada

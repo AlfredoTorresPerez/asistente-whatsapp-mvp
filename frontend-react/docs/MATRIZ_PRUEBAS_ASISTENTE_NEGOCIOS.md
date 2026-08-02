@@ -205,7 +205,7 @@ gestion de clientes.
 
 | ID | Caso | Resultado Esperado | Dependencia |
 |----|------|--------------------|-------------|
-| QA-13-001 | Conectar sesion WhatsApp Web laboratorio | QR escaneado, sesion activa | WPP Service |
+| QA-13-001 | ~~Conectar sesion WhatsApp Web laboratorio~~ (obsoleto: servicio eliminado 2026-08-01) | Canal nativo `META_CLOUD_API` (webhook firmado) o `SIMULATED` | Backend |
 | QA-13-002 | Enviar mensaje real desde num prueba | Mensaje recibido en backend | WhatsApp real |
 | QA-13-003 | Validar recepcion en Conversaciones | Conversacion visible en UI | Backend |
 | QA-13-004 | Validar respuesta generada | Bot responde automaticamente | Backend AI |

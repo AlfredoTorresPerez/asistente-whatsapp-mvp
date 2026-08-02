@@ -1,12 +1,12 @@
 # Asistente WhatsApp MVP
 
-MVP de asistente empresarial para WhatsApp orientado a Centro Estetico Bella. Incluye backend Java/Spring Boot, frontend React/Vite, PostgreSQL, modulo de IA conversacional, catalogo, agenda, conversaciones, administracion y adaptador experimental de WhatsApp Web.
+MVP de asistente empresarial para WhatsApp orientado a Centro Estetico Bella. Incluye backend Java/Spring Boot, frontend React/Vite, PostgreSQL, modulo de IA conversacional, catalogo, agenda, conversaciones, administracion y canal WhatsApp nativo del backend (Cloud API de Meta o simulador local).
 
 ## Evaluacion libre del cliente
 
 Para entregar el MVP a un cliente o evaluador sin guion rigido, usar primero:
 
-- [GUIA_EVALUACION_LIBRE_CLIENTE.md](GUIA_EVALUACION_LIBRE_CLIENTE.md)
+- [GUIA_EVALUACION_LIBRE_CLIENTE.md](docs/cambios/GUIA_EVALUACION_LIBRE_CLIENTE.md)
 - [docs/MVP_CONTROLLED_DEMO_READINESS.md](docs/MVP_CONTROLLED_DEMO_READINESS.md)
 
 La guia explica que se puede probar libremente, que sigue experimental, que no debe considerarse productivo todavia y como reportar errores.
@@ -21,7 +21,7 @@ URLs principales:
 
 - Frontend: http://localhost:5173
 - Backend health: http://localhost:8080/api/v1/health
-- WhatsApp Web visual: http://localhost:6080/vnc.html?autoconnect=true&resize=scale
+- Observabilidad (Grafana): http://localhost:3000 — ver `docs/OBSERVABILIDAD_LOCAL.md`
 
 Credenciales demo locales:
 
@@ -110,12 +110,11 @@ Requiere que el backend esté corriendo y que no haya otro proceso (como contene
 - `BookingPaymentController` — endpoints privados (admin)
 - `PublicBookingPaymentController` — endpoints públicos (checkout)
 - `BookingPaymentJdbcRepository` — persistencia + JOIN con `bookings`
-- Migraciones Flyway: `V20__create_booking_payments.sql`, `V35__booking_payment_indexes.sql`, `V36__booking_payment_cascade_fix.sql`
+- Migraciones Flyway: `V35__booking_payments.sql`, `V36__booking_payment_operations.sql`, `V45__booking_payment_provider_columns.sql`
 
 ## Restricciones
 
-- WhatsApp Web es experimental y no debe presentarse como canal productivo final.
-- Para produccion se recomienda WhatsApp Cloud API.
+- El canal WhatsApp local opera en modo `SIMULATED` por defecto; con credenciales Meta activas (`APP_WHATSAPP_PROVIDER=META_CLOUD_API`) es canal real controlado de pruebas, nunca productivo sin revision.
 - La auto-respuesta IA queda desactivada por defecto.
 - La agenda no debe confirmar disponibilidad sin validacion real.
 - No usar `docker compose down -v` salvo que se quiera borrar datos locales.

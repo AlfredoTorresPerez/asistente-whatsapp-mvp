@@ -40,7 +40,7 @@ Las siguientes laminas son la referencia oficial del producto:
 | `07_pedidos_lista_crear_detalle_editar_pago_despacho_comprobante.png` | Lista de pedidos, detalle, crear, editar, pago, despacho, comprobante |
 | `08_catalogo_productos_servicios_categorias_inventario_importar.png` | Catalogo, crear, detalle, editar, categorias, inventario, importacion |
 | `09_reportes_filtros_detalle_exportar_programar_estados.png` | Reportes, filtros avanzados, detalle, exportar, programar, estado de carga, estado vacio |
-| `10_administracion_seguridad_usuarios_roles_integraciones_2fa_accesos.png` | Administracion, empresa, usuarios, roles, WhatsApp Web, integraciones, plan y facturacion, metodos de pago, seguridad, 2FA, sesiones, dispositivos, access log |
+| `10_administracion_seguridad_usuarios_roles_integraciones_2fa_accesos.png` | Administracion, empresa, usuarios, roles, Canal WhatsApp, integraciones, plan y facturacion, metodos de pago, seguridad, 2FA, sesiones, dispositivos, access log |
 
 ## Reglas obligatorias por modulo
 
