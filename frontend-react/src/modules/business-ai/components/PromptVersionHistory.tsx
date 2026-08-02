@@ -33,7 +33,7 @@ export function PromptVersionHistory({ prompts, activeVersion }: Props) {
               </div>
               <div className="flex items-center gap-2">
                 {prompt.version === activeVersion && (
-                  <StatusBadge status="active" />
+                  <StatusBadge label="Activo" tone="success" />
                 )}
                 {prompt.updatedAt && (
                   <span className="text-xs text-gray-400">{prompt.updatedAt}</span>

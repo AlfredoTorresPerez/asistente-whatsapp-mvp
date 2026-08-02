@@ -190,10 +190,10 @@ describe('BusinessAiPage', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Probar asistente' }))
     await userEvent.click(screen.getByText('Probar'))
     await waitFor(() => {
-      const previewCalls = mockFetch.mock.calls.filter(
-        ([url, opts]: [string, RequestInit]) =>
-          url.includes('/api/v1/ai/preview') && opts?.method === 'POST',
-      )
+      const previewCalls = mockFetch.mock.calls.filter((call) => {
+        const [url, opts] = call as [string, RequestInit]
+        return url.includes('/api/v1/ai/preview') && opts?.method === 'POST'
+      })
       expect(previewCalls.length).toBeGreaterThan(0)
     })
   })
@@ -356,9 +356,10 @@ describe('BusinessAiPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Puede responder automáticamente')).toBeTruthy()
     })
-    const bookingCalls = mockFetch.mock.calls.filter(
-      ([url]: [string]) => url.includes('/bookings') || url.includes('/appointments'),
-    )
+    const bookingCalls = mockFetch.mock.calls.filter((call) => {
+      const [url] = call as [string]
+      return url.includes('/bookings') || url.includes('/appointments')
+    })
     expect(bookingCalls.length).toBe(0)
   })
 

@@ -22,7 +22,10 @@ export function MetricCard({ metric }: { metric: MetricCardData }) {
     <Card className="flex flex-col gap-1 p-4">
       <div className="flex items-center justify-between">
         <span className="text-lg">{icons[metric.icon] ?? '📊'}</span>
-        <StatusBadge status={metric.accent === 'green' ? 'active' : metric.accent === 'orange' ? 'warning' : 'info'} />
+        <StatusBadge
+          label={metric.accent === 'green' ? 'Activo' : metric.accent === 'orange' ? 'Atención' : 'Info'}
+          tone={metric.accent === 'green' ? 'success' : metric.accent === 'orange' ? 'warning' : 'info'}
+        />
       </div>
       <p className="text-2xl font-bold">{metric.value}</p>
       <p className="text-sm font-medium text-gray-700">{metric.title}</p>

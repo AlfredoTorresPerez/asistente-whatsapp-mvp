@@ -123,12 +123,19 @@ export function AssistantTestPanel({
               <div className="space-y-2 rounded-lg border border-gray-200 p-3">
                 <div className="flex items-center gap-2">
                   <StatusBadge
-                    status={
+                    label={
                       routingResult.confidence >= 0.7
-                        ? 'active'
+                        ? 'Activo'
+                        : routingResult.confidence >= 0.3
+                          ? 'Atención'
+                          : 'Inactivo'
+                    }
+                    tone={
+                      routingResult.confidence >= 0.7
+                        ? 'success'
                         : routingResult.confidence >= 0.3
                           ? 'warning'
-                          : 'inactive'
+                          : 'neutral'
                     }
                   />
                   <span className="text-sm text-gray-600">

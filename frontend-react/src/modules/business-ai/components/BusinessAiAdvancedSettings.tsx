@@ -95,7 +95,7 @@ export function BusinessAiAdvancedSettings({
                 </div>
                 <div>
                   <span className="font-medium text-gray-600">Derivación humana:</span>{' '}
-                  <StatusBadge status={routingResult.requiresHuman ? 'active' : 'inactive'} />
+                  <StatusBadge label={routingResult.requiresHuman ? 'Activo' : 'Inactivo'} tone={routingResult.requiresHuman ? 'success' : 'neutral'} />
                 </div>
               </div>
 
