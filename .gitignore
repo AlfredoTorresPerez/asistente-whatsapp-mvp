@@ -47,6 +47,19 @@ CAMBIOS_AGENDA_CELDAS_CONTENIDAS_HORA_ACTUAL.md
 .docker/
 RESULTADOS_QA_IA_RESERVAS.md
 
+# Evidencia de ejecución y resultados de prueba
+registro_ejecucion_IA.json
+frontend-react/e2e/reports/
+
+# Capturas de observabilidad (evidencia)
+docs/observabilidad-capturas/
+
+# Scripts SQL manuales de operación (no migraciones)
+database/manual/
+
+# Memoria persistente de sesiones (sync manual)
+MEMORY.md
+
 # Lock files — only pnpm allowed
 package-lock.json
 yarn.lock
