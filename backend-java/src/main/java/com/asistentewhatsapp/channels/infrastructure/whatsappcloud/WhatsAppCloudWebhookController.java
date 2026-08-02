@@ -2,6 +2,7 @@ package com.asistentewhatsapp.channels.infrastructure.whatsappcloud;
 
 import com.asistentewhatsapp.shared.api.StatusResponse;
 import com.asistentewhatsapp.shared.exception.ApiException;
+import com.asistentewhatsapp.shared.observability.BusinessMetrics;
 import io.micrometer.core.instrument.Timer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
@@ -25,12 +26,14 @@ public class WhatsAppCloudWebhookController {
 	private final WhatsAppCloudWebhookValidator validator;
 	private final WhatsAppCloudWebhookParser parser;
 	private final WhatsAppCloudApiMetrics metrics;
+	private final BusinessMetrics businessMetrics;
 
 	public WhatsAppCloudWebhookController(WhatsAppCloudWebhookValidator validator, WhatsAppCloudWebhookParser parser,
-			WhatsAppCloudApiMetrics metrics) {
+			WhatsAppCloudApiMetrics metrics, BusinessMetrics businessMetrics) {
 		this.validator = validator;
 		this.parser = parser;
 		this.metrics = metrics;
+		this.businessMetrics = businessMetrics;
 	}
 
 	@GetMapping(value = "/api/v1/integrations/whatsapp-cloud/webhook", produces = MediaType.TEXT_PLAIN_VALUE)
@@ -52,6 +55,7 @@ public class WhatsAppCloudWebhookController {
 			@RequestHeader(value = "X-Hub-Signature-256", required = false) String signature,
 			@RequestHeader(value = "X-Hub-Signature", required = false) String legacySignature) {
 		metrics.incrementWebhookReceived();
+		businessMetrics.incrementWhatsappWebhooksRecibidos();
 
 		Timer.Sample sample = Timer.start();
 
@@ -66,6 +70,7 @@ public class WhatsAppCloudWebhookController {
 			validator.validateSignature(effectiveSignature, rawBody);
 		} catch (ApiException exception) {
 			metrics.incrementWebhookRejected();
+			businessMetrics.incrementWhatsappWebhooksFirmaInvalida();
 			HttpStatus status = exception.getStatus() != null ? exception.getStatus() : HttpStatus.UNAUTHORIZED;
 			return ResponseEntity.status(status).body(new StatusResponse("REJECTED"));
 		}

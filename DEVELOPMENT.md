@@ -62,7 +62,14 @@ docker compose up -d
 
 # Con backup sidecar
 docker compose --profile backup up -d
+
+# Con observabilidad local (Prometheus, Loki, Tempo, Alloy, Grafana)
+docker compose --env-file .env.local -f docker-compose.local.yml --profile observability up -d
 ```
+
+El perfil `observability` de Docker Compose activa además el perfil Spring `observability`
+del backend (logs JSON, trazas OTLP hacia Tempo, health checks extendidos y métricas
+funcionales `assistente_*`). Ver `OBSERVABILIDAD_LOCAL.md`.
 
 ## Scripts auxiliares
 

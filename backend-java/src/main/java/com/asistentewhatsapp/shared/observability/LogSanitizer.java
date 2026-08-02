@@ -39,6 +39,19 @@ public final class LogSanitizer {
 		return messageSummary("response", response);
 	}
 
+	public static String clientErrorSummary(String message, String stack) {
+		StringBuilder summary = new StringBuilder();
+		summary.append(sanitizeFreeText(message));
+		if (stack != null && !stack.isBlank()) {
+			String sanitizedStack = sanitizeFreeText(stack);
+			summary.append(" stackLength=").append(stack.length());
+			if (includeMessageBody()) {
+				summary.append(" stack=").append(sanitizedStack);
+			}
+		}
+		return summary.toString();
+	}
+
 	public static String maskPhone(String phone) {
 		if (phone == null || phone.isBlank()) {
 			return "";

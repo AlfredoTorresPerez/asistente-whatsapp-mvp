@@ -9,6 +9,8 @@ import com.asistentewhatsapp.aesthetic.application.AestheticCenterService;
 import com.asistentewhatsapp.aiagents.infrastructure.AiReplyOutboxJdbcRepository;
 import com.asistentewhatsapp.channels.application.ChannelDispatchService;
 import com.asistentewhatsapp.channels.infrastructure.WhatsAppChannelJdbcRepository;
+import com.asistentewhatsapp.shared.observability.BusinessMetrics;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -25,8 +27,8 @@ class AiReplyOutboxProcessorTest {
 		AiAgentProperties properties = new AiAgentProperties();
 		JdbcTemplate jdbcTemplate = mock(JdbcTemplate.class);
 		AiReplyOutboxProcessor processor = new AiReplyOutboxProcessor(outboxRepository, channelRepository,
-				aestheticCenterService, agentCoordinatorService, channelDispatchService, properties, jdbcTemplate, 10,
-				120000L, 30000L, 900000L);
+				aestheticCenterService, agentCoordinatorService, channelDispatchService, properties,
+				new BusinessMetrics(new SimpleMeterRegistry()), jdbcTemplate, 10, 120000L, 30000L, 900000L);
 		when(outboxRepository.claimDueJobs(10, 120000)).thenReturn(List.of());
 
 		processor.processDueJobs();

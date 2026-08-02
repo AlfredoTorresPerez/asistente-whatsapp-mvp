@@ -36,6 +36,7 @@ import com.asistentewhatsapp.security.application.AuditService;
 import com.asistentewhatsapp.security.application.AuditMetadata;
 import com.asistentewhatsapp.security.domain.AuthenticatedUser;
 import com.asistentewhatsapp.shared.exception.ApiException;
+import com.asistentewhatsapp.shared.observability.BusinessMetrics;
 import java.nio.charset.StandardCharsets;
 import java.time.DateTimeException;
 import java.time.LocalDate;
@@ -70,12 +71,14 @@ public class CompleteDigitalAgendaService {
 	private final AvailabilityService availabilityService;
 	private final ReminderSchedulingService reminderSchedulingService;
 	private final BookingPolicyService bookingPolicyService;
+	private final BusinessMetrics businessMetrics;
 
 	public CompleteDigitalAgendaService(CompleteAgendaJdbcRepository repository,
 			BookingJdbcRepository bookingJdbcRepository, BookingConfirmationService bookingConfirmationService,
 			CalendarSyncService calendarSyncService, AuditService auditService,
 			ChannelDispatchService channelDispatchService, AvailabilityService availabilityService,
-			ReminderSchedulingService reminderSchedulingService, BookingPolicyService bookingPolicyService) {
+			ReminderSchedulingService reminderSchedulingService, BookingPolicyService bookingPolicyService,
+			BusinessMetrics businessMetrics) {
 		this.repository = repository;
 		this.bookingJdbcRepository = bookingJdbcRepository;
 		this.bookingConfirmationService = bookingConfirmationService;
@@ -85,10 +88,25 @@ public class CompleteDigitalAgendaService {
 		this.availabilityService = availabilityService;
 		this.reminderSchedulingService = reminderSchedulingService;
 		this.bookingPolicyService = bookingPolicyService;
+		this.businessMetrics = businessMetrics;
 	}
 
 	@Transactional(readOnly = true)
 	public AgendaAvailabilityResponse availability(AuthenticatedUser user, AgendaAvailabilityRequest request) {
+		businessMetrics.incrementDisponibilidadConsultas();
+		long start = System.nanoTime();
+		try {
+			AgendaAvailabilityResponse response = doAvailability(user, request);
+			if (response.slots() == null || response.slots().isEmpty()) {
+				businessMetrics.incrementDisponibilidadSinHorarios();
+			}
+			return response;
+		} finally {
+			businessMetrics.recordDisponibilidadDuracion((System.nanoTime() - start) / 1_000_000L);
+		}
+	}
+
+	private AgendaAvailabilityResponse doAvailability(AuthenticatedUser user, AgendaAvailabilityRequest request) {
 		LocationRecord location = repository.findLocation(user.businessId(), request.locationId());
 		ServiceRecord service = repository.findService(user.businessId(), request.locationId(), request.serviceId());
 		int dayOfWeek = request.date().getDayOfWeek().getValue();

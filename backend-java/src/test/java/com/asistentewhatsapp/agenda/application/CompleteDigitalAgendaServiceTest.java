@@ -23,6 +23,8 @@ import com.asistentewhatsapp.bookings.api.BookingDetailResponse;
 import com.asistentewhatsapp.bookings.application.AvailabilityService;
 import com.asistentewhatsapp.bookings.application.BookingConfirmationService;
 import com.asistentewhatsapp.bookings.application.BookingPolicyService;
+import com.asistentewhatsapp.shared.observability.BusinessMetrics;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import com.asistentewhatsapp.bookings.application.ReminderSchedulingService;
 import com.asistentewhatsapp.bookings.infrastructure.BookingJdbcRepository;
 import com.asistentewhatsapp.calendar.application.CalendarSyncService;
@@ -78,7 +80,8 @@ class CompleteDigitalAgendaServiceTest {
 
 		service = new CompleteDigitalAgendaService(repository, bookingJdbcRepository, bookingConfirmationService,
 				mock(CalendarSyncService.class), auditService, channelDispatchService, availabilityService,
-				mock(ReminderSchedulingService.class), bookingPolicyService);
+				mock(ReminderSchedulingService.class), bookingPolicyService,
+				new BusinessMetrics(new SimpleMeterRegistry()));
 	}
 
 	private OffsetDateTime futureStartsAt() {
@@ -373,9 +376,9 @@ class CompleteDigitalAgendaServiceTest {
 	private BookingDetailResponse bookingDetail(UUID bookingId) {
 		OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
 		return new BookingDetailResponse(bookingId, "Depilacion laser", "PENDIENTE_CONFIRMACION", now, DURATION,
-				LOCATION_ID, "Sucursal Test", "Sucursal Test", null, null, now, now, null, "Cliente Test",
-				"56911112222", null, null, null, null, null, true, BigDecimal.valueOf(10000), "PENDING", List.of(),
-				List.of(), List.of(), List.of(), List.of());
+				LOCATION_ID, "Sucursal Test", "Sucursal Test", SERVICE_ID, PROFESSIONAL_ID, ROOM_ID, null, null, now,
+				now, null, "Cliente Test", "56911112222", null, null, null, null, null, true, BigDecimal.valueOf(10000),
+				"PENDING", List.of(), List.of(), List.of(), List.of(), List.of());
 	}
 
 	private String stableUuid(Object... values) {

@@ -100,4 +100,7 @@ export const handlers = [
   }),
   http.delete(wc('/business-locations/:id'), () => new HttpResponse(null, { status: 204 })),
   http.get(wc('/multisite/summary'), () => HttpResponse.json(mockMultisiteSummary)),
+  http.post(wc('/observability/client-errors'), () =>
+    HttpResponse.json({ status: 'ACCEPTED' }, { status: 202 }),
+  ),
 ]

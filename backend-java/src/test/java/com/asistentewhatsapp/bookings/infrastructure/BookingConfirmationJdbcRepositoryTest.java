@@ -7,6 +7,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.asistentewhatsapp.shared.observability.BusinessMetrics;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -19,7 +21,8 @@ class BookingConfirmationJdbcRepositoryTest {
 	void updateBookingStatusDoesNotWriteConfirmedAtOnBooking() {
 		NamedParameterJdbcTemplate jdbcTemplate = mock(NamedParameterJdbcTemplate.class);
 		when(jdbcTemplate.update(anyString(), any(MapSqlParameterSource.class))).thenReturn(1);
-		BookingConfirmationJdbcRepository repository = new BookingConfirmationJdbcRepository(jdbcTemplate);
+		BookingConfirmationJdbcRepository repository = new BookingConfirmationJdbcRepository(jdbcTemplate,
+				new BusinessMetrics(new SimpleMeterRegistry()));
 
 		repository.updateBookingStatus(UUID.randomUUID(), UUID.randomUUID(), "CONFIRMED");
 

@@ -1,5 +1,6 @@
 package com.asistentewhatsapp.shared.email;
 
+import com.asistentewhatsapp.shared.observability.BusinessMetrics;
 import jakarta.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -33,9 +34,10 @@ public class TransactionalEmailService {
 	private final EmailTemplateRenderer templateRenderer;
 	private final JavaMailSender mirrorMailSender;
 	private final boolean mirrorEnabled;
+	private final BusinessMetrics businessMetrics;
 
 	public TransactionalEmailService(JavaMailSender mailSender, EmailTemplateRenderer templateRenderer,
-			@Value("${app.email.enabled:false}") boolean enabled,
+			BusinessMetrics businessMetrics, @Value("${app.email.enabled:false}") boolean enabled,
 			@Value("${app.email.simulation-enabled:true}") boolean simulationEnabled,
 			@Value("${app.email.from:no-reply@localhost}") String from,
 			@Value("${app.email.from-name:Centro estetico}") String fromName,
@@ -49,6 +51,7 @@ public class TransactionalEmailService {
 			@Value("${app.email.mirror.starttls-required:false}") boolean mirrorStartTlsRequired) {
 		this.mailSender = mailSender;
 		this.templateRenderer = templateRenderer;
+		this.businessMetrics = businessMetrics;
 		this.enabled = enabled;
 		this.simulationEnabled = simulationEnabled;
 		this.from = from;
@@ -284,13 +287,24 @@ public class TransactionalEmailService {
 
 	private void sendMimeMessage(JavaMailSender sender, String recipient, String subject, String textBody,
 			String htmlBody) throws Exception {
-		MimeMessage message = sender.createMimeMessage();
-		MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-		helper.setTo(recipient);
-		helper.setFrom(fromAddress());
-		helper.setSubject(subject);
-		helper.setText(textBody, htmlBody);
-		sender.send(message);
+		boolean realChannel = sender == mailSender;
+		try {
+			MimeMessage message = sender.createMimeMessage();
+			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+			helper.setTo(recipient);
+			helper.setFrom(fromAddress());
+			helper.setSubject(subject);
+			helper.setText(textBody, htmlBody);
+			sender.send(message);
+			if (realChannel) {
+				businessMetrics.incrementNotificacionesEnviadas();
+			}
+		} catch (Exception exception) {
+			if (realChannel) {
+				businessMetrics.incrementNotificacionesFallidas();
+			}
+			throw exception;
+		}
 	}
 
 	private void sendMirrorEmail(String recipient, String subject, String textBody, String htmlBody, String eventName) {

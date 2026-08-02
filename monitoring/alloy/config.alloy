@@ -1,0 +1,45 @@
+// =============================================================================
+// Grafana Alloy 1.9.1 - recoleccion de registros de contenedores -> Loki
+// =============================================================================
+logging {
+  level = "info"
+}
+
+// Descubre los contenedores de este stack (nombres con prefijo asistente-)
+discovery.docker "asistente" {
+  host = "unix:///var/run/docker.sock"
+  filter {
+    name = "name"
+    values = ["asistente-.*"]
+  }
+  refresh_interval = "30s"
+}
+
+discovery.relabel "asistente" {
+  targets = discovery.docker.asistente.targets
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/asistente-(.*)"
+    target_label  = "container"
+    replacement   = "$1"
+  }
+  rule {
+    source_labels = ["__meta_docker_container_log_stream"]
+    target_label  = "stream"
+  }
+}
+
+// Recolecta los logs de cada contenedor y los envia a Loki
+loki.source.docker "asistente_containers" {
+  host         = "unix:///var/run/docker.sock"
+  targets      = discovery.relabel.asistente.output
+  forward_to   = [loki.write.local.receiver]
+  relabel_rules = discovery.relabel.asistente.rules
+}
+
+loki.write "local" {
+  endpoint {
+    url       = "http://loki:3100/loki/api/v1/push"
+    tenant_id = "local"
+  }
+}

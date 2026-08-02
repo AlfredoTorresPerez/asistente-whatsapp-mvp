@@ -1,0 +1,178 @@
+# =============================================================================
+# Reglas de alerta Prometheus - ambiente local del MVP
+# Las alertas se visualizan en Grafana (datasource Prometheus).
+# No se configura Alertmanager: Grafana Alerting es el punto local de alertas.
+# =============================================================================
+groups:
+  - name: asistente-disponibilidad
+    rules:
+      - alert: BackendJavaCaido
+        expr: up{job="backend-java"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          componente: backend-java
+        annotations:
+          summary: "El servicio Java no responde"
+          description: "Prometheus no puede recolectar /actuator/prometheus de backend-java."
+
+      - alert: PrometheusRecolectandoVacio
+        expr: absent(up{job="backend-java"})
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Prometheus sin targets"
+
+  - name: asistente-errores-aplicacion
+    rules:
+      - alert: TasaErroresAlta
+        expr: |
+          (sum(rate(http_server_requests_seconds_count{status=~"5.."}[5m])) by (instance)
+           / clamp_min(sum(rate(http_server_requests_seconds_count[5m])) by (instance), 1))
+          > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          componente: backend-java
+        annotations:
+          summary: "Tasa de errores HTTP superior al 5%"
+
+      - alert: LatenciaP95Alta
+        expr: |
+          histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket[5m])) by (le))
+          > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Percentil 95 de latencia mayor a 2 segundos"
+
+      - alert: MemoriaHeapAlta
+        expr: |
+          jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"} > 0.85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Memoria heap JVM superior al 85%"
+
+  - name: asistente-meta-cloud-api
+    rules:
+      - alert: MetaFallosFrecuentes
+        expr: |
+          increase(whatsapp_cloud_api_errors_total[5m])
+          > 5
+        for: 1m
+        labels:
+          severity: warning
+          proveedor: meta
+        annotations:
+          summary: "Mas de 5 fallos de Meta Cloud API en 5 minutos"
+
+      - alert: FirmaMetaInvalida
+        expr: |
+          increase(whatsapp_cloud_webhook_rejected_total[5m])
+          > 0
+        for: 1m
+        labels:
+          severity: warning
+          proveedor: meta
+        annotations:
+          summary: "Se recibieron firmas invalidas de Meta"
+
+  - name: asistente-cola-ia
+    rules:
+      - alert: ColaIaAcumulada
+        expr: asistente_outbox_pendientes > 25
+        for: 5m
+        labels:
+          severity: warning
+          componente: ai-outbox
+        annotations:
+          summary: "Cola de salida IA acumulada"
+          description: "Hay {{ $value }} mensajes pendientes en ai_reply_outbox."
+
+      - alert: ColaIaAntigua
+        expr: asistente_outbox_antiguedad_maxima_segundos > 1800
+        for: 5m
+        labels:
+          severity: warning
+          componente: ai-outbox
+        annotations:
+          summary: "Mensaje pendiente demasiado antiguo en cola IA"
+
+      - alert: IaProveedorNoDisponible
+        expr: absent(assistente_ia_respuestas_exitosas_total) and on() (up{job="backend-java"} == 1)
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "El proveedor de IA no registra respuestas exitosas"
+
+  - name: asistente-tareas-programadas
+    rules:
+      - alert: TareaProgramadaFallida
+        expr: increase(asistente_tareas_programadas_fallidas_total[10m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Tarea programada fallida recientemente"
+
+      - alert: ReservasConflicto
+        expr: increase(asistente_reservas_conflicto_total[10m]) > 3
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Conflictos de concurrencia elevados en reservas"
+
+      - alert: ReintentosAnormales
+        expr: increase(asistente_notificaciones_reintentos_total[10m]) > 10
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Cantidad anormal de reintentos de notificaciones"
+
+      - alert: ReservasErrorRepetido
+        expr: |
+          increase(asistente_whatsapp_mensajes_fallidos_total[15m])
+          > 5
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Errores repetidos en envio de mensajes"
+
+  - name: asistente-infra
+    rules:
+      - alert: PostgresNoDisponible
+        expr: absent(hikaricp_connections{job="backend-java"})
+        for: 5m
+        labels:
+          severity: critical
+          componente: postgres
+        annotations:
+          summary: "PostgreSQL no responde"
+          description: "No se observan metricas del pool de conexiones Hikari."
+
+      - alert: LokiSinRegistros
+        expr: |
+          absent(loki_distributor_lines_received_total) or sum(increase(loki_distributor_lines_received_total[5m])) == 0
+        for: 5m
+        labels:
+          severity: warning
+          componente: loki
+        annotations:
+          summary: "Loki no esta recibiendo registros"
+
+      - alert: TempoSinTrazas
+        expr: absent(tempo_request_duration_seconds_count) and on() (up{job="backend-java"} == 1)
+        for: 10m
+        labels:
+          severity: warning
+          componente: tempo
+        annotations:
+          summary: "Tempo no recibe trazas del backend"

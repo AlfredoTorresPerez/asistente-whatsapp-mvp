@@ -1,0 +1,50 @@
+spring:
+  config:
+    activate:
+      on-profile: observability
+
+management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: ${APP_TRACING_SAMPLING_PROBABILITY:1.0}
+    correlation:
+      fields:
+        include: traceId,spanId
+  otlp:
+    tracing:
+      endpoint: ${OTLP_TRACING_ENDPOINT:http://localhost:4318/v1/traces}
+  metrics:
+    tags:
+      application: backend-java
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        assistente_reservas_operaciones_duracion_seconds: true
+        assistente_disponibilidad_duracion_seconds: true
+        assistente_ia_duracion_seconds: true
+        whatsapp_cloud_api_call_seconds: true
+        whatsapp_cloud_webhook_processing_seconds: true
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: when-authorized
+      show-components: always
+  info:
+    env:
+      enabled: true
+
+app:
+  observability:
+    method-tracing:
+      enabled: true
+    outbox-health:
+      max-pending: ${APP_OUTBOX_HEALTH_MAX_PENDING:50}
+      max-age-minutes: ${APP_OUTBOX_HEALTH_MAX_AGE_MINUTES:15}
+    scheduled-tasks-health:
+      stale-task-minutes: ${APP_SCHEDULED_TASKS_HEALTH_STALE_MINUTES:10}
+
+logging:
+  pattern:
+    level: "%5p [correlationId:%X{correlationId:-sin-correlacion}] [traceId:%X{traceId:-}] [spanId:%X{spanId:-}]"

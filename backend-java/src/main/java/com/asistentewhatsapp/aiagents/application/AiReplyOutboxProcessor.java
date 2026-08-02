@@ -7,6 +7,7 @@ import com.asistentewhatsapp.channels.application.ChannelDispatchResponse;
 import com.asistentewhatsapp.channels.application.ChannelDispatchService;
 import com.asistentewhatsapp.channels.domain.MessageChannelType;
 import com.asistentewhatsapp.channels.infrastructure.WhatsAppChannelJdbcRepository;
+import com.asistentewhatsapp.shared.observability.BusinessMetrics;
 import com.asistentewhatsapp.shared.observability.LogSanitizer;
 import java.time.Duration;
 import java.time.Instant;
@@ -30,6 +31,7 @@ public class AiReplyOutboxProcessor {
 	private final AgentCoordinatorService agentCoordinatorService;
 	private final ChannelDispatchService channelDispatchService;
 	private final AiAgentProperties properties;
+	private final BusinessMetrics businessMetrics;
 	private final int batchSize;
 	private final long processingTimeoutMs;
 	private final long baseRetryDelayMs;
@@ -39,7 +41,7 @@ public class AiReplyOutboxProcessor {
 	public AiReplyOutboxProcessor(AiReplyOutboxJdbcRepository outboxRepository,
 			WhatsAppChannelJdbcRepository channelRepository, AestheticCenterService aestheticCenterService,
 			AgentCoordinatorService agentCoordinatorService, ChannelDispatchService channelDispatchService,
-			AiAgentProperties properties, JdbcTemplate jdbcTemplate,
+			AiAgentProperties properties, BusinessMetrics businessMetrics, JdbcTemplate jdbcTemplate,
 			@Value("${app.ai.agents.outbox-batch-size:10}") int batchSize,
 			@Value("${app.ai.agents.outbox-processing-timeout-ms:120000}") long processingTimeoutMs,
 			@Value("${app.ai.agents.outbox-retry-base-delay-ms:30000}") long baseRetryDelayMs,
@@ -50,6 +52,7 @@ public class AiReplyOutboxProcessor {
 		this.agentCoordinatorService = agentCoordinatorService;
 		this.channelDispatchService = channelDispatchService;
 		this.properties = properties;
+		this.businessMetrics = businessMetrics;
 		this.jdbcTemplate = jdbcTemplate;
 		this.batchSize = batchSize;
 		this.processingTimeoutMs = processingTimeoutMs;
@@ -82,11 +85,16 @@ public class AiReplyOutboxProcessor {
 					if (completed) {
 						outboxRepository.markProcessed(job.id(), OffsetDateTime.now(ZoneOffset.UTC));
 						processed++;
+						businessMetrics.incrementOutboxProcesadas();
 					} else {
 						failed++;
 					}
 				} catch (RuntimeException exception) {
 					failed++;
+					businessMetrics.incrementOutboxFallidas();
+					if (job.attempts() < job.maxAttempts()) {
+						businessMetrics.incrementNotificacionesReintentos();
+					}
 					OffsetDateTime nextAttemptAt = OffsetDateTime.now(ZoneOffset.UTC).plus(retryDelay(job.attempts()));
 					outboxRepository.markFailedOrRetry(job.id(), job.attempts(), job.maxAttempts(),
 							exception.getClass().getSimpleName(), exception.getMessage(), nextAttemptAt);
@@ -178,6 +186,7 @@ public class AiReplyOutboxProcessor {
 				responseBody, OffsetDateTime.now(ZoneOffset.UTC));
 
 		if (properties.safeModeEnabled()) {
+			businessMetrics.incrementIaModoSeguro();
 			channelRepository.updateOutboundMessageAccepted(messageId, "safe-mode-simulated-" + UUID.randomUUID(),
 					"SIMULATED", OffsetDateTime.now(ZoneOffset.UTC));
 			channelRepository.updateConversationOutboundActivity(job.conversationId(), responseBody,
@@ -214,7 +223,9 @@ public class AiReplyOutboxProcessor {
 					"sent=true adapterStatus=" + deliveryStatus + " externalMessageIdMasked="
 							+ com.asistentewhatsapp.shared.observability.LogSanitizer
 									.maskExternalId(delivery.externalMessageId()));
+			businessMetrics.incrementWhatsappMensajesEnviados();
 		} catch (RuntimeException exception) {
+			businessMetrics.incrementWhatsappMensajesFallidos();
 			channelRepository.updateOutboundMessageFailed(messageId, "AI_REPLY_OUTBOX_DISPATCH_FAILED",
 					OffsetDateTime.now(ZoneOffset.UTC));
 			throw exception;

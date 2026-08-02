@@ -6,10 +6,12 @@ import com.asistentewhatsapp.aiagents.infrastructure.AiReplyOutboxJdbcRepository
 import com.asistentewhatsapp.channels.domain.WhatsAppInboundMessageEvent;
 import com.asistentewhatsapp.channels.infrastructure.WhatsAppChannelJdbcRepository;
 import com.asistentewhatsapp.security.infrastructure.AuditLogJdbcRepository;
+import com.asistentewhatsapp.shared.observability.BusinessMetrics;
 import com.asistentewhatsapp.shared.observability.LogSanitizer;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,14 +27,16 @@ public class WhatsAppInboundMessageService {
 	private final AuditLogJdbcRepository auditLogJdbcRepository;
 	private final AgentCoordinatorService agentCoordinatorService;
 	private final AiReplyOutboxJdbcRepository aiReplyOutboxJdbcRepository;
+	private final BusinessMetrics businessMetrics;
 
 	public WhatsAppInboundMessageService(WhatsAppChannelJdbcRepository repository,
 			AuditLogJdbcRepository auditLogJdbcRepository, AgentCoordinatorService agentCoordinatorService,
-			AiReplyOutboxJdbcRepository aiReplyOutboxJdbcRepository) {
+			AiReplyOutboxJdbcRepository aiReplyOutboxJdbcRepository, BusinessMetrics businessMetrics) {
 		this.repository = repository;
 		this.auditLogJdbcRepository = auditLogJdbcRepository;
 		this.agentCoordinatorService = agentCoordinatorService;
 		this.aiReplyOutboxJdbcRepository = aiReplyOutboxJdbcRepository;
+		this.businessMetrics = businessMetrics;
 	}
 
 	@Transactional
@@ -44,6 +48,8 @@ public class WhatsAppInboundMessageService {
 		OffsetDateTime occurredAt = event.timestamp() != null ? event.timestamp() : OffsetDateTime.now(ZoneOffset.UTC);
 
 		String bodyText = extractBodyText(event);
+
+		businessMetrics.incrementWhatsappMensajesRecibidos();
 
 		AiTraceLogger.info("WHATSAPP_MESSAGE_RECEIVED", traceId, null, null, "WhatsAppInboundMessageService",
 				"deliveryId=" + deliveryId + " phoneMasked=" + AiTraceLogger.maskPhone(normalizedPhone)
@@ -60,15 +66,24 @@ public class WhatsAppInboundMessageService {
 				.map(WhatsAppChannelJdbcRepository.ConversationRecord::assignedUserId)
 				.or(() -> repository.findFirstActiveUserId(businessId)).orElse(null);
 
-		WhatsAppChannelJdbcRepository.ConversationRecord conversation = repository
-				.findLatestConversation(businessId, channelAccountId, customer.id()).orElseGet(
+		Optional<WhatsAppChannelJdbcRepository.ConversationRecord> existingConversation = repository
+				.findLatestConversation(businessId, channelAccountId, customer.id());
+		boolean isNewConversation = existingConversation.isEmpty();
+
+		WhatsAppChannelJdbcRepository.ConversationRecord conversation = existingConversation
+				.orElseGet(
 						() -> new WhatsAppChannelJdbcRepository.ConversationRecord(
 								repository.insertConversation(businessId, channelAccountId, customer.id(),
 										assignedUserId, customer.displayName(), normalizedPhone, occurredAt),
 								assignedUserId, 0, null, null));
 
+		if (isNewConversation) {
+			businessMetrics.incrementConversacionesIniciadas();
+		}
+
 		if (event.externalMessageId() != null && !event.externalMessageId().isBlank()
 				&& repository.findMessageIdByExternalMessageId(businessId, event.externalMessageId()).isPresent()) {
+			businessMetrics.incrementWhatsappEventosDuplicados();
 			AiTraceLogger.info("DUPLICATE_MESSAGE_SKIPPED", traceId, conversation.id(), null,
 					"WhatsAppInboundMessageService",
 					"externalMessageId=" + LogSanitizer.maskExternalId(event.externalMessageId()) + " phoneMasked="

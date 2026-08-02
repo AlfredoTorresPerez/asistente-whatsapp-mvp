@@ -31,6 +31,14 @@ export type StatusResponse = {
   status: string
 }
 
+export type ClientErrorReport = {
+  message: string
+  stack: string
+  url: string
+  component: string
+  errorType: string
+}
+
 export type UserProfileResponse = {
   id: string
   firstName: string
@@ -680,6 +688,9 @@ export type BookingDetailResponse = {
   locationId: string | null
   location: string | null
   locationName: string | null
+  serviceId: string | null
+  professionalId: string | null
+  roomId: string | null
   notes: string | null
   completedAt: string | null
   createdAt: string
@@ -2138,6 +2149,7 @@ export type PromptTemplateResponse = {
   version: number
   fechaCreacion: string
   fechaActualizacion: string
+  updatedAt?: string | null
 }
 
 export type UpsertPromptTemplateRequest = {

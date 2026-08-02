@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<include resource="org/springframework/boot/logging/logback/defaults.xml" />
+
+	<springProfile name="observability">
+		<appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+			<encoder class="net.logstash.logback.encoder.LogstashEncoder">
+				<includeMdc>true</includeMdc>
+				<includeContext>false</includeContext>
+				<customFields>{"service":"backend-java","environment":"local"}</customFields>
+				<fieldNames>
+					<timestamp>timestamp</timestamp>
+					<level>level</level>
+					<logger>logger</logger>
+					<message>message</message>
+					<thread>thread</thread>
+					<mdc>mdc</mdc>
+					<stackTrace>stacktrace</stackTrace>
+				</fieldNames>
+			</encoder>
+		</appender>
+
+		<root level="INFO">
+			<appender-ref ref="JSON_CONSOLE" />
+		</root>
+	</springProfile>
+
+	<springProfile name="!observability">
+		<include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+		<root level="INFO">
+			<appender-ref ref="CONSOLE" />
+		</root>
+	</springProfile>
+</configuration>

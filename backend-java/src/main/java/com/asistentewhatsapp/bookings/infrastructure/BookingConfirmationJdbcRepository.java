@@ -1,6 +1,7 @@
 package com.asistentewhatsapp.bookings.infrastructure;
 
 import com.asistentewhatsapp.shared.exception.ResourceNotFoundException;
+import com.asistentewhatsapp.shared.observability.BusinessMetrics;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -18,9 +19,11 @@ public class BookingConfirmationJdbcRepository {
 			"PENDIENTE_CONFIRMACION", "CONFIRMED", "RESCHEDULED", "REPROGRAMADA", "SOLICITADA", "PENDIENTE_PAGO",
 			"CONFIRMADA", "REPROGRAMACION_PENDIENTE");
 	private final NamedParameterJdbcTemplate jdbcTemplate;
+	private final BusinessMetrics businessMetrics;
 
-	public BookingConfirmationJdbcRepository(NamedParameterJdbcTemplate jdbcTemplate) {
+	public BookingConfirmationJdbcRepository(NamedParameterJdbcTemplate jdbcTemplate, BusinessMetrics businessMetrics) {
 		this.jdbcTemplate = jdbcTemplate;
+		this.businessMetrics = businessMetrics;
 	}
 
 	public ConfirmationBookingRecord findBooking(UUID businessId, UUID bookingId) {
@@ -175,6 +178,18 @@ public class BookingConfirmationJdbcRepository {
 				.addValue("status", status).addValue("activeStatuses", ACTIVE_BOOKING_STATUSES));
 		if (updated == 0) {
 			throw new ResourceNotFoundException("No se encontro una reserva activa para confirmar.");
+		}
+		recordLifecycleMetric(status);
+	}
+
+	private void recordLifecycleMetric(String status) {
+		switch (status) {
+			case "CONFIRMADA", "CONFIRMED" -> businessMetrics.incrementReservasConfirmadas();
+			case "REPROGRAMADA", "RESCHEDULED" -> businessMetrics.incrementReservasReprogramadas();
+			case "CANCELADA", "CANCELADA_POR_CLIENTE", "CANCELLED" -> businessMetrics.incrementReservasCanceladas();
+			case "EXPIRADA", "EXPIRED" -> businessMetrics.incrementReservasExpiradas();
+			default -> {
+			}
 		}
 	}
 

@@ -2,6 +2,8 @@ package com.asistentewhatsapp.aesthetic.infrastructure.openai;
 
 import com.asistentewhatsapp.aesthetic.api.IntentAnalysisResponse;
 import com.asistentewhatsapp.aesthetic.api.IntentEntitiesResponse;
+import com.asistentewhatsapp.shared.observability.BusinessMetrics;
+import com.asistentewhatsapp.shared.observability.health.AiProviderStatusRegistry;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
@@ -18,37 +20,59 @@ import org.springframework.web.client.RestClient;
 @Component
 public class OpenAiIntentClient {
 
+	private static final String PROVIDER_NAME = "openai";
+
 	private final RestClient restClient;
 	private final OpenAiIntentProperties properties;
 	private final ObjectMapper objectMapper;
+	private final BusinessMetrics businessMetrics;
+	private final AiProviderStatusRegistry statusRegistry;
 
-	public OpenAiIntentClient(OpenAiIntentProperties properties, ObjectMapper objectMapper) {
+	public OpenAiIntentClient(RestClient.Builder restClientBuilder, OpenAiIntentProperties properties,
+			ObjectMapper objectMapper, BusinessMetrics businessMetrics, AiProviderStatusRegistry statusRegistry) {
 		this.properties = properties;
 		this.objectMapper = objectMapper;
-		RestClient.Builder builder = RestClient.builder().baseUrl(properties.resolvedBaseUrl())
-				.defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+		this.businessMetrics = businessMetrics;
+		this.statusRegistry = statusRegistry;
+		restClientBuilder.baseUrl(properties.resolvedBaseUrl()).defaultHeader("Content-Type",
+				MediaType.APPLICATION_JSON_VALUE);
 		if (properties.hasApiKey()) {
-			builder.defaultHeader("Authorization", "Bearer " + properties.apiKey());
+			restClientBuilder.defaultHeader("Authorization", "Bearer " + properties.apiKey());
 		}
 		SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
 		requestFactory.setConnectTimeout(Duration.ofSeconds(properties.resolvedTimeoutSeconds()));
 		requestFactory.setReadTimeout(Duration.ofSeconds(properties.resolvedTimeoutSeconds()));
-		this.restClient = builder.requestFactory(requestFactory).build();
+		this.restClient = restClientBuilder.requestFactory(requestFactory).build();
 	}
 
 	public Optional<IntentAnalysisResponse> analyze(String message, String businessSnapshot) {
 		if (!properties.enabled() || !properties.hasApiKey()) {
 			return Optional.empty();
 		}
+		businessMetrics.incrementIaSolicitudes();
+		businessMetrics.recordIaDerivacion(PROVIDER_NAME);
+		long start = System.nanoTime();
 		try {
 			String rawBody = restClient.post().uri("").body(buildPayload(message, businessSnapshot)).retrieve()
 					.body(String.class);
-			if (rawBody == null || rawBody.isBlank()) {
-				return Optional.empty();
+			Optional<IntentAnalysisResponse> result = Optional.empty();
+			if (rawBody != null && !rawBody.isBlank()) {
+				result = parseResponse(rawBody);
 			}
-			return parseResponse(rawBody);
+			if (result.isPresent()) {
+				businessMetrics.incrementIaRespuestasExitosas();
+				statusRegistry.markSuccess(PROVIDER_NAME);
+			} else {
+				businessMetrics.incrementIaRespuestasFallidas();
+				statusRegistry.markFailure(PROVIDER_NAME, "RESPUESTA_VACIA");
+			}
+			return result;
 		} catch (RuntimeException exception) {
+			businessMetrics.incrementIaRespuestasFallidas();
+			statusRegistry.markFailure(PROVIDER_NAME, exception.getClass().getSimpleName());
 			return Optional.empty();
+		} finally {
+			businessMetrics.recordIaDuracion((System.nanoTime() - start) / 1_000_000L);
 		}
 	}
 

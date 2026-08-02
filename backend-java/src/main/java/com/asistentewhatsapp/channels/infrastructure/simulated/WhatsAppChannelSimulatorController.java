@@ -5,6 +5,7 @@ import com.asistentewhatsapp.channels.domain.WhatsAppInboundMessageEvent;
 import com.asistentewhatsapp.channels.domain.WhatsAppMessageType;
 import com.asistentewhatsapp.channels.infrastructure.WhatsAppChannelJdbcRepository;
 import com.asistentewhatsapp.shared.api.StatusResponse;
+import com.asistentewhatsapp.shared.observability.BusinessMetrics;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.UUID;
@@ -30,11 +31,13 @@ public class WhatsAppChannelSimulatorController {
 
 	private final WhatsAppChannelJdbcRepository repository;
 	private final WhatsAppInboundMessageService inboundMessageService;
+	private final BusinessMetrics businessMetrics;
 
 	public WhatsAppChannelSimulatorController(WhatsAppChannelJdbcRepository repository,
-			WhatsAppInboundMessageService inboundMessageService) {
+			WhatsAppInboundMessageService inboundMessageService, BusinessMetrics businessMetrics) {
 		this.repository = repository;
 		this.inboundMessageService = inboundMessageService;
+		this.businessMetrics = businessMetrics;
 	}
 
 	@PostMapping("/whatsapp-inbound")
@@ -67,6 +70,7 @@ public class WhatsAppChannelSimulatorController {
 
 		repository.insertChannelEventLog(businessId, channelAccount.id(), deliveryId, "WHATSAPP_SIMULATED_MESSAGE",
 				"{\"from\":\"" + from + "\"}", occurredAt);
+		businessMetrics.incrementWhatsappWebhooksRecibidos();
 		inboundMessageService.processInboundMessage(event, businessId, channelAccount.id(), deliveryId);
 
 		return new StatusResponse("ACCEPTED");

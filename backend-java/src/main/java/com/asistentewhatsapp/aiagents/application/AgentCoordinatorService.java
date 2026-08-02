@@ -5,6 +5,7 @@ import com.asistentewhatsapp.aiagents.domain.AgentType;
 import com.asistentewhatsapp.aiagents.infrastructure.AiAgentJdbcRepository;
 import com.asistentewhatsapp.businessai.api.BusinessAiSettingsResponse;
 import com.asistentewhatsapp.businessai.application.BusinessAiSettingsService;
+import com.asistentewhatsapp.shared.observability.BusinessMetrics;
 import com.asistentewhatsapp.shared.observability.LogSanitizer;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -43,19 +44,22 @@ public class AgentCoordinatorService {
 	private final BusinessAiSettingsService businessAiSettingsService;
 	private final MessageAnalysisService messageAnalysisService;
 	private final DetectedEntityService detectedEntityService;
+	private final BusinessMetrics businessMetrics;
 
 	public AgentCoordinatorService(AiAgentProperties properties, IntentDetectorService intentDetectorService,
 			EntityExtractionService entityExtractionService, AgentRegistry agentRegistry,
 			AiAgentJdbcRepository aiAgentJdbcRepository, BusinessAiSettingsService businessAiSettingsService) {
 		this(properties, intentDetectorService, entityExtractionService, agentRegistry, aiAgentJdbcRepository,
-				businessAiSettingsService, null, null);
+				businessAiSettingsService, null, null,
+				new BusinessMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()));
 	}
 
 	@org.springframework.beans.factory.annotation.Autowired
 	public AgentCoordinatorService(AiAgentProperties properties, IntentDetectorService intentDetectorService,
 			EntityExtractionService entityExtractionService, AgentRegistry agentRegistry,
 			AiAgentJdbcRepository aiAgentJdbcRepository, BusinessAiSettingsService businessAiSettingsService,
-			MessageAnalysisService messageAnalysisService, DetectedEntityService detectedEntityService) {
+			MessageAnalysisService messageAnalysisService, DetectedEntityService detectedEntityService,
+			BusinessMetrics businessMetrics) {
 		this.properties = properties;
 		this.intentDetectorService = intentDetectorService;
 		this.entityExtractionService = entityExtractionService;
@@ -64,6 +68,7 @@ public class AgentCoordinatorService {
 		this.businessAiSettingsService = businessAiSettingsService;
 		this.messageAnalysisService = messageAnalysisService;
 		this.detectedEntityService = detectedEntityService;
+		this.businessMetrics = businessMetrics;
 	}
 
 	@Transactional
@@ -95,6 +100,10 @@ public class AgentCoordinatorService {
 								.map(AiAgentJdbcRepository.ConversationContextSnapshot::primaryIntent).orElse(null));
 
 		IntentDetectionResult intent = intentDetectorService.detect(request);
+		businessMetrics.recordIntencionDetectada(intent.primaryIntent().name());
+		if (intent.primaryIntent() == AgentIntent.AMBIGUOUS) {
+			businessMetrics.incrementIntencionesAmbiguas();
+		}
 		AiTraceLogger.info("INTENT_DETECTED", traceId, request.conversationId(), null, "AgentCoordinatorService",
 				"intent=" + intent.primaryIntent() + " secondary=" + intent.secondaryIntent() + " confidence="
 						+ intent.confidence() + " urgency=" + intent.urgency() + " reason=" + intent.handoffReason());
@@ -122,6 +131,9 @@ public class AgentCoordinatorService {
 				"agent=" + handler.type() + " intent=" + resolvedIntent.primaryIntent());
 		AgentRoutingResult result = handler.handle(request, resolvedIntent, entities, List.of());
 		enrichResultContext(result);
+		if (result.requiresHuman() || handler.type() == AgentType.HUMAN_HANDOFF) {
+			businessMetrics.incrementConversacionesDerivadas();
+		}
 		AiTraceLogger.info("AI_FINAL_RESPONSE", traceId, request.conversationId(), null, "AgentCoordinatorService",
 				"agent=" + result.agentType() + " intent=" + result.primaryIntent() + " confidence="
 						+ result.confidence() + " missing=" + result.missingData() + " containsLink="
