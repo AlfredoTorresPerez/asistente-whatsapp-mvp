@@ -1,58 +1,26 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { z } from 'zod'
 import { ErrorState } from '../../../components/feedback/ErrorState'
 import { LoadingState } from '../../../components/feedback/LoadingState'
 import { Button } from '../../../components/ui/Button'
 import { Card } from '../../../components/ui/Card'
 import { Input } from '../../../components/ui/Input'
 import { PageHeader } from '../../../components/ui/PageHeader'
-import { Textarea } from '../../../components/ui/Textarea'
 import { useToast } from '../../../lib/toast'
 import { useOnlineStatus } from '../../../lib/useOnlineStatus'
-import {
-  createBookingRescheduleLinkRequest,
-  getBookingDetailRequest,
-  rescheduleBookingRequest,
-} from '../../../services/api/bookingsApi'
-import { getBusinessLocationsRequest } from '../../../services/api/businessLocationsApi'
-import { BusinessLocationSelect } from '../BusinessLocationSelect'
-
-const schema = z.object({
-  startsAt: z.string().min(1, 'Selecciona la nueva fecha y hora.'),
-  durationMinutes: z.coerce.number().min(15).max(720),
-  locationId: z.string().optional(),
-  location: z.string().trim().max(160),
-  notes: z.string().trim().max(2000),
-})
-
-type FormValues = z.infer<typeof schema>
-type FormInput = z.input<typeof schema>
+import { getBookingDetailRequest, rescheduleBookingRequest } from '../../../services/api/bookingsApi'
+import { getAgendaAvailabilityRequest } from '../../../services/api/completeAgendaApi'
+import type { AgendaSlotResponse } from '../../../services/api/types'
 
 export function RescheduleAppointmentPage() {
   const { appointmentId } = useParams()
   const navigate = useNavigate()
   const { showToast } = useToast()
   const isOnline = useOnlineStatus()
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm<FormInput, unknown, FormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      startsAt: '',
-      durationMinutes: 60,
-      locationId: '',
-      location: '',
-      notes: '',
-    },
-  })
+  const [selectedDate, setSelectedDate] = useState('')
+  const [selectedSlot, setSelectedSlot] = useState<AgendaSlotResponse | null>(null)
 
   const bookingQuery = useQuery({
     queryKey: ['bookings', 'detail', appointmentId],
@@ -60,117 +28,96 @@ export function RescheduleAppointmentPage() {
     enabled: Boolean(appointmentId),
   })
 
-  useEffect(() => {
-    if (!bookingQuery.data) {
-      return
-    }
+  const booking = bookingQuery.data
 
-    reset({
-      startsAt: dayjs(bookingQuery.data.startsAt).format('YYYY-MM-DDTHH:mm'),
-      durationMinutes: bookingQuery.data.durationMinutes,
-      locationId: bookingQuery.data.locationId ?? '',
-      location: bookingQuery.data.location ?? '',
-      notes: bookingQuery.data.notes ?? '',
-    })
-  }, [bookingQuery.data, reset])
-
-  const locationsQuery = useQuery({
-    queryKey: ['business-locations', 'active'],
-    queryFn: () => getBusinessLocationsRequest({ activeOnly: true }),
+  const availabilityQuery = useQuery({
+    queryKey: ['booking-reschedule-availability', appointmentId, selectedDate],
+    queryFn: () =>
+      getAgendaAvailabilityRequest({
+        locationId: booking!.locationId!,
+        serviceId: booking!.serviceId!,
+        professionalId: booking!.professionalId ?? undefined,
+        date: selectedDate,
+        maxSlots: 40,
+      }),
+    enabled: Boolean(selectedDate && booking?.locationId && booking?.serviceId),
+    retry: false,
   })
+
+  const sortedSlots = useMemo(() => {
+    const slots = (availabilityQuery.data?.slots ?? []).filter((slot) => slot.available)
+    return [...slots].sort(
+      (a, b) => dayjs(a.startsAt).valueOf() - dayjs(b.startsAt).valueOf(),
+    )
+  }, [availabilityQuery.data])
+
+  useEffect(() => {
+    setSelectedSlot(null)
+  }, [selectedDate])
 
   const rescheduleMutation = useMutation({
-    mutationFn: async (values: FormValues) => {
-      if (!appointmentId) {
-        throw new Error('No hay cita seleccionada.')
+    mutationFn: async () => {
+      if (!appointmentId || !selectedSlot) {
+        throw new Error('No hay cita u horario seleccionado.')
       }
-
       return rescheduleBookingRequest(appointmentId, {
-        startsAt: dayjs(values.startsAt).toISOString(),
-        durationMinutes: values.durationMinutes,
-        locationId: values.locationId || undefined,
-        location: values.location || undefined,
-        notes: values.notes || undefined,
-      })
-    },
-    onSuccess: (booking) => {
-      showToast({
-        title: 'Cita reprogramada',
-        description: 'La agenda ya refleja el nuevo horario.',
-        tone: 'success',
-      })
-      navigate(`/appointments/${booking.id}`)
-    },
-    onError: () => {
-      showToast({
-        title: 'No se pudo reprogramar la cita',
-        description: 'Revisa el nuevo horario e inténtalo nuevamente.',
-        tone: 'error',
-      })
-    },
-  })
-
-  const rescheduleLinkMutation = useMutation({
-    mutationFn: async (values: FormValues) => {
-      if (!appointmentId || !bookingQuery.data) {
-        throw new Error('No hay cita seleccionada.')
-      }
-      const locationId = values.locationId || bookingQuery.data.locationId
-      if (!locationId) {
-        throw new Error('Selecciona una sucursal antes de enviar el enlace.')
-      }
-      return createBookingRescheduleLinkRequest(appointmentId, {
-        locationId,
-        startsAt: dayjs(values.startsAt).toISOString(),
-        reason: values.notes || 'Propuesta de reprogramacion enviada desde agenda.',
-        expirationMinutes: 720,
-        sendWhatsApp: true,
-        sendEmail: true,
+        startsAt: dayjs(selectedSlot.startsAt).toISOString(),
       })
     },
     onSuccess: () => {
       showToast({
-        title: 'Enlace de reprogramacion enviado',
-        description:
-          'El cliente puede confirmar o rechazar la nueva fecha desde la pagina publica.',
+        title: 'Cita reprogramada',
+        description: 'La cita fue reprogramada correctamente.',
         tone: 'success',
       })
       navigate(appointmentId ? `/appointments/${appointmentId}` : '/appointments')
     },
-    onError: () => {
+    onError: (error) => {
       showToast({
-        title: 'No se pudo enviar el enlace',
-        description: 'Revisa la sucursal y el horario propuesto.',
+        title: 'No se pudo reprogramar la cita',
+        description:
+          'El horario seleccionado acaba de dejar de estar disponible. Selecciona otro horario.',
         tone: 'error',
       })
     },
   })
 
-  const onSubmit = handleSubmit(async (values) => {
-    await rescheduleMutation.mutateAsync(values)
-  })
+  const handleDateChange = (value: string) => {
+    setSelectedDate(value)
+  }
+
+  const handleSlotSelect = (slot: AgendaSlotResponse) => {
+    setSelectedSlot((current) =>
+      current?.startsAt === slot.startsAt ? null : slot,
+    )
+  }
+
+  const selectedSlotEndsAt = useMemo(() => {
+    if (!selectedSlot || !booking) {
+      return null
+    }
+    return dayjs(selectedSlot.startsAt).add(booking.durationMinutes, 'minute')
+  }, [selectedSlot, booking])
+
+  const goBack = () =>
+    navigate(appointmentId ? `/appointments/${appointmentId}` : '/appointments')
 
   return (
     <section className="space-y-6">
       <PageHeader
         actions={
-          <Button
-            onClick={() =>
-              navigate(appointmentId ? `/appointments/${appointmentId}` : '/appointments')
-            }
-            variant="secondary"
-          >
+          <Button onClick={goBack} variant="secondary">
             Volver al detalle
           </Button>
         }
-        description="Cambia la fecha, duración o ubicación de la cita y deja el historial en estado reprogramado."
+        description="Selecciona una nueva fecha y elige un horario disponible para tu cita."
         eyebrow="Reprogramacion"
         title="Reprogramar cita"
       />
 
       {bookingQuery.isPending ? (
         <LoadingState message="Cargando la cita para reprogramarla." variant="detail" />
-      ) : bookingQuery.isError || !bookingQuery.data ? (
+      ) : bookingQuery.isError || !booking ? (
         <ErrorState
           description="No pudimos cargar la cita seleccionada."
           onRetry={() => void bookingQuery.refetch()}
@@ -178,70 +125,133 @@ export function RescheduleAppointmentPage() {
         />
       ) : (
         <Card>
-          <form className="space-y-5" onSubmit={onSubmit}>
-            <div className="grid gap-5 md:grid-cols-2">
+          <div className="space-y-6">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-700">
+                Cita actual
+              </p>
+              <h2 className="mt-1 text-xl font-semibold text-slate-950">
+                {booking.subject}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                {dayjs(booking.startsAt).format('DD/MM/YYYY HH:mm')}
+                {' · '}
+                {booking.locationName ?? booking.location}
+                {' · '}
+                {booking.durationMinutes} minutos
+              </p>
+            </div>
+
+            <div className="space-y-3">
               <Input
-                error={errors.startsAt?.message}
-                label="Nueva fecha y hora"
-                type="datetime-local"
-                {...register('startsAt')}
-              />
-              <Input
-                error={errors.durationMinutes?.message}
-                label="Duracion (minutos)"
-                min={15}
-                max={720}
-                type="number"
-                {...register('durationMinutes')}
+                label="Selecciona una nueva fecha"
+                type="date"
+                value={selectedDate}
+                min={dayjs().format('YYYY-MM-DD')}
+                onChange={(event) => handleDateChange(event.target.value)}
               />
             </div>
 
-            <div className="grid gap-5 md:grid-cols-2">
-              <BusinessLocationSelect
-                error={errors.locationId?.message}
-                locations={locationsQuery.data}
-                registration={register('locationId')}
-              />
-              <Input
-                error={errors.location?.message}
-                label="Ubicacion complementaria"
-                placeholder="Sala, box o referencia interna"
-                {...register('location')}
-              />
+            <div className="space-y-3" aria-live="polite">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+                Horarios disponibles
+              </p>
+
+              {!selectedDate ? (
+                <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center">
+                  <p className="text-sm text-slate-500">
+                    Selecciona una fecha para ver los horarios disponibles.
+                  </p>
+                </div>
+              ) : availabilityQuery.isPending ? (
+                <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center">
+                  <p className="text-sm font-medium text-slate-700">Cargando horarios...</p>
+                </div>
+              ) : availabilityQuery.isError ? (
+                <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-center">
+                  <p className="text-sm text-rose-700">
+                    No fue posible consultar los horarios disponibles. Intenta nuevamente.
+                  </p>
+                  <Button
+                    className="mt-3"
+                    onClick={() => void availabilityQuery.refetch()}
+                    variant="secondary"
+                  >
+                    Reintentar
+                  </Button>
+                </div>
+              ) : sortedSlots.length === 0 ? (
+                <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center">
+                  <p className="text-sm text-slate-500">
+                    No encontramos horarios disponibles para esta fecha. Selecciona otro día.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                  {sortedSlots.map((slot) => {
+                    const selected = selectedSlot?.startsAt === slot.startsAt
+                    const slotEnd = dayjs(slot.startsAt)
+                      .add(booking.durationMinutes, 'minute')
+                      .format('HH:mm')
+                    const label = `Horario disponible a las ${dayjs(slot.startsAt).format('HH:mm')}, finaliza a las ${slotEnd}.`
+                    return (
+                      <button
+                        key={`${slot.startsAt}-${slot.professionalId ?? 'any'}-${slot.roomId ?? 'any'}`}
+                        type="button"
+                        aria-label={label}
+                        aria-pressed={selected}
+                        onClick={() => handleSlotSelect(slot)}
+                        className={[
+                          'flex flex-col items-center rounded-xl border px-3 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500',
+                          selected
+                            ? 'border-teal-500 bg-teal-50 text-teal-800 ring-2 ring-teal-500'
+                            : 'border-slate-200 bg-white text-slate-700 hover:border-teal-300 hover:bg-teal-50/50',
+                        ].join(' ')}
+                      >
+                        <span>{dayjs(slot.startsAt).format('HH:mm')}</span>
+                        <span className="text-xs font-normal text-slate-400">
+                          Hasta {slotEnd}
+                        </span>
+                        {selected ? (
+                          <span className="mt-0.5 text-teal-600" aria-hidden="true">
+                            ✓
+                          </span>
+                        ) : null}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
             </div>
 
-            <Textarea
-              error={errors.notes?.message}
-              label="Notas de reprogramacion"
-              rows={6}
-              {...register('notes')}
-            />
+            {selectedDate && selectedSlot && selectedSlotEndsAt ? (
+              <div className="rounded-2xl border border-teal-200 bg-teal-50 p-4">
+                <p className="text-sm leading-6 text-teal-900">
+                  <span className="font-semibold">Nueva fecha:</span>{' '}
+                  {dayjs(selectedSlot.startsAt).format('DD/MM/YYYY')}
+                  <br />
+                  <span className="font-semibold">Hora seleccionada:</span>{' '}
+                  {dayjs(selectedSlot.startsAt).format('HH:mm')}
+                  <br />
+                  <span className="font-semibold">Finaliza:</span>{' '}
+                  {selectedSlotEndsAt.format('HH:mm')}
+                </p>
+              </div>
+            ) : null}
 
             <div className="flex flex-wrap justify-end gap-3">
-              <Button
-                onClick={() => navigate(`/appointments/${bookingQuery.data.id}`)}
-                variant="secondary"
-              >
+              <Button onClick={goBack} variant="secondary">
                 Cancelar
               </Button>
               <Button
-                disabled={!isOnline}
-                loading={rescheduleLinkMutation.isPending}
-                onClick={handleSubmit((values) => rescheduleLinkMutation.mutate(values))}
-                type="button"
-                variant="secondary"
-              >
-                Enviar enlace publico
-              </Button>
-              <Button
-                disabled={!isOnline}
-                loading={rescheduleMutation.isPending || isSubmitting}
-                type="submit"
+                disabled={!isOnline || !selectedDate || !selectedSlot}
+                loading={rescheduleMutation.isPending}
+                onClick={() => rescheduleMutation.mutate()}
               >
                 Guardar nueva fecha
               </Button>
             </div>
-          </form>
+          </div>
         </Card>
       )}
     </section>

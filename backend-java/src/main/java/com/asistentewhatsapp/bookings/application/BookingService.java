@@ -18,6 +18,7 @@ import com.asistentewhatsapp.security.application.AuditService;
 import com.asistentewhatsapp.security.domain.AuthenticatedUser;
 import com.asistentewhatsapp.shared.api.PagedResponse;
 import com.asistentewhatsapp.shared.exception.ApiException;
+import com.asistentewhatsapp.shared.observability.BusinessMetrics;
 import java.time.ZoneId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,18 +41,20 @@ public class BookingService {
 	private final CompleteAgendaJdbcRepository agendaRepository;
 	private final AvailabilityService availabilityService;
 	private final AuditService auditService;
+	private final BusinessMetrics businessMetrics;
 
 	public BookingService(BookingJdbcRepository bookingJdbcRepository,
 			BusinessLocationJdbcRepository businessLocationJdbcRepository,
 			BookingConfirmationJdbcRepository bookingConfirmationJdbcRepository,
 			CompleteAgendaJdbcRepository agendaRepository, AvailabilityService availabilityService,
-			AuditService auditService) {
+			AuditService auditService, BusinessMetrics businessMetrics) {
 		this.bookingJdbcRepository = bookingJdbcRepository;
 		this.businessLocationJdbcRepository = businessLocationJdbcRepository;
 		this.bookingConfirmationJdbcRepository = bookingConfirmationJdbcRepository;
 		this.agendaRepository = agendaRepository;
 		this.availabilityService = availabilityService;
 		this.auditService = auditService;
+		this.businessMetrics = businessMetrics;
 	}
 
 	@Transactional(readOnly = true)
@@ -73,6 +76,7 @@ public class BookingService {
 
 	@Transactional
 	public BookingDetailResponse create(AuthenticatedUser authenticatedUser, CreateBookingRequest request) {
+		long start = System.nanoTime();
 		String subject = normalizeRequiredValue(request.subject(), "subject", 160);
 		String status = normalizeStatus(request.status(), "PENDIENTE_CONFIRMACION");
 		BookingStateMachine.assertTransition(null, status, "crearse");
@@ -110,12 +114,15 @@ public class BookingService {
 				AuditMetadata.of("status", status, "customerId", customer.id(), "customerPhone", customer.phone(),
 						"subject", subject, "startsAt", startsAt, "durationMinutes", durationMinutes, "locationId",
 						location.locationId(), "assignedUserId", assignedUserId));
+		businessMetrics.incrementReservasCreadas();
+		businessMetrics.recordReservaOperacion("crear", (System.nanoTime() - start) / 1_000_000L);
 		return bookingJdbcRepository.findBookingDetail(authenticatedUser.businessId(), bookingId);
 	}
 
 	@Transactional
 	public BookingDetailResponse createFromConversation(AuthenticatedUser authenticatedUser, UUID conversationId,
 			CreateBookingFromConversationRequest request) {
+		long start = System.nanoTime();
 		BookingJdbcRepository.ConversationContextRecord conversation = bookingJdbcRepository
 				.findConversationContext(authenticatedUser.businessId(), conversationId);
 		UUID leadId = request.leadId() != null
@@ -159,12 +166,15 @@ public class BookingService {
 				AuditMetadata.of("status", status, "conversationId", conversationId, "leadId", leadId, "subject",
 						request.subject(), "startsAt", startsAt, "durationMinutes", durationMinutes, "locationId",
 						location.locationId(), "assignedUserId", assignedUserId));
+		businessMetrics.incrementReservasCreadas();
+		businessMetrics.recordReservaOperacion("crear", (System.nanoTime() - start) / 1_000_000L);
 		return bookingJdbcRepository.findBookingDetail(authenticatedUser.businessId(), bookingId);
 	}
 
 	@Transactional
 	public BookingDetailResponse createFromLead(AuthenticatedUser authenticatedUser, UUID leadId,
 			CreateBookingFromLeadRequest request) {
+		long start = System.nanoTime();
 		BookingJdbcRepository.LeadContextRecord lead = bookingJdbcRepository
 				.findLeadContext(authenticatedUser.businessId(), leadId);
 		UUID assignedUserId = resolveResponsibleUserId(authenticatedUser,
@@ -204,6 +214,8 @@ public class BookingService {
 				AuditMetadata.of("status", status, "leadId", leadId, "customerId", lead.customerId(), "subject",
 						request.subject(), "startsAt", startsAt, "durationMinutes", durationMinutes, "locationId",
 						location.locationId(), "assignedUserId", assignedUserId));
+		businessMetrics.incrementReservasCreadas();
+		businessMetrics.recordReservaOperacion("crear", (System.nanoTime() - start) / 1_000_000L);
 		return bookingJdbcRepository.findBookingDetail(authenticatedUser.businessId(), bookingId);
 	}
 
@@ -237,33 +249,30 @@ public class BookingService {
 	@Transactional
 	public BookingDetailResponse reschedule(AuthenticatedUser authenticatedUser, UUID bookingId,
 			RescheduleBookingRequest request) {
+		long start = System.nanoTime();
 		BookingDetailResponse current = bookingJdbcRepository.findBookingDetail(authenticatedUser.businessId(),
 				bookingId);
 		BookingStateMachine.assertTransition(current.status(), BookingStateMachine.RESCHEDULED, "reprogramarse");
-		LocationResolution location = resolveLocation(authenticatedUser.businessId(), request.locationId(),
-				normalizeOptionalText(request.location() != null ? request.location() : current.location(), "location",
-						160),
-				current.locationId(), true);
 		OffsetDateTime startsAt = normalizeStartsAt(request.startsAt());
-		int durationMinutes = normalizeDuration(
-				request.durationMinutes() != null ? request.durationMinutes() : current.durationMinutes());
-		ensureSlotAvailable(authenticatedUser.businessId(), bookingId, location.locationId(), startsAt,
-				durationMinutes);
+		int durationMinutes = normalizeDuration(current.durationMinutes());
+		ensureSlotAvailable(authenticatedUser.businessId(), bookingId, current.locationId(), startsAt, durationMinutes);
 
 		bookingJdbcRepository.rescheduleBooking(authenticatedUser.businessId(), bookingId, startsAt, durationMinutes,
-				location.locationId(), location.locationText(),
-				normalizeOptionalText(request.notes() != null ? request.notes() : current.notes(), "notes", 2000));
+				current.locationId(), current.location(), current.notes());
 		auditService.record(authenticatedUser.businessId(), authenticatedUser.userId(), "BOOKING_RESCHEDULED",
 				"BOOKING", bookingId, "Reserva reprogramada.",
 				AuditMetadata.of("previousStatus", current.status(), "newStatus", BookingStateMachine.RESCHEDULED,
 						"previousStartsAt", current.startsAt(), "newStartsAt", startsAt, "durationMinutes",
-						durationMinutes, "locationId", location.locationId()));
+						durationMinutes, "locationId", current.locationId()));
+		businessMetrics.incrementReservasReprogramadas();
+		businessMetrics.recordReservaOperacion("reprogramar", (System.nanoTime() - start) / 1_000_000L);
 		return bookingJdbcRepository.findBookingDetail(authenticatedUser.businessId(), bookingId);
 	}
 
 	@Transactional
 	public BookingDetailResponse cancel(AuthenticatedUser authenticatedUser, UUID bookingId,
 			CancelBookingRequest request) {
+		long start = System.nanoTime();
 		BookingDetailResponse current = bookingJdbcRepository.findBookingDetail(authenticatedUser.businessId(),
 				bookingId);
 		BookingStateMachine.assertTransition(current.status(), BookingStateMachine.CANCELLED, "cancelarse");
@@ -273,6 +282,8 @@ public class BookingService {
 		auditService.record(authenticatedUser.businessId(), authenticatedUser.userId(), "BOOKING_CANCELLED", "BOOKING",
 				bookingId, "Reserva cancelada: " + reason, AuditMetadata.of("previousStatus", current.status(),
 						"newStatus", BookingStateMachine.CANCELLED, "reason", reason));
+		businessMetrics.incrementReservasCanceladas();
+		businessMetrics.recordReservaOperacion("cancelar", (System.nanoTime() - start) / 1_000_000L);
 		return bookingJdbcRepository.findBookingDetail(authenticatedUser.businessId(), bookingId);
 	}
 
@@ -488,6 +499,7 @@ public class BookingService {
 		OffsetDateTime endsAt = startsAt.plusMinutes(durationMinutes);
 		if (bookingConfirmationJdbcRepository.hasOverlappingActiveBooking(businessId, bookingId, locationId, startsAt,
 				endsAt)) {
+			businessMetrics.incrementReservasConflicto();
 			LOGGER.warn("[diagnostico] Slot ocupado: businessId={} locationId={} startsAt={} endsAt={}", businessId,
 					locationId, startsAt, endsAt);
 			throw new ApiException(HttpStatus.CONFLICT, "BOOKING_SLOT_NOT_AVAILABLE",
