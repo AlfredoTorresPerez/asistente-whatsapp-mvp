@@ -115,6 +115,11 @@ docker compose -f docker-compose.local.yml --profile public-link stop public-tun
 | backend-java | 8080 | 8080 | — | Spring Boot 3 |
 | frontend-react | 5173 | 5173 | — | Vite dev server |
 | public-tunnel | — | — | `public-link` | Cloudflare Tunnel (trycloudflare.com) |
+| prometheus | 9090 | 9090 | `observability` | Métricas (scrape backend) |
+| loki | 3100 | 3100 | `observability` | Logs |
+| tempo | 3200 | 3200 | `observability` | Trazas |
+| alloy | — | 12345 | `observability` | Agente de recolección |
+| grafana | 3000 | 3000 | `observability` | Dashboards y alertas |
 
 ## Comandos Útiles
 
@@ -175,11 +180,37 @@ services:
 |---------|-----------------------------|-----------|
 | postgres-data | volumen Docker anónimo | Datos persistentes de PostgreSQL |
 
+## Observabilidad Local
+
+Stack de Prometheus + Loki + Tempo + Alloy + Grafana para métricas funcionales, logs JSON, trazas y errores de frontend. Ver `OBSERVABILIDAD_LOCAL.md` para la guía completa.
+
+```powershell
+# Requisito: GRAFANA_ADMIN_PASSWORD en .env.local
+Add-Content .env.local "GRAFANA_ADMIN_PASSWORD=cambia-esta-password"
+
+# Levantar (backend + frontend + observabilidad)
+.\scripts\observability-start.ps1
+
+# Verificar contenedores, endpoints, trazas y dashboards
+.\scripts\observability-verify.ps1
+
+# Detener (preserva datos) / reset (borra datos)
+.\scripts\observability-stop.ps1
+.\scripts\observability-reset.ps1
+```
+
+Grafana: http://localhost:3000 (admin / `GRAFANA_ADMIN_PASSWORD`).
+
 ## Documentación Relacionada
 
+- `DOCUMENTATION_INDEX.md` — Índice documental por categoría y vigencia
+- `LOCAL_MATURITY_REPORT.md` — Informe de madurez local vigente
 - `docs/AMBIENTES_WHATSAPP.md` — Proveedores de canal (SIMULATED / Cloud API)
-- `CHECKLIST_DEMO_LOCAL.md` — Checklist para demo funcional
+- `CHECKLIST_DEMO_LOCAL.md` — Checklist para demo funcional (histórico)
 - `DEMO_GUIDE.md` — Guía de demo
+- `OBSERVABILIDAD_LOCAL.md` — Stack de observabilidad local (métricas, logs, trazas, dashboards, alertas)
+
+La validación de la documentación (enlaces y comandos) se ejecuta con `.\scripts\validate-docs.ps1`.
 
 ## Scripts del Túnel Público
 
