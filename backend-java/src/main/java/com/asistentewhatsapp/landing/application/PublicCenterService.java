@@ -64,7 +64,7 @@ public class PublicCenterService {
 		List<ServiceItem> services = findServices(businessId);
 		List<PromotionItem> promotions = findPromotions(businessId);
 		List<LocationItem> locations = findLocations(businessId);
-		WhatsAppInfo whatsapp = buildWhatsAppInfo(businessId);
+		WhatsAppInfo whatsapp = buildWhatsAppInfo(business);
 		PageConfig pageConfig = findPageConfig(businessId);
 
 		return new PublicCenterResponse(company, services, promotions, locations, whatsapp, pageConfig);
@@ -75,7 +75,7 @@ public class PublicCenterService {
 		BusinessEntity business = businessRepository.findByCode(slug)
 				.orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "CENTER_NOT_FOUND",
 						"No se encontro el centro con slug: " + slug));
-		return buildWhatsAppInfo(business.getId());
+		return buildWhatsAppInfo(business);
 	}
 
 	public void registerClick(String slug, String sourceIp, String userAgent, String referer) {
@@ -115,7 +115,7 @@ public class PublicCenterService {
 						""",
 				leadId, businessId, customerId, firstName, lastName, cleanPhone, cleanPhone);
 
-		WhatsAppInfo whatsapp = buildWhatsAppInfo(businessId);
+		WhatsAppInfo whatsapp = buildWhatsAppInfo(business);
 		if (whatsapp == null) {
 			throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "NO_WHATSAPP",
 					"El centro no tiene WhatsApp configurado");
@@ -191,29 +191,46 @@ public class PublicCenterService {
 				.toList();
 	}
 
-	private WhatsAppInfo buildWhatsAppInfo(UUID businessId) {
-		ChannelAccountRecord channel = metaOnboardingRepository.findCloudApiChannel(businessId).orElse(null);
+	/**
+	 * Resuelve el numero de WhatsApp del centro con la siguiente prioridad: 1.
+	 * Numero del canal META_CLOUD_API configurado (phone/normalized). 2. Numero de
+	 * la empresa (business.support_phone). 3. Numero visible del canal
+	 * (display_phone_number). 4. WhatsApp de la sede por defecto
+	 * (business_location.whatsapp_number).
+	 */
+	private WhatsAppInfo buildWhatsAppInfo(BusinessEntity business) {
+		ChannelAccountRecord channel = metaOnboardingRepository.findCloudApiChannel(business.getId()).orElse(null);
+		String channelPhone = channel != null
+				? firstNonBlank(channel.phoneNumber(), channel.normalizedPhoneNumber())
+				: null;
+		String channelDisplay = channel != null ? channel.displayPhoneNumber() : null;
+		BusinessLocationRecord location = locationRepository.findDefaultActive(business.getId()).orElse(null);
+		String locationWhatsapp = location != null ? location.whatsappNumber() : null;
 
-		if (channel == null || channel.phoneNumber() == null || channel.phoneNumber().isBlank()) {
-			BusinessLocationRecord location = locationRepository.findDefaultActive(businessId).orElse(null);
-			if (location == null || location.whatsappNumber() == null || location.whatsappNumber().isBlank()) {
-				return null;
-			}
-			String cleanPhone = location.whatsappNumber().replaceAll("\\D", "");
-			String message = "Hola, quiero más información";
-			String encoded = URLEncoder.encode(message, StandardCharsets.UTF_8);
-			return new WhatsAppInfo("https://wa.me/" + cleanPhone + "?text=" + encoded, cleanPhone, cleanPhone,
-					message);
+		String phone = resolveWhatsAppPhone(channelPhone, business.getSupportPhone(), channelDisplay, locationWhatsapp);
+		if (phone == null || phone.isBlank()) {
+			return null;
 		}
-
-		String phone = channel.phoneNumber();
 		String cleanPhone = phone.replaceAll("\\D", "");
 		String message = "Hola, quiero más información";
 		String encodedMessage = URLEncoder.encode(message, StandardCharsets.UTF_8);
 		String waUrl = "https://wa.me/" + cleanPhone + "?text=" + encodedMessage;
 
-		return new WhatsAppInfo(waUrl, cleanPhone,
-				channel.displayPhoneNumber() != null ? channel.displayPhoneNumber() : cleanPhone, message);
+		return new WhatsAppInfo(waUrl, cleanPhone, channelDisplay != null ? channelDisplay : phone, message);
+	}
+
+	static String resolveWhatsAppPhone(String channelPhone, String businessSupportPhone, String channelDisplayPhone,
+			String locationWhatsapp) {
+		return firstNonBlank(channelPhone, businessSupportPhone, channelDisplayPhone, locationWhatsapp);
+	}
+
+	private static String firstNonBlank(String... values) {
+		for (String value : values) {
+			if (value != null && !value.isBlank()) {
+				return value;
+			}
+		}
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")

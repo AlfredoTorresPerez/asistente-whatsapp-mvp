@@ -211,15 +211,7 @@ public class PublicLandingService {
 				break;
 			}
 		}
-		Map<String, AgendaSlotResponse> unique = new LinkedHashMap<>();
-		for (AgendaSlotResponse s : slots) {
-			unique.putIfAbsent(s.startsAt() + "|" + s.endsAt(), s);
-		}
-		slots = new ArrayList<>(unique.values());
-		slots.sort(Comparator.comparing(AgendaSlotResponse::startsAt));
-		if (slots.size() > limit) {
-			slots = slots.subList(0, limit);
-		}
+		slots = normalizeAndSortSlots(slots, limit);
 		return new AgendaAvailabilityResponse(location.id(), location.name(), service.id(), service.name(),
 				request.date(), service.durationMinutes(), service.requiresRoom(), service.requiresDeposit(), slots);
 	}
@@ -538,7 +530,7 @@ public class PublicLandingService {
 				.orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "WHATSAPP_NOT_CONFIGURED",
 						"WhatsApp Cloud API no esta configurado para este negocio."));
 
-		String phone = firstNonBlank(channel.phoneNumber(), channel.normalizedPhoneNumber(),
+		String phone = firstNonBlank(channel.phoneNumber(), channel.normalizedPhoneNumber(), business.getSupportPhone(),
 				channel.displayPhoneNumber());
 		if (phone == null || phone.isBlank()) {
 			throw new ApiException(HttpStatus.NOT_FOUND, "NO_PHONE_NUMBER",
@@ -637,6 +629,43 @@ public class PublicLandingService {
 		if (maxSlots == null)
 			return 12;
 		return Math.min(Math.max(maxSlots, 1), 40);
+	}
+
+	/**
+	 * Elimina unicamente duplicados exactos (misma fecha, hora de inicio y termino,
+	 * profesional, cabina y sucursal), ordena ascendentemente por hora de inicio
+	 * (con desempate por profesional, cabina e identificadores) y recorta al limite
+	 * solicitado. No altera las reglas de disponibilidad ni descarta posibilidades
+	 * de atencion simultanea con profesionales o cabinas diferentes.
+	 */
+	static List<AgendaSlotResponse> normalizeAndSortSlots(List<AgendaSlotResponse> slots, int limit) {
+		Map<String, AgendaSlotResponse> unique = new LinkedHashMap<>();
+		for (AgendaSlotResponse slot : slots) {
+			unique.putIfAbsent(slotIdentity(slot), slot);
+		}
+		List<AgendaSlotResponse> result = new ArrayList<>(unique.values());
+		result.sort(slotComparator());
+		if (result.size() > limit) {
+			result = new ArrayList<>(result.subList(0, limit));
+		}
+		return result;
+	}
+
+	private static String slotIdentity(AgendaSlotResponse slot) {
+		return slot.startsAt() + "|" + slot.endsAt() + "|" + slot.professionalId() + "|" + slot.roomId() + "|"
+				+ slot.locationId();
+	}
+
+	private static Comparator<AgendaSlotResponse> slotComparator() {
+		return Comparator.comparing(AgendaSlotResponse::startsAt)
+				.thenComparing(slot -> nullSafe(slot.professionalName()))
+				.thenComparing(slot -> nullSafe(slot.roomName()))
+				.thenComparing(slot -> String.valueOf(slot.professionalId()))
+				.thenComparing(slot -> String.valueOf(slot.roomId()));
+	}
+
+	private static String nullSafe(String value) {
+		return value == null ? "" : value;
 	}
 
 	private String generateConfirmationLink(UUID businessId, UUID bookingId, boolean requiresDeposit) {

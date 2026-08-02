@@ -24,6 +24,13 @@ import type {
   PublicServiceBranchResponse,
   PublicServiceItemResponse,
 } from '../../../services/api/types'
+import {
+  SLOT_PERIOD_LABELS,
+  compareSlots,
+  getSlotTimePeriod,
+  slotIdentity,
+  type SlotTimePeriod,
+} from '../utils/slotTimePeriod'
 
 dayjs.extend(customParseFormat)
 
@@ -72,6 +79,8 @@ export function CreatePublicBookingPage() {
   const [dateError, setDateError] = useState('')
   const [phoneError, setPhoneError] = useState('')
   const [selectedSlot, setSelectedSlot] = useState<AgendaSlotResponse | null>(null)
+  const [selectedPeriod, setSelectedPeriod] = useState<SlotTimePeriod | null>(null)
+  const [availabilityNotice, setAvailabilityNotice] = useState('')
   const [customerName, setCustomerName] = useState('')
   const [customerPhone, setCustomerPhone] = useState('')
   const [customerEmail, setCustomerEmail] = useState('')
@@ -174,7 +183,90 @@ export function CreatePublicBookingPage() {
     },
   })
 
-  const availableSlots = availabilityQuery.data?.slots.filter((slot) => slot.available) ?? []
+  const availableSlots = (availabilityQuery.data?.slots.filter((slot) => slot.available) ?? [])
+    .slice()
+    .sort(compareSlots)
+  const uniqueSlots = availableSlots.filter(
+    (slot, index, all) => all.findIndex((other) => slotIdentity(other) === slotIdentity(slot)) === index,
+  )
+
+  const morningSlots = uniqueSlots.filter((slot) => getSlotTimePeriod(slot.startsAt) === 'MORNING')
+  const afternoonSlots = uniqueSlots.filter((slot) => getSlotTimePeriod(slot.startsAt) === 'AFTERNOON')
+  const periodSlots =
+    selectedPeriod === 'MORNING' ? morningSlots : selectedPeriod === 'AFTERNOON' ? afternoonSlots : []
+
+  useEffect(() => {
+    const slots = availabilityQuery.data?.slots.filter((slot) => slot.available) ?? []
+    setSelectedSlot((current) => {
+      if (!current) {
+        return current
+      }
+      const stillAvailable = slots.some((slot) => slotIdentity(slot) === slotIdentity(current))
+      if (!stillAvailable) {
+        setAvailabilityNotice('El horario seleccionado ya no esta disponible. Selecciona otro horario.')
+        return null
+      }
+      return current
+    })
+    setSelectedPeriod((current) => {
+      if (!current) {
+        return current
+      }
+      const periodHasSlots = slots.some((slot) => getSlotTimePeriod(slot.startsAt) === current)
+      if (!periodHasSlots) {
+        setAvailabilityNotice('El tramo seleccionado ya no tiene horarios disponibles para esta fecha.')
+        return null
+      }
+      return current
+    })
+  }, [availabilityQuery.data])
+
+  const refreshAvailability = () => {
+    if (!availabilityPayload || availabilityQuery.isFetching) {
+      return
+    }
+    availabilityQuery.refetch()
+  }
+
+  const selectPeriod = (period: SlotTimePeriod) => {
+    setSelectedPeriod(period)
+    setSelectedSlot(null)
+    setAvailabilityNotice('')
+  }
+
+  const openDatePicker = () => {
+    const input = document.createElement('input')
+    input.type = 'date'
+    input.min = dayjs().format('YYYY-MM-DD')
+    input.style.position = 'fixed'
+    input.style.opacity = '0'
+    input.style.pointerEvents = 'none'
+    input.style.left = '-9999px'
+    const handler = (e: Event) => {
+      const iso = (e.target as HTMLInputElement).value
+      if (iso) {
+        const d = dayjs(iso)
+        if (d.isBefore(dayjs().startOf('day'))) {
+          setDateError('La fecha debe ser hoy o posterior')
+        } else {
+          setSelectedDate(d.format('DD/MM/YYYY'))
+          setSelectedSlot(null)
+          setSelectedPeriod(null)
+          setAvailabilityNotice('')
+          setDateError('')
+        }
+      }
+      input.remove()
+    }
+    input.addEventListener('change', handler, { once: true })
+    input.addEventListener('blur', () => input.remove(), { once: true })
+    document.body.appendChild(input)
+    if (typeof input.showPicker === 'function') {
+      input.showPicker()
+    } else {
+      input.click()
+    }
+  }
 
   const canProceedFromStep = (currentStep: number) => {
     switch (currentStep) {
@@ -185,7 +277,12 @@ export function CreatePublicBookingPage() {
       case 2:
         return Boolean(selectedBranch)
       case 3:
-        return Boolean(selectedDateIso) && Boolean(selectedSlot) && !dateError
+        return (
+          Boolean(selectedDateIso) &&
+          Boolean(selectedSlot) &&
+          !dateError &&
+          !availabilityQuery.isFetching
+        )
       case 4: {
         const phone = customerPhone.trim().replace(/^\+/, '')
         return customerName.trim().length >= 2 && CHILEAN_MOBILE_PHONE_PATTERN.test(phone)
@@ -199,7 +296,7 @@ export function CreatePublicBookingPage() {
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(45,212,191,0.22),_transparent_38%),linear-gradient(180deg,_#f8fafc_0%,_#eef6f8_100%)] px-4 py-10">
-      <section className="mx-auto max-w-2xl space-y-6">
+      <section className="mx-auto max-w-3xl space-y-6">
         <div className="text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-teal-700">
             Asistente WhatsApp Centro Estetico
@@ -463,40 +560,19 @@ export function CreatePublicBookingPage() {
                 </label>
                 <div className="relative">
                   <div
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Seleccionar fecha"
                     className={`flex h-12 w-full cursor-pointer items-center rounded-[14px] border bg-white px-4 text-sm transition ${
                       dateError
                         ? 'border-red-300 ring-4 ring-red-100/60'
                         : 'border-[var(--color-border)]'
                     } ${selectedDate ? 'text-[var(--color-text)]' : 'text-slate-400'}`}
-                    onClick={() => {
-                      const input = document.createElement('input')
-                      input.type = 'date'
-                      input.min = dayjs().format('YYYY-MM-DD')
-                      input.style.position = 'fixed'
-                      input.style.opacity = '0'
-                      input.style.pointerEvents = 'none'
-                      input.style.left = '-9999px'
-                      const handler = (e: Event) => {
-                        const iso = (e.target as HTMLInputElement).value
-                        if (iso) {
-                          const d = dayjs(iso)
-                          if (d.isBefore(dayjs().startOf('day'))) {
-                            setDateError('La fecha debe ser hoy o posterior')
-                          } else {
-                            setSelectedDate(d.format('DD/MM/YYYY'))
-                            setSelectedSlot(null)
-                            setDateError('')
-                          }
-                        }
-                        input.remove()
-                      }
-                      input.addEventListener('change', handler, { once: true })
-                      input.addEventListener('blur', () => input.remove(), { once: true })
-                      document.body.appendChild(input)
-                      if (typeof input.showPicker === 'function') {
-                        input.showPicker()
-                      } else {
-                        input.click()
+                    onClick={openDatePicker}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        openDatePicker()
                       }
                     }}
                   >
@@ -526,11 +602,8 @@ export function CreatePublicBookingPage() {
                     <h4 className="text-sm font-semibold text-slate-900">Horarios disponibles</h4>
                     <Button
                       loading={availabilityQuery.isFetching}
-                      onClick={() => {
-                        if (availabilityPayload) {
-                          availabilityQuery.refetch()
-                        }
-                      }}
+                      disabled={availabilityQuery.isFetching}
+                      onClick={refreshAvailability}
                       type="button"
                       variant="secondary"
                       size="sm"
@@ -538,47 +611,149 @@ export function CreatePublicBookingPage() {
                       Actualizar
                     </Button>
                   </div>
-                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                    {availabilityQuery.isPending ? (
-                      <p className="col-span-full text-sm text-slate-500">
-                        Cargando disponibilidad...
-                      </p>
-                    ) : availabilityQuery.isError ? (
-                      <p className="col-span-full rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                  {availabilityQuery.isPending ? (
+                    <p className="mt-3 text-sm text-slate-500" role="status">
+                      Cargando disponibilidad...
+                    </p>
+                  ) : availabilityQuery.isError ? (
+                    <div
+                      className="mt-3 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700"
+                      role="alert"
+                    >
+                      <p>
                         {getErrorMessage(
                           availabilityQuery.error,
-                          'No fue posible consultar horarios disponibles.',
+                          'No fue posible consultar los horarios disponibles. Intenta nuevamente.',
                         )}
                       </p>
-                    ) : availableSlots.length === 0 ? (
-                      <p className="col-span-full text-sm text-slate-500">
-                        No hay horarios disponibles para la fecha seleccionada.
-                      </p>
-                    ) : (
-                      availableSlots.map((slot) => (
-                        <button
-                          key={`${slot.startsAt}-${slot.professionalId ?? 'sin-prof'}-${slot.roomId ?? 'sin-room'}`}
-                          onClick={() => setSelectedSlot(slot)}
-                          className={`rounded-2xl border p-4 text-left shadow-sm transition hover:shadow-md ${
-                            selectedSlot?.startsAt === slot.startsAt
-                              ? 'border-teal-400 bg-teal-50'
-                              : 'border-slate-200 bg-white hover:border-teal-300'
-                          }`}
-                          type="button"
+                      <button
+                        type="button"
+                        onClick={refreshAvailability}
+                        className="mt-2 font-semibold underline"
+                      >
+                        Reintentar
+                      </button>
+                    </div>
+                  ) : availableSlots.length === 0 ? (
+                    <p className="mt-3 text-sm text-slate-500">
+                      No encontramos horarios disponibles para esta fecha. Selecciona otro dia.
+                    </p>
+                  ) : (
+                    <div className="mt-3 space-y-4">
+                      <fieldset disabled={availabilityQuery.isFetching}>
+                        <legend className="text-sm font-medium text-slate-700">
+                          ¿En que horario prefieres reservar?
+                        </legend>
+                        <div className="mt-2 grid gap-3 sm:grid-cols-2">
+                          <PeriodButton
+                            period="MORNING"
+                            label={SLOT_PERIOD_LABELS.MORNING}
+                            count={morningSlots.length}
+                            selected={selectedPeriod === 'MORNING'}
+                            onSelect={selectPeriod}
+                          />
+                          <PeriodButton
+                            period="AFTERNOON"
+                            label={SLOT_PERIOD_LABELS.AFTERNOON}
+                            count={afternoonSlots.length}
+                            selected={selectedPeriod === 'AFTERNOON'}
+                            onSelect={selectPeriod}
+                          />
+                        </div>
+                      </fieldset>
+
+                      {selectedPeriod ? (
+                        <div aria-live="polite">
+                          <h5 className="text-sm font-semibold text-slate-900">
+                            Horarios disponibles en la{' '}
+                            {SLOT_PERIOD_LABELS[selectedPeriod].toLowerCase()}
+                          </h5>
+                          <div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                            {periodSlots.map((slot) => {
+                              const isSelected =
+                                selectedSlot !== null &&
+                                slotIdentity(selectedSlot) === slotIdentity(slot)
+                              return (
+                                <button
+                                  key={slotIdentity(slot)}
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedSlot(slot)
+                                    setAvailabilityNotice('')
+                                  }}
+                                  aria-pressed={isSelected}
+                                  aria-label={slotAccessibleLabel(slot, isSelected)}
+                                  className={`rounded-2xl border p-4 text-left shadow-sm transition hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 ${
+                                    isSelected
+                                      ? 'border-teal-400 bg-teal-50'
+                                      : 'border-slate-200 bg-white hover:border-teal-300'
+                                  }`}
+                                >
+                                  <strong className="block text-xl font-bold text-slate-950">
+                                    {formatTime(slot.startsAt)}
+                                  </strong>
+                                  <p className="mt-1 text-sm font-medium text-slate-700">
+                                    {slot.professionalName ?? 'Profesional por asignar'}
+                                  </p>
+                                  <p className="text-sm text-slate-500">
+                                    Hasta {formatTime(slot.endsAt)}
+                                  </p>
+                                  <p className="mt-1 text-xs text-slate-500">
+                                    {slot.roomName
+                                      ? `${slot.roomName} · ${slot.locationName}`
+                                      : slot.locationName}
+                                  </p>
+                                  {isSelected ? (
+                                    <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-teal-700">
+                                      <svg
+                                        className="h-3.5 w-3.5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth={2.5}
+                                        viewBox="0 0 24 24"
+                                        aria-hidden="true"
+                                      >
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                      </svg>
+                                      Seleccionado
+                                    </span>
+                                  ) : null}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-slate-500">
+                          Selecciona manana o tarde para ver los horarios disponibles.
+                        </p>
+                      )}
+
+                      {availabilityNotice ? (
+                        <p
+                          className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800"
+                          role="status"
                         >
-                          <strong className="text-slate-950">
-                            {formatTime(slot.startsAt)} - {formatTime(slot.endsAt)}
-                          </strong>
-                          <p className="mt-2 text-sm text-slate-600">
-                            {slot.professionalName ?? 'Profesional por asignar'}
+                          {availabilityNotice}
+                        </p>
+                      ) : null}
+
+                      {selectedSlot ? (
+                        <div
+                          role="status"
+                          className="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm text-teal-900"
+                        >
+                          <p className="font-semibold">
+                            Hora seleccionada: {formatTime(selectedSlot.startsAt)}
                           </p>
-                          <p className="text-sm text-slate-500">
-                            {slot.roomName ?? 'Sin cabina requerida'}
-                          </p>
-                        </button>
-                      ))
-                    )}
-                  </div>
+                          <p>Finaliza: {formatTime(selectedSlot.endsAt)}</p>
+                          <p>Profesional: {selectedSlot.professionalName ?? 'Por asignar'}</p>
+                          <p>Cabina: {selectedSlot.roomName ?? 'No requerida'}</p>
+                          <p>Sucursal: {selectedSlot.locationName}</p>
+                        </div>
+                      ) : null}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <p className="text-sm text-slate-500">
@@ -768,6 +943,8 @@ export function CreatePublicBookingPage() {
                 setSelectedBranch(null)
                 setSelectedDate('')
                 setSelectedSlot(null)
+                setSelectedPeriod(null)
+                setAvailabilityNotice('')
                 setCustomerName('')
                 setCustomerPhone('')
                 setCustomerEmail('')
@@ -790,4 +967,59 @@ function Info({ label, value }: { label: string; value: string }) {
       <p className="mt-2 text-sm font-semibold text-slate-950">{value}</p>
     </div>
   )
+}
+
+function PeriodButton({
+  period,
+  label,
+  count,
+  selected,
+  onSelect,
+}: {
+  period: SlotTimePeriod
+  label: string
+  count: number
+  selected: boolean
+  onSelect: (period: SlotTimePeriod) => void
+}) {
+  const hasSlots = count > 0
+  const accessibleLabel = `${label}, ${
+    hasSlots ? `${count} horarios disponibles` : 'sin horarios disponibles'
+  }.`
+  return (
+    <button
+      type="button"
+      disabled={!hasSlots}
+      aria-pressed={selected}
+      aria-label={accessibleLabel}
+      onClick={() => onSelect(period)}
+      className={`rounded-2xl border px-4 py-3 text-left text-sm font-semibold shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 ${
+        !hasSlots
+          ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400'
+          : selected
+            ? 'border-teal-400 bg-teal-50 text-teal-900 ring-1 ring-teal-300'
+            : 'border-slate-200 bg-white text-slate-700 hover:border-teal-300'
+      }`}
+    >
+      {label}
+      <span className={hasSlots ? 'text-slate-500' : 'text-slate-400'}>
+        {' '}
+        · {hasSlots ? `${count} horarios` : 'Sin horarios'}
+      </span>
+    </button>
+  )
+}
+
+function slotAccessibleLabel(slot: AgendaSlotResponse, selected: boolean) {
+  const parts = [
+    `Hora ${formatTime(slot.startsAt)}`,
+    `hasta ${formatTime(slot.endsAt)}`,
+    slot.professionalName ?? 'Profesional por asignar',
+    slot.roomName ?? 'Sin cabina requerida',
+    slot.locationName,
+  ]
+  if (selected) {
+    parts.push('seleccionado')
+  }
+  return parts.join(', ')
 }
