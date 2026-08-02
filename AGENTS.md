@@ -92,3 +92,20 @@ memanto memory sync --project-dir .
 
 > **Note**: The `memanto-memory` skill in `.agents/skills/memanto/` contains detailed reference guidelines.
 <!-- /MEMANTO-MANAGED-SECTION -->
+
+## Contexto de evaluación del ambiente local (obligatorio)
+
+> Instrucciones iniciales para OpenCode y cualquier agente. Documento completo: `LOCAL_MATURITY_CONTEXT.md`.
+
+Este proyecto es un MVP de asistente de negocios por WhatsApp para un centro de estética. El ambiente local tiene **dos modalidades intencionales**:
+
+1. **Local simulada** — desarrollo, pruebas automáticas, sin servicios externos.
+2. **Local de integración real controlada con WhatsApp Cloud API (Meta)** — pruebas conversacionales completas con número empresarial prepago dedicado a pruebas, un número personal autorizado como cliente de prueba, página de aterrizaje, notificaciones web de Meta, y flujos de agenda, confirmación, reprogramación, cancelación y consultas comerciales.
+
+**Reglas al evaluar la madurez del ambiente local:**
+
+- La activación de WhatsApp Cloud API en local es una **decisión intencional y necesaria**. **NO penalizar el uso de Meta en local por sí solo.**
+- Evaluar los controles: activación explícita del perfil de Meta, número empresarial dedicado a pruebas, lista permitida de clientes de prueba, validación de firma de notificaciones web, prevención de duplicados, límites de frecuencia, interruptor de emergencia, registros sanitizados, secretos fuera del repositorio, ausencia de credenciales en archivos comprimidos, datos exclusivamente de prueba, proveedor simulado disponible, separación clara local simulado / local con Meta / producción.
+- Distinguir en la calificación: aislamiento local, seguridad de la integración, madurez de la integración real, madurez conversacional, reproducibilidad y protección de secretos.
+- La integración real controlada es una **fortaleza** cuando solo intervienen números autorizados, no hay clientes reales, Meta requiere activación explícita, los secretos están protegidos, hay trazabilidad, las respuestas pueden detenerse inmediatamente, el proveedor simulado sigue disponible y no hay riesgo de afectar producción.
+- **Nunca** incluir números telefónicos completos, tokens, contraseñas ni secretos en informes, registros o documentación. Evaluar exclusivamente la madurez del ambiente local.

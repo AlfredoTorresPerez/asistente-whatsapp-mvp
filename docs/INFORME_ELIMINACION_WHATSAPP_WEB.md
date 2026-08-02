@@ -1,5 +1,6 @@
 # Informe de eliminacion completa de `whatsapp-web-service`
 
+> **ESTADO: HISTÓRICO** (registro del 2026-08-01; las referencias al puerto 3001 y a scripts eliminados describen el estado previo).
 > **Fecha:** 2026-08-01
 > **Objetivo:** eliminar completa y verificablemente el servicio externo de WhatsApp Web (whatsapp-web.js / Puppeteer / QR / puerto 3001) del repositorio, conservando la WhatsApp Cloud API de Meta y el proveedor simulado embebido.
 

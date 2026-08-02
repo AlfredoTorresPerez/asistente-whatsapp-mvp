@@ -1,5 +1,7 @@
 # Recuadro Respuesta IA y reglas aplicadas
 
+> **ESTADO: HISTÓRICO.** El nombre de pantalla `Conexion WhatsApp Web` fue reemplazado por `Canal WhatsApp` (`/admin/whatsapp-channel`); la funcionalidad descrita (recuadro de auditoría "Respuesta IA y reglas aplicadas") permanece vigente en esa pantalla.
+
 ## Objetivo
 
 Se agrego en la pantalla `Conexion WhatsApp Web` un recuadro de auditoria llamado `Respuesta IA y reglas aplicadas`.

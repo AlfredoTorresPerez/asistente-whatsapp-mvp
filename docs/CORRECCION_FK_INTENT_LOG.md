@@ -1,5 +1,7 @@
 # Corrección FK intent log
 
+> **ESTADO: HISTÓRICO** (registro de corrección anterior). El canal actual es nativo del backend (`META_CLOUD_API`/`SIMULATED`); la corrección descrita sigue vigente para el análisis de intención.
+
 Se corrigió el registro de análisis de intención del módulo Centro Estético.
 
 ## Problema

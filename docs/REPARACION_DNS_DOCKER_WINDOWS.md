@@ -1,5 +1,7 @@
 # Reparacion de DNS de Docker Desktop en Windows
 
+> **ESTADO: HISTÓRICO.** Solución aplicada en una fase anterior; los scripts `diagnosticar-dns-docker.ps1`, `levantar-local-seguro.ps1` y `build-local-legacy-network.ps1` ya no existen. Los builds actuales usan `docker compose -f docker-compose.local.yml up -d --build`.
+
 ## Diagnostico
 
 Si el build falla con mensajes como estos, el problema no esta en el codigo fuente del proyecto:

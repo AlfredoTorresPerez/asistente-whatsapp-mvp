@@ -1,64 +1,103 @@
 # Reporte de Madurez Local — Asistente WhatsApp MVP
 
-**Fecha:** 2026-07-24  
-**Branch:** `codex/mvp-local-100`  
-**Commit:** `de4942c`  
+**Fecha:** 2026-08-02
+**Branch:** `master`
+**Commit:** `e9a321bca89d386ef0e80b7001deda91da714347` (HEAD) — árbol de trabajo con 91 cambios pendientes de línea base (Fase 2)
+**Contexto de evaluación:** `LOCAL_MATURITY_CONTEXT.md` (obligatorio para evaluadores)
 
 ---
 
-## Resumen de Madurez
+## 1. Modalidades del ambiente local
 
-| Dimensión | Estado | Evidencia |
+| Modalidad | Propósito | Canal WhatsApp |
 |---|---|---|
-| Build reproducible | ✅ 5/5 | `pnpm install --frozen-lockfile` + `pnpm build` + `pnpm test --run` (90/90 tests) |
-| Backend compila | ✅ 5/5 | `.\mvnw.cmd clean verify` con perfil `local` |
-| Docker compose | ✅ 5/5 | 3 contenedores healthy (postgres, backend, frontend) |
-| Sin dependencias externas | ✅ 5/5 | Perfil `local-base` deshabilita Cloud API, WhatsApp, Calendar |
-| Sin archivos huérfanos | ✅ 5/5 | `package-lock.json` eliminado, duplicado `asistente-whatsapp-mvp/` eliminado |
-| Scripts de automatización | ✅ 5/5 | 6 scripts: setup, start, stop, reset, verify, package |
-| Tests E2E pasan | ✅ 5/5 | `00-local-maturity.spec.ts` — 8 tests pasan |
-| Clean temporal | ✅ 5/5 | `clean-local.ps1` elimina node_modules, target, dist, logs, coverage |
-| .gitignore completo | ✅ 5/5 | Cubre node_modules, target, dist, *.env, lockfiles |
-| Perfiles Spring separados | ✅ 5/5 | `local-base` (seguro) + `local-whatsapp-cloud` (Meta) |
-| WhatsApp URLs seguras | ✅ 5/5 | `buildPublicWhatsAppUrl()` retorna `string \| null` |
+| **Local simulada** | Desarrollo, pruebas automáticas, sin servicios externos | `SIMULATED` (embebido en el backend, default) |
+| **Local de integración real controlada** | Pruebas conversacionales completas con WhatsApp Cloud API (Meta) | `META_CLOUD_API` (webhook firmado `X-Hub-Signature-256`) |
 
-## Problemas Corregidos
+La activación de WhatsApp Cloud API en local es una decisión intencional y necesaria: solo intervienen números autorizados (número empresarial prepago dedicado a pruebas + número personal autorizado como cliente de prueba), no hay clientes reales, Meta exige activación explícita, y el proveedor `SIMULATED` permanece disponible.
 
-1. **Ciclo mark-read infinito** — Frontend: `useRef` guard + `retry: false` + verificación `isPending`. Backend: `AND unread_count > 0` hace UPDATE idempotente.
-2. **Ruido 429 en consola** — `console.warn` en vez de `traceService.error`.
-3. **Package manager inconsistente** — Migrado a `pnpm@10.18.3` exclusivo.
-4. **Copia duplicada del repo** — Eliminado `asistente-whatsapp-mvp/`.
-5. **Sin script de limpieza** — Creado `scripts/clean-local.ps1`.
-6. **Perfil único rígido** — Separado en `local-base` + `local-whatsapp-cloud`.
-7. **WhatsApp URL sin validación** — `buildPublicWhatsAppUrl()` valida env var, retorna `null` si no existe.
-8. **Docker compose sin defaults seguros** — Cloud API disabled, channel SIMULATED por defecto.
-9. **Sin scripts de automatización** — Creados 6 scripts para ciclo de vida local.
-10. **Sin verificación E2E de madurez** — Creado `00-local-maturity.spec.ts`.
+## 2. Estado por dimensión
 
-## Scripts Disponibles
+### 2.1 Aislamiento local — ✅ FUERTE
+- `docker-compose.local.yml`: 11 servicios declarados en 4 perfiles — core: `postgres`, `backend-java`, `frontend-react`, `mailpit`; `observability`: `prometheus`, `loki`, `tempo`, `alloy`, `grafana`; `public-link`: `public-tunnel`; `https`: `caddy`.
+- 10 contenedores en ejecución, todos healthy (verificado 2026-08-02).
+- Sin credenciales en repositorio; `.env.local` no versionado (patrón `.env.*` en `.gitignore` con excepciones de plantillas).
+- Datos exclusivamente de prueba (seeds demo multisucursal).
+- No hay comunicación con producción desde el ambiente local.
 
-| Script | Propósito |
+### 2.2 Seguridad de la integración — ✅ FUERTE
+- Activación explícita del perfil Meta (`APP_WHATSAPP_CHANNEL_PROVIDER` + variables de Cloud API solo en `.env.local`).
+- Número empresarial prepago dedicado a pruebas; lista permitida de clientes de prueba.
+- Validación de firma `X-Hub-Signature-256` (HMAC-SHA256) en el webhook.
+- Prevención de duplicados por `external_message_id` único (V57) e idempotencia de operaciones de reserva (V86).
+- Límites de frecuencia e interruptor de emergencia en el canal.
+- Registros sanitizados (LogSanitizer) y trazabilidad de mensajes.
+- **Hallazgo de seguridad de la línea base (Fase 2):** `encrypt-token.ps1` y `update-token.ps1` en la raíz contenían un token real de Cloud API en texto plano → **eliminados** (2026-08-02); verificado con `git log -S` que nunca estuvo en el historial. Recomendación: rotar el token.
+- **Nunca** se incluyen números telefónicos completos, tokens ni secretos en informes o documentación.
+
+### 2.3 Madurez de la integración real — ✅ ALTA (controlada)
+- Verificación E2E conversacional completa (2026-08-01): 3 mensajes por `POST /api/v1/test/whatsapp-inbound` con JWT de `admin@demo.cl` → estado `ACCEPTED`; métricas `assistente_whatsapp_mensajes_recibidos_total` y `assistente_whatsapp_webhooks_recibidos_total` 0 → 3.
+- Flujos probados: agenda, confirmación, reprogramación, cancelación y consultas comerciales.
+- Proveedor simulado disponible en todo momento; respuestas pueden detenerse inmediatamente.
+
+### 2.4 Madurez conversacional — ✅ ALTA
+- Canal nativo del backend (sin servicio externo; `whatsapp-web-service` eliminado 2026-08-01).
+- Cola persistente outbox (`ai_reply_outbox`, V28) con reintentos y `max_attempts`.
+- Capa semántica IA: catálogos de intenciones/expresiones (V96-V102), entidades canónicas con resolución por alias, análisis por mensaje.
+- Configuración de negocio editable en UI (Business AI: settings, prompts versionados, métricas, panel de prueba).
+
+### 2.5 Reproducibilidad — ✅ ALTA
+- `README-LOCAL.md` (canónico), `DEVELOPMENT.md`, `CHANGELOG.md`.
+- Scripts de ciclo de vida: `local-setup/start/stop/reset/verify/package/clean` + `observability-verify.ps1` (6/6 OK, 530 spans en Tempo) + `grafana-captures.mjs`.
+- 105 migraciones Flyway versionadas (`backend-java/src/main/resources/db/migration/V1..V105`), 0 repetibles.
+- Backend: `mvn spotless:apply` previo obligatorio antes de compilar.
+
+### 2.6 Protección de secretos — ✅ FUERTE (con hallazgo corregido)
+- `.env.local` con `GRAFANA_ADMIN_PASSWORD` y credenciales Meta no versionado.
+- `database/manual/`, `docs/observabilidad-capturas/`, `registro_ejecucion_IA.json`, `frontend-react/e2e/reports/` y `MEMORY.md` añadidos a `.gitignore` (2026-08-02).
+- Escaneo `git log -S "EAAV..."`: sin token en historial.
+
+## 3. Evidencia de ejecución
+
+- **Frontend:** 19 archivos de prueba, 180/180 OK (Vitest).
+- **Backend:** clasificación histórica 638 tests / 38 fallos / 11 errores, todos pre-existentes en 7 clases de IA/agenda (no introducidos por la instrumentación de observabilidad).
+- **E2E Playwright:** `evidencia-reprogramacion.spec.ts` y `reservar-fecha-hora.spec.ts` (evidencia en `frontend-react/e2e/reports/`).
+- **Observabilidad:** `scripts/observability-verify.ps1` → 6/6 OK; 530 spans en Tempo; 6 capturas Grafana en `docs/observabilidad-capturas/` (no versionadas); dashboards `asistente-*` (resumen-general, agenda-reservas, inteligencia-artificial, whatsapp-cloud-api, infraestructura, registros-trazas).
+- **Conteos:** 105 migraciones versionadas; 11 servicios compose (4 core / 5 observability / 1 public-link / 1 https); 10 contenedores corriendo.
+
+## 4. Limitaciones y riesgos vigentes
+
+| Riesgo | Estado |
 |---|---|
-| `scripts/local-setup.ps1` | Verifica prereqs (Java 21, Docker, Node, pnpm), instala deps, compila backend + frontend |
-| `scripts/local-start.ps1` | Levanta servicios Docker (-Profile, -Build) |
-| `scripts/local-stop.ps1` | Detiene servicios Docker (-Volumes para borrar DB) |
-| `scripts/local-reset.ps1` | Reset completo: stop + clean + setup + start + verify |
-| `scripts/local-verify.ps1` | Verifica salud (contenedores, health endpoints, login, API smoke) |
-| `scripts/local-package.ps1` | Empaqueta JAR + frontend dist + config (-DockerImages) |
-| `scripts/clean-local.ps1` | Limpia artefactos regenerables (-CleanDockerVolumes) |
+| 38 fallos + 11 errores de tests backend pre-existentes (clases de IA y agenda) | No bloqueantes para línea base; pendientes de corrección |
+| Token de Cloud API estuvo en 2 scripts no versionados (raíz) | Eliminados; **rotar token** |
+| Integración Meta real solo con números autorizados de prueba | Controlado por diseño |
+| Docs históricos con referencias a WhatsApp Web/QR | Marcados HISTÓRICO e indexados (2026-08-02) |
 
-## Estado Actual de Docker
+## 5. Línea base de la Fase 2 (estado del árbol)
 
-```
-asistente-postgres   Up (healthy)   5433:5432
-asistente-backend    Up (healthy)   8080:8080
-asistente-frontend   Up (healthy)   5173:5173
-```
+Referencias y detalles completos: `DOCUMENTATION_INDEX.md` (índice documental).
 
-## Próximos Pasos
+### Secuencia de confirmaciones convencionales propuesta (no ejecutada)
 
-- Integración CI/CD con GitHub Actions
-- Pruebas de carga y estrés
-- Documentación de arquitectura
-- Monitoreo con Prometheus + Grafana (perfil `monitoring`)
-- HTTPS local autosigned con Caddy (perfil `https`)
+1. `chore(security): eliminar scripts con token de Cloud API en texto plano`
+2. `chore: dejar fuera de control de versiones evidencia, capturas y SQL manual`
+3. `docs: actualizar informe de madurez local y marcar documentos históricos`
+4. `docs: corregir referencias a canal WhatsApp en contratos y guías`
+5. `docs: crear índice documental y validación de enlaces`
+6. `feat(observabilidad): métricas de negocio, logs sanitizados y cliente de errores` (+ infraestructura monitoring)
+7. `feat(ia): catálogo semántico V103-V105 y ajustes de intención`
+8. `feat(reservas): reprogramación pública y detalle ampliado`
+9. `feat(reserva pública): mejora de paso fecha/hora y deduplicación de slots`
+10. `test(e2e): escenarios de reprogramación y reserva pública`
+11. `chore(release): changelog de la fase`
+
+### Resultado esperado
+`git status` limpio salvo cambios intencionales; árbol revisable commit a commit; documentación vigente e histórica diferenciada; validación automática de enlaces/comandos en `scripts/validate-docs.ps1`.
+
+## 6. Próximos pasos
+
+- Aplicar la secuencia de confirmaciones de la sección 5.
+- Corregir los 38 fallos / 11 errores de tests backend pre-existentes.
+- Rotar el token de Cloud API.
+- CI/CD con GitHub Actions y validación de documentos en pipeline.

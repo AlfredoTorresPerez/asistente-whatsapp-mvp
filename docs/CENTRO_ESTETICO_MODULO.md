@@ -1,5 +1,7 @@
 # Modulo Centro Estetico
 
+> **ESTADO: HISTÓRICO PARCIAL.** El diagrama usaba el adaptador externo `whatsapp-web-service` (eliminado 2026-08-01); el canal es nativo del backend (`META_CLOUD_API`/`SIMULATED`).
+
 ## Objetivo
 
 Este modulo incorpora catalogo estetico, productos, reglas de negocio, promociones, historial de tratamientos y analisis de intencion para conversaciones de WhatsApp.
@@ -8,7 +10,7 @@ Este modulo incorpora catalogo estetico, productos, reglas de negocio, promocion
 
 ```mermaid
 flowchart TD
-    A[Cliente WhatsApp] --> B[Adaptador WhatsApp Web]
+    A[Cliente WhatsApp] --> B[Canal nativo: META_CLOUD_API / SIMULATED]
     B --> C[Webhook Spring Boot]
     C --> D[Conversaciones y mensajes]
     C --> E[Modulo Centro Estetico]

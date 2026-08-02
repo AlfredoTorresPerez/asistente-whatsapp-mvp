@@ -1,5 +1,7 @@
 # ANÁLISIS DE REPOSITORIO PARA PRUEBAS
 
+> **ESTADO: HISTÓRICO** (análisis previo a la eliminación de `whatsapp-web-service`, 2026-08-01). El canal es nativo del backend (`META_CLOUD_API`/`SIMULATED`), el webhook es `/api/v1/integrations/whatsapp-cloud/webhook` y hoy existe el endpoint de simulación `POST /api/v1/test/whatsapp-inbound`.
+
 ## 1. Módulos encontrados
 
 | Módulo | Frontend | Backend API | DB Tables |

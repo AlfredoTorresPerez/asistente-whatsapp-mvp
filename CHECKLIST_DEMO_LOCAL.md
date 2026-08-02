@@ -1,8 +1,9 @@
 # Checklist Demo Local
 
-> **Modo de uso:** Ejecutar `.\scripts\verify_mvp_local.ps1 -Quick` para validación rápida.
-> Para validación completa con WhatsApp Web: `.\scripts\verify_mvp_local.ps1 -Profile whatsapp`.
-> Ver `docs/VALIDACION_LOCAL_3MIN.md` para más detalles.
+> **ESTADO: HISTÓRICO (registro de la fase de validación local, julio 2026).**
+> Este documento es un registro del estado validado en su fecha; puede contener referencias desactualizadas.
+> La documentación canónica vigente es `README-LOCAL.md`, `DEVELOPMENT.md` y el índice `DOCUMENTATION_INDEX.md`.
+> La validación actual de observabilidad se ejecuta con `.\scripts\observability-verify.ps1`.
 
 ## Estado General: LISTO CON OBSERVACIONES
 
@@ -11,7 +12,7 @@
 | 1  | Aplicacion levanta localmente             | LISTO     | docker-compose.local.yml                  | `docker compose up -d --build` funciona                                    | Bajo   |
 | 2  | Frontend abre sin errores                 | LISTO     | frontend-react/nginx.conf                 | Servido via nginx en :5173                                                  | Bajo   |
 | 3  | Backend inicia sin errores                | LISTO     | backend-java                              | Health check responde 200                                                   | Bajo   |
-| 4  | Base de datos carga datos de prueba       | LISTO     | V4, V8, V17, V20, V31, etc.               | Flyway ejecuta 39 migraciones; datos completos                             | Bajo   |
+| 4  | Base de datos carga datos de prueba       | LISTO     | V4, V8, V17, V20, V31, etc.               | Flyway ejecuta 105 migraciones versionadas; datos completos                 | Bajo   |
 | 5  | Categorias se muestran                    | LISTO     | PublicLandingController                   | GET /api/v1/public/landing/categories devuelve 8 categorias                 | Bajo   |
 | 6  | Servicios se muestran como tarjetas       | LISTO     | ServiceCard.tsx                           | Se ven correctamente con nombre, precio, duracion                          | Bajo   |
 | 7  | Reserva se confirma sin caida             | CORREGIDO | CompleteAgendaJdbcRepository              | Fix hasConflict: ahora detecta profesional cruzando sucursales (era 500, ahora 409) | Alto |
@@ -57,7 +58,7 @@
 | Exclusion constraint violations en produccion | `ex_booking_professional_no_overlap_active` causa 500 si no se pasa por hasConflict; ya corregido en codigo pero datos existentes pueden tener conflictos |
 | Role "app" no existe en PostgreSQL | Solo en ambientes nuevos; no afecta demo actual |
 | Seed booking dates (68000000-...) estan en pasado (Jun 30, Jul 2) | Datos demo originales; no afectan flujo porque se pueden crear nuevas reservas |
-| WhatsApp Web requiere escanear QR | Sin QR, los mensajes no se envian realmente; modo demo fallback activado |
+| Canal WhatsApp en modo SIMULATED | Sin WhatsApp Web/QR: el canal simulado del backend responde mensajes; con credenciales Meta se activa META_CLOUD_API |
 | OpenAI deshabilitado por falta de API key | Agentes IA no responden automaticamente; reglas de negocio seed funcionan offline |
 
 ## Comando para Levantar Demo Local

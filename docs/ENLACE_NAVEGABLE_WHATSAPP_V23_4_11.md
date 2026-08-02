@@ -1,5 +1,7 @@
 # Enlace navegable para confirmacion de reserva por WhatsApp
 
+> **ESTADO: HISTÓRICO** (v23.4.11). Los scripts `start_mvp_public_link.*` fueron eliminados; las utilidades vigentes son `scripts/start-public-link.ps1`, `scripts/stop-public-link.ps1` y `scripts/check-public-link.ps1`. Ver `docs/USO_WINDOWS_ENLACE_NAVEGABLE.md`.
+
 ## Problema corregido
 
 Un enlace con `localhost` no es navegable desde el telefono del cliente. En un telefono, `localhost` apunta al propio dispositivo del cliente, no al computador donde corre el MVP.

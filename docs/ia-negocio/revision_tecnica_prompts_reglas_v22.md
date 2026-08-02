@@ -1,5 +1,7 @@
 # Revisión técnica del último ZIP: reglas, funcionalidades y prompts de IA
 
+> **ESTADO: HISTÓRICO** (revisión de la versión v22). La versión vigente es la v23; el servicio `whatsapp-web-service` descrito fue eliminado y el canal es nativo del backend (`META_CLOUD_API`/`SIMULATED`).
+
 ## Contexto de revisión
 
 Archivo revisado: `asistente_whatsapp_mvp_orquestador_agenda_ia_fix.zip`.
