@@ -9,6 +9,7 @@ import com.asistentewhatsapp.cloudapi.onboarding.MetaOnboardingRepository;
 import com.asistentewhatsapp.shared.exception.MessagingChannelUnavailableException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -38,7 +39,7 @@ class WhatsAppCloudApiAdapterTest {
 
 	private WhatsAppCloudApiProperties properties(String accessToken, String phoneNumberId, boolean dryRun) {
 		return new WhatsAppCloudApiProperties(true, "https://graph.facebook.com", "v23.0", null, null, null, null, true,
-				null, phoneNumberId, null, accessToken, "56911112222", dryRun, 5, 15);
+				null, phoneNumberId, null, accessToken, "56911112222", dryRun, 5, 15, List.of());
 	}
 
 	private WhatsAppCloudApiAdapter createAdapter(boolean dryRun) {

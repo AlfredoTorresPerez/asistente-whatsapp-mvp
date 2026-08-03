@@ -1,6 +1,7 @@
 package com.asistentewhatsapp.channels.infrastructure.whatsappcloud;
 
 import com.asistentewhatsapp.shared.exception.ApiException;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.http.HttpStatus;
@@ -12,7 +13,7 @@ class WhatsAppCloudWebhookValidatorTest {
 
 	private WhatsAppCloudApiProperties properties(boolean signatureRequired, String appSecret, String verifyToken) {
 		return new WhatsAppCloudApiProperties(true, "https://graph.facebook.com", "v23.0", null, appSecret, verifyToken,
-				null, signatureRequired, null, "12345", null, null, "56911112222", false, 5, 15);
+				null, signatureRequired, null, "12345", null, null, "56911112222", false, 5, 15, List.of());
 	}
 
 	@Test

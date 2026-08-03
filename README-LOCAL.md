@@ -7,17 +7,30 @@
 | **Demo base** (sin WhatsApp real) | `docker compose -f docker-compose.local.yml up -d` | Solo Docker | Desactivada por defecto |
 | **Demo con túnel público** | `docker compose -f docker-compose.local.yml --profile public-link up -d` | + Cloudflare Tunnel automático | Desactivada por defecto |
 | **Demo con canal simulado** | `APP_WHATSAPP_CHANNEL_PROVIDER=SIMULATED` (default) + simular mensajes en `/admin/whatsapp-simulator` | Solo Docker | Desactivada por defecto |
-| **Demo con Cloud API** | `APP_WHATSAPP_CHANNEL_PROVIDER=META_CLOUD_API` + credenciales Meta | + Token de acceso y webhook Meta | Activar manualmente en `.env.local` |
+| **Demo con Cloud API controlada** | `SPRING_PROFILES_ACTIVE=local,local-meta-controlled` + credenciales Meta + `APP_LOCAL_META_CONTROLLED_ACKNOWLEDGED=true` + lista permitida de teléfonos | + Token de acceso y webhook Meta | Activar manualmente en `.env.local` |
 
 > **Importante:** La auto-respuesta IA (`APP_AI_AGENTS_AUTO_REPLY_ENABLED`) está desactivada por defecto en entorno local.
 > Para probarla, simula un mensaje entrante en `/admin/whatsapp-simulator` (equivale a `POST /api/v1/test/whatsapp-inbound`).
+
+## Modalidades de aislamiento local (Fase 3)
+
+El ambiente local tiene **dos modalidades intencionales** separadas por perfil de Spring:
+
+| Modalidad | Perfil (default compose) | Comportamiento |
+|---|---|---|
+| **Local segura (simulada)** | `local,local-safe` | Sin tráfico externo: WhatsApp `SIMULATED`, Cloud API off, OpenAI off, correo solo Mailpit (espejo Gmail off), calendario Google off, pagos `SIMULATED`. La compuerta de arranque rechaza cualquier combinación que permita salida externa y el guard de tráfico bloquea llamadas HTTP a hosts externos. |
+| **Local Meta controlada** | `local,local-meta-controlled` | Integración real controlada con WhatsApp Cloud API: exige `APP_LOCAL_META_CONTROLLED_ACKNOWLEDGED=true` (doble confirmación), lista permitida de teléfonos de prueba (`APP_WHATSAPP_CLOUD_API_ALLOWED_TEST_PHONES`), credenciales completas, firma de webhook obligatoria y dry-run desactivado. Solo se procesan mensajes de números autorizados. |
+
+El arranque con perfil `local-safe` o `local-meta-controlled` valida la configuración y **falla con mensaje claro** si algún valor habilita tráfico no autorizado (p. ej. auto-reply activo, Cloud API habilitado, espejo Gmail activo o proveedor de pago externo en modo seguro). Los valores se corrigen en `docker-compose.local.yml` o `.env.local`; nunca se imprime el valor de secretos, solo el nombre de la propiedad.
+
+> **Nota:** el perfil `local-whatsapp-cloud` (legacy) sigue disponible para compatibilidad, pero no tiene doble confirmación ni lista permitida. Se recomienda migrar a `local-meta-controlled`.
 
 ## Gestión de Secretos (Windows Credential Manager)
 
 Los secretos reales (JWT, WhatsApp App Secret, Access Token, Gmail App Password y OpenAI API Key) **no están en ningún archivo**.
 Se almacenan cifrados con DPAPI en Windows Credential Manager.
 Sentry es opcional: si existe `SENTRY_DSN` en Credential Manager, `restore-local-secrets.ps1` lo restaura y activa `SENTRY_ENABLED=true`; si no existe, queda desactivado sin romper el arranque.
-El email local usa doble entrega: Mailpit captura todos los correos en `http://localhost:8025` y, si `APP_EMAIL_MIRROR_ENABLED=true`, también se envían por Gmail usando el password guardado como `GMAIL_PASSWORD`.
+El email local usa doble entrega: Mailpit captura todos los correos en `http://localhost:8025` y, si `APP_EMAIL_MIRROR_ENABLED=true` (desactivado por defecto desde Fase 3; se activa solo para la integración controlada), también se envían por Gmail usando el password guardado como `GMAIL_PASSWORD`.
 
 ```powershell
 # 1. Guardar/actualizar secretos (solo la primera vez)
@@ -112,7 +125,7 @@ docker compose -f docker-compose.local.yml --profile public-link stop public-tun
 | Servicio | Puerto Host | Interno | Perfil | Descripción |
 |----------|-------------|---------|--------|-------------|
 | postgres | 5433 | 5432 | — | PostgreSQL 16 |
-| backend-java | 8080 | 8080 | — | Spring Boot 3 |
+| backend-java | 8080 | 8080 | `local,local-safe` (+`observability`) | Spring Boot 3 |
 | frontend-react | 5173 | 5173 | — | Vite dev server |
 | public-tunnel | — | — | `public-link` | Cloudflare Tunnel (trycloudflare.com) |
 | prometheus | 9090 | 9090 | `observability` | Métricas (scrape backend) |

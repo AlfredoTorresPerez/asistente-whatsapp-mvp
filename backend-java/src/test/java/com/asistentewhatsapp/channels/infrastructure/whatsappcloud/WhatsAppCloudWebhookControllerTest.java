@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.asistentewhatsapp.shared.observability.BusinessMetrics;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -37,7 +38,7 @@ class WhatsAppCloudWebhookControllerTest {
 	@Test
 	void verificationGetValidReturnsChallenge() throws Exception {
 		WhatsAppCloudApiProperties props = new WhatsAppCloudApiProperties(true, null, null, null, null, "test_verify",
-				null, false, null, null, null, null, null, false, 5, 15);
+				null, false, null, null, null, null, null, false, 5, 15, List.of());
 		WhatsAppCloudWebhookValidator localValidator = new WhatsAppCloudWebhookValidator(props);
 		WhatsAppCloudWebhookParser localParser = mock(WhatsAppCloudWebhookParser.class);
 		WhatsAppCloudApiMetrics localMetrics = mock(WhatsAppCloudApiMetrics.class);

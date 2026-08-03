@@ -38,6 +38,17 @@ docker compose --env-file .env.local.example -f docker-compose.local.yml up --bu
 
 No hay servicio en el puerto 3001.
 
+#### Modalidades locales (Fase 3)
+
+El ambiente local tiene dos modalidades intencionales, separadas por perfil de Spring:
+
+| Modalidad | Perfil | Canal | Controles |
+|---|---|---|---|
+| **Local segura (simulada)** | `local,local-safe` (default compose) | `SIMULATED` | Compuerta de arranque + guard de tráfico: sin Cloud API, OpenAI, espejo Gmail ni calendario Google; pagos `SIMULATED`; correo solo Mailpit |
+| **Local Meta controlada** | `local,local-meta-controlled` | `META_CLOUD_API` | Doble confirmación (`APP_LOCAL_META_CONTROLLED_ACKNOWLEDGED=true`), lista permitida de teléfonos (`APP_WHATSAPP_CLOUD_API_ALLOWED_TEST_PHONES`), credenciales completas, firma de webhook obligatoria, dry-run off |
+
+El perfil legacy `local-whatsapp-cloud` se conserva por compatibilidad pero no incluye doble confirmación ni lista permitida.
+
 ### Produccion
 
 Comando recomendado:

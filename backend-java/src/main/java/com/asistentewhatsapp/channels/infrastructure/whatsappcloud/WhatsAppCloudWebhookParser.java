@@ -21,6 +21,7 @@ import java.security.MessageDigest;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,15 +42,17 @@ public class WhatsAppCloudWebhookParser {
 	private final WhatsAppInboundMessageService inboundMessageService;
 	private final WhatsAppDeliveryStatusService deliveryStatusService;
 	private final WhatsAppCloudApiMetrics metrics;
+	private final WhatsAppCloudApiProperties properties;
 
 	public WhatsAppCloudWebhookParser(ObjectMapper objectMapper, WhatsAppChannelJdbcRepository repository,
 			WhatsAppInboundMessageService inboundMessageService, WhatsAppDeliveryStatusService deliveryStatusService,
-			WhatsAppCloudApiMetrics metrics) {
+			WhatsAppCloudApiMetrics metrics, WhatsAppCloudApiProperties properties) {
 		this.objectMapper = objectMapper;
 		this.repository = repository;
 		this.inboundMessageService = inboundMessageService;
 		this.deliveryStatusService = deliveryStatusService;
 		this.metrics = metrics;
+		this.properties = properties;
 	}
 
 	public void parseAndProcess(String rawBody) {
@@ -161,6 +164,9 @@ public class WhatsAppCloudWebhookParser {
 		metrics.incrementMessagesReceived();
 
 		String from = message.from();
+		if (!isTestPhoneAllowed(from)) {
+			return;
+		}
 		String messageId = message.id();
 		String timestampStr = message.timestamp();
 		OffsetDateTime timestamp = parseTimestamp(timestampStr);
@@ -302,6 +308,35 @@ public class WhatsAppCloudWebhookParser {
 
 		return new WhatsAppInboundMessageEvent(messageId, from, null, body != null ? body : "", messageType, timestamp,
 				contactName, null, null, null, null, contextMessageId, metadata.isEmpty() ? null : metadata);
+	}
+
+	/**
+	 * Lista permitida de telefonos de prueba: si {@code allowed-test-phones} no
+	 * esta vacia, solo se procesan mensajes de numeros incluidos en ella. Los demas
+	 * se descartan (el webhook responde ACCEPTED para evitar reintentos de Meta) y
+	 * quedan registrados como rechazados.
+	 */
+	private boolean isTestPhoneAllowed(String from) {
+		List<String> allowed = properties.allowedTestPhones();
+		if (allowed == null || allowed.isEmpty()) {
+			return true;
+		}
+		String normalized = from == null ? "" : from.replaceAll("\\D", "");
+		boolean match = allowed.stream().map(phone -> phone.replaceAll("\\D", ""))
+				.anyMatch(phone -> phone.equals(normalized));
+		if (!match) {
+			LOG.warn("WHATSAPP_CLOUD_PHONE_NOT_ALLOWED phoneMasked={} allowlistSize={}", maskPhone(normalized),
+					allowed.size());
+			metrics.incrementWebhookRejected();
+		}
+		return match;
+	}
+
+	private String maskPhone(String phone) {
+		if (phone == null || phone.length() < 8) {
+			return "***";
+		}
+		return phone.substring(0, 4) + "***" + phone.substring(phone.length() - 2);
 	}
 
 	private void processStatus(Status status, WhatsAppChannelJdbcRepository.ChannelAccountRecord channelAccount,

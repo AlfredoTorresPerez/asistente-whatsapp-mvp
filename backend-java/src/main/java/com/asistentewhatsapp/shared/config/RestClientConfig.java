@@ -4,6 +4,8 @@ import com.asistentewhatsapp.shared.observability.CorrelationIdFilter;
 import io.micrometer.tracing.Span;
 import io.micrometer.tracing.Tracer;
 import java.time.Duration;
+import java.util.Optional;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.context.annotation.Bean;
@@ -16,17 +18,21 @@ import org.springframework.web.client.RestClient;
 public class RestClientConfig {
 
 	private final Tracer tracer;
+	private final ObjectProvider<EgressTrafficGuard> egressTrafficGuard;
 
-	public RestClientConfig(Tracer tracer) {
+	public RestClientConfig(Tracer tracer, ObjectProvider<EgressTrafficGuard> egressTrafficGuard) {
 		this.tracer = tracer;
+		this.egressTrafficGuard = egressTrafficGuard;
 	}
 
 	@Bean
 	RestClient.Builder restClientBuilder() {
-		return RestClient.builder()
+		RestClient.Builder builder = RestClient.builder()
 				.requestFactory(ClientHttpRequestFactories.get(ClientHttpRequestFactorySettings.DEFAULTS
 						.withConnectTimeout(Duration.ofSeconds(5)).withReadTimeout(Duration.ofSeconds(10))))
 				.requestInterceptor(correlationPropagationInterceptor());
+		Optional.ofNullable(egressTrafficGuard.getIfAvailable()).ifPresent(builder::requestInterceptor);
+		return builder;
 	}
 
 	private ClientHttpRequestInterceptor correlationPropagationInterceptor() {

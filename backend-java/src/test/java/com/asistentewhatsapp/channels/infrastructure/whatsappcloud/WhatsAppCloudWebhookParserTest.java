@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,7 +51,14 @@ class WhatsAppCloudWebhookParserTest {
 		objectMapper.registerModule(new JavaTimeModule());
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		parser = new WhatsAppCloudWebhookParser(objectMapper, repository, inboundMessageService, deliveryStatusService,
-				metrics);
+				metrics, new WhatsAppCloudApiProperties(true, null, null, null, null, null, null, true, null, null,
+						null, null, null, false, 5, 15, List.of()));
+	}
+
+	private WhatsAppCloudWebhookParser parserWithAllowlist(List<String> allowlist) {
+		return new WhatsAppCloudWebhookParser(objectMapper, repository, inboundMessageService, deliveryStatusService,
+				metrics, new WhatsAppCloudApiProperties(true, null, null, null, null, null, null, true, null, null,
+						null, null, null, false, 5, 15, allowlist));
 	}
 
 	private String loadFixture(String name) throws IOException {
@@ -149,5 +157,41 @@ class WhatsAppCloudWebhookParserTest {
 		String body = loadFixture("webhook-text-message.json");
 		parser.parseAndProcess(body);
 		verify(inboundMessageService, never()).processInboundMessage(any(), any(), any(), anyString());
+	}
+
+	@Test
+	void phoneInAllowlistIsProcessed() throws IOException {
+		when(repository.findChannelAccountByPhoneNumberId("123456789012345")).thenReturn(Optional.of(accountRecord));
+		when(repository.insertChannelEventLog(any(), any(), anyString(), anyString(), anyString(), any()))
+				.thenReturn(true);
+
+		String body = loadFixture("webhook-text-message.json");
+		parserWithAllowlist(List.of("56950954580")).parseAndProcess(body);
+		verify(inboundMessageService, times(1)).processInboundMessage(any(), eq(businessId), eq(channelAccountId),
+				anyString());
+	}
+
+	@Test
+	void phoneOutsideAllowlistIsSkipped() throws IOException {
+		when(repository.findChannelAccountByPhoneNumberId("123456789012345")).thenReturn(Optional.of(accountRecord));
+		when(repository.insertChannelEventLog(any(), any(), anyString(), anyString(), anyString(), any()))
+				.thenReturn(true);
+
+		String body = loadFixture("webhook-text-message.json");
+		parserWithAllowlist(List.of("56933334444")).parseAndProcess(body);
+		verify(inboundMessageService, never()).processInboundMessage(any(), any(), any(), anyString());
+		verify(metrics, times(1)).incrementWebhookRejected();
+	}
+
+	@Test
+	void allowlistMatchesPhoneWithFormatting() throws IOException {
+		when(repository.findChannelAccountByPhoneNumberId("123456789012345")).thenReturn(Optional.of(accountRecord));
+		when(repository.insertChannelEventLog(any(), any(), anyString(), anyString(), anyString(), any()))
+				.thenReturn(true);
+
+		String body = loadFixture("webhook-text-message.json");
+		parserWithAllowlist(List.of("+56 9 5095 4580")).parseAndProcess(body);
+		verify(inboundMessageService, times(1)).processInboundMessage(any(), eq(businessId), eq(channelAccountId),
+				anyString());
 	}
 }

@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.5.0 (2026-08-02) — Fase 3: aislamiento local y modo simulado seguro
+
+### Agregado
+- Perfil Spring `local-safe`: modo local predeterminado sin tráfico externo (WhatsApp `SIMULATED`, Cloud API off, OpenAI off, espejo de correo off, calendario Google off, pagos `SIMULATED`, auto-reply off, safe-mode on). Activado por defecto en `docker-compose.local.yml` (`SPRING_PROFILES_ACTIVE` default `local,local-safe`).
+- Perfil Spring `local-meta-controlled`: integración real controlada con WhatsApp Cloud API con doble confirmación (`APP_LOCAL_META_CONTROLLED_ACKNOWLEDGED=true`), lista permitida de teléfonos de prueba (`APP_WHATSAPP_CLOUD_API_ALLOWED_TEST_PHONES`), credenciales completas obligatorias, firma de webhook requerida y dry-run desactivado.
+- Compuerta de arranque `LocalEnvironmentGate` (patrón `EmailConfigValidator`): valida la configuración efectiva al iniciar y **falla con mensaje claro** si el entorno habilita tráfico no autorizado; nunca imprime valores de secretos, solo nombres de propiedades.
+- `EgressTrafficGuard`: interceptor en el `RestClient.Builder` compartido que bloquea llamadas HTTP salientes a hosts externos (Meta, OpenAI, Gmail, Mercado Pago, etc.) en el perfil `local-safe`; permite solo localhost y hosts del stack de contenedores.
+- Lista permitida de teléfonos en el webhook Cloud API: los mensajes de números no autorizados se descartan (respuesta ACCEPTED para evitar reintentos) y se registran como rechazados.
+- Tests: `LocalEnvironmentPolicyTest` (18), `EgressTrafficGuardTest` (7) y 3 casos de allowlist en `WhatsAppCloudWebhookParserTest`. Suite backend completa: 697 tests con 38 fallos/11 errores pre-existentes en clases de IA/agenda (sin cambios respecto de la línea base).
+
+### Corregido
+- **Seguridad (defaults de compose)**: `APP_AI_AGENTS_AUTO_REPLY_ENABLED` ahora `false` por defecto (antes `true`), `APP_AI_AGENTS_SAFE_MODE_ENABLED` ahora `true` (antes `false`), `APP_EMAIL_MIRROR_ENABLED` ahora `false` (antes `true` con host `smtp.gmail.com` real). El arranque por defecto ya no envía tráfico externo.
+- `.env.local.template`: `APP_OPENAI_ENABLED=false` por defecto, mirror Gmail desactivado, nuevas variables de la fase Meta controlada y perfil default `local,local-safe`.
+- Import estático roto en `WhatsAppCloudWebhookValidatorTest` (`org.assertj.core.Assertions` → `org.assertj.core.api.Assertions`).
+
+### Documentado
+- `README-LOCAL.md`: modalidades de aislamiento local (segura / Meta controlada), comportamientos de la compuerta y del guard, perfil legacy `local-whatsapp-cloud` marcado para migración.
+- `docs/AMBIENTES_WHATSAPP.md`: tabla de modalidades locales y sus controles.
+
 ## 0.4.0 (2026-08-02) — Fase 2: línea base Git y documentación
 
 ### Agregado
