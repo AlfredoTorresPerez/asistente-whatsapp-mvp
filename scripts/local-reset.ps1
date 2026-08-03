@@ -46,7 +46,11 @@ if (-not (Confirm-Step "Confirmas el reset completo?")) {
 # ── 1. Detener Docker ──────────────────────────────────────
 Write-Host "`n>>> 1/5 - Deteniendo servicios Docker..." -ForegroundColor Cyan
 $composeFile = Join-Path $ROOT "docker-compose.local.yml"
-$downCmd = "docker compose -f `"$composeFile`" down"
+$downCmd = "docker compose -f `"$composeFile`""
+foreach ($profile in @('observability', 'monitoring', 'backup', 'public-link', 'https')) {
+  $downCmd += " --profile $profile"
+}
+$downCmd += " down"
 if ($CleanDockerVolumes) {
   $downCmd += " -v"
 }

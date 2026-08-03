@@ -104,7 +104,8 @@ if ($CleanDockerVolumes) {
   Write-Host "=== LIMPIEZA DE VOLUMENES DOCKER ===" -ForegroundColor Yellow
   Write-Host "ADVERTENCIA: Esto eliminara la base de datos local y todos sus datos." -ForegroundColor Red
   if (Confirm-Step "Confirmas eliminar los volumenes Docker?") {
-    docker compose -p asistente -f (Join-Path $ROOT "docker-compose.local.yml") down -v 2>$null
+    $downProfiles = @('--profile observability', '--profile monitoring', '--profile backup', '--profile public-link', '--profile https') -join ' '
+    docker compose -p asistente -f (Join-Path $ROOT "docker-compose.local.yml") $downProfiles down -v 2>$null
     Write-Host "  [OK] volumenes Docker eliminados" -ForegroundColor Green
   }
 }

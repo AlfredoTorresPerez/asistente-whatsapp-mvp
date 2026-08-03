@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.6.0 (2026-08-02) — Fase 4: orquestación y arranque local
+
+### Agregado
+- Perfil `backup` en `docker-compose.local.yml`: servicio `backup-sidecar` (contenedor `asistente-backup-sidecar`, pg_dump cron diario 04:00, retención 7 días configurable con `BACKUP_CRON_SCHEDULE`/`RETENTION_DAYS`, volumen `postgres-backups`). Activable con `.\scripts\local-start.ps1 -Profile backup`.
+- Pre-flight en `local-start.ps1`: valida docker disponible, archivo compose, perfiles solicitados (`observability`, `monitoring` alias, `backup`, `public-link`, `https` o `all`) y `docker compose config --quiet` antes de levantar; advierte si `GRAFANA_ADMIN_PASSWORD` falta con el perfil `observability`; nuevo switch `-Verify` que ejecuta `local-verify.ps1` al terminar.
+- `local-verify.ps1` ampliado: verifica los 4 servicios core (postgres, backend, frontend, mailpit) y los contenedores opcionales que estén corriendo (observability, backup-sidecar, public-tunnel, caddy), además de health/API.
+- `backup-db.ps1`: si `pg_dump` no está en el PATH, cae a `docker compose exec postgres pg_dump`.
+
+### Cambiado
+- `docker-compose.yml` (base) renombrado a `docker-compose.full.yml`: contenedores `asistente-full-*`, volúmenes propios (`postgres-full-data`, `postgres-full-backups`), red propia `asistente-full` y encabezado con advertencia de colisión. NO debe levantarse simultáneamente con `docker-compose.local.yml` (puertos compartidos 5433/8080/5173).
+- `local-stop.ps1`, `local-reset.ps1`, `clean-local.ps1`, `dev.ps1`: `down` incluye ahora todos los perfiles opcionales para que ningún contenedor del compose local quede corriendo; `dev.ps1` usa `--env-file .env.local` y agrega el comando `verify`.
+
+### Documentado
+- `README-LOCAL.md`: sección "Comandos oficiales (Fase 4)" con la matriz de perfiles, tabla de puertos ampliada (mailpit, backup-sidecar, caddy), backup de BD y nota sobre `docker-compose.full.yml`.
+- `DEVELOPMENT.md`: sección Docker Compose reescrita con los comandos oficiales idénticos a `README-LOCAL.md`.
+- `docs/AGENTS.md`: estructura esperada del repositorio y comandos contractuales actualizados (compose local con `--env-file`; base renombrada a `docker-compose.full.yml`).
+- `docs/SOLUCION_DNS_MAVEN_DOCKER.md`: referencia a `docker-compose.full.yml`.
+
+### Verificado
+- Matriz de arranque `docker compose config --quiet` (Compose v5.1.3) 9/9 combinaciones OK: core, +observability, +monitoring, +backup, +public-link, +https, +all, full core, full +backup.
+- Sintaxis PowerShell de los 7 scripts modificados: OK.
+- **Prueba de inicio limpio (ejecutada):** `local-stop.ps1` removió los 10 contenedores en 4.1s; `local-start.ps1 -Profile bogus` falla con `exit 1`; `local-start.ps1 -Profile all` levantó 12 contenedores en 47.7s; `local-verify.ps1` 12/12 OK + login/API.
+- **Corregido durante la prueba:** en `local-start.ps1` los `--profile` del pre-flight van antes del subcomando `config` (requisito de Compose v5), igual que en el resto del script.
+
 ## 0.5.0 (2026-08-02) — Fase 3: aislamiento local y modo simulado seguro
 
 ### Agregado

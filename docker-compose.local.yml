@@ -8,18 +8,35 @@
 #   docker compose --env-file .env.local -f docker-compose.local.yml --profile observability up -d
 #   (el perfil antiguo "monitoring" se mantiene como alias; "observability" es el canonico)
 #
+# Backup automático PostgreSQL (backup-sidecar):
+#   docker compose --env-file .env.local -f docker-compose.local.yml --profile backup up -d
+#
+# Tunel publico HTTPS (Cloudflare quick tunnel):
+#   docker compose --env-file .env.local -f docker-compose.local.yml --profile public-link up -d
+#
+# HTTPS local autosigned (Caddy):
+#   docker compose --env-file .env.local -f docker-compose.local.yml --profile https up -d
+#
+# Todos los perfiles opcionales a la vez:
+#   docker compose --env-file .env.local -f docker-compose.local.yml --profile observability --profile backup --profile public-link --profile https up -d
+#
 # Sin --env-file no se carga .env.local automáticamente.
+# Scripts oficiales (restauran secretos y validan antes de levantar):
+#   .\scripts\local-start.ps1 | local-stop.ps1 | local-verify.ps1 | local-reset.ps1
 #
 # Servicios y puertos:
 #   postgres         5433:5432
 #   backend-java     8080:8080
 #   frontend-react   5173:5173
 #   mailpit          1025:1025 (SMTP), 8025:8025 (Web UI)
+#   backup-sidecar   sin puerto publicado (perfil backup, cron diario 04:00)
 #   grafana          3000:3000 (perfil observability)
 #   prometheus       9090:9090 (perfil observability)
 #   loki             127.0.0.1:3100 (solo localhost, perfil observability)
 #   tempo            127.0.0.1:3200 (solo localhost, perfil observability)
 #   alloy            sin puerto publicado (recolecta logs de contenedores)
+#   caddy            80/443 (perfil https, Caddyfile.local)
+#   public-tunnel    sin puerto publicado (perfil public-link, URL via cloudflared)
 # =============================================================================
 
 networks:
@@ -242,6 +259,37 @@ services:
       - asistente-local
 
   # ---------------------------------------------------------------------------
+  # BACKUP POSTGRES (opcional: requiere --profile backup)
+  # Sidecar que ejecuta pg_dump diario (cron 04:00) sobre el volumen postgres-backups
+  # ---------------------------------------------------------------------------
+  backup-sidecar:
+    profiles:
+      - backup
+    image: postgres:16-alpine
+    container_name: asistente-backup-sidecar
+    restart: unless-stopped
+    mem_limit: 128m
+    cpus: 0.2
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGPORT: "5432"
+      PGUSER: assistant
+      PGPASSWORD: assistant
+      PGDATABASE: asistente_whatsapp
+      BACKUP_DIR: /backups
+      RETENTION_DAYS: "7"
+      CRON_SCHEDULE: ${BACKUP_CRON_SCHEDULE:-0 4 * * *}
+    volumes:
+      - ./scripts/backup-sidecar-entrypoint.sh:/entrypoint.sh:ro
+      - postgres-backups:/backups
+    entrypoint: ["/bin/sh", "/entrypoint.sh"]
+    networks:
+      - asistente-local
+
+  # ---------------------------------------------------------------------------
   # OBSERVABILIDAD LOCAL (opcional: requiere --profile observability)
   # ---------------------------------------------------------------------------
   prometheus:
@@ -418,6 +466,8 @@ services:
 # =============================================================================
 volumes:
   postgres-data:
+
+  postgres-backups:
 
   prometheus-data:
 

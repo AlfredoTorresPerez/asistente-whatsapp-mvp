@@ -1,7 +1,36 @@
+# =============================================================================
+# ASISTENTE WHATSAPP MVP - STACK ALTERNATIVO "FULL" (fuera del flujo local)
+# =============================================================================
+# ANTES DE USAR ESTE ARCHIVO, LEE ESTE ENCABEZADO.
+#
+# ¿Qué es este archivo?
+#   Es el compose "base" del bootstrap (Fase 1). Levanta un stack completo
+#   (PostgreSQL + backend + frontend + backup-sidecar) pensado para ejecutarse
+#   con docker compose sin scripts: `docker compose -f docker-compose.full.yml up -d`.
+#
+# ⚠ ADVERTENCIA DE COLISIONES
+#   NO lo levantes al mismo tiempo que docker-compose.local.yml: ambos usan los
+#   mismos puertos (5433, 8080, 5173). Si ya tienes el stack local corriendo
+#   (scripts\local-start.ps1), usa SIEMPRE el compose local.
+#
+# Diferencias con docker-compose.local.yml:
+#   - Container names con prefijo asistente-full-* (sin colision con asistente-*)
+#   - Volumen de datos propio: postgres-full-data (NO comparte la BD local)
+#   - Volumen de backups propio: postgres-full-backups
+#   - Red propia: asistente-full
+#   - No usa .env.local (usa variables del shell o defaults; setea secretos:
+#     POSTGRES_PASSWORD, APP_DB_PASSWORD, APP_JWT_SECRET, ...)
+#   - El backend corre con Cloud API habilitado y DNS 1.1.1.1/8.8.8.8 para
+#     salida a Internet (modo NO aislado; NO es el flujo local oficial).
+#
+# Perfiles opcionales:
+#   --profile backup   -> levanta backup-sidecar (cron diario 04:00, RETENTION_DAYS)
+# =============================================================================
+
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: asistente-whatsapp-postgres
+    container_name: asistente-full-postgres
     environment:
       POSTGRES_DB: asistente_whatsapp
       POSTGRES_USER: assistant
@@ -14,11 +43,13 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres-full-data:/var/lib/postgresql/data
+    networks:
+      - asistente-full
 
   backup-sidecar:
     image: postgres:16-alpine
-    container_name: asistente-whatsapp-backup
+    container_name: asistente-full-backup
     profiles:
       - backup
     depends_on:
@@ -35,16 +66,18 @@ services:
       CRON_SCHEDULE: ${BACKUP_CRON_SCHEDULE:-0 4 * * *}
     volumes:
       - ./scripts/backup-sidecar-entrypoint.sh:/entrypoint.sh:ro
-      - postgres-backups:/backups
+      - postgres-full-backups:/backups
     entrypoint: ["/bin/sh", "/entrypoint.sh"]
     restart: unless-stopped
+    networks:
+      - asistente-full
 
   backend-java:
     build:
       context: ./backend-java
       dockerfile: Dockerfile
       network: host
-    container_name: asistente-whatsapp-backend
+    container_name: asistente-full-backend
     depends_on:
       postgres:
         condition: service_healthy
@@ -92,6 +125,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    networks:
+      - asistente-full
 
   frontend-react:
     build:
@@ -100,7 +135,7 @@ services:
       network: host
       args:
         VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080/api/v1}
-    container_name: asistente-whatsapp-frontend
+    container_name: asistente-full-frontend
     ports:
       - "5173:5173"
     depends_on:
@@ -120,11 +155,13 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-
-
+    networks:
+      - asistente-full
 
 volumes:
-  postgres-data:
-  postgres-backups:
+  postgres-full-data:
+  postgres-full-backups:
+
 networks:
-  asistente-local:
+  asistente-full:
+    driver: bridge

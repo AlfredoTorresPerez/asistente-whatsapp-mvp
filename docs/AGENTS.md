@@ -92,7 +92,8 @@ Cuando exista ambiguedad entre documentos, el orden de decision es:
 |-- backend-java/
 |-- frontend-react/
 |-- docs/
-|-- docker-compose.yml
+|-- docker-compose.local.yml   (canonico local; scripts\local-start.ps1)
+|-- docker-compose.full.yml    (alternativo, NO simultaneo con el local)
 `-- README.md
 ```
 
@@ -171,9 +172,14 @@ pnpm --dir frontend-react lint
 ./backend-java/mvnw test
 ./backend-java/mvnw verify
 
-docker compose up --build
-docker compose down
+# Entorno local (comando oficial: docker-compose.local.yml con .env.local)
+docker compose --env-file .env.local -f docker-compose.local.yml up -d --build
+docker compose --env-file .env.local -f docker-compose.local.yml down
 ```
+
+El compose base se renombro a `docker-compose.full.yml` (Fase 4): es el stack alternativo
+fuera del flujo local y NO debe levantarse simultaneamente con `docker-compose.local.yml`
+(comparten puertos 5433/8080/5173).
 
 ## Convenciones de codigo
 

@@ -4,10 +4,45 @@
 
 | Modo | Comando | Requisitos | Auto-respuesta IA |
 |------|---------|------------|-------------------|
-| **Demo base** (sin WhatsApp real) | `docker compose -f docker-compose.local.yml up -d` | Solo Docker | Desactivada por defecto |
-| **Demo con túnel público** | `docker compose -f docker-compose.local.yml --profile public-link up -d` | + Cloudflare Tunnel automático | Desactivada por defecto |
+| **Demo base** (sin WhatsApp real) | `.\scripts\local-start.ps1` | Solo Docker | Desactivada por defecto |
+| **Demo con túnel público** | `.\scripts\start-public-link.ps1` | + Cloudflare Tunnel automático | Desactivada por defecto |
 | **Demo con canal simulado** | `APP_WHATSAPP_CHANNEL_PROVIDER=SIMULATED` (default) + simular mensajes en `/admin/whatsapp-simulator` | Solo Docker | Desactivada por defecto |
 | **Demo con Cloud API controlada** | `SPRING_PROFILES_ACTIVE=local,local-meta-controlled` + credenciales Meta + `APP_LOCAL_META_CONTROLLED_ACKNOWLEDGED=true` + lista permitida de teléfonos | + Token de acceso y webhook Meta | Activar manualmente en `.env.local` |
+
+## Comandos oficiales (Fase 4)
+
+El flujo oficial del entorno local son los scripts `scripts/local-*.ps1` con
+`docker-compose.local.yml` como fuente canónica. Todos devuelven código de error
+(`exit 1`) ante cualquier fallo:
+
+```powershell
+# Levantar (restaura secretos + valida config + perfiles antes de `up`)
+.\scripts\local-start.ps1
+.\scripts\local-start.ps1 -Build                # reconstruir imágenes
+.\scripts\local-start.ps1 -Profile observability,backup
+.\scripts\local-start.ps1 -Profile all          # observability + backup + public-link + https
+.\scripts\local-start.ps1 -Verify               # ejecuta local-verify al terminar
+
+# Detener (incluye todos los perfiles opcionales; -Volumes borra la BD)
+.\scripts\local-stop.ps1
+
+# Verificar (contenedores core + opcionales activos, health, login/API)
+.\scripts\local-verify.ps1
+
+# Reset completo (limpia artefactos, reconstruye, levanta y verifica)
+.\scripts\local-reset.ps1
+```
+
+Perfiles opcionales de `docker-compose.local.yml`:
+
+| Perfil | Servicios | Comando |
+|--------|-----------|---------|
+| `observability` | Prometheus, Loki, Tempo, Alloy, Grafana | `.\scripts\observability-start.ps1` |
+| `backup` | backup-sidecar (pg_dump cron diario 04:00) | `.\scripts\local-start.ps1 -Profile backup` |
+| `public-link` | Cloudflare Tunnel (URL temporal) | `.\scripts\start-public-link.ps1` |
+| `https` | Caddy (HTTPS local autosigned) | `.\scripts\local-start.ps1 -Profile https` |
+
+> `monitoring` se mantiene como alias legacy de `observability`.
 
 > **Importante:** La auto-respuesta IA (`APP_AI_AGENTS_AUTO_REPLY_ENABLED`) está desactivada por defecto en entorno local.
 > Para probarla, simula un mensaje entrante en `/admin/whatsapp-simulator` (equivale a `POST /api/v1/test/whatsapp-inbound`).
@@ -49,16 +84,17 @@ como variables de entorno en la shell o escritos directamente en `.env.local`.
 # 1. Guardar secretos en Windows Credential Manager (solicita los valores)
 .\scripts\store-local-secrets.ps1
 
-# 2. Iniciar servicios (restaura secretos automáticamente)
+# 2. Iniciar servicios (restaura secretos automáticamente + valida config)
 .\scripts\local-start.ps1
 
-# 3. Ver logs
-docker compose logs -f --tail=100
+# 3. Verificar salud (contenedores, health, login/API)
+.\scripts\local-verify.ps1
 ```
 
 Frontend: http://localhost:5173
 Backend:  http://localhost:8080
 API Doc:  http://localhost:8080/swagger-ui.html
+Mailpit:  http://localhost:8025
 
 ## Con Canal Simulado
 
@@ -94,18 +130,18 @@ El script `start-public-link.ps1`:
 
 ```bash
 # Regenerar enlace expirado
-docker compose -f docker-compose.local.yml --profile public-link up -d --force-recreate public-tunnel
+docker compose --env-file .env.local -f docker-compose.local.yml --profile public-link up -d --force-recreate public-tunnel
 
 # Consultar nueva dirección
-docker compose -f docker-compose.local.yml logs --tail=200 public-tunnel
+docker compose --env-file .env.local -f docker-compose.local.yml logs --tail=200 public-tunnel
 
 # Seguir registros
-docker compose -f docker-compose.local.yml logs -f --tail=100 public-tunnel
+docker compose --env-file .env.local -f docker-compose.local.yml logs -f --tail=100 public-tunnel
 
 # Detener solamente el túnel (servicios locales continúan)
 .\scripts\stop-public-link.ps1
 # o
-docker compose -f docker-compose.local.yml --profile public-link stop public-tunnel
+docker compose --env-file .env.local -f docker-compose.local.yml --profile public-link stop public-tunnel
 
 # Verificar estado
 .\scripts\check-public-link.ps1
@@ -127,7 +163,10 @@ docker compose -f docker-compose.local.yml --profile public-link stop public-tun
 | postgres | 5433 | 5432 | — | PostgreSQL 16 |
 | backend-java | 8080 | 8080 | `local,local-safe` (+`observability`) | Spring Boot 3 |
 | frontend-react | 5173 | 5173 | — | Vite dev server |
+| mailpit | 8025, 1025 | 8025, 1025 | — | Captura de correos SMTP |
+| backup-sidecar | — | — | `backup` | pg_dump cron diario (04:00, retención 7 días) |
 | public-tunnel | — | — | `public-link` | Cloudflare Tunnel (trycloudflare.com) |
+| caddy | 80, 443 | 80, 443 | `https` | HTTPS local autosigned (Caddyfile.local) |
 | prometheus | 9090 | 9090 | `observability` | Métricas (scrape backend) |
 | loki | 3100 | 3100 | `observability` | Logs |
 | tempo | 3200 | 3200 | `observability` | Trazas |
@@ -139,16 +178,22 @@ docker compose -f docker-compose.local.yml --profile public-link stop public-tun
 ```powershell
 # PowerShell (recomendado)
 .\scripts\store-local-secrets.ps1  # guardar/actualizar secretos en Credential Manager
-.\scripts\local-start.ps1           # levantar servicios base (restaura secretos)
+.\scripts\local-start.ps1           # levantar servicios base (restaura secretos + valida)
 .\scripts\local-start.ps1 -Build    # reconstruir imágenes y levantar
-# Nota: local-start.ps1 restaura automáticamente los secretos desde Credential Manager
+.\scripts\local-start.ps1 -Profile observability,backup
+.\scripts\local-start.ps1 -Profile all -Verify
+.\scripts\local-stop.ps1            # detener todos los servicios (+ perfiles opcionales)
+.\scripts\local-stop.ps1 -Volumes   # detener y borrar volúmenes (BD incluida)
+.\scripts\local-verify.ps1          # health + smoke test (contenedores core + opcionales)
+.\scripts\local-reset.ps1           # limpiar artefactos, reconstruir, levantar, verificar
 
 .\scripts\dev.ps1 up              # levantar servicios base (sin restaurar secretos)
 .\scripts\dev.ps1 logs            # seguir logs
-.\scripts\dev.ps1 down            # detener (preserva volúmenes)
+.\scripts\dev.ps1 down            # detener (preserva volúmenes, incluye perfiles)
 .\scripts\dev.ps1 reset           # borrar volúmenes + rebuild + up
 .\scripts\dev.ps1 ps              # estado de servicios
 .\scripts\dev.ps1 build           # reconstruir imágenes
+.\scripts\dev.ps1 verify          # ejecuta local-verify.ps1
 
 # npm (desde frontend-react/)
 cd frontend-react
@@ -164,11 +209,36 @@ pnpm run docker:ps                # estado de servicios
 # (setea las variables de entorno que docker compose heredará)
 docker compose --env-file .env.local -f docker-compose.local.yml up -d
 docker compose --env-file .env.local -f docker-compose.local.yml --profile public-link up -d
+docker compose --env-file .env.local -f docker-compose.local.yml --profile backup up -d
+docker compose --env-file .env.local -f docker-compose.local.yml --profile observability up -d
+docker compose --env-file .env.local -f docker-compose.local.yml --profile https up -d
 docker compose --env-file .env.local -f docker-compose.local.yml logs -f --tail=100
 docker compose --env-file .env.local -f docker-compose.local.yml down
 docker compose --env-file .env.local -f docker-compose.local.yml down -v   # borrar volúmenes
 docker compose --env-file .env.local -f docker-compose.local.yml ps
 ```
+
+> **Stack alternativo:** el compose base se renombró a `docker-compose.full.yml`
+> (contenedores `asistente-full-*`, volúmenes y red propios). Es un stack completo
+> alternativo que **no** debe levantarse simultáneamente con `docker-compose.local.yml`
+> (comparten puertos 5433/8080/5173). Ver encabezado del archivo.
+
+## Backup de la Base de Datos
+
+```powershell
+# Backup manual (pg_dump del host; fallback a docker compose exec postgres)
+.\scripts\backup-db.ps1                      # -> .\backups\asistente_whatsapp_<timestamp>.sql.gz
+.\scripts\backup-db.ps1 -OutputDir C:\backups
+
+# Restaurar un backup
+.\scripts\restore-db.ps1 -BackupFile .\backups\asistente_whatsapp_<timestamp>.sql.gz
+
+# Backup automático diario (perfil backup: cron 04:00, retención 7 días)
+.\scripts\local-start.ps1 -Profile backup
+```
+
+Los backups del sidecar se guardan en el volumen `postgres-backups`
+(`docker volume inspect asistente_postgres-backups`).
 
 ## Personalización Local
 
@@ -189,9 +259,11 @@ services:
 
 ## Volúmenes
 
-| Volumen | Directorio Host (bind mount) | Propósito |
-|---------|-----------------------------|-----------|
-| postgres-data | volumen Docker anónimo | Datos persistentes de PostgreSQL |
+| Volumen | Propósito |
+|---------|-----------|
+| postgres-data | Datos persistentes de PostgreSQL |
+| postgres-backups | Backups del sidecar (perfil `backup`) |
+| prometheus-data, loki-data, tempo-data, grafana-data, caddy-data | Datos de servicios opcionales (perfiles `observability` / `https`) |
 
 ## Observabilidad Local
 

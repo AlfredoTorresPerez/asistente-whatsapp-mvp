@@ -56,20 +56,58 @@ pnpm build
 
 ## Docker Compose
 
-```bash
-# Stack completo (backend + frontend + PostgreSQL)
-docker compose up -d
+El archivo canónico del entorno local es `docker-compose.local.yml` (usa `.env.local`
+con `--env-file`). El flujo oficial son los scripts `scripts/local-*.ps1`, que restauran
+secretos desde Windows Credential Manager, validan el compose y devuelven códigos de
+error ante fallos:
 
-# Con backup sidecar
-docker compose --profile backup up -d
+```bash
+# Levantar (restaura secretos + valida config antes de `up`)
+.\scripts\local-start.ps1
+.\scripts\local-start.ps1 -Build              # reconstruir imágenes
+.\scripts\local-start.ps1 -Profile observability,backup
+.\scripts\local-start.ps1 -Profile all -Verify # todos los perfiles + healthcheck
+
+# Detener (incluye todos los perfiles opcionales; -Volumes borra la BD)
+.\scripts\local-stop.ps1
+
+# Verificar health + smoke test
+.\scripts\local-verify.ps1
+
+# Reset completo (limpia artefactos, reconstruye y levanta)
+.\scripts\local-reset.ps1
+```
+
+Comandos docker compose directos equivalentes (requieren restaurar secretos antes):
+
+```bash
+# Stack base (postgres + backend + frontend + mailpit)
+docker compose --env-file .env.local -f docker-compose.local.yml up -d
+
+# Con backup sidecar (cron diario de pg_dump)
+docker compose --env-file .env.local -f docker-compose.local.yml --profile backup up -d
 
 # Con observabilidad local (Prometheus, Loki, Tempo, Alloy, Grafana)
 docker compose --env-file .env.local -f docker-compose.local.yml --profile observability up -d
+
+# Con túnel público HTTPS (cloudflared quick tunnel)
+docker compose --env-file .env.local -f docker-compose.local.yml --profile public-link up -d
+
+# Con HTTPS local autosigned (Caddy)
+docker compose --env-file .env.local -f docker-compose.local.yml --profile https up -d
 ```
 
 El perfil `observability` de Docker Compose activa además el perfil Spring `observability`
 del backend (logs JSON, trazas OTLP hacia Tempo, health checks extendidos y métricas
 funcionales `assistente_*`). Ver `OBSERVABILIDAD_LOCAL.md`.
+
+### Stack alternativo (`docker-compose.full.yml`)
+
+El compose base del bootstrap se renombró a `docker-compose.full.yml` (Fase 4): es un
+stack completo alternativo (PostgreSQL + backend + frontend + backup-sidecar) con
+contenedores `asistente-full-*`, volúmenes propios y red propia. **No se levanta
+simultáneamente con `docker-compose.local.yml`** (comparten puertos 5433/8080/5173).
+Leer el encabezado del archivo antes de usarlo.
 
 ## Scripts auxiliares
 

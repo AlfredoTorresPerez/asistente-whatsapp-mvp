@@ -4,7 +4,9 @@
   Verifica el estado del entorno local (health + smoke test).
 .DESCRIPTION
   Comprueba:
-    - Contenedores Docker saludables (postgres, backend, frontend)
+    - Contenedores core saludables (postgres, backend, frontend, mailpit)
+    - Contenedores de perfiles opcionales si estan corriendo (observability,
+      backup, public-link, https)
     - Backend /actuator/health = UP
     - Frontend HTTP 200
     - Login y API basica
@@ -40,23 +42,49 @@ if (-not (Test-Path $ComposeFile)) {
   exit 1
 }
 
-# ── 2. Verificar contenedores Docker saludables ────────────
+# ── 2. Verificar contenedores Docker ───────────────────────
 Write-Step "1/4 - Verificando contenedores Docker..."
 
-$containers = @("asistente-postgres", "asistente-backend", "asistente-frontend")
-foreach ($name in $containers) {
-  $inspect = docker inspect --format='{{.State.Health.Status}}' $name 2>$null
-  if ($LASTEXITCODE -ne 0) {
-    Write-Fail "Contenedor $name no existe o no esta corriendo"
+# Core: deben estar corriendo y (si definen healthcheck) healthy
+$coreContainers = @("asistente-postgres", "asistente-backend", "asistente-frontend", "asistente-mailpit")
+# Opcionales: se verifican solo si estan corriendo (perfil activo)
+$optionalContainers = @(
+  "asistente-prometheus", "asistente-loki", "asistente-tempo", "asistente-alloy", "asistente-grafana",
+  "asistente-backup-sidecar", "asistente-public-tunnel", "asistente-caddy"
+)
+
+foreach ($name in $coreContainers) {
+  $state = docker inspect --format='{{.State.Status}}' $name 2>$null
+  if ($LASTEXITCODE -ne 0 -or $state -ne "running") {
+    Write-Fail "Contenedor core $name no esta corriendo"
     continue
   }
-  if ($inspect -eq "healthy") {
-    Write-OK "$name = healthy"
-  } elseif ($inspect -eq "starting") {
+  $health = docker inspect --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' $name 2>$null
+  if ($health -eq "healthy" -or $health -eq "none") {
+    Write-OK "$name = running (health: $health)"
+  } elseif ($health -eq "starting") {
     Write-Fail "$name = starting (aun no listo)"
   } else {
-    Write-Fail "$name = $inspect"
+    Write-Fail "$name = $health"
   }
+}
+
+$runningOptional = @()
+foreach ($name in $optionalContainers) {
+  $state = docker inspect --format='{{.State.Status}}' $name 2>$null
+  if ($LASTEXITCODE -ne 0 -or $state -ne "running") {
+    continue
+  }
+  $runningOptional += $name
+  $health = docker inspect --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' $name 2>$null
+  if ($health -eq "healthy" -or $health -eq "none") {
+    Write-OK "$name = running (health: $health)"
+  } else {
+    Write-Fail "$name = $health"
+  }
+}
+if ($runningOptional.Count -eq 0) {
+  Write-Host "  [--] Sin contenedores opcionales activos (perfiles no levantados)" -ForegroundColor DarkGray
 }
 
 # ── 3. Backend health endpoint ──────────────────────────────
