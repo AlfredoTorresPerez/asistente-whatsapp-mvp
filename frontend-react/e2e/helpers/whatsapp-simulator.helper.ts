@@ -1,4 +1,4 @@
-import { apiPost } from './api.helper'
+import { apiPost, loginDemoAdmin } from './api.helper'
 
 let SIMULATOR_ENABLED = true
 
@@ -13,7 +13,8 @@ export async function sendInboundWhatsAppMessage(customerPhone: string, message:
       body: message,
     }
     if (sessionKey) body.sessionKey = sessionKey
-    const resp = await apiPost('/test/whatsapp-inbound', body)
+    const token = await loginDemoAdmin()
+    const resp = await apiPost('/test/whatsapp-inbound', body, token ?? undefined)
     return { ok: resp.ok, error: resp.ok ? undefined : await resp.text() }
   } catch (error) {
     return { ok: false, error: String(error) }

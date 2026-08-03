@@ -3,7 +3,7 @@
 ## Prerrequisitos
 
 - **Backend**: Java 21+, Maven 3.9+
-- **Frontend**: Node.js 20+, pnpm 10+
+- **Frontend**: Node.js 20.19+, pnpm 10+
 - **Docker**: Docker Desktop (para PostgreSQL en perfil `local`)
 - **IDE recomendado**: IntelliJ IDEA Ultimate
 
@@ -113,6 +113,57 @@ Leer el encabezado del archivo antes de usarlo.
 
 - `scripts/run-all.ps1` — PowerShell: build + backend + frontend + tests
 - `scripts/run-all.sh` — Bash (Linux/Mac): build + backend + frontend + tests
+- `scripts/diagnose-local.ps1` / `diagnose-local.sh` — diagnóstico del ambiente
+  (toolchain, recursos, puertos, config, secretos, stack) con salida sanitizada
+  compartible (`-OutFile` / `-o`)
+- `scripts/local-reset-demo.ps1` / `local-reset-demo.sh` — regenera los datos demo
+  (recrea el volumen de postgres; Flyway re-aplica seeds y el LocalDataInitializer
+  refresca las fechas de las reservas de ejemplo)
+
+## Desarrollo desde IDE vs Contenedores
+
+Hay dos modalidades equivalentes para el código fuente; elegí según lo que
+necesites:
+
+### Desde el IDE (IntelliJ IDEA)
+
+Flujo ligero: backend con H2 embebido (perfil Maven `local`, sin seed data) y
+frontend con Vite dev server. No requiere Docker para el backend.
+
+```bash
+# Terminal 1 - backend en :8080 (H2 embebido, sin datos demo)
+cd backend-java
+.\mvnw.cmd spring-boot:run -P local
+
+# Terminal 2 - frontend en :5173 (hot reload)
+cd frontend-react
+pnpm dev
+```
+
+- Pros: iteración rápida, depuración con breakpoints, sin Docker.
+- Limitaciones: no hay PostgreSQL ni datos demo (la BD H2 arranca vacía), no
+  hay MailHog, ni observabilidad, ni canal WhatsApp real. Los flujos de agenda
+  completos requieren el modo contenedores.
+
+### Desde contenedores (recomendado)
+
+Stack completo reproducible: PostgreSQL (con seeds demo de Flyway), backend,
+frontend, MailHog y perfiles opcionales (observabilidad, backup, túnel, HTTPS).
+
+```bash
+.\scripts\local-setup.ps1          # una sola vez: instala y compila
+.\scripts\local-start.ps1          # levanta el stack
+.\scripts\local-verify.ps1         # health + smoke test
+```
+
+- Pros: igual a producción (PostgreSQL), datos demo disponibles, verificable
+  con `local-verify.ps1`.
+- Limitaciones: requiere Docker; el cambio de código del backend requiere
+  reconstruir la imagen (`local-start.ps1 -Build`).
+
+> Recomendado: usar contenedores para validación de flujos y el IDE para
+> desarrollo de features específicas. Los cambios se prueban con `run-all.ps1`
+> antes de commitear.
 
 ## Convenciones
 

@@ -2,7 +2,7 @@
 # =============================================================================
 # DEV STAGE  - Vite dev server con HMR (usado por docker-compose.local.yml)
 # =============================================================================
-FROM node:24-alpine AS dev
+FROM node:20.19.0-alpine AS dev
 
 WORKDIR /app
 
@@ -31,7 +31,7 @@ CMD ["pnpm", "dev", "--host", "0.0.0.0"]
 # =============================================================================
 # BUILD STAGE - Compilacion para produccion
 # =============================================================================
-FROM node:24-alpine AS build
+FROM node:20.19.0-alpine AS build
 
 WORKDIR /app
 
@@ -58,7 +58,7 @@ RUN pnpm build
 # =============================================================================
 # PRODUCTION STAGE - nginx sirviendo el bundle estatico
 # =============================================================================
-FROM nginx:1.27-alpine AS production
+FROM nginx:1.27.4-alpine AS production
 
 RUN apk add --no-cache tzdata
 

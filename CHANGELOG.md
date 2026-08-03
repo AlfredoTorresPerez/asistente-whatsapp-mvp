@@ -1,5 +1,245 @@
 # Changelog
 
+## 0.10.0 (2026-08-03) — Fase 9: respaldo y restauración de PostgreSQL comprobados
+
+### Agregado
+- **Backup real verificable**: `scripts/backup-db.ps1` / `.sh` reescritos — formato `custom`
+  (`pg_dump -Fc -Z5 --no-owner --no-acl` → `.dump`), suma `.sha256`, metadatos `.metadata.json`
+  sanitizados (sin credenciales ni valores sensibles). Evidencia en `backups/`.
+- **Restauración segura** `scripts/restore-db.ps1` / `.sh`: verifica SHA-256, restaura a base
+  temporal `asistente_whatsapp_restore_<ts>` (corrige `Invoke-PgAdmin` con param `Cmd`,
+  bug de `$args` que hacía `sh -c ''` sin efecto), invoca `verify-restore-db.ps1`,
+  y swap a la principal con doble confirmación explícita (`-RestoreToMain`) y limpieza de la
+  temporal ante fallo.
+- **Verificación estructural/funcional** `scripts/verify-restore-db.ps1` / `.sh`: conectividad,
+  93 tablas, 225 FKs validadas, 0 secuencias, 0 defaults `nextval`, Flyway completo
+  (rank 105, 105 success, cadena `version:checksum`), 31 tablas de control con conteos
+  idénticos, e integridad referencial **comparada contra la referencia** (criterio correcto:
+  la referencia tiene 1046 huérfanos de seed; here-string literal para el chequeo SQL).
+- **Backend funcional contra la BD restaurada** `scripts/restore-backend-check.ps1` / `.sh`:
+  contenedor temporal `backend-restore-verify` (puerto 8081, `SERVER_PORT=8081`, `ports
+  8081:8081`, sin `extends` que herede el 8080 — fix de colisión), `/actuator/health` UP,
+  login demo, `GET /api/v1/company` y `POST /api/v1/test/whatsapp-inbound` (escritura real).
+- **6 pruebas negativas** `scripts/test-recovery-negative.ps1` / `.sh`: vacío, suma SHA
+  incorrecta, truncado, falta de espacio (proxy), postgres caído+recuperación, migración
+  incompatible (Flyway V999 → backend NO arranca). Resultado 13/13 PASS (2026-08-03).
+- **Sidecar reforzado** `scripts/backup-sidecar-entrypoint.sh`: formato custom por defecto,
+  `.sha256`, `.metadata.json`, archivo `metrics` (Prometheus text format: success/failures/
+  last_success/duration/size/sha256_ok/result), retención por días, contadores persistentes,
+  modo one-shot y simulación configurable. Probado 2× (1.0 MB, 1 s).
+- **Observabilidad del respaldo**: servicio `backup-exporter` (imagen `busybox:1.36.1`, sirve
+  `/backups/metrics` en :9100, perfil `backup`), job `backup-sidecar` en
+  `monitoring/prometheus/prometheus.yml` con `fallback_scrape_protocol=PrometheusText0.0.4`
+  (compat Prometheus v3 con Content-Type nulo), y grupo `asistente-respaldo` en
+  `monitoring/prometheus/alerts.yml` (BackupFallido critical, BackupDesactualizado warning,
+  BackupSinMetricas warning).
+- Documentación canónica: `docs/informe_recuperacion_fase9.md`.
+
+### Verificado (2026-08-03, ambiente local simulado)
+- Restore+verify completo en verde contra `backups/asistente_whatsapp_20260803_102631.dump`
+  (6.5 s); backend funcional contra la restaurada (puerto 8081) con escritura real.
+- Conteos de control idénticos e integridad referencial coincidente con referencia.
+- Base principal intacta tras todo el flujo (`business=1, booking=3, customer=5, lead=3`),
+  sin BD temporales residuales (limpiadas las de sesiones de depuración).
+- Prometheus: target `backup-sidecar` up y query `backup_sidecar_success_total` =
+  `backup-exporter:9100` + 3 alertas `inactive/ok`.
+- Negativos 13/13 PASS; `local-verify.ps1` TODO OK (13 contenedores).
+
+### Brechas conocidas
+- Swap a la principal (`-RestoreToMain`) diseñado pero no estresado en sesión (no destructor;
+  validar con simulación de desastre).
+- RPO/RTO medidos sobre dataset demo (~583 KB); re-medir con volumen real en producción.
+- 1046 huérfanos de seed en la referencia documentados como contacto de datos (no corrupción).
+
+## 0.9.0 (2026-08-02) — Fase 7: batería Java en verde con proveedor simulado
+
+### Agregado
+- JaCoCo (`jacoco-maven-plugin` 0.8.13) en `backend-java/pom.xml`: instrumentación en
+  `prepare-agent` e informe en `verify` (sin gate de cobertura que bloquee el build).
+  Informe generado en `target/site/jacoco/` y preservado en `resultados/FASE7_TESTS_JAVA_*/`.
+- Preservación de evidencia fuera del código: `resultados/FASE7_TESTS_JAVA_<timestamp>/`
+  con informes Surefire (70 clases), Failsafe (2 clases + summary) y JaCoCo (CSV + HTML).
+
+### Cambiado
+- **Tests desactualizados por la regla `isBusinessAiActive`** (5 clases): mockeaban
+  `findSettingsOpt → Optional.empty()` y quedaron rotos cuando `AgentCoordinatorService`
+  exigió settings activas para enrutar (L582-585). Corregidos para mockear settings
+  activas (`active=true`, mode `auto`): `AiBookingConversationalFlowTest`,
+  `AiAmbiguityAndErrorsTest`, `AiRescheduleCancelConversationalFlowTest`,
+  `AiExcelMatrixOrchestratorCoverageTest`, `AiAgentCoherenceTest`.
+- **Formato de duración consistente** en `AiBusinessKnowledgeService.categoryPriceResponse`
+  (L106): `" (15 min)"` → `" (15 minutos)"`, alineado con `serviceInformationResponse`
+  (L153) y las expectativas de los tests. Único cambio en código de producción de la fase.
+- `CompleteDigitalAgendaServiceTest.createTemporaryBookingRejectsMissingInformedConsent...`:
+  el request no enviaba `informedConsentAccepted=false` (campo añadido al record con 20
+  parámetros quedó en `null`), por lo que la validación no se disparaba; ahora sí, y el
+  test verifica el error `informedConsentAccepted` sin necesidad de horarios mockeados.
+- `AiExcelMatrixOrchestratorCoverageTest`: `previewModePersistsContext...` renombrado a
+  `persistedContextAllowsFragmentedClientAnswersToContinueBookingFlow`. El preview NO
+  persiste contexto por diseño (gate `!request.dryRun()` desde 7e27b0e,
+  `AiAdminController` → "Preview generado sin persistir"); el test ahora persiste el
+  primer turno vía `coordinator.route` y verifica que el segundo turno (preview) continúa
+  el flujo de booking leyendo el contexto persistido. Se añadió `routePersisted()` al
+  Harness de prueba.
+
+### Verificado
+- **Batería unit completa:** `mvn test` → 697 tests, 0 failures, 0 errors, 0 skipped
+  (línea base previa: 697/38F/11E). Cero tráfico externo: Testcontainers
+  `postgres:16-alpine` aislado, `openai.enabled=false`, proveedor WhatsApp SIMULATED.
+- **`mvn verify`** → BUILD SUCCESS: 697 unit + 7 integration Failsafe
+  (`BookingConcurrencyTest` 5, `WhatsAppChannelSimulatorControllerIntegrationTest` 2).
+- **Cobertura JaCoCo** (unit + integration): instrucciones 29.0 %, líneas 29.4 %,
+  ramas 23.4 % (745 clases del proyecto). Paquetes mejor cubiertos: `aiagents.application`
+  54.1 %, `agenda.application` 30.1 %, `channels.*` 49-69 %. Capas de infraestructura y
+  módulos de administración/catálogo quedan por debajo del 10 % (hueco documentado).
+- **Flujos de agenda validados** por tests en verde: reserva temporal + confirmación
+  (por piezas: `CompleteDigitalAgendaServiceTest`, `BookingConfirmationServiceTest`,
+  `AiBookingConversationalFlowTest`), reprogramación (`BookingServiceTest`,
+  `BookingPolicyServiceTest`, `AiRescheduleCancelConversationalFlowTest`,
+  `BookingConcurrencyTest`), cancelación (`BookingPublicActionServiceTest`,
+  `AiRescheduleCancelConversationalFlowTest`), ambigüedad (`AiAmbiguityAndErrorsTest`),
+  duplicados e idempotencia (`AvailabilityServiceTest`,
+  `BookingPaymentServiceTest`), concurrencia (`BookingConcurrencyTest`,
+  `rejectsSimultaneousCreationInSameSlot`), confirmación con link público
+  (`BookingConfirmationServiceTest` + calendario), disponibilidad
+  (`PublicLandingServiceAvailabilityTest`), validaciones de negocio
+  (horarios, feriados, consentimiento informado).
+
+### Brechas conocidas (documentadas, no bloqueantes)
+- Outbox de envío WhatsApp: cobertura mínima (`AiReplyOutboxProcessorTest` solo prueba
+  el caso "sin jobs pendientes"; falta envío/reintento/fallo con jobs reales).
+- No existe un test único de flujo completo temporary → confirmación (se cubre por piezas).
+- Reprogramación por link público: solo `previewReschedule` (sin `confirmReschedule`).
+- Confirmación pública: sin test de token inexistente/inválido o link ya consumido.
+
+## 0.8.0 (2026-08-02) — Fase 6: reproducibilidad y empaquetado
+
+### Agregado
+- `scripts/local-package.ps1` reescrito: genera el paquete distribuible del proyecto
+  en un único ZIP (`target/package/asistente-package-<revision>.zip`). Pasos: compilar
+  backend (`mvnw clean package -DskipTests`), construir frontend (`pnpm build`),
+  registrar dependencias runtime (`mvn dependency:list`), copiar la fuente **solo con
+  lista blanca** (`git ls-files` — nunca `node_modules`, `target`, `dist`, `.git`,
+  `.env.*`, logs ni capturas), adjuntar artefactos compilados (jar, `frontend-dist.zip`)
+  y configuración, y generar un **manifiesto JSON** (`metadata/manifest.json`, formato
+  `asistente-package-manifest-v1`) con revisión git, versiones de herramientas,
+  conteo de fuentes y dependencias, y **SHA-256 por archivo**. Emite además
+  `SHA256SUMS.txt` con la suma del ZIP. Parámetros: `-OutputDir`, `-SkipBuild`.
+- `scripts/local-package.sh`: equivalente Linux/macOS del empaquetado (mismo flujo,
+  misma lista blanca, manifiesto y SHA256SUMS).
+- `scripts/verify-package.ps1` y `scripts/verify-package.sh`: prueba automática de
+  reconstrucción desde el paquete. Extrae el ZIP en un directorio temporal limpio y
+  verifica: (1) SHA-256 de cada archivo del manifiesto, (2) ausencia de artefactos
+  empaquetados accidentalmente (15 patrones auditados por segmento de ruta), (3)
+  `pnpm install --frozen-lockfile`, (4) `mvnw package -DskipTests`, (5) `pnpm build`,
+  (6) `docker compose config --quiet`. Exit 0/1.
+
+### Cambiado
+- **Versiones de imágenes de contenedores fijadas a tags exactas** (antes parcialmente
+  variables o `latest`): `postgres:16.14-alpine` (los 4 composes), `caddy:2.11.4-alpine`
+  (local/qa/prod), `cloudflare/cloudflared:2026.7.0` (local), `maven:3.9.15-eclipse-temurin-21`
+  y `eclipse-temurin:21.0.11_10-jre-jammy` (`backend-java/Dockerfile`), `node:20.19.0-alpine`
+  y `nginx:1.27.4-alpine` (`frontend-react/Dockerfile`). Todas verificadas con
+  `docker manifest inspect` antes de aplicar.
+- Node unificado al tag exacto **20.19.0** en CI: `.github/workflows/frontend-ci.yml`
+  (`node-version: '20.19.0'`) y `frontend-react/.github/workflows/e2e.yml`
+  (`NODE_VERSION: '20.19.0'`).
+- `frontend-react/e2e/reports/` (reportes de ejecución de Playwright): removidos del
+  control de versiones (`git rm --cached`); ya estaban en `.gitignore`. Ya no entran
+  en el paquete.
+
+### Verificado
+- **pnpm desde limpio:** `pnpm install --frozen-lockfile` con store frío en directorio
+  temporal: Done in 9.3s, exit 0 (344 paquetes; store 204.2 MB).
+- **Maven desde caché vacía:** `mvnw go-offline` con `-Dmaven.repo.local` en repo
+  temporal vacío (253s, 5,581 archivos) y `mvnw package` posterior con ese mismo repo:
+  BUILD SUCCESS en 36s. Registro de dependencias runtime: 138.
+- **Empaquetado ejecutado:** `local-package.ps1` en el entorno real — 1,524 archivos de
+  fuente con lista blanca, manifiesto con 1,526 entradas (SHA-256 todas verificadas),
+  ZIP final **105.67 MB** (la referencia "antes", repo completo sin lista blanca,
+  pesaba **391.31 MB**; reducción ≈ 73%). `SHA256SUMS.txt` emitido.
+- **Reconstrucción desde el paquete (2 ejecuciones consecutivas, criterio de
+  aceptación):** `verify-package.ps1` → TODO OK en ambas (integridad SHA-256 100%,
+  exclusiones limpias, pnpm install --frozen-lockfile OK, mvnw package BUILD SUCCESS,
+  pnpm build OK, docker compose config válido). Exit 0.
+- **Migraciones reproducibles:** 105 migraciones Flyway en el repo = 105 aplicadas en
+  la BD regenerada (success=true), última aplicada `V105`; 2 reservas demo.
+- Auditoría de valores variables restantes: ningún `:latest`, `:alpine` sin versión ni
+  tag de Node sin patch en composes, Dockerfiles ni workflows.
+
+### Notas
+- Los composes mantienen defaults `${VAR:-fijo}` explícitos; los números de negocio
+  como default están en `docker-compose.local.yml` y `docker-compose.prod.yml`
+  (configuración de despliegue, no documentación).
+- El stack en ejecución usa todavía las imágenes previas al pinning; las nuevas tags
+  se descargan en el próximo `local-start` con recreación.
+
+## 0.7.0 (2026-08-02) — Fase 5: experiencia de desarrollo
+
+### Agregado
+- `scripts/diagnose-local.ps1` y `scripts/diagnose-local.sh`: diagnóstico completo del
+  ambiente local (toolchain Java/Maven/Node/pnpm/Docker/Compose con versiones mínimas,
+  recursos de RAM/disco, puertos del stack, archivos de configuración, secretos —
+  solo presencia y longitud, nunca valores —, estado de los contenedores `asistente-*`
+  y estado del frontend). Cada fallo incluye una acción correctiva sugerida.
+  Reporte sanitizado compartible con `-OutFile` / `-o` (gitignored: `local-diagnostics*.txt`).
+  Exit code 0/1 según existan errores críticos.
+- `scripts/local-reset-demo.ps1` y `scripts/local-reset-demo.sh`: regenera los datos demo
+  desde cero (detiene postgres/backend, elimina el volumen `asistente_postgres-data`,
+  recrea y reinicia backend para que Flyway reaplique los seeds y el
+  `LocalDataInitializer` refresque las fechas de las reservas de ejemplo). No toca
+  código, `node_modules`, `target`, `dist`, backups ni observabilidad. Requiere
+  confirmación (o `-Force`/`--force`).
+- Equivalentes Linux/macOS del flujo oficial: `scripts/local-setup.sh`,
+  `scripts/local-start.sh`, `scripts/local-stop.sh`, `scripts/local-verify.sh`,
+  `scripts/local-reset.sh`, `scripts/clean-local.sh` (antes solo existían los `.ps1`
+  y los `.sh` de observabilidad/backup/smoke).
+- `QUICKSTART_15_MIN.md`: guía única de arranque en ~15 minutos (requisitos, setup,
+  start, verify, credenciales demo, diagnóstico, parada/limpieza, Linux y modos
+  IDE vs contenedores). Enlazada desde `README-LOCAL.md`.
+- `frontend-react/.nvmrc` (20.19.0) y `engines` en `frontend-react/package.json`
+  (`node >=20.19.0`, `pnpm >=10 <11`).
+
+### Cambiado
+- Requisito de Node unificado a **20.19+** en todo el repositorio (antes 18/20/22/24
+  mezclados): `frontend-react/Dockerfile` (dev y build usan `node:20-alpine`),
+  `frontend-react/.github/workflows/e2e.yml` (`NODE_VERSION: '20'`, antes 22),
+  `DEVELOPMENT.md`, `LOCAL_ENV_SETUP_PROMPT.md`, `frontend-react/docs/COMANDOS_EJECUCION.md`,
+  `frontend-react/e2e/README_TESTS_AGENDA_WHATSAPP.md`. El lockfile ya exigía
+  `^20.19.0 || ^22.12.0 || >=24.0.0`.
+- `scripts/local-setup.ps1` reescrito: valida plataforma (Windows vs Linux/macOS),
+  Node 20.19+ (antes >=18), pnpm 10.x, Docker Compose plugin y lockfile
+  (`frontend-react/pnpm-lock.yaml`); **ya no omite la instalación solo porque exista
+  `node_modules`** — siempre ejecuta `pnpm install --frozen-lockfile` (idempotente) a
+  menos que se pase `-SkipInstall` explícito. Todos los mensajes de error incluyen
+  acción correctiva. Corregido bug preexistente: `java -version` devolvía un array y
+  `$matches` no se poblaba (fallaba con Java 25).
+- `scripts/local-start.ps1` y `scripts/local-verify.ps1`: mensajes de error con acción
+  correctiva sugerida.
+- `DEVELOPMENT.md`: nueva sección "Desarrollo desde IDE vs Contenedores" (perfil Maven
+  `local` con H2 embebido vs stack completo Docker) y scripts auxiliares nuevos.
+- `README-LOCAL.md`: enlace a `QUICKSTART_15_MIN.md` y comandos nuevos
+  (`local-reset-demo.ps1`, `diagnose-local.ps1`).
+
+### Verificado
+- `scripts/diagnose-local.ps1` en el entorno real: 17 OK / 1 aviso (SENTRY_DSN opcional)
+  / 0 errores, exit 0. Falsos positivos corregidos durante la prueba (Compose v5.1.3,
+  ubicación `caddy/Caddyfile.local`, health `none` como válido, clave
+  `APP_JWT_SECRET` en `.env.local`).
+- Sintaxis PowerShell (8 scripts) y Bash (`bash -n` de 7 scripts): OK.
+- `local-setup.ps1` ejecutado: validación de prerequisitos OK, `pnpm install
+  --frozen-lockfile` idempotente (lockfile up to date), backend compilado (BUILD
+  SUCCESS, 546 fuentes) y frontend construido (vite 8, 899 módulos). Exit 0.
+- **Prueba de regeneración de datos demo (ejecutada):** `local-reset-demo.ps1 -Force`
+  detuvo postgres/backend-java, eliminó el volumen, recreó postgres (healthy), reinició
+  backend y `local-verify.ps1` quedó TODO OK (12 contenedores, login + API con id de
+  negocio `11111111-1111-1111-1111-111111111111`). Reservas demo verificadas en BD con
+  fechas futuras (2026-08-03). Corregido durante la prueba: el servicio del compose se
+  llama `backend-java`, no `backend`.
+- `clean-local.ps1` auditado: nunca elimina datos sin confirmación (node_modules y
+  volúmenes Docker requieren confirmación; nunca toca `.env.local`, backups ni datos
+  fuente).
+
 ## 0.6.0 (2026-08-02) — Fase 4: orquestación y arranque local
 
 ### Agregado

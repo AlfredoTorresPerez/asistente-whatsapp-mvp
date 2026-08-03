@@ -33,7 +33,7 @@ Suite exhaustiva de 19 spec files con 82+ tests que cubren los 137 casos de prue
 
 ## Prerrequisitos
 
-1. Node.js 18+ y pnpm instalados globalmente
+1. Node.js 20.19+ y pnpm instalados globalmente
 2. Navegador Chromium instalado (`npx playwright install chromium`)
 3. Frontend corriendo (`pnpm dev` en `frontend-react/`)
 4. Backend accesible en `http://localhost:8080`

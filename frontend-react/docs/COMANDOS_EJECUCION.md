@@ -2,7 +2,7 @@
 
 ## Requisitos previos
 
-- Node.js >= 18
+- Node.js >= 20.19
 - pnpm >= 10
 - Docker Desktop (para levantar el stack completo)
 - Navegador Chromium instalado por Playwright

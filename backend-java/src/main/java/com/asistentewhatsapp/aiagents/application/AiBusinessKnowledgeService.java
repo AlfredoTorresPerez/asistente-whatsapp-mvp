@@ -103,7 +103,7 @@ public class AiBusinessKnowledgeService {
 		StringBuilder sb = new StringBuilder("Estos son los precios disponibles:\n");
 		for (ServiceCatalogItem item : matching) {
 			String price = item.priceBase() == null ? "precio no configurado" : formatMoney(item.priceBase());
-			String duration = item.durationMinutes() == null ? "" : " (" + item.durationMinutes() + " min)";
+			String duration = item.durationMinutes() == null ? "" : " (" + item.durationMinutes() + " minutos)";
 			sb.append("• ").append(displayServiceName(item.name())).append(": ").append(price).append(duration)
 					.append("\n");
 		}

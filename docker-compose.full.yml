@@ -29,7 +29,7 @@
 
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:16.14-alpine
     container_name: asistente-full-postgres
     environment:
       POSTGRES_DB: asistente_whatsapp
@@ -48,7 +48,7 @@ services:
       - asistente-full
 
   backup-sidecar:
-    image: postgres:16-alpine
+    image: postgres:16.14-alpine
     container_name: asistente-full-backup
     profiles:
       - backup

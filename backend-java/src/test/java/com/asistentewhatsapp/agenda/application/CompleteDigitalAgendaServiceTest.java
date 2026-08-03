@@ -155,11 +155,8 @@ class CompleteDigitalAgendaServiceTest {
 		OffsetDateTime startsAt = futureStartsAt();
 		ServiceRecord consentService = new ServiceRecord(SERVICE_ID, "Laser avanzado", DURATION, true, false,
 				BigDecimal.ZERO, PREPARATION, CLEANUP, true, BigDecimal.valueOf(10000), false, true);
-		when(repository.findLocation(BUSINESS_ID, LOCATION_ID)).thenReturn(LOCATION);
+		mockHappyPath(startsAt);
 		when(repository.findService(BUSINESS_ID, LOCATION_ID, SERVICE_ID)).thenReturn(consentService);
-		when(repository.findProfessionalCandidates(BUSINESS_ID, LOCATION_ID, SERVICE_ID, PROFESSIONAL_ID))
-				.thenReturn(List.of(PROFESSIONAL));
-		when(repository.findRoomCandidates(BUSINESS_ID, LOCATION_ID, SERVICE_ID, ROOM_ID)).thenReturn(List.of(ROOM));
 		when(repository.reserveBookingOperationIdempotency(any(), anyString(), anyString(), anyString(), anyString()))
 				.thenReturn(true);
 
@@ -167,7 +164,7 @@ class CompleteDigitalAgendaServiceTest {
 				new AuthenticatedUser(UUID.randomUUID(), BUSINESS_ID, "Demo", "Admin", "Demo", "admin@test.cl", "UTC",
 						List.of("ADMIN"), List.of()),
 				new CreateTemporaryAgendaBookingRequest(LOCATION_ID, SERVICE_ID, PROFESSIONAL_ID, ROOM_ID, startsAt,
-						"Cliente Test", "56911112222", null, null, null, null, "Notas", 60, false, false, null, null,
+						"Cliente Test", "56911112222", null, null, null, null, "Notas", 60, false, false, null, false,
 						null, null, null)))
 				.isInstanceOf(ApiException.class)
 				.matches(e -> ((ApiException) e).getFieldErrors().containsKey("informedConsentAccepted"));

@@ -63,3 +63,13 @@ MEMORY.md
 # Lock files — only pnpm allowed
 package-lock.json
 yarn.lock
+
+# Reporte de diagnostico del ambiente local (sanitizado, compartible)
+local-diagnostics*.txt
+
+# Dumps de respaldo de BD (artefactos binarios; los backups se generan bajo demanda)
+backups/
+
+# Sesiones de debug de Playwright (temporales)
+pw-debug-session.mjs
+frontend-react/pw-debug-session.mjs

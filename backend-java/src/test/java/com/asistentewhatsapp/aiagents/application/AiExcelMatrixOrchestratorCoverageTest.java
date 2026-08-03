@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.asistentewhatsapp.aiagents.domain.AgentIntent;
 import com.asistentewhatsapp.aiagents.domain.AgentType;
+import com.asistentewhatsapp.businessai.api.BusinessAiSettingsResponse;
 import com.asistentewhatsapp.businessai.application.BusinessAiSettingsService;
 import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository;
 import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository.BusinessLocationRecord;
@@ -106,11 +107,11 @@ class AiExcelMatrixOrchestratorCoverageTest {
 	}
 
 	@Test
-	void previewModePersistsContextSoFragmentedClientAnswersContinueBookingFlow() throws Exception {
+	void persistedContextAllowsFragmentedClientAnswersToContinueBookingFlow() throws Exception {
 		Harness harness = new Harness(loadServices(), loadAliases());
 		UUID conversationId = UUID.fromString("bbbbbbbb-0000-0000-0000-000000000001");
 
-		AgentRoutingResult first = harness.preview("Quiero agendar manana a las 16:00 horas", conversationId)
+		AgentRoutingResult first = harness.routePersisted("Quiero agendar manana a las 16:00 horas", conversationId)
 				.orElseThrow();
 		assertThat(first.agentType()).isEqualTo(AgentType.BOOKING);
 		assertThat(first.missingData()).contains("motivo_o_servicio", "sucursal");
@@ -328,7 +329,8 @@ class AiExcelMatrixOrchestratorCoverageTest {
 									com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository.class)),
 					new PaymentsAgent(knowledge), new SupportAgent(locationRepository), new KnowledgeAgent(),
 					new FollowUpAgent(), new HumanHandoffAgent()));
-			Mockito.when(businessAiSettingsService.findSettingsOpt(Mockito.any())).thenReturn(Optional.empty());
+			Mockito.when(businessAiSettingsService.findSettingsOpt(Mockito.any()))
+					.thenReturn(Optional.of(activeSettings()));
 			this.coordinator = new AgentCoordinatorService(enabledProperties(), detector, extractor, registry,
 					contextRepository, businessAiSettingsService);
 		}
@@ -343,6 +345,10 @@ class AiExcelMatrixOrchestratorCoverageTest {
 
 		Optional<AgentRoutingResult> preview(String body, UUID conversationId) {
 			return coordinator.preview(request(body, conversationId, true));
+		}
+
+		Optional<AgentRoutingResult> routePersisted(String body, UUID conversationId) {
+			return coordinator.route(request(body, conversationId, false));
 		}
 
 		private AgentConversationRequest request(String body, UUID conversationId, boolean dryRun) {
@@ -409,6 +415,12 @@ class AiExcelMatrixOrchestratorCoverageTest {
 			properties.setAuditEnabled(true);
 			properties.setAutoReplyEnabled(false);
 			return properties;
+		}
+
+		private BusinessAiSettingsResponse activeSettings() {
+			return new BusinessAiSettingsResponse(UUID.randomUUID(), UUID.randomUUID(), true, "auto", "amigable", "es",
+					new java.math.BigDecimal("0.5"), true, true, true, true, java.util.List.of(), java.util.List.of(),
+					null, null, null, null);
 		}
 	}
 

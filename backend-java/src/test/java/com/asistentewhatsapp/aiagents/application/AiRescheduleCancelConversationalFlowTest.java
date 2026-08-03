@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.asistentewhatsapp.aiagents.domain.AgentIntent;
 import com.asistentewhatsapp.aiagents.infrastructure.AiAgentJdbcRepository;
+import com.asistentewhatsapp.businessai.api.BusinessAiSettingsResponse;
 import com.asistentewhatsapp.businessai.application.BusinessAiSettingsService;
 import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository;
 import java.util.List;
@@ -40,7 +41,8 @@ class AiRescheduleCancelConversationalFlowTest {
 	AiRescheduleCancelConversationalFlowTest() {
 		Mockito.when(aiAgentJdbcRepository.findConversationContext(Mockito.any(), Mockito.any()))
 				.thenReturn(Optional.empty());
-		Mockito.when(businessAiSettingsService.findSettingsOpt(Mockito.any())).thenReturn(Optional.empty());
+		Mockito.when(businessAiSettingsService.findSettingsOpt(Mockito.any()))
+				.thenReturn(Optional.of(activeSettings()));
 		coordinator = new AgentCoordinatorService(enabledProperties(), detector, extractor, registry,
 				aiAgentJdbcRepository, businessAiSettingsService);
 	}
@@ -149,6 +151,12 @@ class AiRescheduleCancelConversationalFlowTest {
 		AiAgentProperties props = new AiAgentProperties();
 		props.setEnabled(true);
 		return props;
+	}
+
+	private static BusinessAiSettingsResponse activeSettings() {
+		return new BusinessAiSettingsResponse(UUID.randomUUID(), UUID.randomUUID(), true, "auto", "amigable", "es",
+				new java.math.BigDecimal("0.5"), true, true, true, true, java.util.List.of(), java.util.List.of(), null,
+				null, null, null);
 	}
 
 	private static BusinessLocationJdbcRepository mockLocationRepository() {

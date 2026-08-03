@@ -1,5 +1,9 @@
 # Asistente WhatsApp MVP — Entorno Local
 
+> **Primera vez aquí?** Sigue la guía paso a paso:
+> [`QUICKSTART_15_MIN.md`](QUICKSTART_15_MIN.md) — configuración y validación
+> del ambiente local en ~15 minutos (requisitos, setup, start, verify).
+
 ## Modos de uso local
 
 | Modo | Comando | Requisitos | Auto-respuesta IA |
@@ -31,6 +35,12 @@ El flujo oficial del entorno local son los scripts `scripts/local-*.ps1` con
 
 # Reset completo (limpia artefactos, reconstruye, levanta y verifica)
 .\scripts\local-reset.ps1
+
+# Regenerar datos demo (recrea la BD; Flyway + LocalDataInitializer)
+.\scripts\local-reset-demo.ps1
+
+# Diagnóstico del ambiente (reporte sanitizado compartible con -OutFile)
+.\scripts\diagnose-local.ps1 -OutFile local-diagnostics.txt
 ```
 
 Perfiles opcionales de `docker-compose.local.yml`:
@@ -38,7 +48,7 @@ Perfiles opcionales de `docker-compose.local.yml`:
 | Perfil | Servicios | Comando |
 |--------|-----------|---------|
 | `observability` | Prometheus, Loki, Tempo, Alloy, Grafana | `.\scripts\observability-start.ps1` |
-| `backup` | backup-sidecar (pg_dump cron diario 04:00) | `.\scripts\local-start.ps1 -Profile backup` |
+| `backup` | backup-sidecar (pg_dump cron diario 04:00) + backup-exporter (métricas :9100) | `.\scripts\local-start.ps1 -Profile backup` |
 | `public-link` | Cloudflare Tunnel (URL temporal) | `.\scripts\start-public-link.ps1` |
 | `https` | Caddy (HTTPS local autosigned) | `.\scripts\local-start.ps1 -Profile https` |
 
@@ -165,6 +175,7 @@ docker compose --env-file .env.local -f docker-compose.local.yml --profile publi
 | frontend-react | 5173 | 5173 | — | Vite dev server |
 | mailpit | 8025, 1025 | 8025, 1025 | — | Captura de correos SMTP |
 | backup-sidecar | — | — | `backup` | pg_dump cron diario (04:00, retención 7 días) |
+| backup-exporter | 9100 | 9100 | `backup` | Sirve las métricas del sidecar a Prometheus |
 | public-tunnel | — | — | `public-link` | Cloudflare Tunnel (trycloudflare.com) |
 | caddy | 80, 443 | 80, 443 | `https` | HTTPS local autosigned (Caddyfile.local) |
 | prometheus | 9090 | 9090 | `observability` | Métricas (scrape backend) |
@@ -223,22 +234,53 @@ docker compose --env-file .env.local -f docker-compose.local.yml ps
 > alternativo que **no** debe levantarse simultáneamente con `docker-compose.local.yml`
 > (comparten puertos 5433/8080/5173). Ver encabezado del archivo.
 
-## Backup de la Base de Datos
+## Backup y Recuperación de la Base de Datos (Fase 9)
+
+Capacidad completa de respaldo/restauración verificada: formato `custom` (pg_dump
+`-Fc -Z5 --no-owner --no-acl`), suma SHA-256, metadatos, restauración a BD temporal
+con verificación estructural/funcional, backend contra la BD restaurada y pruebas
+negativas. Documentación canónica: `docs/informe_recuperacion_fase9.md`.
 
 ```powershell
-# Backup manual (pg_dump del host; fallback a docker compose exec postgres)
-.\scripts\backup-db.ps1                      # -> .\backups\asistente_whatsapp_<timestamp>.sql.gz
+# Backup manual (custom .dump + .sha256 + .metadata.json)
+.\scripts\backup-db.ps1                      # -> .\backups\asistente_whatsapp_<timestamp>.dump
 .\scripts\backup-db.ps1 -OutputDir C:\backups
 
-# Restaurar un backup
-.\scripts\restore-db.ps1 -BackupFile .\backups\asistente_whatsapp_<timestamp>.sql.gz
+# Restaurar a BD temporal segura (verifica SHA-256 + valida estructura contra la
+# BD principal; NO toca la principal). Usa -RestoreToMain para el swap con doble
+# confirmación CONFIRMAR + nombre de BD.
+.\scripts\restore-db.ps1 -BackupFile .\backups\asistente_whatsapp_<timestamp>.dump
+
+# Verificar una BD restaurada contra la referencia (tablas, FKs, Flyway, conteos,
+# integridad referencial)
+.\scripts\verify-restore-db.ps1 -DbName <bd_restaurada>
+
+# Backend funcional contra la BD restaurada (puerto 8081; login, GET /api/v1/company,
+# inbound simulado con escritura real)
+.\scripts\restore-backend-check.ps1 -DbName <bd_restaurada>
+
+# Pruebas negativas de recuperación (6 escenarios, exit 0 si todas pasan)
+.\scripts\test-recovery-negative.ps1 -BackupDir .\backups
 
 # Backup automático diario (perfil backup: cron 04:00, retención 7 días)
 .\scripts\local-start.ps1 -Profile backup
 ```
 
+El sidecar (`backup-sidecar`) genera por cada respaldo: `.dump` (custom), `.sha256`,
+`.metadata.json` (sanitizado) y actualiza `metrics` (texto Prometheus) con
+`backup_sidecar_success_total`, `backup_sidecar_failures_total`,
+`backup_sidecar_last_success_timestamp_seconds`, `last_duration_seconds`,
+`last_size_bytes`, `last_sha256_ok` y `last_result`. Prometheus lo recolecta vía el
+servicio `backup-exporter` (puerto 9100, perfil `backup`) con alertas
+`BackupFallido`, `BackupDesactualizado` y `BackupSinMetricas` en
+`monitoring/prometheus/alerts.yml`.
+
 Los backups del sidecar se guardan en el volumen `postgres-backups`
 (`docker volume inspect asistente_postgres-backups`).
+
+Métricas objetivo en local: **RPO** ≤ 24 h (cron diario 04:00) y **RTO** ~7–10 s de
+restauración de datos + verificación + arranque del backend (~1 min en total),
+medidos en el informe de la Fase 9.
 
 ## Personalización Local
 

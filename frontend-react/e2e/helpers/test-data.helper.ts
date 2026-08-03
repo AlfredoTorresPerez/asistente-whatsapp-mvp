@@ -1,4 +1,4 @@
-import { apiPost, apiGet } from './api.helper'
+import { apiPost, apiGet, loginDemoAdmin } from './api.helper'
 import type { APIResponse } from '@playwright/test'
 
 const QA_PREFIX = 'QA_AUTO_'
@@ -7,6 +7,12 @@ let authToken: string | null = null
 
 export function setAuthToken(token: string) {
   authToken = token
+}
+
+export async function resolveAuthToken(): Promise<string | null> {
+  if (authToken) return authToken
+  authToken = await loginDemoAdmin()
+  return authToken
 }
 
 export function getAuthToken(): string | null {
@@ -31,7 +37,7 @@ export async function createQaClient(index = 1): Promise<{ id: string } | null> 
       displayName: qaId(`CLIENTE_${index}`),
       phone: qaPhone(index),
       email: `qa_auto_${index}@test.cl`,
-    }, authToken ?? undefined)
+    }, authToken ?? await resolveAuthToken() ?? undefined)
     if (resp.ok) return await resp.json() as { id: string }
     return null
   } catch { return null }
@@ -48,7 +54,7 @@ export async function createQaBooking(overrides?: Record<string, unknown>): Prom
     status: 'PENDIENTE_CONFIRMACION',
     ...overrides,
   }
-  return apiPost('/bookings', payload, authToken ?? undefined)
+  return apiPost('/bookings', payload, authToken ?? await resolveAuthToken() ?? undefined)
 }
 
 export async function createQaBookingWithStatus(status: string): Promise<APIResponse> {
@@ -57,11 +63,12 @@ export async function createQaBookingWithStatus(status: string): Promise<APIResp
 
 export async function cleanupQaData() {
   try {
-    const resp = await apiGet('/bookings?search=QA_AUTO_', authToken ?? undefined)
+    const token = authToken ?? await resolveAuthToken()
+    const resp = await apiGet('/bookings?search=QA_AUTO_', token ?? undefined)
     if (resp.ok) {
       const body = await resp.json() as { items?: Array<{ id: string }> }
       for (const item of body.items ?? []) {
-        await apiPost(`/bookings/${item.id}/cancel`, { reason: 'QA cleanup' }, authToken ?? undefined)
+        await apiPost(`/bookings/${item.id}/cancel`, { reason: 'QA cleanup' }, token ?? undefined)
       }
     }
   } catch { /* silent cleanup */ }

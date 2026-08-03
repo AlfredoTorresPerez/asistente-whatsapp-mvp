@@ -34,6 +34,31 @@ export async function apiPatch(path: string, body: Record<string, unknown>, toke
   return context.patch(path, { data: body, headers })
 }
 
+const DEMO_ADMIN_EMAIL = 'admin@demo.cl'
+const DEMO_ADMIN_PASSWORD = 'Cambiar123!'
+
+let cachedAccessToken: string | null = null
+
+export async function loginDemoAdmin(): Promise<string | null> {
+  if (cachedAccessToken) return cachedAccessToken
+  try {
+    const context = await getApiContext()
+    const resp = await context.post('/auth/login', {
+      data: { email: DEMO_ADMIN_EMAIL, password: DEMO_ADMIN_PASSWORD },
+    })
+    if (!resp.ok()) return null
+    const body = await resp.json()
+    cachedAccessToken = typeof body.accessToken === 'string' ? body.accessToken : null
+    return cachedAccessToken
+  } catch {
+    return null
+  }
+}
+
+export function resetDemoAdminToken() {
+  cachedAccessToken = null
+}
+
 export async function expectApiHealthy() {
   try {
     const context = await getApiContext()

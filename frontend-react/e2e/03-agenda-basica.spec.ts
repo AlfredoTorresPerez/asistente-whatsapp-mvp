@@ -1,7 +1,13 @@
 import { test, expect } from '@playwright/test'
+import dayjs from 'dayjs'
+import isoWeek from 'dayjs/plugin/isoWeek.js'
+import { QA_MOCK_PERMISSIONS } from './helpers/auth.helper'
+
+dayjs.extend(isoWeek)
+const weekStart = dayjs().startOf('isoWeek')
 
 async function addSessionAndMocks(page: import('@playwright/test').Page) {
-  await page.addInitScript(() => {
+  await page.addInitScript((permissions) => {
     window.sessionStorage.setItem('asistente-whatsapp.session', JSON.stringify({
       accessToken: 'qa-auto-test-token',
       expiresAt: new Date(Date.now() + 86400000).toISOString(),
@@ -9,13 +15,15 @@ async function addSessionAndMocks(page: import('@playwright/test').Page) {
         id: 'qa-auto-user-001', name: 'QA Auto', firstName: 'QA', lastName: 'Auto',
         email: 'qa_auto@demo.cl', role: 'OWNER', businessId: 'qa-auto-biz-001',
         businessName: 'QA Auto Centro Estetico', timezone: 'America/Santiago', phone: null,
+        permissions,
       },
     }))
-  })
+  }, QA_MOCK_PERMISSIONS)
   await page.route(/\/api\/v1\/auth\/me(\?|$)/, async (route) => {
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
       id: 'qa-auto-user-001', firstName: 'QA', lastName: 'Auto', email: 'qa_auto@demo.cl',
       role: 'OWNER', businessId: 'qa-auto-biz-001', businessName: 'QA Auto Centro Estetico', timezone: 'America/Santiago',
+      permissions: QA_MOCK_PERMISSIONS,
     }) })
   })
   await page.route(/\/api\/v1\/users\/me(\?|$)/, async (route) => {
@@ -28,7 +36,10 @@ async function addSessionAndMocks(page: import('@playwright/test').Page) {
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [], totalItems: 0 }) })
   })
   await page.route(/\/api\/v1\/dashboard\/summary/, async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({}) })
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
+      kpis: { openConversations: 0, newProspects: 0, openOrders: 0, pendingAppointments: 0 },
+      todayAppointments: [], recentActivity: [], conversationSeries: [], orderSeries: [],
+    }) })
   })
   await page.route(/\/api\/v1\/business-locations/, async (route) => {
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([{
@@ -42,13 +53,27 @@ async function addSessionAndMocks(page: import('@playwright/test').Page) {
       rooms: [{ id: 'room-1', name: 'Cabina 1', detail: null }],
     }) })
   })
+  await page.route(/\/api\/v1\/agenda\/business-hours/, async (route) => {
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([
+      { dayOfWeek: 1, startTime: '09:00', endTime: '21:00' },
+      { dayOfWeek: 2, startTime: '09:00', endTime: '21:00' },
+      { dayOfWeek: 3, startTime: '09:00', endTime: '21:00' },
+      { dayOfWeek: 4, startTime: '09:00', endTime: '21:00' },
+      { dayOfWeek: 5, startTime: '09:00', endTime: '21:00' },
+      { dayOfWeek: 6, startTime: '10:00', endTime: '14:00' },
+      { dayOfWeek: 0, startTime: '10:00', endTime: '14:00' },
+    ]) })
+  })
+  await page.route(/\/api\/v1\/agenda\/availability/, async (route) => {
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ slots: [] }) })
+  })
   await page.route(/\/api\/v1\/agenda\/calendar/, async (route) => {
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
       items: [{
         bookingId: 'qa-auto-booking-1',
-        startsAt: '2026-07-07T10:00:00-04:00',
-        endsAt: '2026-07-07T11:00:00-04:00',
-        dateLocal: '2026-07-07',
+        startsAt: `${weekStart.format('YYYY-MM-DD')}T10:00:00-04:00`,
+        endsAt: `${weekStart.format('YYYY-MM-DD')}T11:00:00-04:00`,
+        dateLocal: weekStart.format('YYYY-MM-DD'),
         startTimeLocal: '10:00',
         endTimeLocal: '11:00',
         durationMinutes: 60,
@@ -63,9 +88,9 @@ async function addSessionAndMocks(page: import('@playwright/test').Page) {
         subject: 'Limpieza facial',
       }, {
         bookingId: 'qa-auto-booking-2',
-        startsAt: '2026-07-07T11:00:00-04:00',
-        endsAt: '2026-07-07T11:30:00-04:00',
-        dateLocal: '2026-07-07',
+        startsAt: `${weekStart.format('YYYY-MM-DD')}T11:00:00-04:00`,
+        endsAt: `${weekStart.format('YYYY-MM-DD')}T11:30:00-04:00`,
+        dateLocal: weekStart.format('YYYY-MM-DD'),
         startTimeLocal: '11:00',
         endTimeLocal: '11:30',
         durationMinutes: 30,
@@ -80,9 +105,9 @@ async function addSessionAndMocks(page: import('@playwright/test').Page) {
         subject: 'Depilacion',
       }, {
         bookingId: 'qa-auto-booking-3',
-        startsAt: '2026-07-07T14:00:00-04:00',
-        endsAt: '2026-07-07T15:00:00-04:00',
-        dateLocal: '2026-07-07',
+        startsAt: `${weekStart.format('YYYY-MM-DD')}T14:00:00-04:00`,
+        endsAt: `${weekStart.format('YYYY-MM-DD')}T15:00:00-04:00`,
+        dateLocal: weekStart.format('YYYY-MM-DD'),
         startTimeLocal: '14:00',
         endTimeLocal: '15:00',
         durationMinutes: 60,

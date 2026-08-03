@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:16.14-alpine
     container_name: asistente-whatsapp-postgres-qa
     mem_limit: 768m
     cpus: 1.0
@@ -106,7 +106,7 @@ services:
     restart: unless-stopped
 
   caddy:
-    image: caddy:2-alpine
+    image: caddy:2.11.4-alpine
     container_name: asistente-whatsapp-caddy-qa
     restart: unless-stopped
     mem_limit: 256m

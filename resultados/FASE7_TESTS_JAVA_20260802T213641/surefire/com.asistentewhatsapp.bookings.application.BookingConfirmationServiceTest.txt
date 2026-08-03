@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.asistentewhatsapp.bookings.application.BookingConfirmationServiceTest
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.014 s -- in com.asistentewhatsapp.bookings.application.BookingConfirmationServiceTest

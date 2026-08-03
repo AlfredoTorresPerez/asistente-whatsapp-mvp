@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { QA_MOCK_PERMISSIONS } from './helpers/auth.helper'
 
 test.describe('NIVEL 1 — Smoke Tests basicos', () => {
   test('QA-01-001: Frontend carga en http://localhost:5173', async ({ page }) => {
@@ -18,7 +19,7 @@ test.describe('NIVEL 1 — Smoke Tests basicos', () => {
   })
 
   test('QA-01-005: Sidebar con modulos visibles tras login mockeado', async ({ page }) => {
-    await page.addInitScript(() => {
+    await page.addInitScript((permissions) => {
       window.sessionStorage.setItem('asistente-whatsapp.session', JSON.stringify({
         accessToken: 'qa-auto-test-token',
         expiresAt: new Date(Date.now() + 86400000).toISOString(),
@@ -33,13 +34,15 @@ test.describe('NIVEL 1 — Smoke Tests basicos', () => {
           businessName: 'QA Auto Centro Estetico',
           timezone: 'America/Santiago',
           phone: null,
+          permissions,
         },
       }))
-    })
+    }, QA_MOCK_PERMISSIONS)
     await page.route('**/api/v1/auth/me', async (route) => {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
         id: 'qa-auto-user-001', firstName: 'QA', lastName: 'Auto', email: 'qa_auto@demo.cl',
         role: 'OWNER', businessId: 'qa-auto-biz-001', businessName: 'QA Auto Centro Estetico', timezone: 'America/Santiago',
+        permissions: QA_MOCK_PERMISSIONS,
       }) })
     })
     await page.route('**/api/v1/users/me', async (route) => {
@@ -68,7 +71,7 @@ test.describe('NIVEL 1 — Smoke Tests basicos', () => {
   })
 
   test('QA-01-006: Modulo Agenda completa se abre', async ({ page }) => {
-    await page.addInitScript(() => {
+    await page.addInitScript((permissions) => {
       window.sessionStorage.setItem('asistente-whatsapp.session', JSON.stringify({
         accessToken: 'qa-auto-test-token',
         expiresAt: new Date(Date.now() + 86400000).toISOString(),
@@ -76,13 +79,15 @@ test.describe('NIVEL 1 — Smoke Tests basicos', () => {
           id: 'qa-auto-user-001', name: 'QA Auto', firstName: 'QA', lastName: 'Auto',
           email: 'qa_auto@demo.cl', role: 'OWNER', businessId: 'qa-auto-biz-001',
           businessName: 'QA Auto Centro Estetico', timezone: 'America/Santiago', phone: null,
+          permissions,
         },
       }))
-    })
+    }, QA_MOCK_PERMISSIONS)
     await page.route('**/api/v1/auth/me', async (route) => {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
         id: 'qa-auto-user-001', firstName: 'QA', lastName: 'Auto', email: 'qa_auto@demo.cl',
         role: 'OWNER', businessId: 'qa-auto-biz-001', businessName: 'QA Auto Centro Estetico', timezone: 'America/Santiago',
+        permissions: QA_MOCK_PERMISSIONS,
       }) })
     })
     await page.route('**/api/v1/users/me', async (route) => {
@@ -95,7 +100,10 @@ test.describe('NIVEL 1 — Smoke Tests basicos', () => {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [], totalItems: 0 }) })
     })
     await page.route('**/api/v1/dashboard/summary*', async (route) => {
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({}) })
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
+        kpis: { openConversations: 0, newProspects: 0, openOrders: 0, pendingAppointments: 0 },
+        todayAppointments: [], recentActivity: [], conversationSeries: [], orderSeries: [],
+      }) })
     })
     await page.route('**/api/v1/business-locations*', async (route) => {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) })
@@ -122,7 +130,7 @@ test.describe('NIVEL 1 — Smoke Tests basicos', () => {
   })
 
   test('QA-01-007: Modulo Conversaciones se abre', async ({ page }) => {
-    await page.addInitScript(() => {
+    await page.addInitScript((permissions) => {
       window.sessionStorage.setItem('asistente-whatsapp.session', JSON.stringify({
         accessToken: 'qa-auto-test-token',
         expiresAt: new Date(Date.now() + 86400000).toISOString(),
@@ -130,13 +138,15 @@ test.describe('NIVEL 1 — Smoke Tests basicos', () => {
           id: 'qa-auto-user-001', name: 'QA Auto', firstName: 'QA', lastName: 'Auto',
           email: 'qa_auto@demo.cl', role: 'OWNER', businessId: 'qa-auto-biz-001',
           businessName: 'QA Auto Centro Estetico', timezone: 'America/Santiago', phone: null,
+          permissions,
         },
       }))
-    })
+    }, QA_MOCK_PERMISSIONS)
     await page.route('**/api/v1/auth/me', async (route) => {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
         id: 'qa-auto-user-001', firstName: 'QA', lastName: 'Auto', email: 'qa_auto@demo.cl',
         role: 'OWNER', businessId: 'qa-auto-biz-001', businessName: 'QA Auto Centro Estetico', timezone: 'America/Santiago',
+        permissions: QA_MOCK_PERMISSIONS,
       }) })
     })
     await page.route('**/api/v1/users/me', async (route) => {
@@ -152,7 +162,10 @@ test.describe('NIVEL 1 — Smoke Tests basicos', () => {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [], totalItems: 0 }) })
     })
     await page.route('**/api/v1/dashboard/summary*', async (route) => {
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({}) })
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
+        kpis: { openConversations: 0, newProspects: 0, openOrders: 0, pendingAppointments: 0 },
+        todayAppointments: [], recentActivity: [], conversationSeries: [], orderSeries: [],
+      }) })
     })
 
     await page.goto('/conversations')

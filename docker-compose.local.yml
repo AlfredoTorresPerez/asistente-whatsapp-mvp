@@ -48,7 +48,7 @@ services:
   # POSTGRESQL 16
   # ---------------------------------------------------------------------------
   postgres:
-    image: postgres:16-alpine
+    image: postgres:16.14-alpine
     container_name: asistente-postgres
     restart: unless-stopped
     mem_limit: 512m
@@ -245,7 +245,7 @@ services:
   public-tunnel:
     profiles:
       - public-link
-    image: cloudflare/cloudflared:latest
+    image: cloudflare/cloudflared:2026.7.0
     container_name: asistente-public-tunnel
     restart: unless-stopped
     depends_on:
@@ -261,11 +261,13 @@ services:
   # ---------------------------------------------------------------------------
   # BACKUP POSTGRES (opcional: requiere --profile backup)
   # Sidecar que ejecuta pg_dump diario (cron 04:00) sobre el volumen postgres-backups
+  # Formato custom (Fc -Z 5) + sha256 + metadatos + metricas Prometheus (Fase 9).
+  # Triggers: /entrypoint.sh backup -> respaldo unico y sale (docker exec).
   # ---------------------------------------------------------------------------
   backup-sidecar:
     profiles:
       - backup
-    image: postgres:16-alpine
+    image: postgres:16.14-alpine
     container_name: asistente-backup-sidecar
     restart: unless-stopped
     mem_limit: 128m
@@ -280,12 +282,37 @@ services:
       PGPASSWORD: assistant
       PGDATABASE: asistente_whatsapp
       BACKUP_DIR: /backups
-      RETENTION_DAYS: "7"
+      BACKUP_FORMAT: ${BACKUP_FORMAT:-custom}
+      RETENTION_DAYS: ${RETENTION_DAYS:-7}
       CRON_SCHEDULE: ${BACKUP_CRON_SCHEDULE:-0 4 * * *}
+      BACKUP_ON_START: ${BACKUP_ON_START:-false}
+      BACKUP_SIMULATION_MODE: ${BACKUP_SIMULATION_MODE:-false}
     volumes:
       - ./scripts/backup-sidecar-entrypoint.sh:/entrypoint.sh:ro
       - postgres-backups:/backups
     entrypoint: ["/bin/sh", "/entrypoint.sh"]
+    networks:
+      - asistente-local
+
+  # ---------------------------------------------------------------------------
+  # BACKUP EXPORTER (opcional: requiere --profile backup)
+  # Serve el archivo /backups/metrics (texto Prometheus del sidecar) en el
+  # puerto 9100 para que Prometheus recolecte metricas del respaldo.
+  # ---------------------------------------------------------------------------
+  backup-exporter:
+    profiles:
+      - backup
+    image: busybox:1.36.1
+    container_name: asistente-backup-exporter
+    restart: unless-stopped
+    mem_limit: 64m
+    cpus: 0.1
+    depends_on:
+      backup-sidecar:
+        condition: service_started
+    entrypoint: ["/bin/sh", "-c", "cd /www && /bin/busybox httpd -f -p 9100 -h /www"]
+    volumes:
+      - postgres-backups:/www:ro
     networks:
       - asistente-local
 
@@ -442,7 +469,7 @@ services:
   caddy:
     profiles:
       - https
-    image: caddy:2-alpine
+    image: caddy:2.11.4-alpine
     container_name: asistente-caddy
     restart: unless-stopped
     mem_limit: 128m

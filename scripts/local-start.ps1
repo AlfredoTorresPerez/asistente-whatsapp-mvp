@@ -62,6 +62,7 @@ function Set-EnvValueFromFile {
 # ------------------------------------------------------------------------
 if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
   Write-Error "docker no esta instalado o no esta en el PATH."
+  Write-Host "Accion: instala Docker Desktop y verifica con docker --version" -ForegroundColor Yellow
   exit 1
 }
 
@@ -101,6 +102,7 @@ $configArgs += '--quiet'
 & docker @configArgs 2>&1 | Out-Null
 if ($LASTEXITCODE -ne 0) {
   Write-Error "docker compose config fallo. Revisa $ComposeFile y .env.local"
+  Write-Host "Accion: verifica .env.local (define APP_JWT_SECRET) y ejecuta .\scripts\diagnose-local.ps1" -ForegroundColor Yellow
   exit 1
 }
 Write-Host "  [OK] docker compose config valido (perfiles: $($ProfileList -join ', '))" -ForegroundColor Green

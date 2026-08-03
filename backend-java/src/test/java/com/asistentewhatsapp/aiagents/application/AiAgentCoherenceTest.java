@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.asistentewhatsapp.aiagents.domain.AgentIntent;
 import com.asistentewhatsapp.aiagents.domain.AgentType;
+import com.asistentewhatsapp.businessai.api.BusinessAiSettingsResponse;
 import com.asistentewhatsapp.businessai.application.BusinessAiSettingsService;
 import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository;
 import java.math.BigDecimal;
@@ -37,7 +38,16 @@ class AiAgentCoherenceTest {
 					Mockito.mock(com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository.class)),
 			new PaymentsAgent(knowledgeService), new SupportAgent(locationRepository), new KnowledgeAgent(),
 			new FollowUpAgent(), new HumanHandoffAgent()));
-	private final BusinessAiSettingsService businessAiSettingsService = Mockito.mock();
+	private final BusinessAiSettingsService businessAiSettingsService = activeBusinessAiSettingsService();
+
+	private BusinessAiSettingsService activeBusinessAiSettingsService() {
+		BusinessAiSettingsService service = Mockito.mock(BusinessAiSettingsService.class);
+		Mockito.when(service.findSettingsOpt(Mockito.any()))
+				.thenReturn(Optional.of(new BusinessAiSettingsResponse(UUID.randomUUID(), UUID.randomUUID(), true,
+						"auto", "amigable", "es", new java.math.BigDecimal("0.5"), true, true, true, true,
+						java.util.List.of(), java.util.List.of(), null, null, null, null)));
+		return service;
+	}
 
 	private BusinessLocationJdbcRepository emptyLocationRepository() {
 		BusinessLocationJdbcRepository repository = Mockito.mock(BusinessLocationJdbcRepository.class);

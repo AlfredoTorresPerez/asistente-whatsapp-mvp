@@ -176,3 +176,35 @@ groups:
           componente: tempo
         annotations:
           summary: "Tempo no recibe trazas del backend"
+
+  - name: asistente-respaldo
+    rules:
+      - alert: BackupFallido
+        expr: increase(backup_sidecar_failures_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          componente: backup
+        annotations:
+          summary: "El respaldo de PostgreSQL fallo"
+          description: "backup_sidecar_failures_total aumento en los ultimos 5 minutos."
+
+      - alert: BackupDesactualizado
+        expr: backup_sidecar_last_success_timestamp_seconds < (time() - 26*3600)
+        for: 5m
+        labels:
+          severity: warning
+          componente: backup
+        annotations:
+          summary: "Ultimo respaldo exitoso hace mas de 26 horas"
+          description: "RPO local superado (respaldo diario 04:00 no registra exito reciente)."
+
+      - alert: BackupSinMetricas
+        expr: absent(backup_sidecar_last_success_timestamp_seconds) and (up{job="backup-sidecar"} == 1)
+        for: 15m
+        labels:
+          severity: warning
+          componente: backup
+        annotations:
+          summary: "El sidecar de respaldo no publica metricas"
+          description: "backup-exporter responde pero el sidecar no ha generado metricas."

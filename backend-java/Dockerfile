@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.7
 # La etapa de compilacion usa una imagen con Maven preinstalado para evitar que
 # Maven Wrapper tenga que descargar apache-maven durante el build de Docker.
-FROM maven:3.9.9-eclipse-temurin-21 AS build
+FROM maven:3.9.15-eclipse-temurin-21 AS build
 
 WORKDIR /app
 
@@ -27,7 +27,7 @@ RUN --mount=type=cache,target=/root/.m2 \
       sleep 15; \
     done
 
-FROM eclipse-temurin:21-jre-jammy
+FROM eclipse-temurin:21.0.11_10-jre-jammy
 
 WORKDIR /app
 

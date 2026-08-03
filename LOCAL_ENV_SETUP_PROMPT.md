@@ -7,7 +7,7 @@
 | Docker Desktop | Cualquiera reciente | `docker ps` |
 | Java JDK | 21+ | `java -version` |
 | Maven | 3.9+ | `mvn --version` |
-| Node.js | 20+ | `node --version` |
+| Node.js | 20.19+ | `node --version` |
 | pnpm | 10+ | `pnpm --version` |
 
 **⚠️ Docker Engine debe estar corriendo** antes de cualquier paso. Si `docker ps` falla, abrir Docker Desktop y esperar a que el engine inicie.

@@ -41,3 +41,16 @@ scrape_configs:
         replacement: tempo:3200
       - target_label: service
         replacement: tempo
+
+  - job_name: 'backup-sidecar'
+    static_configs:
+      - targets: ['backup-exporter:9100']
+    metrics_path: '/metrics'
+    scrape_timeout: 5s
+    fallback_scrape_protocol: PrometheusText0.0.4
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: backup-exporter:9100
+      - target_label: service
+        replacement: backup-sidecar

@@ -75,7 +75,7 @@ test.describe('LOCAL MATURITY — Validacion del entorno local', () => {
       await page.goto('/centro-estetica-bella')
       await page.waitForLoadState('networkidle')
       await expect(page.getByRole('heading', { name: /Realza tu belleza/i })).toBeVisible({ timeout: 10000 })
-      await expect(page.getByRole('button', { name: /Agendar por WhatsApp/i })).toBeVisible()
+      await expect(page.getByRole('button', { name: /Abrir conversación de WhatsApp con Centro Estética Bella/i })).toBeVisible()
     })
   })
 })

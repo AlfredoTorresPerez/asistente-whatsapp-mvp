@@ -50,7 +50,7 @@ $coreContainers = @("asistente-postgres", "asistente-backend", "asistente-fronte
 # Opcionales: se verifican solo si estan corriendo (perfil activo)
 $optionalContainers = @(
   "asistente-prometheus", "asistente-loki", "asistente-tempo", "asistente-alloy", "asistente-grafana",
-  "asistente-backup-sidecar", "asistente-public-tunnel", "asistente-caddy"
+  "asistente-backup-sidecar", "asistente-backup-exporter", "asistente-public-tunnel", "asistente-caddy"
 )
 
 foreach ($name in $coreContainers) {
@@ -100,6 +100,7 @@ try {
   }
 } catch {
   Write-Fail "Backend health endpoint no responde: $_"
+  Write-Host "    Accion: revisa docker logs asistente-backend y que el stack este levantado (local-start.ps1)" -ForegroundColor Yellow
 }
 
 # ── 4. Frontend HTTP 200 ────────────────────────────────────
@@ -114,6 +115,7 @@ try {
   }
 } catch {
   Write-Fail "Frontend no responde: $_"
+  Write-Host "    Accion: revisa docker logs asistente-frontend" -ForegroundColor Yellow
 }
 
 # ── 5. Login + API smoke ───────────────────────────────────
@@ -138,6 +140,7 @@ try {
   }
 } catch {
   Write-Fail "Smoke test fallo: $_"
+  Write-Host "    Accion: ejecuta .\scripts\local-reset-demo.ps1 para regenerar los datos demo" -ForegroundColor Yellow
 }
 
 # ── Resumen ─────────────────────────────────────────────────
