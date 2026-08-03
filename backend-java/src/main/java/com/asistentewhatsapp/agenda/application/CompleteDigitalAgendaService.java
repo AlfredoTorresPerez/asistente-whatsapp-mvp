@@ -7,6 +7,7 @@ import com.asistentewhatsapp.agenda.api.AgendaBlockResponse;
 import com.asistentewhatsapp.agenda.api.AgendaCalendarResponse;
 import com.asistentewhatsapp.agenda.api.AgendaCancelRequest;
 import com.asistentewhatsapp.agenda.api.AgendaFilterOptionsResponse;
+import com.asistentewhatsapp.agenda.api.AgendaLifecycleRequest;
 import com.asistentewhatsapp.agenda.api.AgendaRescheduleRequest;
 import com.asistentewhatsapp.agenda.api.AgendaSlotResponse;
 import com.asistentewhatsapp.agenda.api.BusinessHoursResponse;
@@ -37,6 +38,7 @@ import com.asistentewhatsapp.security.application.AuditMetadata;
 import com.asistentewhatsapp.security.domain.AuthenticatedUser;
 import com.asistentewhatsapp.shared.exception.ApiException;
 import com.asistentewhatsapp.shared.observability.BusinessMetrics;
+import com.asistentewhatsapp.shared.util.PhoneUtils;
 import java.nio.charset.StandardCharsets;
 import java.time.DateTimeException;
 import java.time.LocalDate;
@@ -49,7 +51,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -184,14 +188,19 @@ public class CompleteDigitalAgendaService {
 		UUID roomId = resolveRoom(user, request, service);
 		OffsetDateTime startsAt = normalizeStartsAt(request.startsAt());
 		String customerPhone = normalizePhone(request.customerPhone());
+		String legacyCustomerPhone = normalizeLegacyPhone(request.customerPhone());
+		String sourceChannel = normalizeSourceChannel(request.sourceChannel());
 		String idempotencyKey = bookingOperationIdempotencyKey("TEMPORARY_BOOKING_CREATE", request.idempotencyKey(),
 				user.businessId(), request.conversationId(), request.customerId(), customerPhone, location.id(),
 				service.id(), professionalId, roomId, startsAt);
 		String requestHash = bookingOperationRequestHash("TEMPORARY_BOOKING_CREATE", user.businessId(),
 				request.conversationId(), request.customerId(), customerPhone, location.id(), service.id(),
 				professionalId, roomId, startsAt, service.durationMinutes());
+		String legacyRequestHash = bookingOperationRequestHash("TEMPORARY_BOOKING_CREATE", user.businessId(),
+				request.conversationId(), request.customerId(), legacyCustomerPhone, location.id(), service.id(),
+				professionalId, roomId, startsAt, service.durationMinutes());
 		BookingDetailResponse existing = resolveIdempotentTemporaryBooking(user.businessId(), idempotencyKey,
-				requestHash);
+				requestHash, legacyRequestHash);
 		if (existing != null) {
 			return existing;
 		}
@@ -203,23 +212,24 @@ public class CompleteDigitalAgendaService {
 
 		CompleteAgendaJdbcRepository.CustomerRecord customer = repository.findOrCreateCustomer(user.businessId(),
 				request.customerId(), normalizeCustomerName(request.customerName()), customerPhone,
-				request.customerEmail());
+				request.customerEmail(), request.communicationsConsent());
 		OffsetDateTime expiresAt = OffsetDateTime.now(ZoneOffset.UTC)
 				.plusMinutes(resolveExpirationMinutes(request.expirationMinutes()));
 		UUID bookingId = repository.insertTemporaryBooking(user.businessId(), customer.id(), request.conversationId(),
 				request.leadId(), user.userId(), service.name(), location.id(), service.id(), professionalId, roomId,
 				startsAt, endsAt, service.durationMinutes(), expiresAt, service.requiresDeposit(),
-				service.depositAmount(), request.notes());
+				service.depositAmount(), request.notes(), sourceChannel);
 		recordConsentIfPresent(user.businessId(), bookingId, service, request.informedConsentAccepted(),
 				request.customerBirthDate(), request.guardianName(), request.guardianPhone());
 		repository.completeBookingOperationIdempotency(user.businessId(), "TEMPORARY_BOOKING_CREATE", idempotencyKey,
 				requestHash, bookingId);
 		auditService.record(user.businessId(), user.userId(), "AGENDA_TEMPORARY_BOOKING_CREATED", "BOOKING", bookingId,
 				"Reserva temporal creada por agenda digital completa.",
-				AuditMetadata.of("source", historySource(user), "newStatus", BookingStateMachine.PENDING_CONFIRMATION,
-						"locationId", location.id(), "serviceId", service.id(), "professionalId", professionalId,
-						"roomId", roomId, "startsAt", startsAt, "endsAt", endsAt, "temporaryExpiresAt", expiresAt,
-						"requiresDeposit", service.requiresDeposit(), "depositAmount", service.depositAmount()));
+				AuditMetadata.of("source", historySource(user), "sourceChannel", sourceChannel, "newStatus",
+						BookingStateMachine.PENDING_CONFIRMATION, "locationId", location.id(), "serviceId",
+						service.id(), "professionalId", professionalId, "roomId", roomId, "startsAt", startsAt,
+						"endsAt", endsAt, "temporaryExpiresAt", expiresAt, "requiresDeposit", service.requiresDeposit(),
+						"depositAmount", service.depositAmount()));
 
 		if (Boolean.TRUE.equals(request.generateConfirmationLink())) {
 			bookingConfirmationService.createConfirmationLink(user, bookingId, new CreateBookingConfirmationLinkRequest(
@@ -299,6 +309,56 @@ public class CompleteDigitalAgendaService {
 			calendarSyncService.syncCancelled(bookingId, user.businessId());
 		} catch (Exception ignored) {
 		}
+		return bookingJdbcRepository.findBookingDetail(user.businessId(), bookingId);
+	}
+
+	@Transactional
+	public BookingDetailResponse confirm(AuthenticatedUser user, UUID bookingId, AgendaLifecycleRequest request) {
+		BookingDetailResponse detail = changeBookingStatus(user, bookingId, BookingStateMachine.CONFIRMED,
+				"confirmarse", "AGENDA_BOOKING_CONFIRMED", "Cita confirmada desde agenda.", request);
+		try {
+			calendarSyncService.syncConfirmed(bookingId, user.businessId());
+		} catch (Exception ignored) {
+		}
+		return detail;
+	}
+
+	@Transactional
+	public BookingDetailResponse startService(AuthenticatedUser user, UUID bookingId, AgendaLifecycleRequest request) {
+		return changeBookingStatus(user, bookingId, BookingStateMachine.IN_SERVICE, "iniciar atencion",
+				"AGENDA_BOOKING_SERVICE_STARTED", "Atencion iniciada desde agenda.", request);
+	}
+
+	@Transactional
+	public BookingDetailResponse complete(AuthenticatedUser user, UUID bookingId, AgendaLifecycleRequest request) {
+		return changeBookingStatus(user, bookingId, BookingStateMachine.COMPLETED, "completarse",
+				"AGENDA_BOOKING_COMPLETED", "Cita completada desde agenda.", request);
+	}
+
+	@Transactional
+	public BookingDetailResponse markNoShow(AuthenticatedUser user, UUID bookingId, AgendaLifecycleRequest request) {
+		return changeBookingStatus(user, bookingId, BookingStateMachine.NO_SHOW, "registrar inasistencia",
+				"AGENDA_BOOKING_NO_SHOW", "Inasistencia registrada desde agenda.", request);
+	}
+
+	private BookingDetailResponse changeBookingStatus(AuthenticatedUser user, UUID bookingId, String targetStatus,
+			String action, String auditAction, String auditMessage, AgendaLifecycleRequest request) {
+		BookingDetailResponse currentBooking = bookingJdbcRepository.findBookingDetail(user.businessId(), bookingId);
+		String currentStatus = BookingStateMachine.canonical(currentBooking.status());
+		String normalizedTargetStatus = BookingStateMachine.canonical(targetStatus);
+		if (normalizedTargetStatus.equals(currentStatus)) {
+			throw new ApiException(HttpStatus.CONFLICT, "BOOKING_STATE_ALREADY_APPLIED",
+					"La cita ya se encuentra en ese estado.",
+					Map.of("status", BookingStateMachine.label(targetStatus)));
+		}
+		BookingStateMachine.assertTransition(currentBooking.status(), targetStatus, action);
+		String reason = normalizeOptionalText(request != null ? request.reason() : null, "reason", 2000);
+		repository.updateBookingStatus(user.businessId(), bookingId, user.userId(), currentStatus,
+				normalizedTargetStatus, reason, historySource(user));
+		auditService.record(user.businessId(), user.userId(), auditAction, "BOOKING", bookingId, auditMessage,
+				AuditMetadata.of("source", historySource(user), "previousStatus", currentStatus, "newStatus",
+						normalizedTargetStatus, "reason", reason, "notifyCustomer",
+						request != null && Boolean.TRUE.equals(request.notifyCustomer())));
 		return bookingJdbcRepository.findBookingDetail(user.businessId(), bookingId);
 	}
 
@@ -533,6 +593,17 @@ public class CompleteDigitalAgendaService {
 		return user.userId() == null ? "WHATSAPP" : "ADMIN";
 	}
 
+	private String normalizeOptionalText(String value, String field, int maxLength) {
+		if (value == null || value.isBlank()) {
+			return null;
+		}
+		String normalized = value.trim();
+		if (normalized.length() > maxLength) {
+			throw validationError(field, "El texto no puede superar " + maxLength + " caracteres.");
+		}
+		return normalized;
+	}
+
 	private void scheduleDefaultReminders(UUID businessId, UUID bookingId, OffsetDateTime startsAt) {
 		reminderSchedulingService.scheduleDefaultReminders(businessId, bookingId, startsAt);
 		repository.insertReminder(businessId, bookingId, "CONFIRMATION",
@@ -579,11 +650,26 @@ public class CompleteDigitalAgendaService {
 		if (phone == null || phone.isBlank()) {
 			throw validationError("customerPhone", "Ingresa un telefono valido.");
 		}
-		String normalized = phone.replace(" ", "").trim();
-		if (normalized.length() < 8 || normalized.length() > 30) {
-			throw validationError("customerPhone", "El telefono debe tener entre 8 y 30 caracteres.");
+		String normalized = PhoneUtils.normalizeChilePhone(phone);
+		if (normalized == null) {
+			throw validationError("customerPhone", "Ingresa un telefono chileno valido.");
 		}
 		return normalized;
+	}
+
+	private String normalizeLegacyPhone(String phone) {
+		return phone == null ? "" : phone.replace(" ", "").trim();
+	}
+
+	private String normalizeSourceChannel(String sourceChannel) {
+		if (sourceChannel == null || sourceChannel.isBlank()) {
+			return "AGENDA";
+		}
+		String normalized = sourceChannel.trim().toUpperCase(Locale.ROOT);
+		if (Set.of("AGENDA", "WHATSAPP", "TELEFONO", "PRESENCIAL", "WEB").contains(normalized)) {
+			return normalized;
+		}
+		throw validationError("sourceChannel", "Selecciona un origen valido para la cita.");
 	}
 
 	private int resolveExpirationMinutes(Integer expirationMinutes) {
@@ -638,7 +724,7 @@ public class CompleteDigitalAgendaService {
 	}
 
 	private BookingDetailResponse resolveIdempotentTemporaryBooking(UUID businessId, String idempotencyKey,
-			String requestHash) {
+			String requestHash, String legacyRequestHash) {
 		CompleteAgendaJdbcRepository.BookingOperationIdempotencyRecord existing = repository
 				.findBookingOperationIdempotency(businessId, "TEMPORARY_BOOKING_CREATE", idempotencyKey);
 		if (existing == null) {
@@ -654,7 +740,7 @@ public class CompleteDigitalAgendaService {
 			throw new ApiException(HttpStatus.CONFLICT, "IDEMPOTENT_OPERATION_IN_PROGRESS",
 					"La operacion de reserva ya esta en proceso.", Map.of("idempotencyKey", idempotencyKey));
 		}
-		if (!requestHash.equals(existing.requestHash())) {
+		if (!requestHash.equals(existing.requestHash()) && !legacyRequestHash.equals(existing.requestHash())) {
 			throw new ApiException(HttpStatus.CONFLICT, "IDEMPOTENCY_KEY_REUSED",
 					"La clave de idempotencia ya fue usada con otra solicitud.",
 					Map.of("idempotencyKey", idempotencyKey));

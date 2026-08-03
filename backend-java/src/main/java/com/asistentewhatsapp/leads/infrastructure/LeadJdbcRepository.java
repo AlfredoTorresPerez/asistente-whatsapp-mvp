@@ -24,8 +24,8 @@ public class LeadJdbcRepository {
 	}
 
 	public PagedResponse<LeadSummaryResponse> findLeads(UUID businessId, int page, int size, String search,
-			String stage, String origin, UUID responsibleUserId) {
-		QueryParts queryParts = buildLeadListQuery(businessId, search, stage, origin, responsibleUserId);
+			String stage, String origin, UUID responsibleUserId, UUID locationId) {
+		QueryParts queryParts = buildLeadListQuery(businessId, search, stage, origin, responsibleUserId, locationId);
 		Long totalItems = jdbcTemplate.queryForObject("select count(*) " + queryParts.fromAndWhere(),
 				queryParts.parameters(), Long.class);
 		long resolvedTotalItems = totalItems == null ? 0 : totalItems;
@@ -39,6 +39,8 @@ public class LeadJdbcRepository {
 				    l.id,
 				    l.customer_id,
 				    l.conversation_id,
+				    l.location_id,
+				    bl.name as location_name,
 				    l.first_name,
 				    l.last_name,
 				    concat(l.first_name, ' ', l.last_name) as display_name,
@@ -68,6 +70,8 @@ public class LeadJdbcRepository {
 				    l.id,
 				    l.customer_id,
 				    l.conversation_id,
+				    l.location_id,
+				    bl.name as location_name,
 				    l.first_name,
 				    l.last_name,
 				    concat(l.first_name, ' ', l.last_name) as display_name,
@@ -86,6 +90,7 @@ public class LeadJdbcRepository {
 				    l.updated_at
 				from lead l
 				left join user_account ua on ua.id = l.assigned_user_id
+				left join business_location bl on bl.id = l.location_id
 				where l.business_id = :businessId
 				  and l.id = :leadId
 				""", leadParameters(businessId, leadId), leadDetailRowMapper());
@@ -95,10 +100,10 @@ public class LeadJdbcRepository {
 		}
 
 		LeadDetailRow row = rows.getFirst();
-		return new LeadDetailResponse(row.id(), row.customerId(), row.conversationId(), row.firstName(), row.lastName(),
-				row.displayName(), row.phone(), row.email(), row.stage(), row.sourceType(), row.notes(),
-				row.assignedUserId(), row.assignedUserName(), row.active(), row.createdAt(), row.updatedAt(),
-				findLeadNotes(businessId, leadId));
+		return new LeadDetailResponse(row.id(), row.customerId(), row.conversationId(), row.locationId(),
+				row.locationName(), row.firstName(), row.lastName(), row.displayName(), row.phone(), row.email(),
+				row.stage(), row.sourceType(), row.notes(), row.assignedUserId(), row.assignedUserName(), row.active(),
+				row.createdAt(), row.updatedAt(), findLeadNotes(businessId, leadId));
 	}
 
 	public LeadContextRecord findLeadContext(UUID businessId, UUID leadId) {
@@ -127,6 +132,7 @@ public class LeadJdbcRepository {
 				    c.id,
 				    c.customer_id,
 				    c.assigned_user_id,
+				    c.location_id,
 				    c.customer_name,
 				    c.customer_phone,
 				    cu.first_name as customer_first_name,
@@ -141,7 +147,8 @@ public class LeadJdbcRepository {
 						conversationId),
 				(resultSet, rowNum) -> new ConversationLeadContextRecord(resultSet.getObject("id", UUID.class),
 						resultSet.getObject("customer_id", UUID.class),
-						resultSet.getObject("assigned_user_id", UUID.class), resultSet.getString("customer_name"),
+						resultSet.getObject("assigned_user_id", UUID.class),
+						resultSet.getObject("location_id", UUID.class), resultSet.getString("customer_name"),
 						resultSet.getString("customer_phone"), resultSet.getString("customer_first_name"),
 						resultSet.getString("customer_last_name"), resultSet.getString("customer_email")));
 		if (items.isEmpty()) {
@@ -207,6 +214,18 @@ public class LeadJdbcRepository {
 				  and id = :userId
 				  and status = 'ACTIVE'
 				""", new MapSqlParameterSource().addValue("businessId", businessId).addValue("userId", userId),
+				(resultSet, rowNum) -> resultSet.getObject("id", UUID.class));
+		return items.stream().findFirst();
+	}
+
+	public Optional<UUID> findActiveLocationId(UUID businessId, UUID locationId) {
+		List<UUID> items = jdbcTemplate.query("""
+				select id
+				from business_location
+				where business_id = :businessId
+				  and id = :locationId
+				  and active = true
+				""", new MapSqlParameterSource().addValue("businessId", businessId).addValue("locationId", locationId),
 				(resultSet, rowNum) -> resultSet.getObject("id", UUID.class));
 		return items.stream().findFirst();
 	}
@@ -300,8 +319,9 @@ public class LeadJdbcRepository {
 		}
 	}
 
-	public UUID insertLead(UUID businessId, UUID customerId, UUID conversationId, String sourceType, String firstName,
-			String lastName, String phone, String email, String stage, String notes, UUID assignedUserId) {
+	public UUID insertLead(UUID businessId, UUID customerId, UUID conversationId, UUID locationId, String sourceType,
+			String firstName, String lastName, String phone, String email, String stage, String notes,
+			UUID assignedUserId) {
 		UUID leadId = UUID.randomUUID();
 		jdbcTemplate.update("""
 				insert into lead (
@@ -309,6 +329,7 @@ public class LeadJdbcRepository {
 				    business_id,
 				    customer_id,
 				    conversation_id,
+				    location_id,
 				    source_type,
 				    first_name,
 				    last_name,
@@ -324,6 +345,7 @@ public class LeadJdbcRepository {
 				    :businessId,
 				    :customerId,
 				    :conversationId,
+				    :locationId,
 				    :sourceType,
 				    :firstName,
 				    :lastName,
@@ -335,19 +357,22 @@ public class LeadJdbcRepository {
 				    :assignedUserId,
 				    true
 				)
-				""", new MapSqlParameterSource().addValue("id", leadId).addValue("businessId", businessId)
-				.addValue("customerId", customerId).addValue("conversationId", conversationId)
-				.addValue("sourceType", sourceType).addValue("firstName", firstName).addValue("lastName", lastName)
-				.addValue("phone", phone).addValue("normalizedPhone", phone).addValue("email", email)
-				.addValue("stage", stage).addValue("notes", notes).addValue("assignedUserId", assignedUserId));
+				""",
+				new MapSqlParameterSource().addValue("id", leadId).addValue("businessId", businessId)
+						.addValue("customerId", customerId).addValue("conversationId", conversationId)
+						.addValue("locationId", locationId).addValue("sourceType", sourceType)
+						.addValue("firstName", firstName).addValue("lastName", lastName).addValue("phone", phone)
+						.addValue("normalizedPhone", phone).addValue("email", email).addValue("stage", stage)
+						.addValue("notes", notes).addValue("assignedUserId", assignedUserId));
 		return leadId;
 	}
 
-	public void updateLead(UUID businessId, UUID leadId, UUID customerId, String firstName, String lastName,
-			String phone, String email, String stage, String notes, UUID assignedUserId) {
+	public void updateLead(UUID businessId, UUID leadId, UUID customerId, UUID locationId, String firstName,
+			String lastName, String phone, String email, String stage, String notes, UUID assignedUserId) {
 		int updated = jdbcTemplate.update("""
 				update lead
 				set customer_id = :customerId,
+				    location_id = :locationId,
 				    first_name = :firstName,
 				    last_name = :lastName,
 				    phone = :phone,
@@ -361,9 +386,9 @@ public class LeadJdbcRepository {
 				  and id = :leadId
 				""",
 				leadParameters(businessId, leadId).addValue("customerId", customerId).addValue("firstName", firstName)
-						.addValue("lastName", lastName).addValue("phone", phone).addValue("normalizedPhone", phone)
-						.addValue("email", email).addValue("stage", stage).addValue("notes", notes)
-						.addValue("assignedUserId", assignedUserId));
+						.addValue("locationId", locationId).addValue("lastName", lastName).addValue("phone", phone)
+						.addValue("normalizedPhone", phone).addValue("email", email).addValue("stage", stage)
+						.addValue("notes", notes).addValue("assignedUserId", assignedUserId));
 		if (updated == 0) {
 			throw new ResourceNotFoundException("No se encontro el prospecto solicitado.");
 		}
@@ -442,10 +467,11 @@ public class LeadJdbcRepository {
 	}
 
 	private QueryParts buildLeadListQuery(UUID businessId, String search, String stage, String origin,
-			UUID responsibleUserId) {
+			UUID responsibleUserId, UUID locationId) {
 		StringBuilder sql = new StringBuilder("""
 				from lead l
 				left join user_account ua on ua.id = l.assigned_user_id
+				left join business_location bl on bl.id = l.location_id
 				where l.business_id = :businessId
 				""");
 		MapSqlParameterSource parameters = new MapSqlParameterSource().addValue("businessId", businessId);
@@ -478,6 +504,11 @@ public class LeadJdbcRepository {
 			parameters.addValue("responsibleUserId", responsibleUserId);
 		}
 
+		if (locationId != null) {
+			sql.append(" and l.location_id = :locationId ");
+			parameters.addValue("locationId", locationId);
+		}
+
 		return new QueryParts(sql.toString(), parameters);
 	}
 
@@ -488,6 +519,7 @@ public class LeadJdbcRepository {
 	private RowMapper<LeadSummaryResponse> leadSummaryRowMapper() {
 		return (resultSet, rowNum) -> new LeadSummaryResponse(resultSet.getObject("id", UUID.class),
 				resultSet.getObject("customer_id", UUID.class), resultSet.getObject("conversation_id", UUID.class),
+				resultSet.getObject("location_id", UUID.class), resultSet.getString("location_name"),
 				resultSet.getString("first_name"), resultSet.getString("last_name"),
 				resultSet.getString("display_name"), resultSet.getString("phone"), resultSet.getString("email"),
 				resultSet.getString("stage"), resultSet.getString("source_type"),
@@ -499,6 +531,7 @@ public class LeadJdbcRepository {
 	private RowMapper<LeadDetailRow> leadDetailRowMapper() {
 		return (resultSet, rowNum) -> new LeadDetailRow(resultSet.getObject("id", UUID.class),
 				resultSet.getObject("customer_id", UUID.class), resultSet.getObject("conversation_id", UUID.class),
+				resultSet.getObject("location_id", UUID.class), resultSet.getString("location_name"),
 				resultSet.getString("first_name"), resultSet.getString("last_name"),
 				resultSet.getString("display_name"), resultSet.getString("phone"), resultSet.getString("email"),
 				resultSet.getString("stage"), resultSet.getString("source_type"), resultSet.getString("notes"),
@@ -523,10 +556,10 @@ public class LeadJdbcRepository {
 	private record QueryParts(String fromAndWhere, MapSqlParameterSource parameters) {
 	}
 
-	private record LeadDetailRow(UUID id, UUID customerId, UUID conversationId, String firstName, String lastName,
-			String displayName, String phone, String email, String stage, String sourceType, String notes,
-			UUID assignedUserId, String assignedUserName, boolean active, OffsetDateTime createdAt,
-			OffsetDateTime updatedAt) {
+	private record LeadDetailRow(UUID id, UUID customerId, UUID conversationId, UUID locationId, String locationName,
+			String firstName, String lastName, String displayName, String phone, String email, String stage,
+			String sourceType, String notes, UUID assignedUserId, String assignedUserName, boolean active,
+			OffsetDateTime createdAt, OffsetDateTime updatedAt) {
 	}
 
 	public record CustomerRecord(UUID id, String firstName, String lastName, String displayName, String phone,
@@ -536,7 +569,7 @@ public class LeadJdbcRepository {
 	public record LeadContextRecord(UUID id, UUID customerId, UUID conversationId, String sourceType) {
 	}
 
-	public record ConversationLeadContextRecord(UUID id, UUID customerId, UUID assignedUserId,
+	public record ConversationLeadContextRecord(UUID id, UUID customerId, UUID assignedUserId, UUID locationId,
 			String customerDisplayName, String customerPhone, String customerFirstName, String customerLastName,
 			String customerEmail) {
 	}

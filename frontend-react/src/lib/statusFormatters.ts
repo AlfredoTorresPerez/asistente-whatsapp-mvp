@@ -8,15 +8,25 @@ const normalizeStatusKey = (value: string | null | undefined) =>
 
 const statusLabels: Record<string, string> = {
   active: 'Activo',
+  admin: 'Administrador',
   approved: 'Aprobado',
+  archived: 'Archivado',
+  archivada: 'Archivada',
+  abierta: 'Abierta',
+  agente: 'Agente',
   canceled: 'Cancelado',
   cancelled: 'Cancelado',
+  cancelada: 'Cancelada',
+  cancelada_por_cliente: 'Cancelada por cliente',
   closed: 'Cerrado',
   completed: 'Completado',
+  completada: 'Completada',
   confirmed: 'Confirmado',
+  confirmada: 'Confirmada',
   delivered: 'Entregado',
   disabled: 'Desactivado',
   draft: 'Pendiente',
+  en_atencion: 'En atención',
   dry_run: 'Simulación',
   enabled: 'Activo',
   escalated: 'Derivado a humano',
@@ -24,22 +34,35 @@ const statusLabels: Record<string, string> = {
   inactive: 'Desactivado',
   interested: 'Interesado',
   new: 'Nuevo',
+  no_asiste: 'Inasistencia',
+  owner: 'Propietario',
   open: 'Abierto',
   paid: 'Pagado',
   partial: 'Pago parcial',
   partially_paid: 'Pago parcial',
   pending: 'Pendiente',
+  pendiente_confirmacion: 'Pendiente de confirmación',
+  pendiente_de_confirmacion: 'Pendiente de confirmación',
+  pendiente_del_cliente: 'Pendiente del cliente',
+  pendiente_del_negocio: 'Pendiente del negocio',
+  pendiente_pago: 'Pendiente de pago',
   preparing: 'En preparación',
   processing: 'En proceso',
+  publicada: 'Publicada',
   qualified: 'Calificado',
   read: 'Leído',
   ready: 'Listo',
   rejected: 'Rechazado',
   requested: 'Solicitado',
   rescheduled: 'Reprogramado',
+  reprogramacion_pendiente: 'Reprogramación pendiente',
+  reprogramada: 'Reprogramada',
   resolved: 'Resuelto',
+  resuelta: 'Resuelta',
+  sales: 'Ventas',
   refunded: 'Reembolsado',
   scheduled: 'Programado',
+  solicitada: 'Solicitada',
   sent: 'Enviado',
   simulated: 'Simulado',
   unread: 'No leído',
@@ -117,7 +140,9 @@ export function getEstadoTone(value: string | null | undefined): BadgeTone {
       'active',
       'approved',
       'completed',
+      'completada',
       'confirmed',
+      'confirmada',
       'delivered',
       'enabled',
       'paid',
@@ -131,6 +156,8 @@ export function getEstadoTone(value: string | null | undefined): BadgeTone {
   if (
     [
       'cancelled',
+      'cancelada',
+      'cancelada_por_cliente',
       'canceled',
       'disabled',
       'expired',
@@ -146,13 +173,18 @@ export function getEstadoTone(value: string | null | undefined): BadgeTone {
   if (
     [
       'draft',
+      'no_asiste',
       'pending',
+      'pendiente_confirmacion',
+      'pendiente_pago',
       'partially_paid',
       'partial',
       'preparing',
       'processing',
       'requested',
       'rescheduled',
+      'reprogramacion_pendiente',
+      'reprogramada',
       'unpaid',
       'unread',
     ].includes(key)
@@ -160,7 +192,7 @@ export function getEstadoTone(value: string | null | undefined): BadgeTone {
     return 'warning'
   }
 
-  if (['new', 'open', 'qualified', 'ready', 'scheduled', 'sent'].includes(key)) {
+  if (['new', 'open', 'qualified', 'ready', 'scheduled', 'sent', 'solicitada'].includes(key)) {
     return 'info'
   }
 

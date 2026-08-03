@@ -18,6 +18,7 @@ type GetLeadsFilters = {
   stage?: string
   origin?: string
   assignedUserId?: string
+  locationId?: string
 }
 
 function toSearchParams(filters: Record<string, string | number | undefined | null>) {

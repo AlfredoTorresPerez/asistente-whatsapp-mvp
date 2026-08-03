@@ -290,7 +290,7 @@ public class PublicLandingService {
 		bookingValidationService.throwIfErrors(vctx);
 
 		CompleteAgendaJdbcRepository.CustomerRecord customer = agendaRepository.findOrCreateCustomer(businessId, null,
-				request.customerName(), request.customerPhone(), request.customerEmail());
+				request.customerName(), request.customerPhone(), request.customerEmail(), null);
 
 		UUID existingBooking = agendaRepository.findActiveBookingByCustomerProfessionalAndStart(businessId,
 				customer.id(), professionalId, startsAt);
@@ -306,7 +306,7 @@ public class PublicLandingService {
 		UUID bookingId = agendaRepository.insertTemporaryBooking(businessId, customer.id(), null, null, null,
 				service.name(), location.id(), service.id(), professionalId, roomId, startsAt, endsAt,
 				service.durationMinutes(), expiresAt, service.requiresDeposit(), service.depositAmount(),
-				request.notes());
+				request.notes(), "WEB");
 		recordConsentIfPresent(businessId, bookingId, service, request.informedConsentAccepted(),
 				request.customerBirthDate(), request.guardianName(), request.guardianPhone());
 		agendaRepository.completeBookingOperationIdempotency(businessId, "PUBLIC_BOOKING_CREATE", idempotencyKey,

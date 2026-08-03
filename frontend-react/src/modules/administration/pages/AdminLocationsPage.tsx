@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CommercialWhatsAppQr } from '../../../components/whatsapp/CommercialWhatsAppQr'
 import { Modal } from '../../../components/overlay/Modal'
+import { ConfirmDialog } from '../../../components/overlay/ConfirmDialog'
 import { ApiClientError } from '../../../services/api/httpClient'
 import { ErrorState } from '../../../components/feedback/ErrorState'
 import { LoadingState } from '../../../components/feedback/LoadingState'
@@ -88,6 +89,7 @@ export function AdminLocationsPage() {
   const [businessHours, setBusinessHours] =
     useState<{ dayOfWeek: number; startTime: string; endTime: string }[]>(defaultHours)
   const [businessHoursSaved, setBusinessHoursSaved] = useState(false)
+  const [locationToDeactivate, setLocationToDeactivate] = useState<BusinessLocationResponse | null>(null)
 
   const locationsQuery = useQuery({
     queryKey: ['business-locations', 'admin'],
@@ -181,7 +183,7 @@ export function AdminLocationsPage() {
     onSuccess: () => {
       showToast({
         title: 'Sucursal desactivada',
-        description: 'La sucursal ya no queda disponible para nuevas operaciónes.',
+        description: 'La sucursal ya no queda disponible para nuevas operaciones.',
         tone: 'success',
       })
       void queryClient.invalidateQueries({ queryKey: ['business-locations'] })
@@ -276,6 +278,29 @@ export function AdminLocationsPage() {
       void _discardedGeneralError
       return remainingErrors
     })
+  }
+
+  const executeLocationAction = (location: BusinessLocationResponse, action: string) => {
+    if (!action) return
+    if (action === 'view' || action === 'edit') {
+      editLocation(location)
+      return
+    }
+    if (action === 'professionals') {
+      navigate('/admin/professionals')
+      return
+    }
+    if (action === 'rooms') {
+      navigate('/admin/rooms')
+      return
+    }
+    if (action === 'qr') {
+      setQrLocationId(location.active ? location.id : null)
+      return
+    }
+    if (action === 'deactivate') {
+      setLocationToDeactivate(location)
+    }
   }
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
@@ -403,21 +428,18 @@ export function AdminLocationsPage() {
             </div>
 
             <div className="overflow-x-auto rounded-2xl border border-[var(--color-border)] bg-white">
-              <div className="hidden grid-cols-[70px_minmax(120px,1.4fr)_minmax(110px,1fr)_minmax(80px,0.7fr)_minmax(95px,0.7fr)_minmax(95px,0.7fr)_minmax(95px,0.7fr)_80px_180px] items-center border-b border-[var(--color-border)] bg-slate-50 px-4 py-3 text-xs font-bold uppercase tracking-[0.14em] text-slate-500 xl:grid">
+              <div className="hidden grid-cols-[80px_minmax(160px,1.4fr)_minmax(160px,1fr)_minmax(100px,0.8fr)_110px_150px] items-center border-b border-[var(--color-border)] bg-slate-50 px-4 py-3 text-xs font-bold uppercase tracking-[0.14em] text-slate-500 xl:grid">
                 <span>Código</span>
                 <span>Sucursal</span>
                 <span>Dirección</span>
                 <span>Comuna</span>
-                <span>Teléfono</span>
-                <span>WhatsApp</span>
-                <span>Zona horaria</span>
                 <span>Estado</span>
                 <span>Acciones</span>
               </div>
 
               {filteredLocations.map((location) => (
                 <div
-                  className="grid gap-2 border-b border-[var(--color-border)] px-4 py-3 last:border-b-0 xl:grid-cols-[70px_minmax(120px,1.4fr)_minmax(110px,1fr)_minmax(80px,0.7fr)_minmax(95px,0.7fr)_minmax(95px,0.7fr)_minmax(95px,0.7fr)_80px_180px] xl:items-center"
+                  className="grid gap-2 border-b border-[var(--color-border)] px-4 py-3 last:border-b-0 xl:grid-cols-[80px_minmax(160px,1.4fr)_minmax(160px,1fr)_minmax(100px,0.8fr)_110px_150px] xl:items-center"
                   key={location.id}
                 >
                   <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
@@ -437,50 +459,26 @@ export function AdminLocationsPage() {
                   <p className="truncate text-sm text-slate-600">
                     {location.commune ?? location.city ?? 'Sin comuna'}
                   </p>
-                  <p className="truncate text-sm font-semibold text-blue-600">
-                    {location.phone ?? 'Sin teléfono'}
-                  </p>
-                  <p className="truncate text-sm text-slate-600">
-                    {location.whatsappNumber ?? 'Sin WhatsApp'}
-                  </p>
-                  <p className="truncate text-sm text-slate-600">{location.timezone}</p>
                   <StatusBadge
                     label={location.active ? 'Activa' : 'Inactiva'}
                     tone={location.active ? 'success' : 'neutral'}
                   />
-                  <div className="flex shrink-0 gap-1.5">
-                    <Button
-                      className="px-2.5 text-xs"
-                      onClick={() => editLocation(location)}
-                      size="sm"
-                      variant="secondary"
-                    >
-                      Editar
-                    </Button>
-                    <Button
-                      className="px-2.5 text-xs"
-                      disabled={!location.active}
-                      onClick={() => setQrLocationId(location.active ? location.id : null)}
-                      size="sm"
-                      variant="secondary"
-                    >
-                      Ver QR comercial
-                    </Button>
-                    {location.active ? (
-                      <Button
-                        className="px-2.5 text-xs"
-                        loading={deactivateMutation.isPending && form.id === location.id}
-                        onClick={() => {
-                          setForm(toFormState(location))
-                          deactivateMutation.mutate(location.id)
-                        }}
-                        size="sm"
-                        variant="secondary"
-                      >
-                        Desactivar
-                      </Button>
-                    ) : null}
-                  </div>
+                  <select
+                    className="h-10 rounded-[12px] border border-[var(--color-border)] bg-white px-3 text-sm font-semibold text-slate-700"
+                    defaultValue=""
+                    onChange={(event) => {
+                      executeLocationAction(location, event.target.value)
+                      event.target.value = ''
+                    }}
+                  >
+                    <option value="">Acciones</option>
+                    <option value="view">Ver</option>
+                    <option value="edit">Editar</option>
+                    <option value="professionals">Profesionales</option>
+                    <option value="rooms">Cabinas</option>
+                    <option value="qr" disabled={!location.active}>QR comercial</option>
+                    <option value="deactivate" disabled={!location.active}>Desactivar</option>
+                  </select>
                 </div>
               ))}
 
@@ -567,12 +565,14 @@ export function AdminLocationsPage() {
                 <Input
                   error={formErrors.phone}
                   label="Teléfono"
+                  placeholder="+56XXXXXXXXX"
                   value={form.phone}
                   onChange={(event) => updateField('phone', event.target.value)}
                 />
                 <Input
                   error={formErrors.whatsappNumber}
                   label="WhatsApp"
+                  placeholder="+56XXXXXXXXX"
                   value={form.whatsappNumber}
                   onChange={(event) => updateField('whatsappNumber', event.target.value)}
                 />
@@ -773,6 +773,28 @@ export function AdminLocationsPage() {
           ) : null}
         </div>
       </Modal>
+
+      <ConfirmDialog
+        confirmLabel="Desactivar"
+        confirmLoading={deactivateMutation.isPending}
+        description={
+          locationToDeactivate
+            ? `La sucursal ${locationToDeactivate.name} dejara de recibir nuevas reservas.`
+            : 'Confirma la desactivacion de la sucursal.'
+        }
+        onCancel={() => setLocationToDeactivate(null)}
+        onConfirm={() => {
+          if (locationToDeactivate) {
+            setForm(toFormState(locationToDeactivate))
+            deactivateMutation.mutate(locationToDeactivate.id, {
+              onSettled: () => setLocationToDeactivate(null),
+            })
+          }
+        }}
+        open={Boolean(locationToDeactivate)}
+        title="Desactivar sucursal"
+        tone="danger"
+      />
     </section>
   )
 }

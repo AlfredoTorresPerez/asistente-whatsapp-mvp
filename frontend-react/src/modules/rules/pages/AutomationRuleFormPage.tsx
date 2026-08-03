@@ -22,19 +22,21 @@ import type {
 } from '../../../services/api/types'
 
 type FormState = {
-  active: boolean
   code: string
   description: string
+  lifecycleStatus: RuleLifecycleStatus
   name: string
   priority: string
   rulePayload: string
   ruleType: string
 }
 
+type RuleLifecycleStatus = 'draft' | 'testing' | 'published' | 'paused' | 'archived'
+
 const emptyForm: FormState = {
-  active: true,
   code: '',
   description: '',
+  lifecycleStatus: 'draft',
   name: '',
   priority: '100',
   rulePayload: '{\n  "condiciones": [],\n  "acciones": []\n}',
@@ -46,6 +48,14 @@ const selectClassName =
 
 const ruleTypeOptions = DEFAULT_RULE_TYPE_OPTIONS
 
+const ruleStatusOptions: { label: string; value: RuleLifecycleStatus }[] = [
+  { label: 'Borrador', value: 'draft' },
+  { label: 'En prueba', value: 'testing' },
+  { label: 'Publicada', value: 'published' },
+  { label: 'Pausada', value: 'paused' },
+  { label: 'Archivada', value: 'archived' },
+]
+
 function nullable(value: string) {
   return value.trim() === '' ? null : value.trim()
 }
@@ -55,11 +65,37 @@ function numberValue(value: string) {
   return Number.isFinite(parsed) ? parsed : 100
 }
 
+function parseRulePayload(payload: string) {
+  const parsed = JSON.parse(payload || '{}')
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    throw new Error('La configuración estructurada debe contener condición y acción.')
+  }
+  return parsed as Record<string, unknown>
+}
+
+function getLifecycleStatus(rule: AestheticBusinessRuleResponse): RuleLifecycleStatus {
+  try {
+    const payload = parseRulePayload(rule.rulePayload || '{}')
+    const status = String(payload.estadoRegla ?? payload.lifecycleStatus ?? '').toLowerCase()
+    if (['draft', 'testing', 'published', 'paused', 'archived'].includes(status)) {
+      return status as RuleLifecycleStatus
+    }
+  } catch {
+    return rule.active ? 'published' : 'paused'
+  }
+  return rule.active ? 'published' : 'paused'
+}
+
+function hasTestCase(payload: Record<string, unknown>) {
+  const testCases = payload.casosPrueba ?? payload.testCases
+  return Array.isArray(testCases) && testCases.length > 0
+}
+
 function fromRule(rule: AestheticBusinessRuleResponse): FormState {
   return {
-    active: rule.active,
     code: rule.code,
     description: rule.description,
+    lifecycleStatus: getLifecycleStatus(rule),
     name: rule.name,
     priority: String(rule.priority),
     rulePayload: rule.rulePayload || '{}',
@@ -93,18 +129,21 @@ export function AutomationRuleFormPage() {
       if (!form.name.trim() || !form.description.trim() || !form.ruleType.trim()) {
         throw new Error('Nombre, descripcion y tipo de regla son obligatorios.')
       }
-      try {
-        JSON.parse(form.rulePayload || '{}')
-      } catch {
-        throw new Error('El payload JSON de la regla no tiene un formato valido.')
+      const payload = parseRulePayload(form.rulePayload || '{}')
+      if (form.lifecycleStatus === 'published' && !isEdit && !hasTestCase(payload)) {
+        throw new Error('Guarda la regla en prueba y registra al menos un caso antes de publicarla.')
       }
+      const payloadWithLifecycle = JSON.stringify({
+        ...payload,
+        estadoRegla: form.lifecycleStatus,
+      })
       const request: UpsertAestheticBusinessRuleRequest = {
-        active: form.active,
+        active: form.lifecycleStatus === 'published',
         code: nullable(form.code),
         description: form.description.trim(),
         name: form.name.trim(),
         priority: numberValue(form.priority),
-        rulePayload: form.rulePayload || '{}',
+        rulePayload: payloadWithLifecycle,
         ruleType: form.ruleType.trim(),
       }
       if (ruleId) {
@@ -142,7 +181,7 @@ export function AutomationRuleFormPage() {
             </Link>
           </>
         }
-        description="Editor conectado al servidor para reglas que controlan las respuestas de IA, derivaciones, seguridad, promociones y disponibilidad."
+        description="Editor para reglas que controlan respuestas de IA, derivaciones, seguridad, promociones y disponibilidad."
         eyebrow="Reglas"
         title={title}
       />
@@ -172,8 +211,8 @@ export function AutomationRuleFormPage() {
               </p>
             </div>
             <StatusBadge
-              label={form.active ? 'Activo' : 'Desactivado'}
-              tone={form.active ? 'success' : 'warning'}
+              label={ruleStatusOptions.find((option) => option.value === form.lifecycleStatus)?.label ?? 'Borrador'}
+              tone={form.lifecycleStatus === 'published' ? 'success' : 'warning'}
             />
           </div>
 
@@ -197,7 +236,7 @@ export function AutomationRuleFormPage() {
                 value={form.name}
               />
               <Input
-                label="Codigo"
+                label="Código operativo"
                 hint="Si queda vacio se genera desde el nombre."
                 onChange={(event) => setForm({ ...form, code: event.target.value })}
                 value={form.code}
@@ -226,6 +265,27 @@ export function AutomationRuleFormPage() {
                 type="number"
                 value={form.priority}
               />
+              <label className="block">
+                <span className="mb-2.5 block text-sm font-medium text-[#23385F]">
+                  Estado
+                </span>
+                <select
+                  className={selectClassName}
+                  onChange={(event) =>
+                    setForm({
+                      ...form,
+                      lifecycleStatus: event.target.value as RuleLifecycleStatus,
+                    })
+                  }
+                  value={form.lifecycleStatus}
+                >
+                  {ruleStatusOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
             </div>
 
             <Textarea
@@ -235,18 +295,12 @@ export function AutomationRuleFormPage() {
             />
             <Textarea
               hint={
-                'Formato JSON. Ejemplo: {"condiciones":["riesgo clínico"],"acciones":["derivar a humano"]}'
+                'Estructura esperada: {"condiciones":["riesgo clínico"],"acciones":["derivar a una persona"],"casosPrueba":["mensaje de ejemplo"]}'
               }
-              label="Payload JSON de la regla"
+              label="Condición, acción y casos de prueba"
               onChange={(event) => setForm({ ...form, rulePayload: event.target.value })}
               rows={10}
               value={form.rulePayload}
-            />
-
-            <CheckboxField
-              checked={form.active}
-              label="Regla activa"
-              onChange={(checked) => setForm({ ...form, active: checked })}
             />
 
             <div className="flex flex-wrap justify-end gap-3 border-t border-[var(--color-border)] pt-5">
@@ -261,27 +315,5 @@ export function AutomationRuleFormPage() {
         </Card>
       ) : null}
     </section>
-  )
-}
-
-function CheckboxField({
-  checked,
-  label,
-  onChange,
-}: {
-  checked: boolean
-  label: string
-  onChange: (checked: boolean) => void
-}) {
-  return (
-    <label className="flex items-center gap-3 rounded-[18px] border border-[var(--color-border)] bg-white p-4 text-sm font-semibold text-[var(--color-text)]">
-      <input
-        checked={checked}
-        className="h-4 w-4"
-        onChange={(event) => onChange(event.target.checked)}
-        type="checkbox"
-      />
-      {label}
-    </label>
   )
 }

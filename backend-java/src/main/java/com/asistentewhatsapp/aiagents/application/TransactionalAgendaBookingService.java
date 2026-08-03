@@ -364,7 +364,7 @@ public class TransactionalAgendaBookingService {
 							normalizedCustomerName(customerName), normalizedCustomerPhone(customerPhone), null,
 							customerId, conversationId, null,
 							"Reserva temporal creada automaticamente por IA de agenda WhatsApp.", expirationMinutes(),
-							false, false, null, null, null, null, null));
+							false, false, null, null, "WHATSAPP", null, null, null, null));
 			AiTraceLogger.info("TEMPORARY_BOOKING_CREATED", traceId, traceConversationId, booking.id(),
 					"TransactionalAgendaBookingService",
 					"bookingId=" + booking.id() + " status=" + booking.status() + " serviceId=" + service.get().id()

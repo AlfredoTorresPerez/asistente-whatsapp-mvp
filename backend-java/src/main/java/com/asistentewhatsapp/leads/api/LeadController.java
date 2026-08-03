@@ -35,8 +35,8 @@ public class LeadController {
 			@RequestParam(required = false) String search, @RequestParam(required = false) String stage,
 			@RequestParam(required = false) String status, @RequestParam(required = false) String origin,
 			@RequestParam(required = false) String sourceType, @RequestParam(required = false) UUID ownerUserId,
-			@RequestParam(required = false) UUID assignedUserId,
-			@RequestParam(required = false) UUID responsibleUserId) {
+			@RequestParam(required = false) UUID assignedUserId, @RequestParam(required = false) UUID responsibleUserId,
+			@RequestParam(required = false) UUID locationId) {
 		UUID resolvedResponsibleUserId = assignedUserId != null
 				? assignedUserId
 				: responsibleUserId != null ? responsibleUserId : ownerUserId;
@@ -44,7 +44,7 @@ public class LeadController {
 		String resolvedOrigin = origin != null ? origin : sourceType;
 
 		return leadService.list(authenticatedUser, page, size, search, resolvedStage, resolvedOrigin,
-				resolvedResponsibleUserId);
+				resolvedResponsibleUserId, locationId);
 	}
 
 	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'LEAD_MANAGE')")

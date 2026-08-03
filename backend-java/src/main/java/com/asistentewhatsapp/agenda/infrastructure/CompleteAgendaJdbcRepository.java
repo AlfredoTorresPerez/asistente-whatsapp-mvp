@@ -3,8 +3,10 @@ package com.asistentewhatsapp.agenda.infrastructure;
 import com.asistentewhatsapp.agenda.api.AgendaBlockResponse;
 import com.asistentewhatsapp.agenda.api.AgendaCalendarItemResponse;
 import com.asistentewhatsapp.agenda.api.AgendaFilterOptionResponse;
+import com.asistentewhatsapp.shared.exception.ApiException;
 import com.asistentewhatsapp.shared.exception.ResourceNotFoundException;
 import com.asistentewhatsapp.shared.observability.CorrelationIdFilter;
+import com.asistentewhatsapp.shared.util.PhoneUtils;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.Types;
@@ -20,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -31,6 +34,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -40,7 +44,7 @@ public class CompleteAgendaJdbcRepository {
 	private static final Logger log = LoggerFactory.getLogger(CompleteAgendaJdbcRepository.class);
 	private static final List<String> ACTIVE_BOOKING_STATUSES = List.of("REQUESTED", "TEMPORARY",
 			"PENDIENTE_CONFIRMACION", "CONFIRMED", "RESCHEDULED", "REPROGRAMADA", "SOLICITADA", "PENDIENTE_PAGO",
-			"CONFIRMADA", "REPROGRAMACION_PENDIENTE");
+			"CONFIRMADA", "REPROGRAMACION_PENDIENTE", "IN_PROGRESS", "EN_ATENCION");
 
 	private final NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -935,16 +939,19 @@ public class CompleteAgendaJdbcRepository {
 	}
 
 	public CustomerRecord findOrCreateCustomer(UUID businessId, UUID customerId, String customerName,
-			String customerPhone, String customerEmail) {
-		logInput("findOrCreateCustomer", businessId, customerId, customerName, customerPhone, customerEmail);
+			String customerPhone, String customerEmail, Boolean communicationsConsent) {
+		logInput("findOrCreateCustomer", businessId, customerId, customerName, customerPhone, customerEmail,
+				communicationsConsent);
 		if (customerId != null) {
-			CustomerRecord result = findCustomerById(businessId, customerId);
+			CustomerRecord result = updateExistingCustomerContactIfNeeded(businessId,
+					findCustomerById(businessId, customerId), customerEmail, communicationsConsent);
 			logOutput("findOrCreateCustomer", result);
 			return result;
 		}
 		Optional<CustomerRecord> existing = findCustomerByPhone(businessId, customerPhone);
 		if (existing.isPresent()) {
-			CustomerRecord result = updateExistingCustomerContactIfNeeded(businessId, existing.get(), customerEmail);
+			CustomerRecord result = updateExistingCustomerContactIfNeeded(businessId, existing.get(), customerEmail,
+					communicationsConsent);
 			logOutput("findOrCreateCustomer", result);
 			return result;
 		}
@@ -952,37 +959,51 @@ public class CompleteAgendaJdbcRepository {
 		String[] parts = customerName.trim().split("\\s+", 2);
 		String firstName = parts[0];
 		String lastName = parts.length > 1 ? parts[1] : parts[0];
-		jdbcTemplate.update("""
-				insert into customer (
-				    id, business_id, first_name, last_name, display_name, phone, normalized_phone, email, active
-				) values (
-				    :id, :businessId, :firstName, :lastName, :displayName, :phone, :normalizedPhone, :email, true
-				)
-				""",
+		String normalizedPhone = PhoneUtils.normalizeChilePhone(customerPhone);
+		jdbcTemplate.update(
+				"""
+						insert into customer (
+						    id, business_id, first_name, last_name, display_name, phone, normalized_phone, email, active,
+						    consent_whatsapp, consent_updated_at
+						) values (
+						    :id, :businessId, :firstName, :lastName, :displayName, :phone, :normalizedPhone, :email, true,
+						    :communicationsConsent, case when :communicationsConsent is null then null else current_timestamp end
+						)
+						""",
 				new MapSqlParameterSource().addValue("id", id).addValue("businessId", businessId)
 						.addValue("firstName", firstName).addValue("lastName", lastName)
 						.addValue("displayName", customerName).addValue("phone", customerPhone)
-						.addValue("normalizedPhone", customerPhone.replace(" ", "")).addValue("email", customerEmail));
+						.addValue("normalizedPhone", normalizedPhone != null ? normalizedPhone : customerPhone)
+						.addValue("email", customerEmail).addValue("communicationsConsent", communicationsConsent));
 		CustomerRecord result = new CustomerRecord(id, customerName, customerPhone, customerEmail);
 		logOutput("findOrCreateCustomer", result);
 		return result;
 	}
 
 	private CustomerRecord updateExistingCustomerContactIfNeeded(UUID businessId, CustomerRecord customer,
-			String customerEmail) {
+			String customerEmail, Boolean communicationsConsent) {
 		String email = normalizeEmail(customerEmail);
-		if (email == null || email.equalsIgnoreCase(normalizeEmail(customer.email()))) {
+		boolean shouldUpdateEmail = email != null && !email.equalsIgnoreCase(normalizeEmail(customer.email()));
+		boolean shouldUpdateConsent = communicationsConsent != null;
+		if (!shouldUpdateEmail && !shouldUpdateConsent) {
 			return customer;
 		}
-		jdbcTemplate.update("""
-				update customer
-				set email = :email,
-				    updated_at = current_timestamp
-				where business_id = :businessId
-				  and id = :customerId
-				""", new MapSqlParameterSource().addValue("businessId", businessId)
-				.addValue("customerId", customer.id()).addValue("email", email));
-		return new CustomerRecord(customer.id(), customer.displayName(), customer.phone(), email);
+		jdbcTemplate.update(
+				"""
+						update customer
+						set email = case when :shouldUpdateEmail then :email else email end,
+						    consent_whatsapp = case when :shouldUpdateConsent then :communicationsConsent else consent_whatsapp end,
+						    consent_updated_at = case when :shouldUpdateConsent then current_timestamp else consent_updated_at end,
+						    updated_at = current_timestamp
+						where business_id = :businessId
+						  and id = :customerId
+						""",
+				new MapSqlParameterSource().addValue("businessId", businessId).addValue("customerId", customer.id())
+						.addValue("email", email).addValue("shouldUpdateEmail", shouldUpdateEmail)
+						.addValue("shouldUpdateConsent", shouldUpdateConsent)
+						.addValue("communicationsConsent", communicationsConsent));
+		return new CustomerRecord(customer.id(), customer.displayName(), customer.phone(),
+				shouldUpdateEmail ? email : customer.email());
 	}
 
 	private String normalizeEmail(String email) {
@@ -1008,13 +1029,26 @@ public class CompleteAgendaJdbcRepository {
 
 	public Optional<CustomerRecord> findCustomerByPhone(UUID businessId, String customerPhone) {
 		logInput("findCustomerByPhone", businessId, customerPhone);
+		String normalizedPhone = PhoneUtils.normalizeChilePhone(customerPhone);
+		String phoneDigits = normalizePhoneDigits(normalizedPhone != null ? normalizedPhone : customerPhone);
+		String phoneLast9 = lastDigits(phoneDigits, 9);
+		String phoneLast8 = lastDigits(phoneDigits, 8);
 		List<CustomerRecord> items = jdbcTemplate.query("""
 				select id, display_name, phone, email
 				from customer
 				where business_id = :businessId
-				  and normalized_phone = :normalizedPhone
-				""", new MapSqlParameterSource().addValue("businessId", businessId).addValue("normalizedPhone",
-				customerPhone.replace(" ", "")), customerMapper());
+				  and (
+				      normalized_phone = :normalizedPhone
+				       or regexp_replace(coalesce(normalized_phone, phone, ''), '\\D', '', 'g') = :phoneDigits
+				       or right(regexp_replace(coalesce(normalized_phone, phone, ''), '\\D', '', 'g'), 9) = :phoneLast9
+				       or right(regexp_replace(coalesce(normalized_phone, phone, ''), '\\D', '', 'g'), 8) = :phoneLast8
+				  )
+				""",
+				new MapSqlParameterSource().addValue("businessId", businessId)
+						.addValue("normalizedPhone", normalizedPhone != null ? normalizedPhone : customerPhone)
+						.addValue("phoneDigits", phoneDigits).addValue("phoneLast9", phoneLast9)
+						.addValue("phoneLast8", phoneLast8),
+				customerMapper());
 		Optional<CustomerRecord> result = items.stream().findFirst();
 		logOutput("findCustomerByPhone", result);
 		return result;
@@ -1024,9 +1058,18 @@ public class CompleteAgendaJdbcRepository {
 			UUID actorUserId, String subject, UUID locationId, UUID serviceId, UUID professionalId, UUID roomId,
 			OffsetDateTime startsAt, OffsetDateTime endsAt, int durationMinutes, OffsetDateTime temporaryExpiresAt,
 			boolean requiresDeposit, BigDecimal depositAmount, String notes) {
+		return insertTemporaryBooking(businessId, customerId, conversationId, leadId, actorUserId, subject, locationId,
+				serviceId, professionalId, roomId, startsAt, endsAt, durationMinutes, temporaryExpiresAt,
+				requiresDeposit, depositAmount, notes, "WHATSAPP");
+	}
+
+	public UUID insertTemporaryBooking(UUID businessId, UUID customerId, UUID conversationId, UUID leadId,
+			UUID actorUserId, String subject, UUID locationId, UUID serviceId, UUID professionalId, UUID roomId,
+			OffsetDateTime startsAt, OffsetDateTime endsAt, int durationMinutes, OffsetDateTime temporaryExpiresAt,
+			boolean requiresDeposit, BigDecimal depositAmount, String notes, String sourceChannel) {
 		logInput("insertTemporaryBooking", businessId, customerId, conversationId, leadId, actorUserId, subject,
 				locationId, serviceId, professionalId, roomId, startsAt, endsAt, durationMinutes, temporaryExpiresAt,
-				requiresDeposit, depositAmount, notes);
+				requiresDeposit, depositAmount, notes, sourceChannel);
 		lockAndAssertLocationDailyCapacity(businessId, null, locationId, startsAt);
 		lockAndAssertProfessionalTravel(businessId, null, professionalId, locationId, startsAt, endsAt);
 		lockAndAssertRoomCapacity(businessId, null, locationId, roomId, startsAt, endsAt);
@@ -1041,7 +1084,7 @@ public class CompleteAgendaJdbcRepository {
 						select
 						    :id, :businessId, :customerId, :leadId, :conversationId, :actorUserId, :subject, 'PENDIENTE_CONFIRMACION',
 						    :startsAt, :endsAt, :durationMinutes, bl.id, bl.name, :serviceId, :professionalId, :roomId,
-						    :temporaryExpiresAt, 'WHATSAPP', :requiresDeposit, :depositAmount,
+						    :temporaryExpiresAt, :sourceChannel, :requiresDeposit, :depositAmount,
 						    case when :requiresDeposit then 'PENDING' else 'NOT_REQUIRED' end,
 						    :notes
 						from business_location bl
@@ -1056,9 +1099,9 @@ public class CompleteAgendaJdbcRepository {
 						.addValue("roomId", roomId).addValue("startsAt", startsAt).addValue("endsAt", endsAt)
 						.addValue("durationMinutes", durationMinutes).addValue("temporaryExpiresAt", temporaryExpiresAt)
 						.addValue("requiresDeposit", requiresDeposit).addValue("depositAmount", depositAmount)
-						.addValue("notes", notes));
+						.addValue("notes", notes).addValue("sourceChannel", sourceChannel));
 		insertStatusHistory(businessId, bookingId, null, "PENDIENTE_CONFIRMACION",
-				"Reserva pendiente de confirmacion creada desde agenda digital completa.", actorUserId, "WHATSAPP");
+				"Reserva pendiente de confirmacion creada desde agenda digital completa.", actorUserId, sourceChannel);
 		logOutput("insertTemporaryBooking", bookingId);
 		return bookingId;
 	}
@@ -1138,6 +1181,35 @@ public class CompleteAgendaJdbcRepository {
 		logOutput("cancelBookingByCustomer", "done");
 	}
 
+	public void updateBookingStatus(UUID businessId, UUID bookingId, UUID actorUserId, String previousStatus,
+			String newStatus, String reason, String source) {
+		logInput("updateBookingStatus", businessId, bookingId, actorUserId, previousStatus, newStatus, reason, source);
+		int updated = jdbcTemplate.update("""
+				update booking
+				set status = :newStatus,
+				    completed_at = case
+				        when :newStatus = 'COMPLETADA' then current_timestamp
+				        else completed_at
+				    end,
+				    version = version + 1,
+				    updated_at = current_timestamp
+				where business_id = :businessId
+				  and id = :bookingId
+				  and status in (:expectedStatuses)
+				""", new MapSqlParameterSource().addValue("businessId", businessId).addValue("bookingId", bookingId)
+				.addValue("newStatus", newStatus).addValue("expectedStatuses", statusAliases(previousStatus)));
+		if (updated == 0) {
+			throw new ApiException(HttpStatus.CONFLICT, "BOOKING_STATE_CHANGED",
+					"La cita fue modificada recientemente. Actualiza la agenda antes de continuar.", Map.of());
+		}
+		insertStatusHistory(businessId, bookingId, previousStatus, newStatus, reason, actorUserId,
+				source == null || source.isBlank() ? "ADMIN" : source);
+		if (List.of("COMPLETADA", "NO_ASISTE").contains(newStatus)) {
+			cancelReminderByBooking(businessId, bookingId);
+		}
+		logOutput("updateBookingStatus", "done");
+	}
+
 	private void cancelBookingWithStatus(UUID businessId, UUID bookingId, UUID actorUserId, String reason,
 			String source, String targetStatus) {
 		String previousStatus = jdbcTemplate.query("""
@@ -1165,6 +1237,19 @@ public class CompleteAgendaJdbcRepository {
 		insertStatusHistory(businessId, bookingId, previousStatus, targetStatus, reason, actorUserId,
 				source == null || source.isBlank() ? "ADMIN" : source);
 		cancelReminderByBooking(businessId, bookingId);
+	}
+
+	private List<String> statusAliases(String status) {
+		return switch (status == null ? "" : status) {
+			case "SOLICITADA" -> List.of("REQUESTED", "SOLICITADA");
+			case "PENDIENTE_CONFIRMACION" -> List.of("TEMPORARY", "PENDING_CONFIRMATION", "PENDIENTE_CONFIRMACION");
+			case "PENDIENTE_PAGO" -> List.of("PENDING_PAYMENT", "PENDIENTE_PAGO");
+			case "CONFIRMADA" -> List.of("CONFIRMED", "CONFIRMADA");
+			case "EN_ATENCION" -> List.of("IN_PROGRESS", "EN_ATENCION");
+			case "REPROGRAMADA" -> List.of("RESCHEDULED", "REPROGRAMADA");
+			case "REPROGRAMACION_PENDIENTE" -> List.of("RESCHEDULE_PENDING", "REPROGRAMACION_PENDIENTE");
+			default -> List.of(status == null ? "" : status);
+		};
 	}
 
 	public void insertStatusHistory(UUID businessId, UUID bookingId, String previousStatus, String newStatus,

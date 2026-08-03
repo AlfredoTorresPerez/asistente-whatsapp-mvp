@@ -104,6 +104,14 @@ function jsonResponse(payload: unknown, status = 200) {
   })
 }
 
+function apiPath(url: RequestInfo | URL) {
+  const raw = typeof url === 'string' ? url : String(url)
+  if (raw.startsWith('http')) {
+    return new URL(raw).pathname
+  }
+  return raw
+}
+
 let availabilityStatus = 200
 let availabilityByDate = new Map<string, AgendaAvailabilityResponse>()
 let rescheduleStatus = 200
@@ -121,18 +129,18 @@ beforeEach(() => {
   vi.stubGlobal(
     'fetch',
     vi.fn(async (url: RequestInfo | URL, init?: RequestInit) => {
-      const str = typeof url === 'string' ? url : String(url)
-      if (str === `${API_BASE}/bookings/${BOOKING_ID}`) {
+      const path = apiPath(url)
+      if (path === `/api/v1/bookings/${BOOKING_ID}` || path === `${API_BASE}/bookings/${BOOKING_ID}`) {
         return jsonResponse(makeBooking())
       }
-      if (str === `${API_BASE}/agenda/availability` && init?.method === 'POST') {
+      if (path === '/api/v1/agenda/availability' && init?.method === 'POST') {
         if (availabilityStatus !== 200) {
           return jsonResponse({ message: 'Error interno' }, availabilityStatus)
         }
         const body = JSON.parse(String(init?.body ?? '{}')) as { date?: string }
         return jsonResponse(availabilityByDate.get(body.date ?? '') ?? makeAvailability([]))
       }
-      if (str === `${API_BASE}/bookings/${BOOKING_ID}/reschedule` && init?.method === 'PATCH') {
+      if (path === `/api/v1/bookings/${BOOKING_ID}/reschedule` && init?.method === 'PATCH') {
         rescheduleCalls.push(String(init?.body ?? ''))
         if (rescheduleStatus !== 200) {
           return jsonResponse({ message: 'El horario seleccionado ya no esta disponible.' }, 409)

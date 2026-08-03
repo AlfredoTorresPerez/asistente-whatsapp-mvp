@@ -4,8 +4,12 @@ import com.asistentewhatsapp.administration.api.AdminRoleResponse;
 import com.asistentewhatsapp.administration.api.AdminUserRequest;
 import com.asistentewhatsapp.administration.api.AdminUserResponse;
 import com.asistentewhatsapp.administration.infrastructure.AdministrationJdbcRepository;
+import com.asistentewhatsapp.security.api.ForgotPasswordRequest;
+import com.asistentewhatsapp.security.application.AuthService;
 import com.asistentewhatsapp.security.domain.AuthenticatedUser;
 import com.asistentewhatsapp.security.infrastructure.AuditLogJdbcRepository;
+import com.asistentewhatsapp.security.infrastructure.UserSessionJdbcRepository;
+import com.asistentewhatsapp.shared.api.StatusResponse;
 import com.asistentewhatsapp.shared.api.PagedResponse;
 import com.asistentewhatsapp.shared.exception.ApiException;
 import java.time.OffsetDateTime;
@@ -23,12 +27,17 @@ public class AdminUserService {
 
 	private final AdministrationJdbcRepository administrationJdbcRepository;
 	private final AuditLogJdbcRepository auditLogJdbcRepository;
+	private final AuthService authService;
+	private final UserSessionJdbcRepository userSessionJdbcRepository;
 	private final PasswordEncoder passwordEncoder;
 
 	public AdminUserService(AdministrationJdbcRepository administrationJdbcRepository,
-			AuditLogJdbcRepository auditLogJdbcRepository, PasswordEncoder passwordEncoder) {
+			AuditLogJdbcRepository auditLogJdbcRepository, AuthService authService,
+			UserSessionJdbcRepository userSessionJdbcRepository, PasswordEncoder passwordEncoder) {
 		this.administrationJdbcRepository = administrationJdbcRepository;
 		this.auditLogJdbcRepository = auditLogJdbcRepository;
+		this.authService = authService;
+		this.userSessionJdbcRepository = userSessionJdbcRepository;
 		this.passwordEncoder = passwordEncoder;
 	}
 
@@ -57,24 +66,17 @@ public class AdminUserService {
 		AdminAccessGuard.requireOwnerOrAdmin(authenticatedUser);
 		String role = normalizeRole(request.role());
 		String status = normalizeStatus(request.status());
-		String temporaryPassword = normalize(request.temporaryPassword());
-		if (temporaryPassword == null) {
-			throw new ApiException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR",
-					"La contrasena temporal es obligatoria para crear usuarios.",
-					Map.of("temporaryPassword", "Define una contrasena temporal unica para este usuario."));
-		}
-		if (temporaryPassword.length() < 8 || temporaryPassword.length() > 72) {
-			throw new ApiException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR",
-					"La contrasena temporal debe tener entre 8 y 72 caracteres.",
-					Map.of("temporaryPassword", "Usa entre 8 y 72 caracteres."));
-		}
+		String initialPassword = generateInternalInitialPassword();
 
 		AdminUserResponse created = administrationJdbcRepository.insertAdminUser(authenticatedUser.businessId(),
 				request, role, status, normalizeTimezone(request.timezone(), authenticatedUser.timezone()),
-				passwordEncoder.encode(temporaryPassword));
+				passwordEncoder.encode(initialPassword));
+		if ("ACTIVE".equals(created.status())) {
+			authService.forgotPassword(new ForgotPasswordRequest(created.email()));
+		}
 		auditLogJdbcRepository.insert(authenticatedUser.businessId(), authenticatedUser.userId(), "ADMIN_USER_CREATED",
-				"USER_ACCOUNT", created.id(), "Usuario administrativo creado.",
-				Map.of("email", created.email(), "role", created.role(), "status", created.status()),
+				"USER_ACCOUNT", created.id(), "Usuario administrativo creado.", Map.of("email", created.email(), "role",
+						created.role(), "status", created.status(), "accessInvitation", "REQUESTED"),
 				OffsetDateTime.now(ZoneOffset.UTC));
 		return created;
 	}
@@ -91,6 +93,54 @@ public class AdminUserService {
 				Map.of("email", updated.email(), "role", updated.role(), "status", updated.status()),
 				OffsetDateTime.now(ZoneOffset.UTC));
 		return updated;
+	}
+
+	@Transactional
+	public StatusResponse deactivateUser(AuthenticatedUser authenticatedUser, UUID userId) {
+		AdminAccessGuard.requireOwnerOrAdmin(authenticatedUser);
+		if (authenticatedUser.userId().equals(userId)) {
+			throw new ApiException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR",
+					"No puedes desactivar tu propio usuario desde esta pantalla.");
+		}
+		AdminUserResponse current = administrationJdbcRepository.findAdminUser(authenticatedUser.businessId(), userId);
+		administrationJdbcRepository.updateAdminUser(authenticatedUser.businessId(), userId,
+				new AdminUserRequest(current.firstName(), current.lastName(), current.email(), current.phone(),
+						current.role(), "INACTIVE", current.timezone(), null),
+				current.role(), "INACTIVE", current.timezone());
+		userSessionJdbcRepository.revokeAllByUser(authenticatedUser.businessId(), userId,
+				OffsetDateTime.now(ZoneOffset.UTC), authenticatedUser.userId());
+		auditLogJdbcRepository.insert(authenticatedUser.businessId(), authenticatedUser.userId(),
+				"ADMIN_USER_DEACTIVATED", "USER_ACCOUNT", userId, "Usuario administrativo desactivado.",
+				Map.of("email", current.email()), OffsetDateTime.now(ZoneOffset.UTC));
+		return new StatusResponse("USER_DEACTIVATED");
+	}
+
+	@Transactional
+	public StatusResponse revokeSessions(AuthenticatedUser authenticatedUser, UUID userId) {
+		AdminAccessGuard.requireOwnerOrAdmin(authenticatedUser);
+		AdminUserResponse current = administrationJdbcRepository.findAdminUser(authenticatedUser.businessId(), userId);
+		userSessionJdbcRepository.revokeAllByUser(authenticatedUser.businessId(), userId,
+				OffsetDateTime.now(ZoneOffset.UTC), authenticatedUser.userId());
+		auditLogJdbcRepository.insert(authenticatedUser.businessId(), authenticatedUser.userId(),
+				"ADMIN_USER_SESSIONS_REVOKED", "USER_ACCOUNT", userId, "Sesiones de usuario revocadas.",
+				Map.of("email", current.email()), OffsetDateTime.now(ZoneOffset.UTC));
+		return new StatusResponse("USER_SESSIONS_REVOKED");
+	}
+
+	@Transactional
+	public StatusResponse resetAccess(AuthenticatedUser authenticatedUser, UUID userId) {
+		AdminAccessGuard.requireOwnerOrAdmin(authenticatedUser);
+		AdminUserResponse current = administrationJdbcRepository.findAdminUser(authenticatedUser.businessId(), userId);
+		authService.forgotPassword(new ForgotPasswordRequest(current.email()));
+		auditLogJdbcRepository.insert(authenticatedUser.businessId(), authenticatedUser.userId(),
+				"ADMIN_USER_ACCESS_RESET_REQUESTED", "USER_ACCOUNT", userId,
+				"Restablecimiento de acceso solicitado por administracion.", Map.of("email", current.email()),
+				OffsetDateTime.now(ZoneOffset.UTC));
+		return new StatusResponse("USER_ACCESS_RESET_REQUESTED");
+	}
+
+	private String generateInternalInitialPassword() {
+		return UUID.randomUUID() + "Aa1!";
 	}
 
 	private String normalize(String value) {

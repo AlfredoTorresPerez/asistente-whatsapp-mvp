@@ -323,7 +323,7 @@ export function CatalogFormPage() {
     if (itemType === 'service') {
       return 'Estos datos son usados por la IA para responder precios, duracion, contraindicaciones, disponibilidad y cuidados posteriores.'
     }
-    return 'Estos datos son usados por la IA para responder consultas de stock, precio, recomendacion y venta cruzada.'
+    return 'Estos datos son usados por la IA para responder informacion comercial del catálogo.'
   }, [itemType])
 
   return (
@@ -334,8 +334,8 @@ export function CatalogFormPage() {
             Volver al catalogo
           </Link>
         }
-        description="Formulario conectado al backend para crear o editar servicios y productos del centro estetico."
-        eyebrow="Catalogo"
+        description="Formulario conectado al backend para crear o editar servicios del centro estetico."
+        eyebrow="Servicios"
         title={pageTitle}
       />
 
@@ -384,25 +384,6 @@ export function CatalogFormPage() {
               mutation.mutate()
             }}
           >
-            {!isEdit ? (
-              <label className="block">
-                <span className="mb-2.5 block text-sm font-medium text-[#23385F]">
-                  Tipo de item
-                </span>
-                <select
-                  className={selectClassName}
-                  onChange={(event) => {
-                    setItemType(event.target.value as CatalogItemType)
-                    setForm({ ...emptyForm, active: form.active })
-                  }}
-                  value={itemType}
-                >
-                  <option value="service">Servicio</option>
-                  <option value="product">Producto</option>
-                </select>
-              </label>
-            ) : null}
-
             <div className="grid gap-4 md:grid-cols-2">
               <Input
                 label="Nombre"

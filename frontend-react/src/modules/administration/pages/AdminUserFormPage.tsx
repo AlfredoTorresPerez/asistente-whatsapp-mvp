@@ -30,7 +30,6 @@ type FormState = {
   phone: string
   role: string
   status: string
-  temporaryPassword: string
   timezone: string
 }
 
@@ -48,7 +47,6 @@ function toInitialForm(user?: AdminUserResponse): FormState {
     phone: user?.phone ?? '',
     role: user?.role ?? 'AGENT',
     status: user?.status ?? 'ACTIVE',
-    temporaryPassword: '',
     timezone: user?.timezone ?? 'America/Santiago',
   }
 }
@@ -61,9 +59,23 @@ function toRequest(form: FormState, isEdit: boolean): AdminUserRequest {
     phone: form.phone.trim() || null,
     role: form.role,
     status: form.status,
-    temporaryPassword: isEdit ? null : form.temporaryPassword.trim(),
+    temporaryPassword: null,
     timezone: form.timezone.trim() || 'America/Santiago',
   }
+}
+
+function statusLabel(status: string) {
+  if (status === 'ACTIVE') return 'Activo'
+  if (status === 'LOCKED') return 'Bloqueado'
+  return 'Inactivo'
+}
+
+function roleLabel(role: string, roles: AdminRoleResponse[]) {
+  return roles.find((item) => item.code === role)?.name ?? role
+}
+
+function requiresMfa(role: string) {
+  return role === 'OWNER' || role === 'ADMIN'
 }
 
 export function AdminUserFormPage() {
@@ -127,7 +139,7 @@ function AdminUserForm({
   const [formError, setFormError] = useState<string | null>(null)
 
   const roleOptions = roles.map((role) => ({
-    label: `${role.name} (${role.permissionCount})`,
+    label: role.name,
     value: role.code,
   }))
 
@@ -146,7 +158,9 @@ function AdminUserForm({
       await queryClient.invalidateQueries({ queryKey: ['administration', 'summary'] })
       showToast({
         title: isEdit ? 'Usuario actualizado' : 'Usuario creado',
-        description: 'Los cambios ya estan disponibles en administracion.',
+        description: isEdit
+          ? 'Los cambios ya estan disponibles en administracion.'
+          : 'Se solicito un enlace de acceso de un solo uso para el usuario.',
         tone: 'success',
       })
       navigate('/admin/users')
@@ -157,10 +171,6 @@ function AdminUserForm({
     setFormError(null)
     if (!form.firstName.trim() || !form.lastName.trim() || !form.email.trim()) {
       setFormError('Nombre, apellido y correo son obligatorios.')
-      return
-    }
-    if (!isEdit && !form.temporaryPassword.trim()) {
-      setFormError('La contrasena temporal es obligatoria y debe ser unica para este usuario.')
       return
     }
     mutation.mutate()
@@ -184,11 +194,11 @@ function AdminUserForm({
           <div>
             <p className="text-lg font-semibold text-slate-950">Datos del usuario</p>
             <p className="mt-1 text-sm text-slate-600">
-              Roles disponibles desde la matriz de permisos del backend.
+              El acceso inicial se completa con un enlace de un solo uso enviado al correo.
             </p>
           </div>
           <StatusBadge
-            label={form.status === 'ACTIVE' ? 'Activo' : form.status}
+            label={statusLabel(form.status)}
             tone={form.status === 'ACTIVE' ? 'success' : 'warning'}
           />
         </div>
@@ -232,15 +242,24 @@ function AdminUserForm({
             onChange={(event) => setForm({ ...form, timezone: event.target.value })}
             value={form.timezone}
           />
-          {!isEdit ? (
-            <Input
-              hint="Usa una contrasena temporal unica; no se define una por defecto."
-              label="Contrasena temporal"
-              onChange={(event) => setForm({ ...form, temporaryPassword: event.target.value })}
-              type="password"
-              value={form.temporaryPassword}
-            />
-          ) : null}
+        </div>
+
+        <div className="mt-5 grid gap-4 md:grid-cols-2">
+          <div className="rounded-[18px] border border-blue-100 bg-blue-50 px-4 py-4">
+            <p className="text-sm font-semibold text-slate-950">Invitacion de acceso</p>
+            <p className="mt-2 text-sm leading-6 text-slate-700">
+              Al crear el usuario se solicita un enlace de un solo uso para que defina su
+              contrasena. El administrador no ve ni define contrasenas temporales.
+            </p>
+          </div>
+          <div className="rounded-[18px] border border-amber-100 bg-amber-50 px-4 py-4">
+            <p className="text-sm font-semibold text-slate-950">MFA</p>
+            <p className="mt-2 text-sm leading-6 text-slate-700">
+              {requiresMfa(form.role)
+                ? `${roleLabel(form.role, roles)} requiere MFA antes de operar permisos privilegiados.`
+                : 'MFA queda disponible como refuerzo de acceso para este perfil.'}
+            </p>
+          </div>
         </div>
 
         {formError ? (

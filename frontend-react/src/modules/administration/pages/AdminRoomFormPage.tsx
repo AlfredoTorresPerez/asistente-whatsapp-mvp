@@ -26,6 +26,8 @@ type FormState = {
   locationId: string
 }
 
+const DEFAULT_COLOR = '#0EA5E9'
+
 const ROOM_TYPE_OPTIONS = [
   { label: 'Facial', value: 'FACIAL' },
   { label: 'Corporal', value: 'CORPORAL' },
@@ -45,7 +47,7 @@ function toInitialForm(r?: RoomResponse): FormState {
     roomType: r?.roomType ?? 'FACIAL',
     capacity: r?.capacity != null ? String(r.capacity) : '1',
     description: r?.description ?? '',
-    color: r?.color ?? '',
+    color: r?.color ?? DEFAULT_COLOR,
     notes: r?.notes ?? '',
     active: r?.active != null ? (r.active ? 'true' : 'false') : 'true',
     locationId: r?.locationId ?? '',
@@ -221,13 +223,21 @@ function AdminRoomForm({
             options={locationOptions}
             value={form.locationId}
           />
-          <Input
-            label="Color"
-            hint="Hex: #E8F4FD"
-            onChange={(event) => setForm({ ...form, color: event.target.value })}
-            placeholder="#"
-            value={form.color}
-          />
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              Color en agenda
+            </label>
+            <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2.5">
+              <input
+                aria-label="Seleccionar color de la cabina"
+                className="h-10 w-12 cursor-pointer rounded-lg border border-slate-200 bg-white p-1"
+                onChange={(event) => setForm({ ...form, color: event.target.value })}
+                type="color"
+                value={form.color || DEFAULT_COLOR}
+              />
+              <span className="text-sm text-slate-600">Selecciona el color visible en agenda</span>
+            </div>
+          </div>
           <Select
             label="Estado"
             onChange={(event) => setForm({ ...form, active: event.target.value })}

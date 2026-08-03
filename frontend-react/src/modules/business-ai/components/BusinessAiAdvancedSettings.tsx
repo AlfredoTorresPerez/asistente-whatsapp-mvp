@@ -56,7 +56,7 @@ export function BusinessAiAdvancedSettings({
         <div>
           <h2 className="text-lg font-semibold">Configuración avanzada</h2>
           <p className="mt-1 text-xs text-gray-500">
-            Instrucciones internas, versión del motor y parámetros técnicos.
+            Instrucciones internas, versiones y criterios de operación.
           </p>
         </div>
         <span className="text-xl text-gray-400 transition-transform" style={{ transform: isOpen ? 'rotate(180deg)' : 'none' }}>

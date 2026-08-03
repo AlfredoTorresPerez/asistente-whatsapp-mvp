@@ -19,6 +19,7 @@ import com.asistentewhatsapp.security.domain.AuthenticatedUser;
 import com.asistentewhatsapp.shared.api.PagedResponse;
 import com.asistentewhatsapp.shared.exception.ApiException;
 import com.asistentewhatsapp.shared.observability.BusinessMetrics;
+import com.asistentewhatsapp.shared.util.PhoneUtils;
 import java.time.ZoneId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -391,10 +392,11 @@ public class BookingService {
 			case "PENDIENTE_CONFIRMACION", "TEMPORARY", "TEMPORAL" -> BookingStateMachine.PENDING_CONFIRMATION;
 			case "PENDING_PAYMENT", "PENDIENTE_PAGO" -> BookingStateMachine.PENDING_PAYMENT;
 			case "CONFIRMED", "CONFIRMADA", "SCHEDULED" -> BookingStateMachine.CONFIRMED;
+			case "IN_PROGRESS", "EN_ATENCION", "EN_ATENCIÓN" -> BookingStateMachine.IN_SERVICE;
 			case "RESCHEDULE_PENDING", "REPROGRAMACION_PENDIENTE" -> BookingStateMachine.RESCHEDULE_PENDING;
 			case "RESCHEDULED", "REPROGRAMADA" -> BookingStateMachine.RESCHEDULED;
 			case "CANCELLED", "CANCELED", "CANCELADA" -> BookingStateMachine.CANCELLED;
-			case "COMPLETED", "ATTENDED", "ATENDIDA" -> BookingStateMachine.ATTENDED;
+			case "COMPLETED", "COMPLETADA", "ATTENDED", "ATENDIDA" -> BookingStateMachine.COMPLETED;
 			case "NO_SHOW", "NO_ASISTE" -> BookingStateMachine.NO_SHOW;
 			case "EXPIRED", "RELEASED", "LIBERADA", "EXPIRADA" -> BookingStateMachine.EXPIRED;
 			case "PENDING", "PENDIENTE" -> BookingStateMachine.REQUESTED;
@@ -443,11 +445,11 @@ public class BookingService {
 	}
 
 	private String normalizePhone(String value, String field) {
-		String normalized = normalizeRequiredValue(value, field, 30).replace(" ", "");
-		if (normalized.length() < 8) {
+		String cleaned = normalizeRequiredValue(value, field, 30).replace(" ", "");
+		if (cleaned.length() < 8) {
 			throw validationError(field, "El telefono debe tener al menos 8 caracteres.");
 		}
-		return normalized;
+		return PhoneUtils.normalizeChilePhone(cleaned);
 	}
 
 	private String normalizeOptionalEmail(String value, String field) {
@@ -462,7 +464,7 @@ public class BookingService {
 	}
 
 	private OffsetDateTime resolveCompletedAt(String status, OffsetDateTime startsAt) {
-		return BookingStateMachine.ATTENDED.equals(BookingStateMachine.canonical(status)) ? startsAt : null;
+		return BookingStateMachine.COMPLETED.equals(BookingStateMachine.canonical(status)) ? startsAt : null;
 	}
 
 	private String appendCancellationReason(String currentNotes, String reason) {

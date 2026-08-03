@@ -15,9 +15,11 @@ import { Textarea } from '../../../components/ui/Textarea'
 import { useShellSession } from '../../../lib/shellSession'
 import { useToast } from '../../../lib/toast'
 import { useOnlineStatus } from '../../../lib/useOnlineStatus'
+import { getBusinessLocationsRequest } from '../../../services/api/businessLocationsApi'
 import { getConversationDetailRequest } from '../../../services/api/conversationsApi'
 import { ApiClientError } from '../../../services/api/httpClient'
 import { createLeadFromConversationRequest } from '../../../services/api/leadsApi'
+import { translateConversationStatus } from '../../conversations/pages/conversationInbox'
 import { leadStageOptions } from '../leadOptions'
 
 const schema = z.object({
@@ -26,6 +28,7 @@ const schema = z.object({
   phone: z.string().trim().min(8, 'Ingresa un telefono valido.').max(30),
   email: z.string().trim().max(255).email('Ingresa un correo valido.').or(z.literal('')),
   stage: z.string().trim().min(1, 'Selecciona una etapa.'),
+  locationId: z.string(),
   notes: z.string().trim().max(2000, 'La nota no puede superar los 2000 caracteres.'),
 })
 
@@ -58,8 +61,14 @@ export function NewLeadFromConversationPage() {
       phone: '',
       email: '',
       stage: 'NEW',
+      locationId: '',
       notes: '',
     },
+  })
+
+  const locationsQuery = useQuery({
+    queryKey: ['business-locations', 'active'],
+    queryFn: () => getBusinessLocationsRequest({ activeOnly: true }),
   })
 
   const conversationQuery = useQuery({
@@ -80,6 +89,7 @@ export function NewLeadFromConversationPage() {
       phone: conversationQuery.data.customer.phone,
       email: conversationQuery.data.customer.email ?? '',
       stage: 'NEW',
+      locationId: conversationQuery.data.locationId ?? '',
       notes: conversationQuery.data.lastMessagePreview ?? '',
     })
   }, [conversationQuery.data, reset])
@@ -98,6 +108,7 @@ export function NewLeadFromConversationPage() {
         stage: values.stage,
         notes: values.notes || undefined,
         assignedUserId: user?.id,
+        locationId: values.locationId || undefined,
       })
     },
     onSuccess: (lead) => {
@@ -193,15 +204,28 @@ export function NewLeadFromConversationPage() {
                 />
               </div>
 
-              <Select
-                error={errors.stage?.message}
-                label="Etapa"
-                options={leadStageOptions.map((option) => ({
-                  label: option.label,
-                  value: option.value,
-                }))}
-                {...register('stage')}
-              />
+              <div className="grid gap-5 md:grid-cols-2">
+                <Select
+                  error={errors.stage?.message}
+                  label="Etapa"
+                  options={leadStageOptions.map((option) => ({
+                    label: option.label,
+                    value: option.value,
+                  }))}
+                  {...register('stage')}
+                />
+                <Select
+                  label="Sucursal"
+                  options={[
+                    { label: 'Sin sucursal asignada', value: '' },
+                    ...(locationsQuery.data ?? []).map((location) => ({
+                      label: location.name,
+                      value: location.id,
+                    })),
+                  ]}
+                  {...register('locationId')}
+                />
+              </div>
 
               <Textarea
                 error={errors.notes?.message}
@@ -238,7 +262,11 @@ export function NewLeadFromConversationPage() {
             </h2>
             <ul className="space-y-3 text-sm leading-6 text-[var(--color-text-secondary)]">
               <li>Telefono: {conversationQuery.data.customer.phone}</li>
-              <li>Estado de la conversacion: {conversationQuery.data.status}</li>
+              <li>
+                Estado de la conversacion:{' '}
+                {translateConversationStatus(conversationQuery.data.status)}
+              </li>
+              <li>Sucursal: {conversationQuery.data.locationName ?? 'Sin sucursal detectada'}</li>
               <li>
                 Ultimo mensaje:{' '}
                 {conversationQuery.data.lastMessagePreview ?? 'Sin mensaje reciente'}

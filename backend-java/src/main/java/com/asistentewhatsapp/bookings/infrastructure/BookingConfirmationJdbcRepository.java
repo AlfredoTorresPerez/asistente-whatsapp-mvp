@@ -17,7 +17,7 @@ public class BookingConfirmationJdbcRepository {
 
 	private static final List<String> ACTIVE_BOOKING_STATUSES = List.of("REQUESTED", "TEMPORARY",
 			"PENDIENTE_CONFIRMACION", "CONFIRMED", "RESCHEDULED", "REPROGRAMADA", "SOLICITADA", "PENDIENTE_PAGO",
-			"CONFIRMADA", "REPROGRAMACION_PENDIENTE");
+			"CONFIRMADA", "REPROGRAMACION_PENDIENTE", "IN_PROGRESS", "EN_ATENCION");
 	private final NamedParameterJdbcTemplate jdbcTemplate;
 	private final BusinessMetrics businessMetrics;
 

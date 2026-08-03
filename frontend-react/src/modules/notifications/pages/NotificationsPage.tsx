@@ -41,6 +41,10 @@ const defaultFilters: NotificationsFiltersValues = {
 
 const NOTIFICATION_TYPE_LABELS: Record<string, string> = {
   NEW_MESSAGE: 'Nuevo mensaje',
+  BOOKING_CONFIRMATION: 'Confirmacion de cita',
+  BOOKING_REMINDER: 'Recordatorio de cita',
+  BOOKING_CANCELLED: 'Cita cancelada',
+  WHATSAPP_DELIVERY_FAILED: 'Envio fallido',
 }
 
 const NOTIFICATION_STATUS_LABELS: Record<string, string> = {
@@ -54,6 +58,16 @@ function formatNotificationType(type: string) {
 
 function formatNotificationStatus(status: string) {
   return NOTIFICATION_STATUS_LABELS[status] ?? status
+}
+
+function formatNotificationChannel(notification: NotificationResponse) {
+  if (notification.relatedEntityType === 'CONVERSATION' || notification.type.includes('WHATSAPP')) {
+    return 'WhatsApp'
+  }
+  if (notification.type.includes('BOOKING')) {
+    return 'Agenda'
+  }
+  return 'Interna'
 }
 
 function getStatusTone(status: string) {
@@ -79,8 +93,6 @@ function resolveNotificationRoute(notification: NotificationResponse) {
       return `/prospects/${notification.relatedEntityId}`
     case 'BOOKING':
       return `/appointments/${notification.relatedEntityId}`
-    case 'ORDER':
-      return `/orders/${notification.relatedEntityId}`
     default:
       return null
   }
@@ -218,7 +230,7 @@ export function NotificationsPage() {
             Marcar todas como leidas
           </Button>
         }
-        description="Centro basico de notificaciones del negocio, con filtros, tabs y acceso directo a la entidad relacionada."
+        description="Centro de notificaciones del negocio, con filtros y acceso directo al seguimiento relacionado."
         eyebrow="Alertas"
         title="Centro de notificaciones"
       />
@@ -294,6 +306,10 @@ export function NotificationsPage() {
             <select className={fieldClassName} {...register('type')}>
               <option value="">Todos</option>
               <option value="NEW_MESSAGE">Nuevo mensaje</option>
+              <option value="BOOKING_CONFIRMATION">Confirmacion de cita</option>
+              <option value="BOOKING_REMINDER">Recordatorio de cita</option>
+              <option value="BOOKING_CANCELLED">Cita cancelada</option>
+              <option value="WHATSAPP_DELIVERY_FAILED">Envio fallido</option>
             </select>
           </label>
 
@@ -340,7 +356,7 @@ export function NotificationsPage() {
             <table className="min-w-full border-separate border-spacing-0">
               <thead>
                 <tr className="bg-slate-50">
-                  {['Notificacion', 'Tipo', 'Estado', 'Momento', 'Acciones'].map((column) => (
+                  {['Notificacion', 'Canal', 'Tipo', 'Estado', 'Momento', 'Lectura', 'Acciones'].map((column) => (
                     <th
                       key={column}
                       className="border-b border-[var(--color-border)] px-5 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500"
@@ -374,6 +390,12 @@ export function NotificationsPage() {
                       </td>
                       <td className="border-b border-[var(--color-border)] px-5 py-4">
                         <StatusBadge
+                          label={formatNotificationChannel(notification)}
+                          tone={notification.relatedEntityType === 'CONVERSATION' ? 'success' : 'neutral'}
+                        />
+                      </td>
+                      <td className="border-b border-[var(--color-border)] px-5 py-4">
+                        <StatusBadge
                           label={formatNotificationType(notification.type)}
                           tone="info"
                         />
@@ -389,6 +411,11 @@ export function NotificationsPage() {
                         <p className="mt-1 text-xs uppercase tracking-[0.16em] text-slate-500">
                           {dayjs(notification.createdAt).format('HH:mm')}
                         </p>
+                      </td>
+                      <td className="border-b border-[var(--color-border)] px-5 py-4 text-sm text-slate-600">
+                        {notification.readAt
+                          ? dayjs(notification.readAt).format('DD/MM/YYYY HH:mm')
+                          : 'Pendiente'}
                       </td>
                       <td className="border-b border-[var(--color-border)] px-5 py-4">
                         <div className="flex flex-wrap justify-end gap-2">

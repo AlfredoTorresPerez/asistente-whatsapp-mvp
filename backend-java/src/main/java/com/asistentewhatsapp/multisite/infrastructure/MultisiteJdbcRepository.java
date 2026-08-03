@@ -42,16 +42,27 @@ public class MultisiteJdbcRepository {
 						    count(distinct c.id) as conversations,
 						    count(distinct l.id) as leads,
 						    count(distinct b.id) as bookings,
+						    count(distinct bt.id) as bookings_today,
 						    count(distinct o.id) as orders,
 						    count(distinct pls.product_service_id) as products_with_stock,
-						    count(distinct apl.professional_id) as professionals
+						    count(distinct apl.professional_id) as professionals,
+						    count(distinct ar.id) filter (where ar.active = true) as rooms_available,
+						    count(distinct ar.id) filter (where ar.active = false) as rooms_in_maintenance,
+						    (
+						      case when bl.active = false then 1 else 0 end
+						      + count(distinct ar.id) filter (where ar.active = false)
+						    ) as alerts
 						from business_location bl
 						left join conversation c on c.business_id = bl.business_id and c.location_id = bl.id
 						left join lead l on l.business_id = bl.business_id and l.location_id = bl.id
 						left join booking b on b.business_id = bl.business_id and b.location_id = bl.id
+						left join booking bt on bt.business_id = bl.business_id and bt.location_id = bl.id
+						  and bt.starts_at::date = current_date
+						  and bt.status not in ('CANCELLED', 'CANCELADA')
 						left join order_request o on o.business_id = bl.business_id and o.location_id = bl.id
 						left join product_location_stock pls on pls.business_id = bl.business_id and pls.location_id = bl.id and pls.active = true
 						left join aesthetic_professional_location apl on apl.business_id = bl.business_id and apl.location_id = bl.id and apl.active = true
+						left join agenda_room ar on ar.business_id = bl.business_id and ar.location_id = bl.id
 						where bl.business_id = :businessId
 						group by bl.id, bl.code, bl.name, bl.active
 						order by bl.active desc, bl.name asc
@@ -60,7 +71,8 @@ public class MultisiteJdbcRepository {
 				(rs, rowNum) -> new MultisiteLocationSummaryResponse(rs.getObject("location_id", UUID.class),
 						rs.getString("location_code"), rs.getString("location_name"), rs.getBoolean("active"),
 						rs.getLong("conversations"), rs.getLong("leads"), rs.getLong("bookings"), rs.getLong("orders"),
-						rs.getLong("products_with_stock"), rs.getLong("professionals")));
+						rs.getLong("products_with_stock"), rs.getLong("professionals"), rs.getLong("bookings_today"),
+						rs.getLong("rooms_available"), rs.getLong("rooms_in_maintenance"), rs.getLong("alerts")));
 	}
 
 	public List<MultisiteCatalogAvailabilityResponse> catalogAvailability(UUID businessId, UUID locationId) {

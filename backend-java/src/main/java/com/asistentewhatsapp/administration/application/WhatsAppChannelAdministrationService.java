@@ -65,11 +65,20 @@ public class WhatsAppChannelAdministrationService {
 						event.processingStatus(), event.receivedAt(), event.processedAt()))
 				.toList();
 		int recentErrorCount = repository.countRecentEventErrors(authenticatedUser.businessId(), 24 * 60);
+		OffsetDateTime lastInboundMessageAt = repository.findLastMessageAt(authenticatedUser.businessId(), "INBOUND")
+				.orElse(null);
+		OffsetDateTime lastOutboundMessageAt = repository.findLastMessageAt(authenticatedUser.businessId(), "OUTBOUND")
+				.orElse(null);
+		int deliveredMessages = repository.countRecentDeliveryStatus(authenticatedUser.businessId(), "DELIVERED",
+				24 * 60);
+		int readMessages = repository.countRecentDeliveryStatus(authenticatedUser.businessId(), "READ", 24 * 60);
+		int failedMessages = repository.countRecentDeliveryStatus(authenticatedUser.businessId(), "FAILED", 24 * 60);
 
 		return new WhatsAppChannelStatusResponse(canalWhatsApp.provider().name(),
 				normalizeSessionStatus(session.connectionStatus()), phoneNumber, phoneNumberId, session.adapterMode(),
 				lastEventAt, true, recentEvents.size(), recentErrorCount, recentEvents,
-				buildStatusMessage(canalWhatsApp.provider()));
+				buildStatusMessage(canalWhatsApp.provider()), lastInboundMessageAt, lastOutboundMessageAt,
+				deliveredMessages, readMessages, failedMessages);
 	}
 
 	@Transactional
@@ -124,9 +133,9 @@ public class WhatsAppChannelAdministrationService {
 		String normalizedPhone = normalizePhone(request.recipientPhone());
 		WhatsAppChannelJdbcRepository.CustomerRecord customer = repository
 				.findCustomerByPhone(authenticatedUser.businessId(), normalizedPhone)
-				.orElseGet(() -> new WhatsAppChannelJdbcRepository.CustomerRecord(repository
-						.insertCustomer(authenticatedUser.businessId(), normalizedPhone, "Contacto de prueba"),
-						"Contacto de prueba", normalizedPhone, normalizedPhone));
+				.orElseGet(() -> new WhatsAppChannelJdbcRepository.CustomerRecord(
+						repository.insertCustomer(authenticatedUser.businessId(), normalizedPhone, "Contacto WhatsApp"),
+						"Contacto WhatsApp", normalizedPhone, normalizedPhone));
 
 		WhatsAppChannelJdbcRepository.ConversationRecord conversation = repository
 				.findLatestConversation(authenticatedUser.businessId(), channelAccount.id(), customer.id()).orElseGet(
@@ -200,9 +209,8 @@ public class WhatsAppChannelAdministrationService {
 
 	private String buildStatusMessage(WhatsAppChannelProvider provider) {
 		return switch (provider) {
-			case META_CLOUD_API -> "WhatsApp Cloud API de Meta. Verifique el webhook, el token y el numero vinculados.";
-			case SIMULATED ->
-				"Modo simulado: los mensajes no se envian por WhatsApp. Use el proveedor META_CLOUD_API para envios reales.";
+			case META_CLOUD_API -> "Canal conectado a WhatsApp Cloud API de Meta para operar mensajes del negocio.";
+			case SIMULATED -> "Canal en modo de prueba local. Los mensajes no se envian a clientes reales.";
 		};
 	}
 

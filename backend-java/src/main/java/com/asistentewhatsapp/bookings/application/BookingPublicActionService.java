@@ -702,7 +702,8 @@ public class BookingPublicActionService {
 			case "CANCELLED" -> "CANCELADA";
 			case "CONFIRMED" -> "CONFIRMADA";
 			case "REQUESTED" -> "SOLICITADA";
-			case "COMPLETED", "ATTENDED" -> "ATENDIDA";
+			case "IN_PROGRESS" -> "EN_ATENCION";
+			case "COMPLETED", "ATTENDED", "ATENDIDA" -> "COMPLETADA";
 			case "NO_SHOW" -> "NO_ASISTE";
 			case "EXPIRED", "RELEASED" -> "EXPIRADA";
 			default -> status;

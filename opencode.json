@@ -1,25 +1,25 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "provider": {
-    "ollama": {
+    "lmstudio": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "Ollama local",
+      "name": "LM Studio local",
       "options": {
-        "baseURL": "http://localhost:11434/v1"
+        "baseURL": "http://127.0.0.1:1234/v1"
       },
       "models": {
-        "qwen3-coder-opencode:32k": {
-          "name": "Qwen 3 Coder OpenCode 32K"
+        "mvp-coder": {
+          "name": "Qwen2.5-Coder 7B local",
+          "limit": {
+            "context": 16384,
+            "output": 1024
+          }
         }
       }
     }
   },
-  "model": "ollama/qwen3-coder-opencode:32k",
-  "permission": {
-    "read": "allow",
-    "glob": "allow",
-    "grep": "allow",
-    "bash": "allow",
-    "edit": "ask"
-  }
+  "model": "lmstudio/mvp-coder",
+  "instructions": [
+    "AGENTS.md"
+  ]
 }

@@ -25,7 +25,7 @@ const RULE_TYPE_LABELS: Record<string, string> = {
   SAFETY: 'Seguridad',
   SCHEDULE: 'Horario',
   SEGURIDAD: 'Seguridad',
-  STOCK: 'Stock',
+  STOCK: 'Inventario',
   VENTA_CRUZADA: 'Venta cruzada',
 }
 

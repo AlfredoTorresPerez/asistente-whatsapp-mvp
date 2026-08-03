@@ -16,7 +16,8 @@ class BookingStateMachineTest {
 		assertThat(BookingStateMachine.canonical("NO_SHOW")).isEqualTo(BookingStateMachine.NO_SHOW);
 		assertThat(BookingStateMachine.canonical("SOLICITADA")).isEqualTo(BookingStateMachine.REQUESTED);
 		assertThat(BookingStateMachine.canonical("PENDIENTE_PAGO")).isEqualTo(BookingStateMachine.PENDING_PAYMENT);
-		assertThat(BookingStateMachine.canonical("ATENDIDA")).isEqualTo(BookingStateMachine.ATTENDED);
+		assertThat(BookingStateMachine.canonical("ATENDIDA")).isEqualTo(BookingStateMachine.COMPLETED);
+		assertThat(BookingStateMachine.canonical("IN_PROGRESS")).isEqualTo(BookingStateMachine.IN_SERVICE);
 		assertThat(BookingStateMachine.canonical("EXPIRADA")).isEqualTo(BookingStateMachine.EXPIRED);
 		assertThat(BookingStateMachine.canonical("NO_ASISTE")).isEqualTo(BookingStateMachine.NO_SHOW);
 	}
@@ -26,6 +27,8 @@ class BookingStateMachineTest {
 		BookingStateMachine.assertTransition("PENDIENTE_CONFIRMACION", "CONFIRMED", "confirmarse");
 		BookingStateMachine.assertTransition("CONFIRMED", "REPROGRAMADA", "reprogramarse");
 		BookingStateMachine.assertTransition("REPROGRAMADA", "CANCELADA", "cancelarse");
+		BookingStateMachine.assertTransition("CONFIRMED", "EN_ATENCION", "iniciar atencion");
+		BookingStateMachine.assertTransition("EN_ATENCION", "COMPLETADA", "completarse");
 		BookingStateMachine.assertTransition("CONFIRMED", "ATENDIDA", "completarse");
 		BookingStateMachine.assertTransition("SOLICITADA", "PENDIENTE_PAGO", "solicitar pago");
 		BookingStateMachine.assertTransition("PENDIENTE_PAGO", "CONFIRMADA", "confirmarse");
@@ -93,5 +96,42 @@ class BookingStateMachineTest {
 	void rejectsInvalidTransitionFromCompletedToRescheduled() {
 		assertThatThrownBy(() -> BookingStateMachine.assertTransition("ATENDIDA", "REPROGRAMADA", "reprogramarse"))
 				.isInstanceOf(ApiException.class);
+	}
+
+	@Test
+	void labelReturnsSpanishLabels() {
+		assertThat(BookingStateMachine.label("SOLICITADA")).isEqualTo("Solicitada");
+		assertThat(BookingStateMachine.label("PENDIENTE_CONFIRMACION")).isEqualTo("Pendiente de confirmación");
+		assertThat(BookingStateMachine.label("PENDIENTE_PAGO")).isEqualTo("Pendiente de pago");
+		assertThat(BookingStateMachine.label("CONFIRMADA")).isEqualTo("Confirmada");
+		assertThat(BookingStateMachine.label("REPROGRAMACION_PENDIENTE")).isEqualTo("Reprogramación pendiente");
+		assertThat(BookingStateMachine.label("REPROGRAMADA")).isEqualTo("Reprogramada");
+		assertThat(BookingStateMachine.label("CANCELADA")).isEqualTo("Cancelada");
+		assertThat(BookingStateMachine.label("CANCELADA_POR_CLIENTE")).isEqualTo("Cancelada por cliente");
+		assertThat(BookingStateMachine.label("EXPIRADA")).isEqualTo("Expirada");
+		assertThat(BookingStateMachine.label("EN_ATENCION")).isEqualTo("En atención");
+		assertThat(BookingStateMachine.label("COMPLETADA")).isEqualTo("Completada");
+		assertThat(BookingStateMachine.label("ATENDIDA")).isEqualTo("Completada");
+		assertThat(BookingStateMachine.label("NO_ASISTE")).isEqualTo("No asistió");
+	}
+
+	@Test
+	void labelAcceptsEnglishInternalStatusAliases() {
+		assertThat(BookingStateMachine.label("REQUESTED")).isEqualTo("Solicitada");
+		assertThat(BookingStateMachine.label("CONFIRMED")).isEqualTo("Confirmada");
+		assertThat(BookingStateMachine.label("IN_PROGRESS")).isEqualTo("En atención");
+		assertThat(BookingStateMachine.label("CANCELLED")).isEqualTo("Cancelada");
+		assertThat(BookingStateMachine.label("COMPLETED")).isEqualTo("Completada");
+		assertThat(BookingStateMachine.label("NO_SHOW")).isEqualTo("No asistió");
+	}
+
+	@Test
+	void labelReturnsSinEstadoForNull() {
+		assertThat(BookingStateMachine.label(null)).isEqualTo("Sin estado");
+	}
+
+	@Test
+	void labelReturnsUnknownStatusAsStringFallback() {
+		assertThat(BookingStateMachine.label("UNKNOWN")).isEqualTo("UNKNOWN");
 	}
 }

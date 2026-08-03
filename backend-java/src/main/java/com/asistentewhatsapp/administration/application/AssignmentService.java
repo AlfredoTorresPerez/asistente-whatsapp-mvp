@@ -32,11 +32,12 @@ public class AssignmentService {
 
 	@Transactional(readOnly = true)
 	public PagedResponse<AssignmentGroupResponse> listGroups(AuthenticatedUser authenticatedUser, int page, int size,
-			String search, UUID serviceId, String coverage) {
+			String search, UUID serviceId, UUID locationId, String categoryCode, UUID professionalId, UUID roomId,
+			String coverage) {
 		int safePage = Math.max(page, 0);
 		int safeSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
 		return assignmentJdbcRepository.findGroups(authenticatedUser.businessId(), safePage, safeSize, search,
-				serviceId, coverage);
+				serviceId, locationId, categoryCode, professionalId, roomId, coverage);
 	}
 
 	@Transactional(readOnly = true)

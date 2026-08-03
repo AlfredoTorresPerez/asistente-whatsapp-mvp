@@ -23,6 +23,37 @@ import { KnowledgeBaseModal } from '../components/KnowledgeBaseModal'
 
 type Section = 'general' | 'test' | 'info' | 'audit' | 'advanced'
 
+function formatAiIntent(intent: string) {
+  const labels: Record<string, string> = {
+    AVAILABILITY_QUERY: 'Consulta de disponibilidad',
+    BOOKING_CANCEL: 'Cancelar cita',
+    BOOKING_CHANGE: 'Reprogramar cita',
+    BOOKING_REQUEST: 'Crear cita',
+    BOOKING_STATUS: 'Estado de cita',
+    BUSINESS_HOURS_QUERY: 'Horario de atención',
+    COMMERCIAL_AND_BOOKING: 'Consulta comercial y cita',
+    COMMERCIAL_INQUIRY: 'Consulta comercial',
+    COMPLAINT: 'Reclamo',
+    FOLLOW_UP: 'Seguimiento',
+    GREETING: 'Saludo',
+    HUMAN_REQUEST: 'Solicita atención humana',
+    KNOWLEDGE_QUERY: 'Consulta de información',
+    LOCATION_QUERY: 'Consulta de sucursal',
+    PAYMENT_INQUIRY: 'Consulta de pago',
+    PAYMENT_PROBLEM: 'Problema de pago',
+    PRICE_REQUEST: 'Consulta de precio',
+    PROFESSIONAL_QUERY: 'Consulta de profesional',
+    QUOTE_REQUEST: 'Solicitud de cotización',
+    SERVICE_INFORMATION: 'Información de servicio',
+    SERVICE_RECOMMENDATION: 'Recomendación de servicio',
+    SUPPORT_GENERAL: 'Soporte',
+    TECHNICAL_MESSAGE: 'Mensaje no comercial',
+    THANKS_OR_FAREWELL: 'Cierre de conversación',
+    WAITLIST_QUERY: 'Lista de espera',
+  }
+  return labels[intent] ?? intent.replace(/_/g, ' ').toLowerCase()
+}
+
 export function BusinessAiPage() {
   const session = useShellSession()
   const { hasPermission } = usePermissions()
@@ -82,6 +113,7 @@ export function BusinessAiPage() {
   return (
     <section className="mx-auto max-w-[1440px] px-4 py-6">
       <PageHeader
+        eyebrow="Asistente inteligente"
         title="IA del Negocio"
         description="Configura el asistente inteligente para la atención de tus clientes por WhatsApp."
       />
@@ -132,6 +164,8 @@ export function BusinessAiPage() {
               onSave={() => settings.saveSettingsMutation.mutate()}
               isSaving={settings.saveSettingsMutation.isPending}
               hasChanges={settings.hasUnsavedSettings}
+              lastModifiedAt={settings.settingsQuery.data?.updatedAt}
+              updatedBy={settings.settingsQuery.data?.updatedBy}
             />
             <AssistantCapabilities
               allowedTopics={settings.allowedTopics}
@@ -193,8 +227,8 @@ export function BusinessAiPage() {
           <UnresolvedQueriesPanel
             entries={audit.paginatedLogs.map((log) => ({
               id: log.id,
-              title: log.intent,
-              category: log.intent,
+              title: formatAiIntent(log.intent),
+              category: formatAiIntent(log.intent),
               status: log.requiresHumanHandoff ? 'pending' : 'resolved',
               updatedAt: log.createdAt,
               description: log.sourceMessage,
@@ -251,7 +285,6 @@ export function BusinessAiPage() {
         open={knowledge.showBaseModal}
         onClose={() => knowledge.setShowBaseModal(false)}
         services={knowledge.services}
-        products={knowledge.products}
         rules={knowledge.rules}
       />
     </section>

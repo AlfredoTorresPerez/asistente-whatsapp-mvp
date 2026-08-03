@@ -22,13 +22,27 @@ import { Card } from '../../../components/ui/Card'
 import { DataTableShell } from '../../../components/ui/DataTableShell'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
+import {
+  formatChileanCurrency,
+  formatChileanDate,
+  formatChileanNumber,
+  formatChileanPercent,
+  formatChileanShortDate,
+  formatMaskedPhone,
+  formatMinutesAsHours,
+} from '../../../lib/formatters'
+import { useShellSession } from '../../../lib/shellSession'
+import { formatEstado } from '../../../lib/statusFormatters'
 import { useOnlineStatus } from '../../../lib/useOnlineStatus'
+import { usePermissions } from '../../../hooks/usePermissions'
 import { getAgendaFilterOptionsRequest } from '../../../services/api/completeAgendaApi'
 import { getBusinessLocationsRequest } from '../../../services/api/businessLocationsApi'
-import { getReportsSummaryRequest } from '../../../services/api/reportsApi'
+import { downloadReportsCsvRequest, getReportsSummaryRequest } from '../../../services/api/reportsApi'
 import type {
   ReportsAppointmentDistributionPoint,
   ReportsFunnelStageResponse,
+  ReportsKpiItem,
+  ReportsOccupancyResponse,
   ReportsProspectRowResponse,
   ReportsSummaryResponse,
 } from '../../../services/api/types'
@@ -70,8 +84,8 @@ const BOOKING_STATUS_OPTIONS = [
   { value: 'CANCELADA', label: 'Cancelada' },
   { value: 'CANCELADA_POR_CLIENTE', label: 'Cancelada por cliente' },
   { value: 'EXPIRADA', label: 'Expirada' },
-  { value: 'ATENDIDA', label: 'Atendida' },
-  { value: 'NO_ASISTE', label: 'No asiste' },
+  { value: 'COMPLETADA', label: 'Completada' },
+  { value: 'NO_ASISTE', label: 'Inasistencia' },
 ]
 
 const PIE_COLORS: Record<string, string> = {
@@ -85,7 +99,15 @@ const PIE_COLORS: Record<string, string> = {
   CANCELADA_POR_CLIENTE: '#dc2626',
   EXPIRADA: '#6b7280',
   ATENDIDA: '#3b82f6',
+  COMPLETADA: '#3b82f6',
   NO_ASISTE: '#f59e0b',
+}
+
+const CHANNEL_LABELS: Record<string, string> = {
+  WHATSAPP: 'WhatsApp',
+  WEB: 'Sitio publico',
+  MANUAL: 'Ingreso manual',
+  EMAIL: 'Correo electronico',
 }
 
 function buildDefaultFilters() {
@@ -99,32 +121,28 @@ function buildDefaultFilters() {
   }
 }
 
-function formatDate(value: string) {
-  return dayjs(value).format('DD MMM YYYY')
+function formatChannel(channel: string) {
+  return CHANNEL_LABELS[channel] ?? formatEstado(channel)
 }
 
-function formatShortDate(value: string | null) {
-  return value ? dayjs(value).format('DD MMM') : '---'
+function formatKpiValue(kpi: Pick<ReportsKpiItem, 'currentValue' | 'valueType'>) {
+  if (kpi.valueType === 'PERCENT') return `${formatChileanNumber(kpi.currentValue)}%`
+  if (kpi.valueType === 'CURRENCY') return formatChileanCurrency(kpi.currentValue)
+  if (kpi.valueType === 'HOURS') return `${formatChileanNumber(kpi.currentValue)} h`
+  if (kpi.valueType === 'MINUTES') return `${formatChileanNumber(kpi.currentValue)} min`
+  return formatChileanNumber(kpi.currentValue)
 }
 
-function maskPhone(phone: string) {
-  if (!phone || phone.length < 4) return phone
-  const visible = phone.slice(-4)
-  const masked = phone.slice(0, -4).replace(/\d/g, '*')
-  return masked + visible
-}
-
-function KpiVariation({ value, label }: { value: number | null; label: string }) {
-  if (value === null) return <span className="text-xs text-emerald-600 font-semibold">Nuevo</span>
+function KpiVariation({ value, lowerIsBetter }: { value: number | null; lowerIsBetter: boolean }) {
+  if (value === null) {
+    return <span className="text-xs font-medium text-slate-500">Sin periodo anterior</span>
+  }
   if (value === 0) return <span className="text-xs text-slate-400">0%</span>
-  const unfavorableIncrease = ['Canceladas', 'Ausencias', 'No asiste'].some((k) =>
-    label.includes(k),
-  )
-  const isPositive = unfavorableIncrease ? value < 0 : value > 0
+  const isPositive = lowerIsBetter ? value < 0 : value > 0
   return (
     <span className={`text-xs font-semibold ${isPositive ? 'text-emerald-600' : 'text-red-600'}`}>
       {value > 0 ? '+' : ''}
-      {value}%
+      {formatChileanPercent(value)}
     </span>
   )
 }
@@ -134,11 +152,15 @@ function KpiCard({
   currentValue,
   variationPercent,
   help,
+  lowerIsBetter,
+  valueType,
 }: {
   label: string
   currentValue: number
   variationPercent: number | null
   help: string
+  lowerIsBetter: boolean
+  valueType: ReportsKpiItem['valueType']
 }) {
   return (
     <Card className="p-5">
@@ -147,13 +169,12 @@ function KpiCard({
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
             {label}
           </p>
-          <p className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-slate-950" title={help}>
-            {label === 'Tasa de respuesta' || label === 'Conversion a cita'
-              ? `${currentValue}%`
-              : currentValue}
+          <p className="mt-3 text-2xl font-semibold text-slate-950" title={help}>
+            {formatKpiValue({ currentValue, valueType })}
           </p>
           <p className="mt-1 text-xs text-slate-400">
-            vs. periodo anterior: <KpiVariation value={variationPercent} label={label} />
+            vs. periodo anterior:{' '}
+            <KpiVariation lowerIsBetter={lowerIsBetter} value={variationPercent} />
           </p>
         </div>
         <div className="group relative shrink-0">
@@ -171,9 +192,15 @@ function KpiCard({
 
 export function ReportsPage() {
   const isOnline = useOnlineStatus()
+  const { user } = useShellSession()
+  const { hasAnyPermission } = usePermissions()
   const [filters, setFilters] = useState(buildDefaultFilters)
   const [prospectPage, setProspectPage] = useState(0)
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState<string | null>(null)
   const pageSize = 15
+  const canExportReports =
+    hasAnyPermission('REPORTS_EXPORT') || user?.role === 'OWNER' || user?.role === 'ADMIN'
 
   const locationsQuery = useQuery({
     queryKey: ['business-locations', true],
@@ -229,70 +256,32 @@ export function ReportsPage() {
     setProspectPage(0)
   }
 
-  function exportCsv() {
-    if (!data) return
-    const rows: string[] = []
-    rows.push(`Reporte ${filters.from} al ${filters.to}`)
-    rows.push('')
-
-    rows.push('INDICADORES')
-    rows.push('Indicador,Valor actual,Valor anterior,Variacion %')
-    for (const kpi of data.kpis) {
-      rows.push(
-        `${kpi.label},${kpi.currentValue},${kpi.previousValue},${kpi.variationPercent ?? '---'}`,
-      )
+  async function exportCsv() {
+    if (!data || !canExportReports) return
+    setExporting(true)
+    setExportError(null)
+    try {
+      const blob = await downloadReportsCsvRequest({
+        from: filters.from,
+        to: filters.to,
+        locationId: filters.locationId || undefined,
+        professionalId: filters.professionalId || undefined,
+        serviceId: filters.serviceId || undefined,
+        bookingStatus: filters.bookingStatus || undefined,
+        page: 0,
+        size: 500,
+      })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `reporte_${filters.from}_${filters.to}.csv`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch {
+      setExportError('No fue posible exportar el reporte con los filtros actuales.')
+    } finally {
+      setExporting(false)
     }
-    rows.push('')
-
-    rows.push('DISTRIBUCION DE CITAS')
-    rows.push('Estado,Cantidad,Porcentaje')
-    for (const d of data.appointmentDistribution) {
-      rows.push(`${d.label},${d.count},${d.percentage}%`)
-    }
-    rows.push('')
-
-    rows.push('EMBUDO DE CONVERSION')
-    rows.push('Etapa,Cantidad,Conversion etapa anterior,Conversion acumulada')
-    for (const f of data.conversionFunnel) {
-      rows.push(
-        `${f.name},${f.count},${f.conversionFromPrevious ?? '---'}%,${f.conversionFromFirst ?? '---'}%`,
-      )
-    }
-    rows.push('')
-
-    rows.push('CONVERSACIONES POR DIA')
-    rows.push('Fecha,Recibidas,Respondidas IA,Atencion humana,Sin respuesta')
-    for (const p of data.conversationPerformance) {
-      rows.push(`${p.date},${p.received},${p.aiAnswered},${p.humanAnswered},${p.unanswered}`)
-    }
-    rows.push('')
-
-    rows.push('CITAS POR DIA')
-    rows.push('Fecha,Solicitada,Confirmada,Atendida,Cancelada,No asiste')
-    for (const p of data.appointmentPerformance) {
-      rows.push(
-        `${p.date},${p.solicitada},${p.confirmada},${p.completada},${p.cancelada},${p.ausencia}`,
-      )
-    }
-    rows.push('')
-
-    rows.push('PROSPECTOS')
-    rows.push(
-      'Nombre,Telefono,Ultimo contacto,Etapa,Responsable,Proxima cita,Sucursal,Servicio interes,Estado atencion',
-    )
-    for (const p of data.prospects.items) {
-      rows.push(
-        `${p.name},${p.phone},${p.lastContact},${p.stage},${p.responsible ?? ''},${p.nextAppointment ?? ''},${p.location ?? ''},${p.serviceInterest ?? ''},${p.attentionStatus}`,
-      )
-    }
-
-    const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `reporte_${filters.from}_${filters.to}.csv`
-    a.click()
-    URL.revokeObjectURL(url)
   }
 
   return (
@@ -307,18 +296,30 @@ export function ReportsPage() {
             >
               Limpiar filtros
             </Button>
-            <Button disabled={!data || !isOnline} onClick={exportCsv} variant="secondary">
-              Exportar CSV
-            </Button>
-            <span className="inline-flex items-center rounded-xl border border-dashed border-slate-300 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-400">
-              Programar envio (proximamente)
-            </span>
+            {canExportReports ? (
+              <Button disabled={!data || !isOnline || exporting} onClick={exportCsv} variant="secondary">
+                {exporting ? 'Exportando' : 'Exportar CSV'}
+              </Button>
+            ) : null}
           </div>
         }
         description="Indicadores de conversaciones, prospectos, citas y rendimiento del centro estetico."
         eyebrow="Reportes"
-        title="Reportes basicos"
+        title="Reportes"
       />
+
+      {data ? (
+        <p className="text-sm text-slate-500">
+          Periodo: {formatChileanDate(data.period.from)} al {formatChileanDate(data.period.to)}.
+          Zona horaria: {data.period.timezone}.
+        </p>
+      ) : null}
+
+      {exportError ? (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+          {exportError}
+        </div>
+      ) : null}
 
       <div className="flex flex-wrap gap-4 items-end">
         <label className="block">
@@ -403,7 +404,7 @@ export function ReportsPage() {
       </div>
 
       {reportsQuery.isPending && !data ? (
-        <LoadingState message="Cargando indicadores desde la base de datos." variant="page" />
+        <LoadingState message="Cargando indicadores del negocio." variant="page" />
       ) : null}
 
       {reportsQuery.isError && !data ? (
@@ -422,6 +423,51 @@ export function ReportsPage() {
             ))}
           </div>
 
+          <section className="space-y-3">
+            <h2 className="text-lg font-semibold text-slate-900">Indicadores operativos</h2>
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
+              {data.operationalKpis.map((kpi) => (
+                <KpiCard key={kpi.label} {...kpi} />
+              ))}
+            </div>
+          </section>
+
+          <div className="grid gap-4 xl:grid-cols-3">
+            <OccupancyPanel title="Ocupacion por profesional" rows={data.occupancyByProfessional} />
+            <OccupancyPanel title="Ocupacion por cabina" rows={data.occupancyByRoom} />
+            <OccupancyPanel title="Ocupacion por sucursal" rows={data.occupancyByLocation} />
+          </div>
+
+          <Card className="p-5">
+            <p className="mb-4 text-sm font-semibold text-slate-900">Servicios mas solicitados</p>
+            {data.topServices.length === 0 ? (
+              <EmptyState
+                description="No hay servicios con citas en el periodo seleccionado."
+                title="Sin datos"
+                variant="card"
+              />
+            ) : (
+              <DataTableShell
+                caption="Servicios ordenados por cantidad de citas e ingresos estimados."
+                columns={['Servicio', 'Citas', 'Ingresos estimados']}
+                rows={data.topServices.map((service) => ({
+                  id: service.serviceId,
+                  cells: [
+                    <span key={`${service.serviceId}-name`} className="font-medium text-slate-900">
+                      {service.serviceName}
+                    </span>,
+                    <span key={`${service.serviceId}-bookings`}>
+                      {formatChileanNumber(service.bookings)}
+                    </span>,
+                    <span key={`${service.serviceId}-revenue`}>
+                      {formatChileanCurrency(service.estimatedRevenue)}
+                    </span>,
+                  ],
+                }))}
+              />
+            )}
+          </Card>
+
           <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
             <Card className="space-y-4 p-5">
               <p className="text-sm font-semibold text-slate-900">Conversaciones por canal</p>
@@ -436,7 +482,7 @@ export function ReportsPage() {
                 data.channelDistribution.map((ch) => (
                   <div key={ch.channel}>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="font-medium text-slate-700">{ch.channel}</span>
+                      <span className="font-medium text-slate-700">{formatChannel(ch.channel)}</span>
                       <span className="font-semibold text-slate-900">{ch.count}</span>
                     </div>
                     <div className="mt-2 flex items-center gap-2">
@@ -473,7 +519,7 @@ export function ReportsPage() {
                       tickFormatter={(v) => dayjs(v).format('DD MMM')}
                     />
                     <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
-                    <Tooltip labelFormatter={(v) => formatDate(v as string)} />
+                    <Tooltip labelFormatter={(v) => formatChileanDate(v as string)} />
                     <Legend />
                     <Line
                       type="monotone"
@@ -580,7 +626,7 @@ export function ReportsPage() {
                         <th className="pb-2 pr-3 font-semibold">Fecha</th>
                         <th className="pb-2 pr-3 font-semibold">Solicitada</th>
                         <th className="pb-2 pr-3 font-semibold">Confirmada</th>
-                        <th className="pb-2 pr-3 font-semibold">Atendida</th>
+                        <th className="pb-2 pr-3 font-semibold">Completada</th>
                         <th className="pb-2 pr-3 font-semibold">Cancelada</th>
                         <th className="pb-2 font-semibold">No asiste</th>
                       </tr>
@@ -589,7 +635,7 @@ export function ReportsPage() {
                       {data.appointmentPerformance.map((point) => (
                         <tr key={point.date} className="border-t border-slate-100">
                           <td className="py-2 pr-3 text-slate-700">
-                            {formatShortDate(point.date)}
+                            {formatChileanShortDate(point.date)}
                           </td>
                           <td className="py-2 pr-3 font-medium text-blue-600">
                             {point.solicitada}
@@ -685,6 +731,49 @@ function FunnelChart({ funnel }: { funnel: ReportsFunnelStageResponse[] }) {
   )
 }
 
+function OccupancyPanel({ rows, title }: { rows: ReportsOccupancyResponse[]; title: string }) {
+  return (
+    <Card className="p-5">
+      <p className="mb-4 text-sm font-semibold text-slate-900">{title}</p>
+      {rows.length === 0 || rows.every((row) => row.availableMinutes + row.reservedMinutes === 0) ? (
+        <EmptyState
+          description="No hay capacidad configurada para el periodo seleccionado."
+          title="Sin datos"
+          variant="card"
+        />
+      ) : (
+        <div className="space-y-4">
+          {rows.map((row) => {
+            const percent = row.occupancyPercent ?? 0
+            return (
+              <div key={row.id} className="space-y-2">
+                <div className="flex items-start justify-between gap-3">
+                  <span className="min-w-0 font-medium text-slate-800">{row.name}</span>
+                  <span className="shrink-0 text-sm font-semibold text-slate-950">
+                    {row.occupancyPercent === null
+                      ? 'Sin horario'
+                      : `${formatChileanNumber(row.occupancyPercent)}%`}
+                  </span>
+                </div>
+                <div className="h-3 overflow-hidden rounded-full bg-slate-100" aria-hidden="true">
+                  <div
+                    className="h-full rounded-full bg-emerald-500"
+                    style={{ width: `${Math.min(Math.max(percent, 2), 100)}%` }}
+                  />
+                </div>
+                <p className="text-xs text-slate-500">
+                  {formatMinutesAsHours(row.reservedMinutes)} reservadas de{' '}
+                  {formatMinutesAsHours(row.availableMinutes)} disponibles
+                </p>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </Card>
+  )
+}
+
 function ProspectTable({
   page,
   pageSize,
@@ -772,10 +861,10 @@ function buildProspectRow(p: ReportsProspectRowResponse) {
         {p.name}
       </span>,
       <span key={`${p.id}-phone`} className="text-slate-600">
-        {maskPhone(p.phone)}
+        {formatMaskedPhone(p.phone)}
       </span>,
       <span key={`${p.id}-contact`} className="text-slate-600">
-        {formatShortDate(p.lastContact)}
+        {formatChileanShortDate(p.lastContact)}
       </span>,
       <StatusBadge
         key={`${p.id}-stage`}
@@ -786,7 +875,7 @@ function buildProspectRow(p: ReportsProspectRowResponse) {
         {p.responsible ?? '---'}
       </span>,
       <span key={`${p.id}-next`} className="text-slate-600">
-        {formatShortDate(p.nextAppointment)}
+        {formatChileanShortDate(p.nextAppointment)}
       </span>,
       <span key={`${p.id}-loc`} className="text-slate-600">
         {p.location ?? '---'}

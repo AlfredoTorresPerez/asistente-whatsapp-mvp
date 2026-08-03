@@ -29,7 +29,7 @@ import {
   EditAppointmentPage,
   NewAppointmentFromConversationPage,
   NewAppointmentFromProspectPage,
-  NewAppointmentPage,
+  NewAppointmentFlowPage,
   RescheduleAppointmentPage,
 } from '../modules/bookings'
 import { DashboardPage } from '../modules/dashboard/pages/DashboardPage'
@@ -212,8 +212,8 @@ export const appRoutes: RouteObject[] = [
       {
         path: 'appointments/new',
         element: (
-          <RequirePermission permission="BOOKINGS_CREATE">
-            <NewAppointmentPage />
+           <RequirePermission permission="BOOKINGS_CREATE">
+            <NewAppointmentFlowPage />
           </RequirePermission>
         ),
       },
@@ -262,7 +262,7 @@ export const appRoutes: RouteObject[] = [
         path: 'catalog/products/new',
         element: (
           <RequirePermission permission="CATALOG_MANAGE">
-            <CatalogFormPage />
+            <Navigate replace to="/catalog" />
           </RequirePermission>
         ),
       },
@@ -278,7 +278,7 @@ export const appRoutes: RouteObject[] = [
         path: 'catalog/products/:productId/edit',
         element: (
           <RequirePermission permission="CATALOG_MANAGE">
-            <CatalogFormPage />
+            <Navigate replace to="/catalog" />
           </RequirePermission>
         ),
       },

@@ -57,6 +57,27 @@ export function updateAdminUserRequest(userId: string, payload: AdminUserRequest
   })
 }
 
+export function deactivateAdminUserRequest(userId: string) {
+  return apiFetch<StatusResponse>(`/admin/users/${userId}/deactivate`, {
+    body: JSON.stringify({}),
+    method: 'POST',
+  })
+}
+
+export function revokeAdminUserSessionsRequest(userId: string) {
+  return apiFetch<StatusResponse>(`/admin/users/${userId}/revoke-sessions`, {
+    body: JSON.stringify({}),
+    method: 'POST',
+  })
+}
+
+export function resetAdminUserAccessRequest(userId: string) {
+  return apiFetch<StatusResponse>(`/admin/users/${userId}/reset-access`, {
+    body: JSON.stringify({}),
+    method: 'POST',
+  })
+}
+
 export function listAdminRolesRequest() {
   return apiFetch<AdminRoleResponse[]>('/admin/roles')
 }

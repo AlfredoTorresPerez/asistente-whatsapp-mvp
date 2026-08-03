@@ -77,7 +77,7 @@ export function AssistantCapabilities(props: Props) {
           />
           <div>
             <span className="text-sm font-medium">Precios</span>
-            <p className="text-xs text-gray-500">Puede informar precios de servicios y productos.</p>
+            <p className="text-xs text-gray-500">Puede informar precios de servicios.</p>
           </div>
         </label>
 
@@ -119,6 +119,20 @@ export function AssistantCapabilities(props: Props) {
             <p className="text-xs text-gray-500">Verifica la agenda digital antes de confirmar una cita.</p>
           </div>
         </label>
+
+        <div className="rounded-lg border border-blue-100 bg-blue-50 p-3">
+          <p className="text-sm font-semibold text-blue-900">Confianza mínima por acción</p>
+          <div className="mt-2 grid gap-2 text-xs text-blue-900 sm:grid-cols-2">
+            <span>Responder información: 60%</span>
+            <span>Informar precio: 70%</span>
+            <span>Consultar disponibilidad: 75%</span>
+            <span>Crear cita: 90%</span>
+            <span>Reprogramar: 90%</span>
+            <span>Cancelar: 90%</span>
+            <span>Aplicar promociones: 85%</span>
+            <span>Derivar a una persona: 50%</span>
+          </div>
+        </div>
       </div>
     </Card>
   )

@@ -25,6 +25,7 @@ import {
   getAgendaDateKey,
   getStatusStyle,
 } from '../../agenda/components/agendaUtils'
+import { getBookingStatusLabel } from '../bookingOptions'
 
 const fieldClassName =
   'w-full rounded-2xl border border-[var(--color-border)] bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100'
@@ -107,6 +108,29 @@ function bookingToAgendaItem(booking: BookingSummaryResponse) {
   }
 }
 
+function escapeCsv(value: string | number | null | undefined) {
+  const text = value === null || value === undefined ? '' : String(value)
+  return `"${text.replace(/"/g, '""')}"`
+}
+
+function getPaymentLabel(status: string) {
+  switch ((status ?? '').toUpperCase()) {
+    case 'PAID':
+    case 'PAGADO':
+      return 'Pagado'
+    case 'PARTIAL':
+    case 'PARCIAL':
+      return 'Abono parcial'
+    case 'PENDING':
+    case 'PENDIENTE':
+      return 'Pendiente'
+    case 'NOT_REQUIRED':
+      return 'No requiere pago'
+    default:
+      return 'Sin estado'
+  }
+}
+
 export function AppointmentsPage() {
   const navigate = useNavigate()
   const { user } = useShellSession()
@@ -186,6 +210,39 @@ export function AppointmentsPage() {
     setAppliedFilters(defaultFilters)
   }
 
+  const exportCsv = () => {
+    const headers = [
+      'Fecha',
+      'Hora',
+      'Cliente',
+      'Servicio',
+      'Estado',
+      'Estado de pago',
+      'Profesional',
+      'Sucursal',
+    ]
+    const rows = bookings.map((booking) => [
+      dayjs(booking.startsAt).format('DD/MM/YYYY'),
+      dayjs(booking.startsAt).format('HH:mm'),
+      booking.customerName,
+      booking.subject,
+      getBookingStatusLabel(booking.status),
+      getPaymentLabel(booking.paymentStatus),
+      booking.assignedUserName ?? '',
+      booking.locationName ?? booking.location ?? '',
+    ])
+    const csv = [headers, ...rows]
+      .map((row) => row.map((value) => escapeCsv(value)).join(';'))
+      .join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const anchor = document.createElement('a')
+    anchor.href = url
+    anchor.download = `citas-${visibleMonth.format('YYYY-MM')}.csv`
+    anchor.click()
+    URL.revokeObjectURL(url)
+  }
+
   const weekDayLabels = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab']
 
   return (
@@ -194,14 +251,22 @@ export function AppointmentsPage() {
         actions={
           <>
             <Button onClick={() => navigate('/appointments/new')}>Crear cita</Button>
+            <Button
+              disabled={bookings.length === 0}
+              onClick={exportCsv}
+              type="button"
+              variant="secondary"
+            >
+              Exportar
+            </Button>
             <Link className={buttonClassName({ variant: 'secondary' })} to="/conversations">
               Ir a conversaciones
             </Link>
           </>
         }
-        description="Agenda mensual simple con lista diaria, filtros y accesos al detalle para crear, reprogramar o cancelar citas."
-        eyebrow="Agenda"
-        title="Agenda y citas"
+        description="Consulta el historial, filtra citas pasadas o futuras y exporta resultados sin exponer identificadores internos."
+        eyebrow="Citas"
+        title="Historial de citas"
       />
 
       {!isOnline ? (
@@ -244,14 +309,15 @@ export function AppointmentsPage() {
             <span className="mb-2 block text-sm font-medium text-slate-700">Estado</span>
             <select className={fieldClassName} {...register('status')}>
               <option value="">Todos</option>
-              <option value="REQUESTED">Solicitadas</option>
+              <option value="SOLICITADA">Solicitadas</option>
               <option value="PENDIENTE_CONFIRMACION">Pendientes de confirmacion</option>
-              <option value="CONFIRMED">Confirmadas</option>
+              <option value="CONFIRMADA">Confirmadas</option>
+              <option value="EN_ATENCION">En atencion</option>
               <option value="REPROGRAMADA">Reprogramadas</option>
               <option value="CANCELADA">Canceladas</option>
-              <option value="COMPLETED">Completadas</option>
+              <option value="COMPLETADA">Completadas</option>
               <option value="EXPIRADA">Expiradas</option>
-              <option value="NO_SHOW">No asistio</option>
+              <option value="NO_ASISTE">Inasistencias</option>
             </select>
           </label>
 

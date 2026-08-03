@@ -101,6 +101,34 @@ public class CompleteDigitalAgendaController {
 		return completeDigitalAgendaService.cancel(authenticatedUser, bookingId, request);
 	}
 
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_UPDATE')")
+	@PatchMapping(value = "/bookings/{bookingId}/confirm", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public BookingDetailResponse confirm(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@PathVariable UUID bookingId, @Valid @RequestBody(required = false) AgendaLifecycleRequest request) {
+		return completeDigitalAgendaService.confirm(authenticatedUser, bookingId, request);
+	}
+
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_UPDATE')")
+	@PatchMapping(value = "/bookings/{bookingId}/start-service", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public BookingDetailResponse startService(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@PathVariable UUID bookingId, @Valid @RequestBody(required = false) AgendaLifecycleRequest request) {
+		return completeDigitalAgendaService.startService(authenticatedUser, bookingId, request);
+	}
+
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_UPDATE')")
+	@PatchMapping(value = "/bookings/{bookingId}/complete", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public BookingDetailResponse complete(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@PathVariable UUID bookingId, @Valid @RequestBody(required = false) AgendaLifecycleRequest request) {
+		return completeDigitalAgendaService.complete(authenticatedUser, bookingId, request);
+	}
+
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_UPDATE')")
+	@PatchMapping(value = "/bookings/{bookingId}/mark-no-show", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public BookingDetailResponse markNoShow(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@PathVariable UUID bookingId, @Valid @RequestBody(required = false) AgendaLifecycleRequest request) {
+		return completeDigitalAgendaService.markNoShow(authenticatedUser, bookingId, request);
+	}
+
 	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'BOOKINGS_CREATE')")
 	@PostMapping(value = "/blocks", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)

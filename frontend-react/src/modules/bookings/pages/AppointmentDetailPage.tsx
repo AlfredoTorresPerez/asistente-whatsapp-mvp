@@ -20,7 +20,7 @@ import {
   getBookingDetailRequest,
 } from '../../../services/api/bookingsApi'
 import type { BookingSyncStatusResponse } from '../../../services/api/types'
-import { getBookingStatusLabel, getBookingStatusTone } from '../bookingOptions'
+import { getBookingStatusLabel, getBookingStatusTone, normalizeBookingStatus } from '../bookingOptions'
 import { usePermissions } from '../../../hooks/usePermissions'
 import {
   getBookingSyncStatusRequest,
@@ -178,7 +178,8 @@ export function AppointmentDetailPage() {
               <>
                 <Button
                   disabled={
-                    confirmationLinkMutation.isPending || bookingQuery.data.status === 'CONFIRMED'
+                    confirmationLinkMutation.isPending ||
+                    normalizeBookingStatus(bookingQuery.data.status) === 'CONFIRMADA'
                   }
                   onClick={() => confirmationLinkMutation.mutate()}
                   variant="secondary"
@@ -188,8 +189,7 @@ export function AppointmentDetailPage() {
                 <Button
                   disabled={
                     cancellationLinkMutation.isPending ||
-                    bookingQuery.data.status === 'CANCELADA' ||
-                    bookingQuery.data.status === 'CANCELLED'
+                    normalizeBookingStatus(bookingQuery.data.status) === 'CANCELADA'
                   }
                   onClick={() => cancellationLinkMutation.mutate()}
                   variant="secondary"

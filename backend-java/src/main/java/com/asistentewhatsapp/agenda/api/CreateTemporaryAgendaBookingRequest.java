@@ -16,6 +16,16 @@ public record CreateTemporaryAgendaBookingRequest(@NotNull(message = "locationId
 		@Email(message = "customerEmail debe tener formato valido") @Size(max = 255) String customerEmail,
 		UUID customerId, UUID conversationId, UUID leadId, @Size(max = 2000) String notes, Integer expirationMinutes,
 		Boolean generateConfirmationLink, Boolean sendWhatsApp, @Size(max = 255) String idempotencyKey,
-		Boolean informedConsentAccepted, LocalDate customerBirthDate, @Size(max = 160) String guardianName,
-		@Size(max = 30) String guardianPhone) {
+		Boolean communicationsConsent, @Size(max = 30) String sourceChannel, Boolean informedConsentAccepted,
+		LocalDate customerBirthDate, @Size(max = 160) String guardianName, @Size(max = 30) String guardianPhone) {
+
+	public CreateTemporaryAgendaBookingRequest(UUID locationId, UUID serviceId, UUID professionalId, UUID roomId,
+			OffsetDateTime startsAt, String customerName, String customerPhone, String customerEmail, UUID customerId,
+			UUID conversationId, UUID leadId, String notes, Integer expirationMinutes, Boolean generateConfirmationLink,
+			Boolean sendWhatsApp, String idempotencyKey, Boolean informedConsentAccepted, LocalDate customerBirthDate,
+			String guardianName, String guardianPhone) {
+		this(locationId, serviceId, professionalId, roomId, startsAt, customerName, customerPhone, customerEmail,
+				customerId, conversationId, leadId, notes, expirationMinutes, generateConfirmationLink, sendWhatsApp,
+				idempotencyKey, null, null, informedConsentAccepted, customerBirthDate, guardianName, guardianPhone);
+	}
 }

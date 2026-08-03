@@ -13,7 +13,7 @@ export function useBusinessAiPreview(userPermissions: string[] = []) {
   const { showToast } = useToast()
 
   const [scenario, setScenario] = useState(
-    'Hola, quiero saber que tipo de depilacion ofrecen y agendar depilacion bozo para manana a las 14 horas.',
+    'Hola, quiero saber qué tipo de depilación ofrecen y agendar depilación bozo para mañana a las 14 horas.',
   )
   const [conversationSearch, setConversationSearch] = useState('')
   const [selectedConversationId, setSelectedConversationId] = useState('')
@@ -161,8 +161,32 @@ export function useBusinessAiPreview(userPermissions: string[] = []) {
 }
 
 function formatIntent(intent: string): string {
-  return intent
-    .toLowerCase()
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, (c) => c.toUpperCase())
+  const labels: Record<string, string> = {
+    AVAILABILITY_QUERY: 'Consulta de disponibilidad',
+    BOOKING_CANCEL: 'Cancelar cita',
+    BOOKING_CHANGE: 'Reprogramar cita',
+    BOOKING_REQUEST: 'Crear cita',
+    BOOKING_STATUS: 'Estado de cita',
+    BUSINESS_HOURS_QUERY: 'Horario de atención',
+    COMMERCIAL_AND_BOOKING: 'Consulta comercial y cita',
+    COMMERCIAL_INQUIRY: 'Consulta comercial',
+    COMPLAINT: 'Reclamo',
+    FOLLOW_UP: 'Seguimiento',
+    GREETING: 'Saludo',
+    HUMAN_REQUEST: 'Solicita atención humana',
+    KNOWLEDGE_QUERY: 'Consulta de información',
+    LOCATION_QUERY: 'Consulta de sucursal',
+    PAYMENT_INQUIRY: 'Consulta de pago',
+    PAYMENT_PROBLEM: 'Problema de pago',
+    PRICE_REQUEST: 'Consulta de precio',
+    PROFESSIONAL_QUERY: 'Consulta de profesional',
+    QUOTE_REQUEST: 'Solicitud de cotización',
+    SERVICE_INFORMATION: 'Información de servicio',
+    SERVICE_RECOMMENDATION: 'Recomendación de servicio',
+    SUPPORT_GENERAL: 'Soporte',
+    TECHNICAL_MESSAGE: 'Mensaje no comercial',
+    THANKS_OR_FAREWELL: 'Cierre de conversación',
+    WAITLIST_QUERY: 'Lista de espera',
+  }
+  return labels[intent] ?? intent.replace(/_/g, ' ').toLowerCase()
 }

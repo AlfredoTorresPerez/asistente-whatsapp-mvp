@@ -9,6 +9,7 @@ import com.asistentewhatsapp.bookings.api.BookingSummaryResponse;
 import com.asistentewhatsapp.bookings.api.BookingStatusHistoryResponse;
 import com.asistentewhatsapp.shared.api.PagedResponse;
 import com.asistentewhatsapp.shared.exception.ResourceNotFoundException;
+import com.asistentewhatsapp.shared.util.PhoneUtils;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +24,7 @@ public class BookingJdbcRepository {
 
 	private static final List<String> ACTIVE_BOOKING_STATUSES = List.of("REQUESTED", "TEMPORARY",
 			"PENDIENTE_CONFIRMACION", "CONFIRMED", "RESCHEDULED", "REPROGRAMADA", "SOLICITADA", "PENDIENTE_PAGO",
-			"CONFIRMADA", "REPROGRAMACION_PENDIENTE");
+			"CONFIRMADA", "REPROGRAMACION_PENDIENTE", "IN_PROGRESS", "EN_ATENCION");
 
 	private final NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -257,9 +258,16 @@ public class BookingJdbcRepository {
 				    email
 				from customer
 				where business_id = :businessId
-				  and normalized_phone = :normalizedPhone
-				""", new MapSqlParameterSource().addValue("businessId", businessId).addValue("normalizedPhone",
-				normalizedPhone), customerRowMapper());
+				  and active = true
+				  and (
+				      normalized_phone = :normalizedPhone
+				       or regexp_replace(coalesce(normalized_phone, phone, ''), '[\\D+]', '', 'g') = :phoneDigits
+				  )
+				""",
+				new MapSqlParameterSource().addValue("businessId", businessId)
+						.addValue("normalizedPhone", normalizedPhone).addValue("phoneDigits",
+								normalizedPhone != null ? normalizedPhone.replaceAll("[\\D+]", "") : null),
+				customerRowMapper());
 		return items.stream().findFirst();
 	}
 
@@ -308,9 +316,11 @@ public class BookingJdbcRepository {
 				    :email,
 				    true
 				)
-				""", new MapSqlParameterSource().addValue("id", customerId).addValue("businessId", businessId)
-				.addValue("firstName", firstName).addValue("lastName", lastName).addValue("displayName", displayName)
-				.addValue("phone", phone).addValue("normalizedPhone", phone).addValue("email", email));
+				""",
+				new MapSqlParameterSource().addValue("id", customerId).addValue("businessId", businessId)
+						.addValue("firstName", firstName).addValue("lastName", lastName)
+						.addValue("displayName", displayName).addValue("phone", phone)
+						.addValue("normalizedPhone", PhoneUtils.normalizeChilePhone(phone)).addValue("email", email));
 		return customerId;
 	}
 
@@ -327,9 +337,11 @@ public class BookingJdbcRepository {
 				    updated_at = current_timestamp
 				where business_id = :businessId
 				  and id = :customerId
-				""", new MapSqlParameterSource().addValue("businessId", businessId).addValue("customerId", customerId)
-				.addValue("firstName", firstName).addValue("lastName", lastName).addValue("displayName", displayName)
-				.addValue("phone", phone).addValue("normalizedPhone", phone).addValue("email", email));
+				""",
+				new MapSqlParameterSource().addValue("businessId", businessId).addValue("customerId", customerId)
+						.addValue("firstName", firstName).addValue("lastName", lastName)
+						.addValue("displayName", displayName).addValue("phone", phone)
+						.addValue("normalizedPhone", PhoneUtils.normalizeChilePhone(phone)).addValue("email", email));
 		if (updated == 0) {
 			throw new ResourceNotFoundException("No se encontro el cliente asociado.");
 		}
@@ -594,7 +606,7 @@ public class BookingJdbcRepository {
 
 	private RowMapper<BookingSummaryResponse> bookingSummaryRowMapper() {
 		return (resultSet, rowNum) -> new BookingSummaryResponse(resultSet.getObject("id", UUID.class),
-				resultSet.getString("subject"), resultSet.getString("status"),
+				resultSet.getString("subject"), normalizeStatusForApi(resultSet.getString("status")),
 				resultSet.getObject("starts_at", OffsetDateTime.class), resultSet.getInt("duration_minutes"),
 				resultSet.getObject("location_id", UUID.class), resultSet.getString("location"),
 				resultSet.getString("location_name"), resultSet.getObject("customer_id", UUID.class),
@@ -654,7 +666,8 @@ public class BookingJdbcRepository {
 			case "CANCELLED" -> "CANCELADA";
 			case "CONFIRMED" -> "CONFIRMADA";
 			case "REQUESTED" -> "SOLICITADA";
-			case "COMPLETED", "ATTENDED" -> "ATENDIDA";
+			case "IN_PROGRESS" -> "EN_ATENCION";
+			case "COMPLETED", "ATTENDED", "ATENDIDA" -> "COMPLETADA";
 			case "NO_SHOW" -> "NO_ASISTE";
 			case "EXPIRED", "RELEASED" -> "EXPIRADA";
 			default -> status;

@@ -15,6 +15,7 @@ import { PageHeader } from '../../../components/ui/PageHeader'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { useShellSession } from '../../../lib/shellSession'
 import { useOnlineStatus } from '../../../lib/useOnlineStatus'
+import { getBusinessLocationsRequest } from '../../../services/api/businessLocationsApi'
 import { getLeadsRequest } from '../../../services/api/leadsApi'
 import {
   getLeadOriginLabel,
@@ -33,6 +34,7 @@ const filtersSchema = z.object({
   stage: z.string(),
   origin: z.string(),
   assignedUserId: z.string(),
+  locationId: z.string(),
 })
 
 type FiltersValues = z.infer<typeof filtersSchema>
@@ -42,6 +44,7 @@ const defaultFilters: FiltersValues = {
   stage: '',
   origin: '',
   assignedUserId: '',
+  locationId: '',
 }
 
 export function ProspectsPage() {
@@ -70,9 +73,15 @@ export function ProspectsPage() {
         stage: appliedFilters.stage || undefined,
         origin: appliedFilters.origin || undefined,
         assignedUserId: appliedFilters.assignedUserId || undefined,
+        locationId: appliedFilters.locationId || undefined,
       }),
     placeholderData: keepPreviousData,
     refetchInterval: isOnline ? 30_000 : false,
+  })
+
+  const locationsQuery = useQuery({
+    queryKey: ['business-locations', 'active'],
+    queryFn: () => getBusinessLocationsRequest({ activeOnly: true }),
   })
 
   const onSubmitFilters = handleSubmit(async (values) => {
@@ -92,7 +101,7 @@ export function ProspectsPage() {
     <section className="space-y-6">
       <PageHeader
         actions={<Button onClick={() => navigate('/prospects/new')}>Crear prospecto</Button>}
-        description="Embudo comercial para prospectos demo con filtros por estado, origen y responsable, ademas de acceso al detalle y seguimiento."
+        description="Embudo comercial para prospectos con filtros por estado, origen y responsable, ademas de acceso al detalle y seguimiento."
         eyebrow="Prospectos"
         title="Prospectos"
       />
@@ -158,6 +167,18 @@ export function ProspectsPage() {
           </label>
 
           <label className="block">
+            <span className="mb-2 block text-sm font-medium text-slate-700">Sucursal</span>
+            <select className={fieldClassName} {...register('locationId')}>
+              <option value="">Todas</option>
+              {(locationsQuery.data ?? []).map((location) => (
+                <option key={location.id} value={location.id}>
+                  {location.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="block">
             <span className="mb-2 block text-sm font-medium text-slate-700">Responsable</span>
             <select className={fieldClassName} {...register('assignedUserId')}>
               <option value="">Todos</option>
@@ -169,7 +190,7 @@ export function ProspectsPage() {
 
       {leadsQuery.isPending && !leadsQuery.data ? (
         <LoadingState
-          message="Cargando prospectos demo, etapas activas y ultima actividad comercial."
+          message="Cargando prospectos, etapas activas y ultima actividad comercial."
           variant="table"
         />
       ) : null}
@@ -214,6 +235,7 @@ export function ProspectsPage() {
                       'Contacto',
                       'Estado',
                       'Origen',
+                      'Sucursal',
                       'Responsable',
                       'Ultima actualizacion',
                       'Accion',
@@ -251,6 +273,9 @@ export function ProspectsPage() {
                       </td>
                       <td className="border-b border-[var(--color-border)] px-5 py-4 text-sm text-slate-700">
                         {getLeadOriginLabel(lead.sourceType)}
+                      </td>
+                      <td className="border-b border-[var(--color-border)] px-5 py-4 text-sm text-slate-700">
+                        {lead.locationName ?? 'Sin sucursal'}
                       </td>
                       <td className="border-b border-[var(--color-border)] px-5 py-4 text-sm text-slate-700">
                         {lead.assignedUserName ?? 'Sin asignar'}

@@ -31,7 +31,7 @@ export function DataTableShell({
   }
 
   return (
-    <div className="overflow-hidden rounded-[1.5rem] border border-[var(--color-border)]">
+    <div className="overflow-hidden rounded-lg border border-[var(--color-border)]">
       <div className="border-b border-[var(--color-border)] bg-slate-50 px-5 py-4">
         <p className="text-sm font-medium text-slate-600">{caption}</p>
       </div>
@@ -43,7 +43,7 @@ export function DataTableShell({
               {columns.map((column) => (
                 <th
                   key={column}
-                  className="border-b border-[var(--color-border)] px-5 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500"
+                  className="max-w-56 border-b border-[var(--color-border)] px-4 py-3 text-left text-xs font-semibold uppercase text-slate-500"
                   scope="col"
                 >
                   {column}
@@ -66,7 +66,7 @@ export function DataTableShell({
               rows.map((row) => (
                 <tr
                   key={row.id}
-                  className={row.href ? 'cursor-pointer transition hover:bg-slate-50' : ''}
+                  className={row.href ? 'cursor-pointer transition hover:bg-slate-50 focus-within:bg-slate-50' : ''}
                   onClick={() => handleRowNavigation(row.href)}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
@@ -80,7 +80,7 @@ export function DataTableShell({
                   {row.cells.map((cell, index) => (
                     <td
                       key={`${row.id}-${index}`}
-                      className="border-b border-[var(--color-border)] px-5 py-4 text-sm text-slate-700 last:text-right"
+                      className="max-w-72 break-words border-b border-[var(--color-border)] px-4 py-3 text-sm text-slate-700 last:text-right"
                     >
                       {cell}
                     </td>

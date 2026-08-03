@@ -28,6 +28,10 @@ export type AssignmentGroupsParams = {
   size?: number
   search?: string
   serviceId?: string
+  locationId?: string
+  categoryCode?: string
+  professionalId?: string
+  roomId?: string
   coverage?: 'covered' | 'partial' | 'none' | ''
 }
 
@@ -37,6 +41,10 @@ export function listAssignmentGroupsRequest(params: AssignmentGroupsParams = {})
   query.set('size', String(params.size ?? 10))
   if (params.search) query.set('search', params.search)
   if (params.serviceId) query.set('serviceId', params.serviceId)
+  if (params.locationId) query.set('locationId', params.locationId)
+  if (params.categoryCode) query.set('categoryCode', params.categoryCode)
+  if (params.professionalId) query.set('professionalId', params.professionalId)
+  if (params.roomId) query.set('roomId', params.roomId)
   if (params.coverage) query.set('coverage', params.coverage)
   return apiFetch<PagedResponse<AssignmentGroupResponse>>(`/admin/assignments/groups?${query.toString()}`)
 }

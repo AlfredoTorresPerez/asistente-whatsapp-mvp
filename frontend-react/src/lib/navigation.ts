@@ -48,7 +48,7 @@ export const ADMIN_SUBMENU_ITEMS: NavigationItem[] = [
   {
     label: 'MultiSede',
     path: '/admin/multisite',
-    description: 'Disponibilidad, stock, profesionales, permisos y canales por sede.',
+    description: 'Disponibilidad, servicios, profesionales, permisos y canales por sede.',
     allowedRoles: ['OWNER', 'ADMIN'],
   },
   {
@@ -108,7 +108,7 @@ export const PRIMARY_NAV_ITEMS: NavigationItem[] = [
   {
     label: 'Catálogo',
     path: '/catalog',
-    description: 'Productos y servicios del catálogo comercial.',
+    description: 'Servicios, precios, duración y cobertura del catálogo.',
   },
   {
     label: 'Reglas',
@@ -264,18 +264,18 @@ const ROUTE_METADATA: RouteMeta[] = [
   },
   {
     path: '/catalog/products/new',
-    title: 'Crear producto',
-    description: 'Formulario para cargar productos o servicios del catálogo.',
+    title: 'Crear servicio',
+    description: 'Formulario para cargar servicios del catálogo.',
   },
   {
     matcher: /^\/catalog\/products\/[^/]+\/edit$/,
-    title: 'Editar producto',
+    title: 'Editar servicio',
     description: 'Formulario reservado para actualizar datos del catálogo.',
   },
   {
     path: '/catalog',
     title: 'Catálogo',
-    description: 'Listado de productos y servicios con filtros y estado.',
+    description: 'Listado de servicios con filtros y estado.',
   },
   {
     path: '/automation-rules/new',
@@ -327,7 +327,7 @@ const ROUTE_METADATA: RouteMeta[] = [
     path: '/admin/multisite',
     title: 'Operación multisede',
     description:
-      'Control operativo de catálogo, stock, profesionales, permisos y canales por sede.',
+      'Control operativo de servicios, profesionales, permisos y canales por sede.',
   },
   {
     path: '/admin/users/new',

@@ -42,8 +42,11 @@ public class AssignmentController {
 	public PagedResponse<AssignmentGroupResponse> listGroups(
 			@AuthenticationPrincipal AuthenticatedUser authenticatedUser, @RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "10") int size, @RequestParam(required = false) String search,
-			@RequestParam(required = false) UUID serviceId, @RequestParam(required = false) String coverage) {
-		return assignmentService.listGroups(authenticatedUser, page, size, search, serviceId, coverage);
+			@RequestParam(required = false) UUID serviceId, @RequestParam(required = false) UUID locationId,
+			@RequestParam(required = false) String categoryCode, @RequestParam(required = false) UUID professionalId,
+			@RequestParam(required = false) UUID roomId, @RequestParam(required = false) String coverage) {
+		return assignmentService.listGroups(authenticatedUser, page, size, search, serviceId, locationId, categoryCode,
+				professionalId, roomId, coverage);
 	}
 
 	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'ASSIGNMENT_VIEW')")

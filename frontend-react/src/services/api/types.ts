@@ -126,7 +126,32 @@ export type ReportsKpiItem = {
   currentValue: number
   previousValue: number
   variationPercent: number | null
+  valueType: 'COUNT' | 'PERCENT' | 'CURRENCY' | 'HOURS' | 'MINUTES'
+  lowerIsBetter: boolean
   help: string
+}
+
+export type ReportsPeriodResponse = {
+  from: string
+  to: string
+  previousFrom: string
+  previousTo: string
+  timezone: string
+}
+
+export type ReportsOccupancyResponse = {
+  id: string
+  name: string
+  availableMinutes: number
+  reservedMinutes: number
+  occupancyPercent: number | null
+}
+
+export type ReportsServiceDemandResponse = {
+  serviceId: string
+  serviceName: string
+  bookings: number
+  estimatedRevenue: number
 }
 
 export type ReportsChannelResponse = {
@@ -187,7 +212,13 @@ export type ReportsProspectsResponse = {
 }
 
 export type ReportsSummaryResponse = {
+  period: ReportsPeriodResponse
   kpis: ReportsKpiItem[]
+  operationalKpis: ReportsKpiItem[]
+  occupancyByProfessional: ReportsOccupancyResponse[]
+  occupancyByRoom: ReportsOccupancyResponse[]
+  occupancyByLocation: ReportsOccupancyResponse[]
+  topServices: ReportsServiceDemandResponse[]
   channelDistribution: ReportsChannelResponse[]
   conversationPerformance: ReportsConversationPerformancePoint[]
   appointmentDistribution: ReportsAppointmentDistributionPoint[]
@@ -359,6 +390,9 @@ export type AssignmentGroupResponse = {
   serviceId: string
   serviceName: string
   serviceCode: string
+  categoryCode: string
+  categoryName: string
+  locationNames: string[]
   professionals: AssignmentResponse[]
   rooms: AssignmentResponse[]
   professionalsCount: number
@@ -441,6 +475,11 @@ export type WhatsAppChannelStatusResponse = {
   recentErrorCount: number
   recentEvents: WhatsAppChannelRecentEvent[]
   message: string | null
+  lastInboundMessageAt: string | null
+  lastOutboundMessageAt: string | null
+  deliveredMessages: number
+  readMessages: number
+  failedMessages: number
 }
 
 export type WhatsAppChannelActionResponse = {
@@ -581,11 +620,13 @@ export type UpdateTemplateStatusRequest = {
   active: boolean
 }
 
-export type LeadSummaryResponse = {
-  id: string
-  customerId: string
-  conversationId: string | null
-  firstName: string
+  export type LeadSummaryResponse = {
+    id: string
+    customerId: string
+    conversationId: string | null
+    locationId: string | null
+    locationName: string | null
+    firstName: string
   lastName: string
   displayName: string
   phone: string
@@ -607,11 +648,13 @@ export type LeadNoteResponse = {
   updatedAt: string
 }
 
-export type LeadDetailResponse = {
-  id: string
-  customerId: string
-  conversationId: string | null
-  firstName: string
+  export type LeadDetailResponse = {
+    id: string
+    customerId: string
+    conversationId: string | null
+    locationId: string | null
+    locationName: string | null
+    firstName: string
   lastName: string
   displayName: string
   phone: string
@@ -632,10 +675,11 @@ export type CreateLeadRequest = {
   lastName: string
   phone: string
   email?: string
-  notes?: string
-  stage?: string
-  assignedUserId?: string
-}
+    notes?: string
+    stage?: string
+    assignedUserId?: string
+    locationId?: string
+  }
 
 export type UpdateLeadRequest = CreateLeadRequest
 
@@ -647,6 +691,7 @@ export type CreateLeadFromConversationRequest = {
   notes?: string
   stage?: string
   assignedUserId?: string
+  locationId?: string
 }
 
 export type AddLeadNoteRequest = {
@@ -1501,6 +1546,10 @@ export type MultisiteLocationSummaryResponse = {
   orders: number
   productsWithStock: number
   professionals: number
+  bookingsToday?: number
+  roomsAvailable?: number
+  roomsInMaintenance?: number
+  alerts?: number
 }
 
 export type MultisiteCatalogAvailabilityResponse = {
@@ -1663,6 +1712,8 @@ export type CreateTemporaryAgendaBookingRequest = {
   expirationMinutes?: number
   generateConfirmationLink?: boolean
   sendWhatsApp?: boolean
+  communicationsConsent?: boolean
+  sourceChannel?: string
 }
 
 export type AgendaCalendarItemResponse = {
@@ -1760,6 +1811,11 @@ export type AgendaRescheduleRequest = {
 
 export type AgendaCancelRequest = {
   reason: string
+}
+
+export type AgendaLifecycleRequest = {
+  reason?: string
+  notifyCustomer?: boolean
 }
 
 export type CustomerBookingItemResponse = {
@@ -2213,4 +2269,21 @@ export type AiPreviewResponse = {
   result: AgentRoutingResult | null
   status: string
   message: string
+}
+
+export type CustomerSearchResponse = {
+  id: string
+  firstName: string
+  lastName: string
+  displayName: string
+  phone: string
+  normalizedPhone: string
+  email: string | null
+  createdAt: string
+}
+
+export type CustomerSearchRequest = {
+  phone?: string
+  name?: string
+  email?: string
 }

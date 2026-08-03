@@ -23,6 +23,27 @@ type Props = {
   isLoading: boolean
 }
 
+function formatReviewStatus(status: string) {
+  switch (status) {
+    case 'pending':
+    case 'requires handoff':
+      return 'Pendiente'
+    case 'resolved':
+    case 'synced':
+    case 'active':
+      return 'Resuelta'
+    default:
+      return 'Por revisar'
+  }
+}
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat('es-CL', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(new Date(value))
+}
+
 export function UnresolvedQueriesPanel({
   entries,
   page,
@@ -36,7 +57,7 @@ export function UnresolvedQueriesPanel({
     <Card className="p-4">
       <h2 className="text-lg font-semibold">Historial de respuestas</h2>
       <p className="mt-1 text-xs text-gray-500">
-        Últimas respuestas generadas por el asistente. Haz clic en una para cargarla en el simulador.
+        Últimas respuestas generadas por el asistente. Haz clic en una para revisarla en el panel de prueba.
       </p>
 
       {isLoading ? (
@@ -53,20 +74,23 @@ export function UnresolvedQueriesPanel({
               onClick={() => onSelectEntry(entry)}
               className="w-full rounded-lg border border-gray-100 p-3 text-left transition-colors hover:bg-gray-50"
             >
-              <div className="flex items-center gap-2">
-                <span
-                  className={`inline-block h-2 w-2 rounded-full ${
-                    entry.status === 'requires handoff'
-                      ? 'bg-amber-400'
-                      : entry.status === 'active' || entry.status === 'synced'
-                        ? 'bg-green-400'
-                        : 'bg-blue-400'
-                  }`}
-                />
-                <span className="text-sm font-medium">{entry.category}</span>
+              <div className="grid gap-2 text-xs text-gray-600 md:grid-cols-4">
+                <ReviewField label="Fecha" value={formatDate(entry.updatedAt)} />
+                <ReviewField label="Cliente" value="Cliente por identificar" />
+                <ReviewField label="Confianza" value={`${Math.round((entry.log?.confidence ?? 0) * 100)}%`} />
+                <ReviewField label="Estado" value={formatReviewStatus(entry.status)} />
               </div>
-              <p className="mt-1 line-clamp-2 text-xs text-gray-600">{entry.title}</p>
-              <p className="mt-1 text-xs text-gray-400">{entry.updatedAt}</p>
+              <div className="mt-3 grid gap-2 text-xs text-gray-600 md:grid-cols-2">
+                <ReviewField label="Pregunta" value={entry.log?.sourceMessage ?? entry.description} />
+                <ReviewField label="Respuesta" value={entry.log?.suggestedResponse ?? entry.description} />
+                <ReviewField label="Regla aplicada" value={entry.category} />
+                <ReviewField
+                  label="Motivo de revisión"
+                  value={entry.log?.handoffReason ?? 'Control de calidad del asistente'}
+                />
+                <ReviewField label="Corrección propuesta" value="Pendiente de revisión" />
+                <ReviewField label="Responsable" value="Sin responsable asignado" />
+              </div>
             </button>
           ))}
         </div>
@@ -98,5 +122,14 @@ export function UnresolvedQueriesPanel({
         </div>
       )}
     </Card>
+  )
+}
+
+function ReviewField({ label, value }: { label: string; value: string }) {
+  return (
+    <span className="block">
+      <span className="block font-semibold text-gray-500">{label}</span>
+      <span className="line-clamp-2 text-gray-800">{value}</span>
+    </span>
   )
 }

@@ -69,7 +69,7 @@ export function LoginPage() {
             Iniciar sesion
           </h2>
           <p className="mt-3 text-sm leading-6 text-[var(--color-text-secondary)]">
-            Ingresa con tu cuenta para gestionar conversaciones, prospectos y pedidos desde un solo
+              Ingresa con tu cuenta para gestionar conversaciones, prospectos y reservas desde un solo
             lugar.
           </p>
         </div>

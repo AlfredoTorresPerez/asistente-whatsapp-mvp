@@ -16,6 +16,8 @@ type Props = {
   onSave: () => void
   isSaving: boolean
   hasChanges: boolean
+  lastModifiedAt?: string | null
+  updatedBy?: string | null
 }
 
 export function AssistantGeneralSettings({
@@ -32,6 +34,8 @@ export function AssistantGeneralSettings({
   onSave,
   isSaving,
   hasChanges,
+  lastModifiedAt,
+  updatedBy,
 }: Props) {
   return (
     <Card className="p-4">
@@ -100,8 +104,8 @@ export function AssistantGeneralSettings({
             onChange={(e) => onLanguageChange(e.target.value)}
             options={[
               { label: 'Español', value: 'es' },
-              { label: 'English', value: 'en' },
-              { label: 'Português', value: 'pt' },
+              { label: 'Inglés', value: 'en' },
+              { label: 'Portugués', value: 'pt' },
             ]}
             className="mt-1"
           />
@@ -110,7 +114,7 @@ export function AssistantGeneralSettings({
         <div>
           <label className="text-sm font-medium">Cuándo derivar a una persona</label>
           <p className="text-xs text-gray-500">
-            Umbral mínimo de seguridad estimada para que el asistente responda automaticamente. Si la confianza está por debajo, deriva a atención humana.
+            Umbral mínimo de seguridad estimada para que el asistente responda automáticamente. Si la confianza está por debajo, deriva a atención humana.
           </p>
           <Select
             value={escalationThreshold}
@@ -124,11 +128,20 @@ export function AssistantGeneralSettings({
           />
         </div>
 
-        {hasChanges && (
-          <Button onClick={onSave} loading={isSaving} className="w-full">
-            Guardar configuración
-          </Button>
-        )}
+        <div className="rounded-lg border border-gray-100 bg-gray-50 p-3 text-xs text-gray-600">
+          <p>
+            <span className="font-medium">Última modificación:</span>{' '}
+            {lastModifiedAt ? new Date(lastModifiedAt).toLocaleString('es-CL') : 'Sin registro'}
+          </p>
+          <p className="mt-1">
+            <span className="font-medium">Usuario modificador:</span>{' '}
+            {updatedBy || 'Sin registro'}
+          </p>
+        </div>
+
+        <Button onClick={onSave} loading={isSaving} disabled={!hasChanges} className="w-full">
+          Guardar configuración
+        </Button>
       </div>
     </Card>
   )

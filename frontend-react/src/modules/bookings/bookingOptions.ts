@@ -1,39 +1,65 @@
 export const bookingStatusOptions = [
-  { value: 'REQUESTED', label: 'Solicitada' },
-  { value: 'PENDIENTE_CONFIRMACION', label: 'Pendiente de confirmacion' },
-  { value: 'CONFIRMED', label: 'Confirmada' },
+  { value: 'SOLICITADA', label: 'Solicitada' },
+  { value: 'PENDIENTE_CONFIRMACION', label: 'Pendiente de confirmación' },
+  { value: 'CONFIRMADA', label: 'Confirmada' },
+  { value: 'EN_ATENCION', label: 'En atención' },
+  { value: 'COMPLETADA', label: 'Completada' },
   { value: 'REPROGRAMADA', label: 'Reprogramada' },
-  { value: 'RESCHEDULED', label: 'Reprogramada (legacy)' },
   { value: 'CANCELADA', label: 'Cancelada' },
-  { value: 'CANCELLED', label: 'Cancelada (legacy)' },
-  { value: 'COMPLETED', label: 'Completada' },
+  { value: 'NO_ASISTE', label: 'Inasistencia' },
   { value: 'EXPIRADA', label: 'Expirada' },
-  { value: 'NO_SHOW', label: 'No asistio' },
-  { value: 'ATTENDED', label: 'Atendida' },
+  { value: 'PENDIENTE_PAGO', label: 'Pendiente de pago' },
+  { value: 'REPROGRAMACION_PENDIENTE', label: 'Reprogramación pendiente' },
+  { value: 'CANCELADA_POR_CLIENTE', label: 'Cancelada por cliente' },
 ]
 
+const bookingStatusAliases: Record<string, string> = {
+  REQUESTED: 'SOLICITADA',
+  TEMPORARY: 'PENDIENTE_CONFIRMACION',
+  CONFIRMED: 'CONFIRMADA',
+  SCHEDULED: 'CONFIRMADA',
+  IN_PROGRESS: 'EN_ATENCION',
+  RESCHEDULED: 'REPROGRAMADA',
+  CANCELLED: 'CANCELADA',
+  CANCELED: 'CANCELADA',
+  COMPLETED: 'COMPLETADA',
+  ATTENDED: 'COMPLETADA',
+  ATENDIDA: 'COMPLETADA',
+  NO_SHOW: 'NO_ASISTE',
+  RELEASED: 'EXPIRADA',
+  EXPIRED: 'EXPIRADA',
+}
+
+export function normalizeBookingStatus(status: string | null | undefined) {
+  if (!status) return ''
+  const normalized = status.trim().toUpperCase()
+  return bookingStatusAliases[normalized] ?? normalized
+}
+
 export function getBookingStatusLabel(status: string) {
-  return bookingStatusOptions.find((option) => option.value === status)?.label ?? status
+  const normalized = normalizeBookingStatus(status)
+  return bookingStatusOptions.find((option) => option.value === normalized)?.label ?? normalized
 }
 
 export function getBookingStatusTone(status: string) {
-  switch (status) {
-    case 'REQUESTED':
+  switch (normalizeBookingStatus(status)) {
+    case 'SOLICITADA':
     case 'PENDIENTE_CONFIRMACION':
+    case 'PENDIENTE_PAGO':
+    case 'REPROGRAMACION_PENDIENTE':
       return 'warning'
-    case 'CONFIRMED':
-    case 'ATTENDED':
+    case 'CONFIRMADA':
+    case 'COMPLETADA':
       return 'success'
-    case 'RESCHEDULED':
+    case 'EN_ATENCION':
+      return 'info'
     case 'REPROGRAMADA':
       return 'info'
-    case 'CANCELLED':
     case 'CANCELADA':
+    case 'CANCELADA_POR_CLIENTE':
     case 'EXPIRADA':
-    case 'NO_SHOW':
+    case 'NO_ASISTE':
       return 'danger'
-    case 'COMPLETED':
-      return 'neutral'
     default:
       return 'neutral'
   }

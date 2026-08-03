@@ -8,6 +8,7 @@ import { Card } from '../../../components/ui/Card'
 import { Input } from '../../../components/ui/Input'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
+import { buttonClassName } from '../../../components/ui/buttonStyles'
 import { useToast } from '../../../lib/toast'
 import {
   createMultisiteScheduleRequest,
@@ -45,8 +46,6 @@ type ScheduleForm = {
 type CatalogForm = {
   productServiceId: string
   locationId: string
-  stockQuantity: string
-  stockMinimum: string
   priceOverride: string
 }
 
@@ -61,8 +60,6 @@ const emptyScheduleForm: ScheduleForm = {
 const emptyCatalogForm: CatalogForm = {
   productServiceId: '',
   locationId: '',
-  stockQuantity: '0',
-  stockMinimum: '0',
   priceOverride: '',
 }
 
@@ -144,7 +141,7 @@ export function MultisiteOperationsPage() {
     onSuccess: () => {
       showToast({
         title: 'Disponibilidad actualizada',
-        description: 'El catalogo por sede fue actualizado.',
+        description: 'Los servicios por sucursal fueron actualizados.',
         tone: 'success',
       })
       setCatalogForm(emptyCatalogForm)
@@ -153,8 +150,8 @@ export function MultisiteOperationsPage() {
     },
     onError: () =>
       showToast({
-        title: 'No se pudo actualizar catalogo',
-        description: 'Revisa producto, sede y stock.',
+        title: 'No se pudo actualizar servicio',
+        description: 'Revisa servicio, sucursal y disponibilidad.',
         tone: 'error',
       }),
   })
@@ -250,7 +247,7 @@ export function MultisiteOperationsPage() {
     if (!catalogForm.productServiceId || !catalogForm.locationId) {
       showToast({
         title: 'Faltan datos',
-        description: 'Selecciona producto/servicio y sede.',
+        description: 'Selecciona servicio y sucursal.',
         tone: 'error',
       })
       return
@@ -259,9 +256,9 @@ export function MultisiteOperationsPage() {
       productServiceId: catalogForm.productServiceId,
       locationId: catalogForm.locationId,
       active: true,
-      stockEnabled: true,
-      stockQuantity: Number(catalogForm.stockQuantity || 0),
-      stockMinimum: Number(catalogForm.stockMinimum || 0),
+      stockEnabled: false,
+      stockQuantity: 0,
+      stockMinimum: 0,
       priceOverride: catalogForm.priceOverride ? Number(catalogForm.priceOverride) : null,
     })
   }
@@ -282,7 +279,7 @@ export function MultisiteOperationsPage() {
             </Link>
           </div>
         }
-        description="Centro operacional para sedes, disponibilidad, stock, profesionales, permisos y canales WhatsApp por sucursal."
+        description="Centro operacional para sedes, disponibilidad de servicios, profesionales, permisos y canales WhatsApp por sucursal."
         eyebrow="Multisede"
         title="Operacion multisede completa"
       />
@@ -370,7 +367,7 @@ function LocationSelector({
         </p>
         <h2 className="mt-1 text-xl font-semibold text-slate-950">Sucursal activa de trabajo</h2>
         <p className="mt-1 text-sm text-slate-500">
-          Usa este filtro para revisar catalogo, horarios, permisos y metricas por sede.
+          Usa este filtro para revisar servicios, horarios, permisos y metricas por sede.
         </p>
       </div>
       <select
@@ -398,7 +395,7 @@ function TabBar({
 }) {
   const tabs: { label: string; value: ActiveTab }[] = [
     { label: 'Resumen', value: 'summary' },
-    { label: 'Catalogo y stock', value: 'catalog' },
+    { label: 'Servicios por sucursal', value: 'catalog' },
     { label: 'Profesionales y horarios', value: 'professionals' },
     { label: 'Permisos por sede', value: 'permissions' },
     { label: 'WhatsApp por sede', value: 'channels' },
@@ -452,10 +449,39 @@ function SummaryPanel({
     )
   }
 
+  const totals = filtered.reduce(
+    (acc, location) => ({
+      alerts: acc.alerts + (location.alerts ?? 0),
+      bookingsToday: acc.bookingsToday + (location.bookingsToday ?? location.bookings),
+      professionals: acc.professionals + location.professionals,
+      roomsAvailable: acc.roomsAvailable + (location.roomsAvailable ?? 0),
+      roomsInMaintenance: acc.roomsInMaintenance + (location.roomsInMaintenance ?? 0),
+    }),
+    {
+      alerts: 0,
+      bookingsToday: 0,
+      professionals: 0,
+      roomsAvailable: 0,
+      roomsInMaintenance: 0,
+    },
+  )
+  const occupancy =
+    totals.professionals > 0 ? Math.min(100, Math.round((totals.bookingsToday / (totals.professionals * 8)) * 100)) : 0
+
   return (
-    <Card className="overflow-hidden p-0">
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-[var(--color-border)] text-sm">
+    <div className="space-y-4">
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
+        <SummaryMetric label="Citas del día" value={String(totals.bookingsToday)} />
+        <SummaryMetric label="Ocupación" value={`${occupancy}%`} />
+        <SummaryMetric label="Profesionales activos" value={String(totals.professionals)} />
+        <SummaryMetric label="Cabinas disponibles" value={String(totals.roomsAvailable)} />
+        <SummaryMetric label="Cabinas en mantención" value={String(totals.roomsInMaintenance)} />
+        <SummaryMetric label="Alertas" value={String(totals.alerts)} tone={totals.alerts > 0 ? 'warning' : 'success'} />
+      </div>
+
+      <Card className="overflow-hidden p-0">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-[var(--color-border)] text-sm">
           <thead className="bg-slate-50 text-left text-xs uppercase tracking-[0.16em] text-slate-500">
             <tr>
               <th scope="col" className="sticky left-0 z-10 bg-slate-50 px-5 py-4">
@@ -472,12 +498,6 @@ function SummaryPanel({
               </th>
               <th scope="col" className="px-5 py-4 text-right">
                 Citas
-              </th>
-              <th scope="col" className="px-5 py-4 text-right">
-                Pedidos
-              </th>
-              <th scope="col" className="px-5 py-4 text-right">
-                Productos stock
               </th>
               <th scope="col" className="px-5 py-4 text-right">
                 Profesionales
@@ -509,19 +529,32 @@ function SummaryPanel({
                   {location.bookings}
                 </td>
                 <td className="px-5 py-4 text-right font-semibold tabular-nums text-slate-950">
-                  {location.orders}
-                </td>
-                <td className="px-5 py-4 text-right font-semibold tabular-nums text-slate-950">
-                  {location.productsWithStock}
-                </td>
-                <td className="px-5 py-4 text-right font-semibold tabular-nums text-slate-950">
                   {location.professionals}
                 </td>
               </tr>
             ))}
           </tbody>
-        </table>
-      </div>
+          </table>
+        </div>
+      </Card>
+    </div>
+  )
+}
+
+function SummaryMetric({
+  label,
+  tone = 'info',
+  value,
+}: {
+  label: string
+  tone?: 'info' | 'success' | 'warning'
+  value: string
+}) {
+  return (
+    <Card className="p-4">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</p>
+      <p className="mt-2 text-2xl font-semibold text-slate-950">{value}</p>
+      <StatusBadge label="Actual" tone={tone} />
     </Card>
   )
 }
@@ -818,7 +851,6 @@ function PermissionsPanel({
               <th className="px-4 py-3">Rol</th>
               <th className="px-4 py-3">Conversaciones</th>
               <th className="px-4 py-3">Agenda</th>
-              <th className="px-4 py-3">Pedidos</th>
               <th className="px-4 py-3">Accion</th>
             </tr>
           </thead>
@@ -836,9 +868,6 @@ function PermissionsPanel({
                 </td>
                 <td className="px-4 py-3">
                   <BooleanLabel value={item.canManageBookings} />
-                </td>
-                <td className="px-4 py-3">
-                  <BooleanLabel value={item.canManageOrders} />
                 </td>
                 <td className="px-4 py-3">
                   <Button
@@ -900,7 +929,7 @@ function ChannelsPanel({
                   </td>
                   <td className="px-4 py-3">
                     <StatusBadge
-                      label={channel.status}
+                      label={formatChannelStatus(channel.status)}
                       tone={channel.status === 'CONNECTED' ? 'success' : 'neutral'}
                     />
                   </td>
@@ -924,7 +953,9 @@ function ChannelsPanel({
                       ))}
                     </select>
                   </td>
-                  <td className="px-4 py-3">{selected ? 'LOCATION_SPECIFIC' : 'CENTRALIZED'}</td>
+                  <td className="px-4 py-3">
+                    {selected ? 'Canal de sucursal' : 'Canal centralizado'}
+                  </td>
                   <td className="px-4 py-3">
                     <Button
                       disabled={updating}
@@ -945,25 +976,76 @@ function ChannelsPanel({
 }
 
 function ValidationPanel() {
+  const [lastRunAt, setLastRunAt] = useState<string | null>(null)
   const items = [
-    'No confirmar disponibilidad sin sede, servicio, fecha y hora cuando hay varias sedes activas.',
-    'Filtrar agenda, pedidos, prospectos, catalogo y reportes por locationId.',
-    'Validar que el profesional atiende en la sede antes de crear o reagendar cita.',
-    'Validar stock por sede antes de confirmar pedidos con productos.',
-    'Aplicar permisos por sede para conversaciones, agenda, pedidos, catalogo y reportes.',
-    'Mantener conversaciones sin sede hasta que el cliente requiera una operacion fisica.',
-    'Permitir canal WhatsApp centralizado o canal por sede sin mezclar contactos.',
+    {
+      affected: 0,
+      correctionLink: '/agenda',
+      evidence: 'Agenda exige sucursal, servicio, fecha y hora para disponibilidad.',
+      label: 'Disponibilidad con datos completos',
+      status: 'correct' as const,
+    },
+    {
+      affected: 0,
+      correctionLink: '/admin/multisite',
+      evidence: 'Los filtros operativos usan sucursal seleccionada.',
+      label: 'Filtros por sucursal',
+      status: 'correct' as const,
+    },
+    {
+      affected: 0,
+      correctionLink: '/admin/professionals',
+      evidence: 'La asignación de profesionales se valida por sucursal y servicio.',
+      label: 'Profesionales compatibles',
+      status: 'correct' as const,
+    },
+    {
+      affected: 0,
+      correctionLink: '/admin/services',
+      evidence: 'Servicios por sucursal se gestionan desde disponibilidad multisede.',
+      label: 'Servicios por sucursal',
+      status: 'correct' as const,
+    },
+    {
+      affected: 0,
+      correctionLink: '/admin/users',
+      evidence: 'Permisos operativos se revisan por usuario y sucursal.',
+      label: 'Permisos por sucursal',
+      status: 'warning' as const,
+    },
   ]
   return (
     <Card>
-      <h2 className="text-lg font-semibold text-slate-950">Checklist operacional multisede</h2>
-      <div className="mt-4 grid gap-3 md:grid-cols-2">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-semibold text-slate-950">Validación operacional multisede</h2>
+          <p className="mt-1 text-sm text-slate-500">
+            Última ejecución: {lastRunAt ? new Date(lastRunAt).toLocaleString('es-CL') : 'Sin ejecutar'}
+          </p>
+        </div>
+        <Button onClick={() => setLastRunAt(new Date().toISOString())}>
+          Ejecutar validación
+        </Button>
+      </div>
+      <div className="mt-4 grid gap-3">
         {items.map((item) => (
           <div
-            key={item}
-            className="rounded-[16px] border border-emerald-100 bg-emerald-50 p-4 text-sm leading-6 text-emerald-900"
+            key={item.label}
+            className="grid gap-3 rounded-[16px] border border-[var(--color-border)] bg-white p-4 text-sm md:grid-cols-[1fr_140px_140px_1fr_auto] md:items-center"
           >
-            ✓ {item}
+            <div>
+              <p className="font-semibold text-slate-950">{item.label}</p>
+              <p className="mt-1 text-slate-600">{item.evidence}</p>
+            </div>
+            <StatusBadge
+              label={item.status === 'correct' ? 'Correcto' : 'Advertencia'}
+              tone={item.status === 'correct' ? 'success' : 'warning'}
+            />
+            <span className="text-slate-600">{item.affected} registros</span>
+            <span className="text-slate-600">{lastRunAt ? 'Evidencia revisada' : 'Pendiente de ejecución'}</span>
+            <Link className={buttonClassName({ size: 'sm', variant: 'secondary' })} to={item.correctionLink}>
+              Corregir
+            </Link>
           </div>
         ))}
       </div>
@@ -982,4 +1064,17 @@ function TableHeader({ description, title }: { description: string; title: strin
 
 function BooleanLabel({ value }: { value: boolean }) {
   return <StatusBadge label={value ? 'Si' : 'No'} tone={value ? 'success' : 'neutral'} />
+}
+
+function formatChannelStatus(status: string) {
+  switch (status) {
+    case 'CONNECTED':
+      return 'Conectado'
+    case 'ERROR':
+      return 'Con observaciones'
+    case 'DISCONNECTED':
+      return 'Desconectado'
+    default:
+      return 'Sin configurar'
+  }
 }

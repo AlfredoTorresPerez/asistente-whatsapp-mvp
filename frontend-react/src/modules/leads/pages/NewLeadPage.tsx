@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
@@ -12,6 +12,7 @@ import { Textarea } from '../../../components/ui/Textarea'
 import { useShellSession } from '../../../lib/shellSession'
 import { useToast } from '../../../lib/toast'
 import { useOnlineStatus } from '../../../lib/useOnlineStatus'
+import { getBusinessLocationsRequest } from '../../../services/api/businessLocationsApi'
 import { createLeadRequest } from '../../../services/api/leadsApi'
 import { leadStageOptions } from '../leadOptions'
 
@@ -21,6 +22,7 @@ const schema = z.object({
   phone: z.string().trim().min(8, 'Ingresa un telefono valido.').max(30),
   email: z.string().trim().max(255).email('Ingresa un correo valido.').or(z.literal('')),
   stage: z.string().trim().min(1, 'Selecciona una etapa.'),
+  locationId: z.string(),
   notes: z.string().trim().max(2000, 'La nota inicial no puede superar los 2000 caracteres.'),
 })
 
@@ -43,8 +45,14 @@ export function NewLeadPage() {
       phone: '',
       email: '',
       stage: 'NEW',
+      locationId: '',
       notes: '',
     },
+  })
+
+  const locationsQuery = useQuery({
+    queryKey: ['business-locations', 'active'],
+    queryFn: () => getBusinessLocationsRequest({ activeOnly: true }),
   })
 
   const createMutation = useMutation({
@@ -75,6 +83,7 @@ export function NewLeadPage() {
       stage: values.stage,
       notes: values.notes || undefined,
       assignedUserId: user?.id,
+      locationId: values.locationId || undefined,
     })
   })
 
@@ -122,27 +131,40 @@ export function NewLeadPage() {
               <Input
                 error={errors.phone?.message}
                 label="Telefono"
-                placeholder="+56911112222"
+                placeholder="Ej. +56 9 XXXX XXXX"
                 {...register('phone')}
               />
               <Input
                 error={errors.email?.message}
                 label="Correo"
-                placeholder="cliente@demo.cl"
+                placeholder="cliente@dominio.cl"
                 type="email"
                 {...register('email')}
               />
             </div>
 
-            <Select
-              error={errors.stage?.message}
-              label="Etapa"
-              options={leadStageOptions.map((option) => ({
-                label: option.label,
-                value: option.value,
-              }))}
-              {...register('stage')}
-            />
+            <div className="grid gap-5 md:grid-cols-2">
+              <Select
+                error={errors.stage?.message}
+                label="Etapa"
+                options={leadStageOptions.map((option) => ({
+                  label: option.label,
+                  value: option.value,
+                }))}
+                {...register('stage')}
+              />
+              <Select
+                label="Sucursal"
+                options={[
+                  { label: 'Sin sucursal asignada', value: '' },
+                  ...(locationsQuery.data ?? []).map((location) => ({
+                    label: location.name,
+                    value: location.id,
+                  })),
+                ]}
+                {...register('locationId')}
+              />
+            </div>
 
             <Textarea
               error={errors.notes?.message}
@@ -170,12 +192,12 @@ export function NewLeadPage() {
 
         <Card className="space-y-4">
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-500">
-            Snapshot
+            Resumen
           </p>
           <h2 className="text-2xl font-semibold text-[var(--color-text)]">Checklist rapido</h2>
           <ul className="space-y-3 text-sm leading-6 text-[var(--color-text-secondary)]">
             <li>Si el telefono ya existe, se asociara el cliente existente.</li>
-            <li>La etapa inicial puede arrancar donde te convenga para la demo.</li>
+            <li>La etapa inicial puede ajustarse al estado comercial real.</li>
             <li>El prospecto quedara asignado al usuario autenticado.</li>
           </ul>
         </Card>

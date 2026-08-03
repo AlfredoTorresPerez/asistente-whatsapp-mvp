@@ -28,6 +28,26 @@ function normalizeStatus(status?: string | null) {
   return (status ?? '').toUpperCase()
 }
 
+function paymentStatusLabel(status?: string | null) {
+  switch (normalizeStatus(status)) {
+    case 'PAID':
+    case 'APPROVED':
+      return 'Pagado'
+    case 'PENDING':
+    case 'PENDING_PAYMENT':
+      return 'Pendiente de pago'
+    case 'REJECTED':
+    case 'FAILED':
+      return 'Pago rechazado'
+    case 'REFUNDED':
+      return 'Reembolsado'
+    case '':
+      return 'Sin informacion'
+    default:
+      return 'Estado por revisar'
+  }
+}
+
 function getErrorMessage(error: unknown, fallback: string) {
   return error instanceof ApiClientError ? error.message : fallback
 }
@@ -209,7 +229,7 @@ export function BookingConfirmationPage() {
                 label="Abono"
                 value={
                   data.requiresDeposit
-                    ? `$${Number(data.depositAmount ?? 0).toLocaleString('es-CL')} · ${data.paymentStatus}`
+                    ? `$${Number(data.depositAmount ?? 0).toLocaleString('es-CL')} · ${paymentStatusLabel(data.paymentStatus)}`
                     : 'No requerido'
                 }
               />

@@ -8,16 +8,17 @@ import { Input } from '../../../components/ui/Input'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { Select } from '../../../components/ui/Select'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
-import { Textarea } from '../../../components/ui/Textarea'
 import { useToast } from '../../../lib/toast'
 import { ApiClientError } from '../../../services/api/httpClient'
 import {
   cancelAgendaBookingRequest,
-  createTemporaryAgendaBookingRequest,
-  getAgendaAvailabilityRequest,
+  completeAgendaBookingRequest,
+  confirmAgendaBookingRequest,
   getAgendaCalendarRequest,
   getAgendaFilterOptionsRequest,
   getBusinessHoursRequest,
+  markAgendaBookingNoShowRequest,
+  startAgendaBookingServiceRequest,
 } from '../../../services/api/completeAgendaApi'
 import { getBusinessLocationsRequest } from '../../../services/api/businessLocationsApi'
 import {
@@ -25,6 +26,7 @@ import {
   getBookingDetailRequest,
 } from '../../../services/api/bookingsApi'
 import type { AgendaCalendarItemResponse, BookingDetailResponse } from '../../../services/api/types'
+import { getBookingStatusLabel } from '../../bookings/bookingOptions'
 import { AppointmentDetailPanel } from '../components/AppointmentDetailPanel'
 import { CalendarWeekNavigation } from '../components/CalendarWeekNavigation'
 import { WeeklyCalendarView } from '../components/WeeklyCalendarView'
@@ -36,7 +38,6 @@ import {
 import {
   buildVisibleDays,
   calendarDays,
-  formatAgendaTime,
   getStatusLabel,
 } from '../components/agendaUtils'
 
@@ -44,15 +45,16 @@ const today = dayjs().format('YYYY-MM-DD')
 
 const statusOptions = [
   { label: 'Reservas activas', value: '' },
-  { label: 'Confirmadas', value: 'CONFIRMED' },
+  { label: 'Confirmadas', value: 'CONFIRMADA' },
   { label: 'Pendientes de confirmacion', value: 'PENDIENTE_CONFIRMACION' },
-  { label: 'Canceladas', value: 'CANCELLED' },
-  { label: 'Reprogramadas', value: 'RESCHEDULED' },
-  { label: 'Atendidas', value: 'COMPLETED' },
-  { label: 'Solicitadas', value: 'REQUESTED' },
-  { label: 'Pendientes pago', value: 'PENDING_PAYMENT' },
-  { label: 'No asistio', value: 'NO_SHOW' },
-  { label: 'Vencidas', value: 'EXPIRED' },
+  { label: 'En atencion', value: 'EN_ATENCION' },
+  { label: 'Completadas', value: 'COMPLETADA' },
+  { label: 'Canceladas', value: 'CANCELADA' },
+  { label: 'Reprogramadas', value: 'REPROGRAMADA' },
+  { label: 'Solicitadas', value: 'SOLICITADA' },
+  { label: 'Pendientes pago', value: 'PENDIENTE_PAGO' },
+  { label: 'Inasistencias', value: 'NO_ASISTE' },
+  { label: 'Vencidas', value: 'EXPIRADA' },
 ]
 
 function buildFilterLabel(name: string, detail?: string | null) {
@@ -69,8 +71,8 @@ function buildRecentActivity(detail?: BookingDetailResponse) {
 
   const reminderEvents = (detail?.reminders ?? []).map((reminder) => ({
     id: reminder.id,
-    title: `${reminder.reminderType} por ${reminder.channelType}`,
-    detail: reminder.status,
+    title: `${getReminderTypeLabel(reminder.reminderType)} por ${getChannelLabel(reminder.channelType)}`,
+    detail: getReminderStatusLabel(reminder.status),
     at: reminder.sentAt ?? reminder.scheduledAt,
   }))
 
@@ -79,33 +81,129 @@ function buildRecentActivity(detail?: BookingDetailResponse) {
     .slice(0, 4)
 }
 
-function getAgentRows(item: AgendaCalendarItemResponse | null, detail?: BookingDetailResponse) {
+function formatCLP(value: number) {
+  return new Intl.NumberFormat('es-CL', {
+    style: 'currency',
+    currency: 'CLP',
+    maximumFractionDigits: 0,
+  }).format(value)
+}
+
+function getPaymentStatusLabel(status?: string | null) {
+  switch ((status ?? '').toUpperCase()) {
+    case 'PAID':
+    case 'PAGADO':
+      return 'Pagado'
+    case 'PARTIAL':
+    case 'PARCIAL':
+      return 'Abono parcial'
+    case 'PENDING':
+    case 'PENDIENTE':
+      return 'Pendiente'
+    case 'NOT_REQUIRED':
+      return 'No requiere pago'
+    default:
+      return 'Sin estado de pago'
+  }
+}
+
+function getChannelLabel(channel?: string | null) {
+  switch ((channel ?? '').toUpperCase()) {
+    case 'WHATSAPP':
+      return 'WhatsApp'
+    case 'AGENDA':
+      return 'Agenda interna'
+    case 'WEB':
+      return 'Web'
+    case 'TELEFONO':
+      return 'Teléfono'
+    case 'PRESENCIAL':
+      return 'Presencial'
+    case 'EMAIL':
+      return 'Correo electrónico'
+    default:
+      return 'No registrado'
+  }
+}
+
+function getReminderTypeLabel(type?: string | null) {
+  switch ((type ?? '').toUpperCase()) {
+    case 'CONFIRMATION':
+      return 'Confirmación'
+    case 'REMINDER':
+      return 'Recordatorio'
+    case 'RESCHEDULE':
+      return 'Reprogramación'
+    case 'CANCELLATION':
+      return 'Cancelación'
+    default:
+      return 'Notificación'
+  }
+}
+
+function getReminderStatusLabel(status?: string | null) {
+  switch ((status ?? '').toUpperCase()) {
+    case 'PENDING':
+    case 'SCHEDULED':
+      return 'Programada'
+    case 'SENT':
+      return 'Enviada'
+    case 'DELIVERED':
+      return 'Entregada'
+    case 'READ':
+      return 'Leída'
+    case 'FAILED':
+      return 'Fallida'
+    case 'CANCELLED':
+      return 'Cancelada'
+    default:
+      return 'Sin estado'
+  }
+}
+
+function getNotificationSummary(detail?: BookingDetailResponse) {
+  const reminders = detail?.reminders ?? []
+  if (reminders.length === 0) {
+    return 'Sin notificaciones programadas'
+  }
+  const sent = reminders.filter((reminder) => reminder.sentAt).length
+  const pending = reminders.filter((reminder) =>
+    ['PENDING', 'SCHEDULED'].includes((reminder.status ?? '').toUpperCase()),
+  ).length
+  return `${sent} enviada(s), ${pending} pendiente(s)`
+}
+
+function getOperationalRows(item: AgendaCalendarItemResponse | null, detail?: BookingDetailResponse) {
+  const paidAmount = (detail?.payments ?? [])
+    .filter((payment) => ['APPROVED', 'PAID'].includes((payment.status ?? '').toUpperCase()))
+    .reduce((total, payment) => total + Number(payment.amount ?? 0), 0)
+  const deposit = Number(detail?.depositAmount ?? 0)
+  const balance = Math.max(deposit - paidAmount, 0)
+
   return [
     {
-      name: 'Agenda',
-      detail: item ? `${item.startTimeLocal ?? ''} sin solapamiento visual` : 'Selecciona una cita',
+      name: 'Estado',
+      detail: item ? getBookingStatusLabel(item.status) : 'Selecciona una cita',
     },
     {
-      name: 'Cliente',
-      detail: detail?.customerPhone ?? item?.customerPhone ?? 'Telefono no disponible',
+      name: 'Pago',
+      detail: `${getPaymentStatusLabel(detail?.paymentStatus)} · Abono ${formatCLP(deposit)}`,
     },
     {
-      name: 'Profesional',
-      detail: item?.professionalName ?? detail?.assignedUserName ?? 'Profesional por asignar',
+      name: 'Saldo',
+      detail: formatCLP(balance),
     },
     {
-      name: 'Servicio',
-      detail: item?.serviceName ?? item?.subject ?? detail?.subject ?? 'Servicio no definido',
+      name: 'Origen',
+      detail: getChannelLabel(item?.sourceChannel),
     },
     {
       name: 'Notificaciones',
-      detail: item?.sourceChannel?.toUpperCase().includes('WHATSAPP')
-        ? 'Canal WhatsApp asociado'
-        : 'Sin registro',
+      detail: getNotificationSummary(detail),
     },
     {
-      name: 'Administracion',
-      detail: 'Confirmar, reprogramar, cancelar o editar notas',
+      name: 'Historial',
+      detail: `${detail?.statusHistory?.length ?? 0} cambio(s) registrados`,
     },
   ]
 }
@@ -141,10 +239,6 @@ export function CompleteAgendaPage() {
   const [roomId, setRoomId] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [date, setDate] = useState(today)
-  const [customerName, setCustomerName] = useState('')
-  const [customerPhone, setCustomerPhone] = useState('')
-  const [customerEmail, setCustomerEmail] = useState('')
-  const [notes, setNotes] = useState('')
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null)
   const [cancelReason, setCancelReason] = useState('')
   const detailPanelRef = useRef<HTMLDivElement>(null)
@@ -283,71 +377,6 @@ export function CompleteAgendaPage() {
     return () => clearTimeout(id)
   }, [calendarItems, selectedBookingId])
 
-  const availabilityMutation = useMutation({
-    mutationFn: () =>
-      getAgendaAvailabilityRequest({
-        locationId,
-        serviceId,
-        professionalId: professionalId || undefined,
-        roomId: roomId || undefined,
-        date,
-        maxSlots: 20,
-      }),
-    onError: () => {
-      showToast({
-        title: 'No se pudo consultar disponibilidad',
-        description: 'Verifica sucursal, servicio y fecha.',
-        tone: 'error',
-      })
-    },
-  })
-
-  const createMutation = useMutation({
-    mutationFn: (startsAt: string) => {
-      const payload = {
-        locationId,
-        serviceId,
-        professionalId: professionalId || undefined,
-        roomId: roomId || undefined,
-        startsAt,
-        customerName,
-        customerPhone,
-        customerEmail: customerEmail || undefined,
-        notes: notes || undefined,
-        expirationMinutes: 30,
-        generateConfirmationLink: true,
-        sendWhatsApp: true,
-      }
-      return createTemporaryAgendaBookingRequest(payload)
-    },
-    onSuccess: (booking) => {
-      showToast({
-        title: 'Reserva temporal creada',
-        description: 'Se genero el enlace de confirmacion y quedo lista para WhatsApp.',
-        tone: 'success',
-      })
-      navigate(`/appointments/${booking.id}`)
-    },
-    onError: (error) => {
-      const apiError = error as ApiClientError
-      if (apiError?.fieldErrors && Object.keys(apiError.fieldErrors).length > 0) {
-        const firstFieldError = Object.values(apiError.fieldErrors)[0]
-        showToast({
-          title: 'No se pudo crear la reserva',
-          description: firstFieldError,
-          tone: 'error',
-        })
-      } else {
-        showToast({
-          title: 'No se pudo crear la reserva',
-          description:
-            apiError?.message ?? 'El horario pudo quedar ocupado o faltan datos obligatorios.',
-          tone: 'error',
-        })
-      }
-    },
-  })
-
   const confirmWhatsAppMutation = useMutation({
     mutationFn: (bookingId: string) =>
       createBookingConfirmationLinkRequest(bookingId, {
@@ -458,9 +487,42 @@ export function CompleteAgendaPage() {
     },
   })
 
-  const canSearch = locationId && serviceId && date
-  const canCreate = customerName.trim().length > 0 && customerPhone.trim().length >= 8
-  const slots = availabilityMutation.data?.slots ?? []
+  const lifecycleMutation = useMutation({
+    mutationFn: ({ action, bookingId }: { action: string; bookingId: string }) => {
+      if (action === 'CONFIRM') {
+        return confirmAgendaBookingRequest(bookingId)
+      }
+      if (action === 'START') {
+        return startAgendaBookingServiceRequest(bookingId)
+      }
+      if (action === 'COMPLETE') {
+        return completeAgendaBookingRequest(bookingId)
+      }
+      return markAgendaBookingNoShowRequest(bookingId, { reason: 'Inasistencia registrada desde agenda' })
+    },
+    onSuccess: (booking) => {
+      showToast({
+        title: 'Cita actualizada',
+        description: `Estado actual: ${getBookingStatusLabel(booking.status)}.`,
+        tone: 'success',
+      })
+      void bookingDetailQuery.refetch()
+      void calendarQuery.refetch()
+    },
+    onError: (error) => {
+      const apiError = error as ApiClientError
+      showToast({
+        title: 'No se pudo actualizar la cita',
+        description:
+          apiError?.fieldErrors && Object.keys(apiError.fieldErrors).length > 0
+            ? Object.values(apiError.fieldErrors)[0]
+            : (apiError?.message ?? 'La cita no permite esa acción en su estado actual.'),
+        tone: 'error',
+      })
+      void bookingDetailQuery.refetch()
+    },
+  })
+
   const activityItems = buildRecentActivity(bookingDetail)
 
   function handleSelectBooking(bookingId: string) {
@@ -590,12 +652,25 @@ export function CompleteAgendaPage() {
                 cancelPending={cancelMutation.isPending}
                 cancelReason={cancelReason}
                 confirmWhatsAppPending={confirmWhatsAppMutation.isPending}
+                lifecyclePending={lifecycleMutation.isPending}
                 selectedItem={selectedItem}
                 onCancel={(bookingId) => cancelMutation.mutate(bookingId)}
                 onCancelReasonChange={setCancelReason}
+                onCompleteBooking={(bookingId) =>
+                  lifecycleMutation.mutate({ action: 'COMPLETE', bookingId })
+                }
+                onConfirmBooking={(bookingId) =>
+                  lifecycleMutation.mutate({ action: 'CONFIRM', bookingId })
+                }
                 onConfirmWhatsApp={handleConfirmWhatsApp}
                 onEditNotes={(bookingId) => navigate(`/appointments/${bookingId}/edit`)}
+                onMarkNoShow={(bookingId) =>
+                  lifecycleMutation.mutate({ action: 'NO_SHOW', bookingId })
+                }
                 onReschedule={(bookingId) => navigate(`/appointments/${bookingId}/reschedule`)}
+                onStartService={(bookingId) =>
+                  lifecycleMutation.mutate({ action: 'START', bookingId })
+                }
                 onViewHistory={(bookingId) => navigate(`/appointments/${bookingId}`)}
               />
             </Card>
@@ -605,19 +680,19 @@ export function CompleteAgendaPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <SectionCard
-          description="Cada cita queda conectada con agenda, cliente, profesional, servicio, notificaciones y administracion."
-          title="Agentes involucrados"
+          description="Información útil para decidir acciones durante la operación diaria."
+          title="Resumen operativo"
         >
           <div className="grid gap-2 sm:grid-cols-2">
-            {getAgentRows(selectedItem, bookingDetail).map((agent) => (
+            {getOperationalRows(selectedItem, bookingDetail).map((item) => (
               <div
                 className="rounded-lg border border-slate-100 bg-slate-50/50 p-3 transition hover:border-slate-200"
-                key={agent.name}
+                key={item.name}
               >
                 <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-blue-600">
-                  Agente {agent.name}
+                  {item.name}
                 </p>
-                <p className="mt-1 text-xs text-slate-600">{agent.detail}</p>
+                <p className="mt-1 text-xs text-slate-600">{item.detail}</p>
               </div>
             ))}
           </div>
@@ -658,153 +733,6 @@ export function CompleteAgendaPage() {
                 Ver historial completo &rarr;
               </button>
             ) : null}
-          </div>
-        </SectionCard>
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <SectionCard
-          description="Usa este bloque cuando el orquestador detecta intencion de agendar desde WhatsApp."
-          title="Consultar disponibilidad real"
-        >
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Select
-              label="Sucursal"
-              onChange={(event) => setLocationId(event.target.value)}
-              options={[
-                { label: 'Selecciona sucursal', value: '' },
-                ...(locationsQuery.data ?? []).map((location) => ({
-                  label: location.commune
-                    ? `${location.name} - ${location.commune}`
-                    : location.name,
-                  value: location.id,
-                })),
-              ]}
-              value={locationId}
-            />
-            <Select
-              disabled={filterOptionsQuery.isLoading}
-              label="Servicio"
-              onChange={(event) => setServiceId(event.target.value)}
-              options={[
-                { label: 'Selecciona servicio', value: '' },
-                ...serviceOptions.filter((option) => option.value),
-              ]}
-              value={serviceId}
-            />
-            <Input
-              label="Fecha"
-              onChange={(event) => setDate(event.target.value)}
-              type="date"
-              value={date}
-            />
-            <Select
-              label="Preferencia"
-              onChange={() => undefined}
-              options={[
-                { label: 'Cualquier horario', value: '' },
-                { label: 'Manana', value: 'MORNING' },
-                { label: 'Tarde', value: 'AFTERNOON' },
-              ]}
-            />
-            <Select
-              disabled={filterOptionsQuery.isLoading}
-              label="Profesional opcional"
-              onChange={(event) => setProfessionalId(event.target.value)}
-              options={professionalOptions}
-              value={professionalId}
-            />
-            <Select
-              disabled={filterOptionsQuery.isLoading}
-              label="Cabina opcional"
-              onChange={(event) => setRoomId(event.target.value)}
-              options={roomOptions}
-              value={roomId}
-            />
-          </div>
-
-          <Button
-            disabled={!canSearch}
-            loading={availabilityMutation.isPending}
-            onClick={() => availabilityMutation.mutate()}
-            type="button"
-          >
-            Buscar horarios disponibles
-          </Button>
-
-          <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-4">
-            <h3 className="text-sm font-semibold text-slate-800">
-              Horarios sugeridos por la agenda
-            </h3>
-            <div className="mt-3 grid gap-2 sm:grid-cols-2">
-              {slots.length === 0 ? (
-                <p className="text-sm text-slate-500">
-                  Consulta disponibilidad para ver horarios validos.
-                </p>
-              ) : (
-                slots.map((slot) => (
-                  <button
-                    className="rounded-lg border border-slate-200 bg-white p-3 text-left shadow-xs transition hover:border-blue-300 hover:shadow-sm"
-                    disabled={!canCreate || createMutation.isPending}
-                    key={`${slot.startsAt}-${slot.professionalId}-${slot.roomId}`}
-                    onClick={() => createMutation.mutate(slot.startsAt)}
-                    type="button"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <strong className="text-sm text-slate-900">
-                        {formatAgendaTime(slot.startsAt)}
-                      </strong>
-                      <StatusBadge
-                        label={slot.available ? 'Disponible' : 'Bloqueado'}
-                        tone={slot.available ? 'success' : 'danger'}
-                      />
-                    </div>
-                    <p className="mt-1 text-xs text-slate-600">
-                      {slot.professionalName ?? 'Profesional por asignar'}
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      {slot.roomName ?? 'Sin cabina requerida'}
-                    </p>
-                    <p className="mt-1 text-[10px] text-slate-400">
-                      Duracion: {slot.durationMinutes} minutos
-                    </p>
-                  </button>
-                ))
-              )}
-            </div>
-          </div>
-        </SectionCard>
-
-        <SectionCard
-          description="Al elegir un horario se crea reserva temporal, enlace de confirmacion y bloqueo de cupo."
-          title="Datos del cliente WhatsApp"
-        >
-          <Input
-            label="Cliente"
-            onChange={(event) => setCustomerName(event.target.value)}
-            value={customerName}
-          />
-          <Input
-            label="Telefono WhatsApp"
-            onChange={(event) => setCustomerPhone(event.target.value)}
-            value={customerPhone}
-          />
-          <Input
-            label="Correo opcional"
-            onChange={(event) => setCustomerEmail(event.target.value)}
-            type="email"
-            value={customerEmail}
-          />
-          <Textarea
-            label="Notas de agenda"
-            onChange={(event) => setNotes(event.target.value)}
-            rows={4}
-            value={notes}
-          />
-          <div className="rounded-xl bg-blue-50 p-3 text-xs text-blue-900 leading-relaxed">
-            <strong className="font-semibold">Flujo coordinado:</strong> WhatsApp registra mensaje,
-            orquestador detecta intencion, agenda calcula disponibilidad, recursos validan
-            profesional y cabina, enlace confirma reserva y auditoria registra el evento.
           </div>
         </SectionCard>
       </div>

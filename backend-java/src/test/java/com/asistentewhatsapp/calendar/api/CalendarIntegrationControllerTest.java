@@ -36,6 +36,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -43,6 +44,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @WebMvcTest(controllers = CalendarIntegrationController.class)
 @Import({SecurityConfig.class, GlobalExceptionHandler.class})
+@TestPropertySource(properties = "app.frontend.public-base-url=http://localhost:5173")
 @DisplayName("CalendarIntegrationController - API REST de integración de calendario")
 class CalendarIntegrationControllerTest {
 

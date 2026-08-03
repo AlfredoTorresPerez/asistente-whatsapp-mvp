@@ -109,6 +109,14 @@ function bookingUrl(token: string) {
   return `${API_BASE}/public/customer-bookings/${token}`
 }
 
+function isCustomerBookingsIndex(str: string, token: string) {
+  return (
+    (str === bookingUrl(token) || str.endsWith(`/public/customer-bookings/${token}`)) &&
+    !str.includes('/reschedule') &&
+    !str.includes('/cancel')
+  )
+}
+
 function isGetPreview(str: string, bookingId: string) {
   return str.includes('/reschedule') && str.includes(bookingId) && !str.includes('availability')
 }
@@ -137,7 +145,7 @@ describe('CustomerBookingsPage', () => {
 
     fetchMock.mockImplementation(async (url, init) => {
       const str = typeof url === 'string' ? url : url.toString()
-      if (str === bookingUrl('validtoken') && methodIs(init, 'GET')) {
+      if (isCustomerBookingsIndex(str, 'validtoken') && methodIs(init, 'GET')) {
         return jsonResponse([booking1Response(), booking2Response()])
       }
       if (methodIs(init, 'GET') && isGetPreview(str, booking1Id)) {
@@ -163,7 +171,7 @@ describe('CustomerBookingsPage', () => {
 
     fetchMock.mockImplementation(async (url, init) => {
       const str = typeof url === 'string' ? url : url.toString()
-      if (str === bookingUrl('validtoken') && methodIs(init, 'GET')) {
+      if (isCustomerBookingsIndex(str, 'validtoken') && methodIs(init, 'GET')) {
         return jsonResponse([booking1Response(), booking2Response()])
       }
       if (methodIs(init, 'GET') && isGetPreview(str, booking1Id)) {
@@ -196,7 +204,7 @@ describe('CustomerBookingsPage', () => {
 
     fetchMock.mockImplementation(async (url, init) => {
       const str = typeof url === 'string' ? url : url.toString()
-      if (str === bookingUrl('validtoken') && methodIs(init, 'GET')) {
+      if (isCustomerBookingsIndex(str, 'validtoken') && methodIs(init, 'GET')) {
         return jsonResponse([booking1Response(), booking2Response()])
       }
       if (methodIs(init, 'GET') && isGetPreview(str, booking1Id)) {
@@ -229,7 +237,7 @@ describe('CustomerBookingsPage', () => {
 
     fetchMock.mockImplementation(async (url, init) => {
       const str = typeof url === 'string' ? url : url.toString()
-      if (str === bookingUrl('validtoken') && methodIs(init, 'GET')) {
+      if (isCustomerBookingsIndex(str, 'validtoken') && methodIs(init, 'GET')) {
         return jsonResponse([b1, booking2Response()])
       }
       if (methodIs(init, 'GET') && isGetPreview(str, booking1Id)) {
@@ -275,7 +283,7 @@ describe('CustomerBookingsPage', () => {
     fetchMock.mockImplementation(async (url, init) => {
       const str = typeof url === 'string' ? url : url.toString()
       const method = (init as RequestInit)?.method ?? 'GET'
-      if (str === bookingUrl('validtoken') && method === 'GET') {
+      if (isCustomerBookingsIndex(str, 'validtoken') && method === 'GET') {
         return jsonResponse([b1, booking2Response()])
       }
       if (method === 'GET' && isGetPreview(str, booking1Id)) {
@@ -341,7 +349,7 @@ describe('CustomerBookingsPage', () => {
     fetchMock.mockImplementation(async (url, init) => {
       const str = typeof url === 'string' ? url : url.toString()
       const method = (init as RequestInit)?.method ?? 'GET'
-      if (str === bookingUrl('validtoken') && method === 'GET') {
+      if (isCustomerBookingsIndex(str, 'validtoken') && method === 'GET') {
         return jsonResponse([b1, booking2Response()])
       }
       if (method === 'GET' && isGetPreview(str, booking1Id)) {
@@ -377,7 +385,7 @@ describe('CustomerBookingsPage', () => {
 
     fetchMock.mockImplementation(async (url, init) => {
       const str = typeof url === 'string' ? url : url.toString()
-      if (str === bookingUrl('validtoken') && methodIs(init, 'GET')) {
+      if (isCustomerBookingsIndex(str, 'validtoken') && methodIs(init, 'GET')) {
         return jsonResponse([booking1Response(), booking2Response()])
       }
       if (methodIs(init, 'GET') && isGetPreview(str, booking1Id)) {

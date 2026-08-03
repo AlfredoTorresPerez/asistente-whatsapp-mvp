@@ -22,11 +22,62 @@ import type { AestheticBusinessRuleResponse } from '../../../services/api/types'
 import { DEFAULT_RULE_TYPE_OPTIONS, formatRuleType } from '../lib/ruleTypeLabels'
 
 type ActiveFilter = '' | 'true' | 'false'
+type RuleLifecycleStatus = 'draft' | 'testing' | 'published' | 'paused' | 'archived'
 
 const fieldClassName =
   'h-11 w-full rounded-2xl border border-[var(--color-border)] bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100'
 
 const PAGE_SIZE = 10
+
+const RULE_STATUS_LABELS: Record<RuleLifecycleStatus, string> = {
+  archived: 'Archivada',
+  draft: 'Borrador',
+  paused: 'Pausada',
+  published: 'Publicada',
+  testing: 'En prueba',
+}
+
+function parseRulePayload(payload: string) {
+  try {
+    const parsed = JSON.parse(payload || '{}')
+    return typeof parsed === 'object' && parsed !== null ? parsed as Record<string, unknown> : {}
+  } catch {
+    return {}
+  }
+}
+
+function getRuleStatus(rule: AestheticBusinessRuleResponse): RuleLifecycleStatus {
+  const payload = parseRulePayload(rule.rulePayload)
+  const status = String(payload.estadoRegla ?? payload.lifecycleStatus ?? '').toLowerCase()
+  if (['draft', 'testing', 'published', 'paused', 'archived'].includes(status)) {
+    return status as RuleLifecycleStatus
+  }
+  return rule.active ? 'published' : 'paused'
+}
+
+function getRuleStatusTone(status: RuleLifecycleStatus) {
+  switch (status) {
+    case 'published':
+      return 'success'
+    case 'testing':
+      return 'info'
+    case 'paused':
+      return 'warning'
+    case 'archived':
+      return 'neutral'
+    case 'draft':
+    default:
+      return 'neutral'
+  }
+}
+
+function buildPayloadWithStatus(rule: AestheticBusinessRuleResponse, active: boolean) {
+  const payload = parseRulePayload(rule.rulePayload)
+  return JSON.stringify({
+    ...payload,
+    estadoRegla: active ? 'published' : 'paused',
+  })
+}
 
 export function AutomationRulesPage() {
   const navigate = useNavigate()
@@ -34,8 +85,9 @@ export function AutomationRulesPage() {
   const isOnline = useOnlineStatus()
   const [page, setPage] = useState(0)
   const [ruleTypeInput, setRuleTypeInput] = useState('')
+  const [searchInput, setSearchInput] = useState('')
   const [activeInput, setActiveInput] = useState<ActiveFilter>('')
-  const [filters, setFilters] = useState({ active: '' as ActiveFilter, ruleType: '' })
+  const [filters, setFilters] = useState({ active: '' as ActiveFilter, ruleType: '', search: '' })
   const [ruleToToggle, setRuleToToggle] = useState<{
     rule: AestheticBusinessRuleResponse
     active: boolean
@@ -69,7 +121,7 @@ export function AutomationRulesPage() {
         description: rule.description,
         name: rule.name,
         priority: rule.priority,
-        rulePayload: rule.rulePayload,
+        rulePayload: buildPayloadWithStatus(rule, active),
         ruleType: rule.ruleType,
       }),
     onError: (error) => {
@@ -85,7 +137,17 @@ export function AutomationRulesPage() {
     },
   })
 
-  const rules = useMemo(() => rulesQuery.data?.items ?? [], [rulesQuery.data?.items])
+  const rules = useMemo(() => {
+    const items = rulesQuery.data?.items ?? []
+    if (!filters.search.trim()) return items
+    const term = filters.search.trim().toLowerCase()
+    return items.filter((rule) =>
+      [rule.name, rule.code, rule.description, formatRuleType(rule.ruleType)]
+        .join(' ')
+        .toLowerCase()
+        .includes(term),
+    )
+  }, [filters.search, rulesQuery.data?.items])
   const ruleTypes = useMemo(
     () =>
       Array.from(
@@ -93,27 +155,28 @@ export function AutomationRulesPage() {
       ).sort(),
     [rules],
   )
-  const activeCount = rules.filter((rule) => rule.active).length
-  const pausedCount = rules.filter((rule) => !rule.active).length
+  const activeCount = rules.filter((rule) => getRuleStatus(rule) === 'published').length
+  const pausedCount = rules.filter((rule) => getRuleStatus(rule) === 'paused').length
   const highPriority = rules.filter((rule) => rule.priority <= 20).length
 
   const applyFilters = () => {
     setPage(0)
-    setFilters({ active: activeInput, ruleType: ruleTypeInput })
+    setFilters({ active: activeInput, ruleType: ruleTypeInput, search: searchInput })
   }
 
   const clearFilters = () => {
     setPage(0)
+    setSearchInput('')
     setRuleTypeInput('')
     setActiveInput('')
-    setFilters({ active: '', ruleType: '' })
+    setFilters({ active: '', ruleType: '', search: '' })
   }
 
   return (
     <section className="space-y-4 overflow-hidden">
       <PageHeader
         actions={<Button onClick={() => navigate('/automation-rules/new')}>Crear regla</Button>}
-        description="Reglas reales del centro estético conectadas al servidor para que la IA responda según criterios de seguridad, negocio y operación."
+        description="Reglas del centro estético para que la IA responda según criterios de seguridad, negocio y operación."
         eyebrow="Reglas"
         title="Reglas de automatización e IA"
       />
@@ -124,9 +187,9 @@ export function AutomationRulesPage() {
           value={String(rulesQuery.data?.totalItems ?? 0)}
           tone="info"
         />
-        <MetricCard label="Activas" value={String(activeCount)} tone="success" />
+        <MetricCard label="Publicadas en esta página" value={String(activeCount)} tone="success" />
         <MetricCard
-          label="Desactivadas"
+          label="Pausadas en esta página"
           value={String(pausedCount)}
           tone={pausedCount > 0 ? 'warning' : 'success'}
         />
@@ -146,6 +209,16 @@ export function AutomationRulesPage() {
             </>
           }
         >
+          <label className="block">
+            <span className="mb-1.5 block text-sm font-medium text-slate-700">Búsqueda</span>
+            <input
+              className={fieldClassName}
+              onChange={(event) => setSearchInput(event.target.value)}
+              placeholder="Buscar por nombre, tipo o descripción"
+              type="search"
+              value={searchInput}
+            />
+          </label>
           <label className="block">
             <span className="mb-1.5 block text-sm font-medium text-slate-700">Tipo de regla</span>
             <select
@@ -169,8 +242,8 @@ export function AutomationRulesPage() {
               value={activeInput}
             >
               <option value="">Todos</option>
-              <option value="true">Activas</option>
-              <option value="false">Desactivadas</option>
+              <option value="true">Publicadas</option>
+              <option value="false">Pausadas o archivadas</option>
             </select>
           </label>
         </FilterBar>
@@ -182,12 +255,12 @@ export function AutomationRulesPage() {
         ) : null}
 
         {rulesQuery.isPending && !rulesQuery.data ? (
-          <LoadingState message="Cargando reglas reales del centro estético." variant="table" />
+          <LoadingState message="Cargando reglas del centro estético." variant="table" />
         ) : null}
 
         {rulesQuery.isError && !rulesQuery.data ? (
           <ErrorState
-            description="No fue posible cargar las reglas. Verifica el servidor y la base de datos."
+            description="No fue posible cargar las reglas. Reintenta en unos segundos."
             onRetry={() => void rulesQuery.refetch()}
             title="No fue posible cargar las reglas"
           />
@@ -203,7 +276,7 @@ export function AutomationRulesPage() {
 
         {rulesQuery.data ? (
           <div className="grid gap-3" data-testid="rules-list">
-            <div className="grid gap-2 rounded-[18px] border border-[var(--color-border)] bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 md:grid-cols-[minmax(0,1.1fr)_150px_90px_120px_minmax(0,1.2fr)_auto] md:items-center">
+            <div className="grid gap-2 rounded-[18px] border border-[var(--color-border)] bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 md:grid-cols-[minmax(0,1.1fr)_150px_90px_120px_minmax(0,1.4fr)_auto] md:items-center">
               <span>Regla</span>
               <span>Tipo</span>
               <span>Prioridad</span>
@@ -218,11 +291,12 @@ export function AutomationRulesPage() {
             ) : (
               rules.map((rule) => {
                 const active = isRegistroActivo(rule.active)
+                const lifecycleStatus = getRuleStatus(rule)
 
                 return (
                   <article
                     className={[
-                      'grid gap-3 rounded-[20px] border p-4 transition md:grid-cols-[minmax(0,1.1fr)_150px_90px_120px_minmax(0,1.2fr)_auto] md:items-center',
+                      'grid gap-3 rounded-[20px] border p-4 transition md:grid-cols-[minmax(0,1.1fr)_150px_90px_120px_minmax(0,1.4fr)_auto] md:items-start',
                       active
                         ? 'border-[var(--color-border)] bg-white'
                         : 'border-amber-200 bg-amber-50/70',
@@ -242,13 +316,20 @@ export function AutomationRulesPage() {
                     </p>
                     <p className="text-sm text-slate-700">Prioridad {rule.priority}</p>
                     <StatusBadge
-                      label={formatEstadoRegistro(rule.active)}
-                      tone={getRegistroTone(rule.active)}
+                      label={RULE_STATUS_LABELS[lifecycleStatus]}
+                      tone={getRuleStatusTone(lifecycleStatus)}
                     />
-                    <p className="line-clamp-2 text-sm leading-5 text-slate-700">
+                    <p className="text-sm leading-5 text-slate-700">
                       {rule.description}
                     </p>
                     <div className="flex flex-wrap justify-end gap-2">
+                      <Link
+                        className={buttonClassName({ size: 'sm', variant: 'secondary' })}
+                        title={`Probar ${rule.name}`}
+                        to={`/automation-rules/${rule.id}/test`}
+                      >
+                        Probar
+                      </Link>
                       {active ? (
                         <Link
                           className={buttonClassName({ size: 'sm', variant: 'secondary' })}
@@ -356,7 +437,7 @@ function MetricCard({
             {value}
           </p>
         </div>
-        <StatusBadge label="BD" tone={tone} />
+        <StatusBadge label="Actual" tone={tone} />
       </div>
     </Card>
   )

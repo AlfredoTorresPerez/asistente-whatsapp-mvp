@@ -13,7 +13,7 @@ import type {
   PublicServiceItemResponse,
 } from '../../../services/api/types'
 
-const API_BASE = 'http://localhost:8080/api/v1'
+const API_BASES = ['http://localhost:8080/api/v1', '/api/v1']
 const DAY = dayjs().add(20, 'day').format('YYYY-MM-DD')
 const DAY_LABEL = dayjs(DAY).format('DD/MM/YYYY')
 const DAY_2 = dayjs().add(27, 'day').format('YYYY-MM-DD')
@@ -150,19 +150,19 @@ beforeEach(() => {
     'fetch',
     vi.fn(async (url: RequestInfo | URL, init?: RequestInit) => {
       const str = typeof url === 'string' ? url : String(url)
-      if (str === `${API_BASE}/public/landing/whatsapp-entry`) {
+      if (matchesApiPath(str, '/public/landing/whatsapp-entry')) {
         return jsonResponse({})
       }
-      if (str === `${API_BASE}/public/landing/categories`) {
+      if (matchesApiPath(str, '/public/landing/categories')) {
         return jsonResponse(makeCategories())
       }
-      if (str === `${API_BASE}/public/landing/categories/FACIAL/services`) {
+      if (matchesApiPath(str, '/public/landing/categories/FACIAL/services')) {
         return jsonResponse(makeServices())
       }
-      if (str === `${API_BASE}/public/landing/services/svc-1/branches`) {
+      if (matchesApiPath(str, '/public/landing/services/svc-1/branches')) {
         return jsonResponse(makeBranches())
       }
-      if (str === `${API_BASE}/public/landing/availability`) {
+      if (matchesApiPath(str, '/public/landing/availability')) {
         if (availabilityStatus !== 200) {
           return jsonResponse({ message: 'Error interno' }, availabilityStatus)
         }
@@ -173,6 +173,10 @@ beforeEach(() => {
     }),
   )
 })
+
+function matchesApiPath(url: string, path: string) {
+  return API_BASES.some((base) => url === `${base}${path}`)
+}
 
 afterEach(() => {
   vi.unstubAllGlobals()

@@ -200,6 +200,15 @@ export function LeadDetailPage() {
 
               <Card className="space-y-2 bg-slate-50">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                  Sucursal
+                </p>
+                <p className="text-sm font-medium text-[var(--color-text)]">
+                  {leadQuery.data.locationName ?? 'Sin sucursal asignada'}
+                </p>
+              </Card>
+
+              <Card className="space-y-2 bg-slate-50">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                   Alta
                 </p>
                 <p className="text-sm font-medium text-[var(--color-text)]">

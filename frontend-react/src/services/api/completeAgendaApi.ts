@@ -7,6 +7,7 @@ import type {
   AgendaCalendarResponse,
   AgendaCancelRequest,
   AgendaFilterOptionsResponse,
+  AgendaLifecycleRequest,
   AgendaRescheduleRequest,
   BookingDetailResponse,
   BusinessHoursResponse,
@@ -73,6 +74,46 @@ export function rescheduleAgendaBookingRequest(
 
 export function cancelAgendaBookingRequest(bookingId: string, payload: AgendaCancelRequest) {
   return apiFetch<BookingDetailResponse>(`/agenda/bookings/${bookingId}/cancel`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  })
+}
+
+export function confirmAgendaBookingRequest(
+  bookingId: string,
+  payload: AgendaLifecycleRequest = {},
+) {
+  return apiFetch<BookingDetailResponse>(`/agenda/bookings/${bookingId}/confirm`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  })
+}
+
+export function startAgendaBookingServiceRequest(
+  bookingId: string,
+  payload: AgendaLifecycleRequest = {},
+) {
+  return apiFetch<BookingDetailResponse>(`/agenda/bookings/${bookingId}/start-service`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  })
+}
+
+export function completeAgendaBookingRequest(
+  bookingId: string,
+  payload: AgendaLifecycleRequest = {},
+) {
+  return apiFetch<BookingDetailResponse>(`/agenda/bookings/${bookingId}/complete`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  })
+}
+
+export function markAgendaBookingNoShowRequest(
+  bookingId: string,
+  payload: AgendaLifecycleRequest = {},
+) {
+  return apiFetch<BookingDetailResponse>(`/agenda/bookings/${bookingId}/mark-no-show`, {
     method: 'PATCH',
     body: JSON.stringify(payload),
   })

@@ -22,14 +22,8 @@ import {
   listAestheticServices,
   updateAestheticService,
 } from '../../../services/api/aestheticApi'
-import {
-  listCatalogCategories,
-  listCatalogProducts,
-  updateCatalogProductStatus,
-} from '../../../services/api/catalogEtapa8Api'
-import type { CatalogProductResponse, AestheticServiceResponse } from '../../../services/api/types'
+import type { AestheticServiceResponse } from '../../../services/api/types'
 
-type CatalogTab = 'services' | 'products'
 type ActiveFilter = '' | 'true' | 'false'
 
 type CatalogRow = {
@@ -41,8 +35,8 @@ type CatalogRow = {
   name: string
   price: number
   status: boolean
-  source: AestheticServiceResponse | CatalogProductResponse
-  type: 'Servicio' | 'Producto' | 'Producto · stock bajo'
+  source: AestheticServiceResponse
+  type: 'Servicio'
 }
 
 const fieldClassName =
@@ -72,25 +66,6 @@ function serviceToRow(service: AestheticServiceResponse): CatalogRow {
   }
 }
 
-function productToRow(product: CatalogProductResponse): CatalogRow {
-  return {
-    category: product.categoryName,
-    code: product.sku,
-    detail: `Stock ${product.stock} · mínimo ${product.stockMinimum}`,
-    href: `/catalog/products/${product.id}/edit`,
-    id: product.id,
-    name: product.name,
-    price: product.price,
-    source: product,
-    status: product.active,
-    type: product.lowStock ? 'Producto · stock bajo' : 'Producto',
-  }
-}
-
-function isServiceRow(row: CatalogRow): row is CatalogRow & { source: AestheticServiceResponse } {
-  return row.type === 'Servicio'
-}
-
 function buildServiceStatusRequest(service: AestheticServiceResponse, active: boolean) {
   return {
     active,
@@ -117,7 +92,6 @@ function buildServiceStatusRequest(service: AestheticServiceResponse, active: bo
 export function CatalogPage() {
   const queryClient = useQueryClient()
   const isOnline = useOnlineStatus()
-  const [tab, setTab] = useState<CatalogTab>('services')
   const [page, setPage] = useState(0)
   const [searchInput, setSearchInput] = useState('')
   const [activeInput, setActiveInput] = useState<ActiveFilter>('')
@@ -144,40 +118,15 @@ export function CatalogPage() {
     refetchInterval: isOnline ? 30_000 : false,
   })
 
-  const productsQuery = useQuery({
-    queryKey: ['catalog', 'products', page, filters],
-    queryFn: () =>
-      listCatalogProducts({
-        active: filters.active === '' ? undefined : filters.active === 'true',
-        categoryCode: filters.categoryCode || undefined,
-        page,
-        search: filters.search || undefined,
-        size: PAGE_SIZE,
-      }),
-    enabled: tab === 'products',
-    placeholderData: keepPreviousData,
-    refetchInterval: isOnline ? 30_000 : false,
-  })
-
   const serviceCategoriesQuery = useQuery({
     queryKey: ['aesthetic', 'service-categories'],
     queryFn: () => listAestheticServiceCategories({ active: true, size: 100 }),
   })
 
-  const productCategoriesQuery = useQuery({
-    queryKey: ['catalog', 'categories'],
-    queryFn: () => listCatalogCategories({ active: true, size: 100 }),
-    enabled: tab === 'products',
-  })
-
   const statusMutation = useMutation({
     mutationFn: async ({ active, row }: { row: CatalogRow; active: boolean }) => {
-      if (isServiceRow(row)) {
-        const service = row.source
-        return updateAestheticService(service.id, buildServiceStatusRequest(service, active))
-      }
-
-      return updateCatalogProductStatus(row.source.id, active)
+      const service = row.source
+      return updateAestheticService(service.id, buildServiceStatusRequest(service, active))
     },
     onError: (error) => {
       setInlineError(
@@ -195,24 +144,15 @@ export function CatalogPage() {
   })
 
   const services = useMemo(() => servicesQuery.data?.items ?? [], [servicesQuery.data?.items])
-  const products = useMemo(() => productsQuery.data?.items ?? [], [productsQuery.data?.items])
-  const currentQuery = tab === 'services' ? servicesQuery : productsQuery
-  const currentItems = tab === 'services' ? services.map(serviceToRow) : products.map(productToRow)
-  const categories =
-    tab === 'services'
-      ? (serviceCategoriesQuery.data?.items ?? [])
-      : (productCategoriesQuery.data?.items ?? [])
+  const currentQuery = servicesQuery
+  const currentItems = services.map(serviceToRow)
+  const categories = serviceCategoriesQuery.data?.items ?? []
 
   const metrics = useMemo(() => {
     const activeServices = services.filter((service) => service.active).length
-    const activeProducts = products.filter((product) => product.active).length
-    const lowStock = products.filter((product) => product.lowStock).length
-    const totalCategories = new Set([
-      ...services.map((service) => service.categoryCode),
-      ...products.map((product) => product.categoryCode),
-    ]).size
-    return { activeProducts, activeServices, lowStock, totalCategories }
-  }, [products, services])
+    const totalCategories = new Set(services.map((service) => service.categoryCode)).size
+    return { activeServices, totalCategories }
+  }, [services])
 
   const applyFilters = () => {
     setPage(0)
@@ -227,13 +167,6 @@ export function CatalogPage() {
     setFilters({ active: '', categoryCode: '', search: '' })
   }
 
-  const changeTab = (nextTab: CatalogTab) => {
-    setTab(nextTab)
-    setPage(0)
-    setCategoryInput('')
-    setFilters((current) => ({ ...current, categoryCode: '' }))
-  }
-
   return (
     <section className="space-y-4 overflow-hidden">
       <PageHeader
@@ -244,9 +177,9 @@ export function CatalogPage() {
             </Link>
           </>
         }
-        description="Catálogo real del centro estético conectado al servidor, con servicios, productos, precios, stock, categorías y estados editables."
-        eyebrow="Catálogo"
-        title="Catálogo de servicios y productos"
+        description="Administración de servicios del centro estético con precios, duración, categorías, cobertura y estados editables."
+        eyebrow="Servicios"
+        title="Servicios"
       />
 
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
@@ -343,14 +276,14 @@ export function CatalogPage() {
         ) : null}
 
         {currentQuery.isPending && !currentQuery.data ? (
-          <LoadingState message="Cargando catálogo real desde el servidor." variant="table" />
+          <LoadingState message="Cargando servicios del negocio." variant="table" />
         ) : null}
 
         {currentQuery.isError && !currentQuery.data ? (
           <ErrorState
-            description="No fue posible recuperar el catálogo. Verifica que el servidor este levantado y que las migraciones se hayan ejecutado."
+            description="No fue posible recuperar los servicios. Reintenta en unos segundos."
             onRetry={() => void currentQuery.refetch()}
-            title="No fue posible cargar el catálogo"
+            title="No fue posible cargar los servicios"
           />
         ) : null}
 
@@ -358,8 +291,8 @@ export function CatalogPage() {
           <EmptyState
             description="No hay elementos que coincidan con los filtros aplicados. Puedes crear uno nuevo desde las acciones superiores."
             primaryAction={{
-              label: tab === 'services' ? 'Crear servicio' : 'Crear producto',
-              to: tab === 'services' ? '/catalog/services/new' : '/catalog/products/new',
+              label: 'Crear servicio',
+              to: '/catalog/services/new',
             }}
             title="Catálogo sin resultados"
           />
@@ -479,7 +412,7 @@ export function CatalogPage() {
         confirmLoading={statusMutation.isPending}
         description={
           rowToToggle
-            ? `El ${rowToToggle.row.type.toLowerCase()} ${rowToToggle.row.name} quedara ${rowToToggle.active ? 'activo' : 'desactivado'}, pero no será eliminado físicamente.`
+            ? `El servicio ${rowToToggle.row.name} quedara ${rowToToggle.active ? 'activo' : 'desactivado'}, pero no será eliminado físicamente.`
             : 'Confirma el cambio de estado del item.'
         }
         onCancel={() => setRowToToggle(null)}
@@ -489,7 +422,7 @@ export function CatalogPage() {
           }
         }}
         open={Boolean(rowToToggle)}
-        title={rowToToggle?.active ? 'Activar item del catálogo' : 'Desactivar item del catálogo'}
+        title={rowToToggle?.active ? 'Activar servicio' : 'Desactivar servicio'}
         tone={rowToToggle?.active ? 'neutral' : 'danger'}
       />
     </section>
@@ -516,7 +449,7 @@ function MetricCard({
             {value}
           </p>
         </div>
-        <StatusBadge label="BD" tone={tone} />
+        <StatusBadge label="Vigente" tone={tone} />
       </div>
     </Card>
   )

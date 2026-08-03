@@ -160,8 +160,6 @@ describe('MultisiteOperationsPage - Summary (Resumen)', () => {
         'Conversaciones',
         'Prospectos',
         'Citas',
-        'Pedidos',
-        'Productos stock',
         'Profesionales',
       ])
     })
@@ -216,7 +214,7 @@ describe('MultisiteOperationsPage - Summary (Resumen)', () => {
       const zeroCells = Array.from(table.querySelectorAll('td')).filter(
         (td) => td.textContent === '0',
       )
-      expect(zeroCells.length).toBeGreaterThanOrEqual(5)
+      expect(zeroCells.length).toBeGreaterThanOrEqual(3)
     })
   })
 
@@ -372,7 +370,7 @@ describe('MultisiteOperationsPage - Catalog (Servicios por sede)', () => {
       expect(screen.getByRole('table')).toBeInTheDocument()
     })
 
-    await userEvent.click(screen.getByText('Catalogo y stock'))
+    await userEvent.click(screen.getByText('Servicios por sucursal'))
 
     await waitFor(() => {
       expect(screen.getByText('Servicios por sede')).toBeInTheDocument()
@@ -426,7 +424,7 @@ describe('MultisiteOperationsPage - Catalog (Servicios por sede)', () => {
       expect(screen.getByRole('table')).toBeInTheDocument()
     })
 
-    await userEvent.click(screen.getByText('Catalogo y stock'))
+    await userEvent.click(screen.getByText('Servicios por sucursal'))
 
     await waitFor(() => {
       const tables = screen.getAllByRole('table')
@@ -460,7 +458,7 @@ describe('MultisiteOperationsPage - Catalog (Servicios por sede)', () => {
       expect(screen.getByRole('table')).toBeInTheDocument()
     })
 
-    await userEvent.click(screen.getByText('Catalogo y stock'))
+    await userEvent.click(screen.getByText('Servicios por sucursal'))
 
     await waitFor(() => {
       expect(
@@ -491,7 +489,7 @@ describe('MultisiteOperationsPage - Catalog (Servicios por sede)', () => {
       expect(screen.getByRole('table')).toBeInTheDocument()
     })
 
-    await userEvent.click(screen.getByText('Catalogo y stock'))
+    await userEvent.click(screen.getByText('Servicios por sucursal'))
 
     await waitFor(() => {
       const tables = screen.getAllByRole('table')
@@ -523,7 +521,7 @@ describe('MultisiteOperationsPage - Catalog (Servicios por sede)', () => {
       expect(screen.getByRole('table')).toBeInTheDocument()
     })
 
-    await userEvent.click(screen.getByText('Catalogo y stock'))
+    await userEvent.click(screen.getByText('Servicios por sucursal'))
 
     await waitFor(() => {
       expect(screen.getByText('Servicios por sede')).toBeInTheDocument()
@@ -555,7 +553,7 @@ describe('MultisiteOperationsPage - Catalog (Servicios por sede)', () => {
       expect(screen.getByRole('table')).toBeInTheDocument()
     })
 
-    await userEvent.click(screen.getByText('Catalogo y stock'))
+    await userEvent.click(screen.getByText('Servicios por sucursal'))
 
     await waitFor(() => {
       const tables = screen.getAllByRole('table')

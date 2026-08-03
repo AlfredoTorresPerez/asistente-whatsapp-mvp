@@ -14,15 +14,21 @@ public class PasswordPolicyService {
 	private static final Pattern UPPERCASE_PATTERN = Pattern.compile(".*[A-Z].*");
 	private static final Pattern NUMBER_PATTERN = Pattern.compile(".*\\d.*");
 	private static final Pattern SYMBOL_PATTERN = Pattern.compile(".*[^A-Za-z0-9].*");
+	private static final java.util.Set<String> COMMON_PASSWORDS = java.util.Set.of("12345678", "123456789", "password",
+			"password1", "qwerty123", "admin1234", "changeme", "bienvenido", "contraseña", "contrasena",
+			"asistente123");
 
 	public void validateNewPassword(String newPassword, SecurityPolicyEntity securityPolicy) {
 		Map<String, String> fieldErrors = new LinkedHashMap<>();
+		String normalizedPassword = newPassword.trim().toLowerCase();
 
 		if (newPassword.length() < securityPolicy.getPasswordMinLength()) {
 			fieldErrors.put("newPassword", "La nueva contrasena debe tener al menos %d caracteres."
 					.formatted(securityPolicy.getPasswordMinLength()));
 		} else if (newPassword.length() > 72) {
 			fieldErrors.put("newPassword", "La nueva contrasena no puede superar 72 caracteres.");
+		} else if (COMMON_PASSWORDS.contains(normalizedPassword)) {
+			fieldErrors.put("newPassword", "La nueva contrasena es demasiado comun. Usa una diferente.");
 		} else if (securityPolicy.isRequireUppercase() && !UPPERCASE_PATTERN.matcher(newPassword).matches()) {
 			fieldErrors.put("newPassword", "La nueva contrasena debe incluir al menos una mayuscula.");
 		} else if (securityPolicy.isRequireNumber() && !NUMBER_PATTERN.matcher(newPassword).matches()) {

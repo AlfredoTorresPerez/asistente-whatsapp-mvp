@@ -3,6 +3,7 @@ import { Button } from '../../../components/ui/Button'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { Textarea } from '../../../components/ui/Textarea'
 import type { AgendaCalendarItemResponse, BookingDetailResponse } from '../../../services/api/types'
+import { normalizeBookingStatus } from '../../bookings/bookingOptions'
 import { formatLongDate, formatTimeRange, getStatusLabel, getStatusStyle } from './agendaUtils'
 
 function getInitials(name: string) {
@@ -57,11 +58,16 @@ type AppointmentDetailPanelProps = {
   cancelReason: string
   onCancelReasonChange: (value: string) => void
   onConfirmWhatsApp: (bookingId: string) => void
+  onConfirmBooking: (bookingId: string) => void
+  onStartService: (bookingId: string) => void
+  onCompleteBooking: (bookingId: string) => void
+  onMarkNoShow: (bookingId: string) => void
   onCancel: (bookingId: string) => void
   onReschedule: (bookingId: string) => void
   onViewHistory: (bookingId: string) => void
   onEditNotes: (bookingId: string) => void
   confirmWhatsAppPending: boolean
+  lifecyclePending: boolean
   cancelPending: boolean
 }
 
@@ -72,14 +78,29 @@ export function AppointmentDetailPanel({
   cancelReason,
   onCancelReasonChange,
   onConfirmWhatsApp,
+  onConfirmBooking,
+  onStartService,
+  onCompleteBooking,
+  onMarkNoShow,
   onCancel,
   onReschedule,
   onViewHistory,
   onEditNotes,
   confirmWhatsAppPending,
+  lifecyclePending,
   cancelPending,
 }: AppointmentDetailPanelProps) {
   const selectedStatusStyle = getStatusStyle(selectedItem?.status ?? bookingDetail?.status ?? '')
+  const currentStatus = normalizeBookingStatus(selectedItem?.status ?? bookingDetail?.status)
+  const canConfirm = ['SOLICITADA', 'PENDIENTE_CONFIRMACION', 'PENDIENTE_PAGO'].includes(
+    currentStatus,
+  )
+  const canStart = ['CONFIRMADA', 'REPROGRAMADA'].includes(currentStatus)
+  const canComplete = ['CONFIRMADA', 'REPROGRAMADA', 'EN_ATENCION'].includes(currentStatus)
+  const canMarkNoShow = ['CONFIRMADA', 'REPROGRAMADA'].includes(currentStatus)
+  const canChange = !['CANCELADA', 'CANCELADA_POR_CLIENTE', 'COMPLETADA', 'NO_ASISTE', 'EXPIRADA'].includes(
+    currentStatus,
+  )
 
   if (!selectedItem) {
     return (
@@ -185,23 +206,59 @@ export function AppointmentDetailPanel({
       </div>
 
       <div className="space-y-2.5">
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            disabled={!canConfirm || lifecyclePending}
+            fullWidth
+            loading={lifecyclePending}
+            onClick={() => onConfirmBooking(selectedItem.bookingId)}
+          >
+            Confirmar
+          </Button>
+          <Button
+            disabled={!canStart || lifecyclePending}
+            fullWidth
+            onClick={() => onStartService(selectedItem.bookingId)}
+            variant="secondary"
+          >
+            Iniciar atención
+          </Button>
+          <Button
+            disabled={!canComplete || lifecyclePending}
+            fullWidth
+            onClick={() => onCompleteBooking(selectedItem.bookingId)}
+            variant="secondary"
+          >
+            Completar
+          </Button>
+          <Button
+            disabled={!canMarkNoShow || lifecyclePending}
+            fullWidth
+            onClick={() => onMarkNoShow(selectedItem.bookingId)}
+            variant="secondary"
+          >
+            Inasistencia
+          </Button>
+        </div>
         <Button
           className="bg-emerald-600 hover:bg-emerald-700"
+          disabled={!canChange}
           fullWidth
           loading={confirmWhatsAppPending}
           onClick={() => onConfirmWhatsApp(selectedItem.bookingId)}
         >
-          Confirmar por WhatsApp
+          Enviar solicitud por WhatsApp
         </Button>
         <div className="grid grid-cols-2 gap-2">
           <Button
+            disabled={!canChange}
             fullWidth
             onClick={() => onReschedule(selectedItem.bookingId)}
             variant="secondary"
           >
             Reprogramar
           </Button>
-          <Button fullWidth onClick={() => onEditNotes(selectedItem.bookingId)} variant="secondary">
+          <Button disabled={!canChange} fullWidth onClick={() => onEditNotes(selectedItem.bookingId)} variant="secondary">
             Editar notas
           </Button>
         </div>
@@ -222,7 +279,7 @@ export function AppointmentDetailPanel({
           value={cancelReason}
         />
         <Button
-          disabled={cancelReason.trim().length < 5}
+          disabled={!canChange || cancelReason.trim().length < 5}
           fullWidth
           loading={cancelPending}
           onClick={() => onCancel(selectedItem.bookingId)}

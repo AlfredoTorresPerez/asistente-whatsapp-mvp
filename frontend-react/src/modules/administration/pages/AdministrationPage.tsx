@@ -110,7 +110,7 @@ export function AdministrationPage() {
               }
               label="Canal de WhatsApp"
               value="Canal activo"
-              note="Conexion por proveedor simulado o Cloud API segun configuracion del ambiente."
+              note="Conexion segun la configuracion vigente del canal."
             />
             <SummaryCard
               label="Timeout de sesion"
@@ -191,7 +191,7 @@ function AdminAreaTabs({
       value: 'locations',
     },
     {
-      description: 'Catalogo, stock, horarios, permisos y canales por sede',
+      description: 'Servicios, horarios, permisos y canales por sede',
       label: 'Operacion multisede',
       value: 'multisite',
     },
@@ -298,7 +298,7 @@ function MultisiteAdminPanel() {
             Operacion multisede completa
           </h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-            Controla disponibilidad de catalogo, stock, profesionales, horarios, permisos de usuario
+            Controla disponibilidad de servicios, profesionales, horarios, permisos de usuario
             y canales WhatsApp por sede.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
@@ -312,7 +312,7 @@ function MultisiteAdminPanel() {
             Cobertura
           </p>
           <ul className="mt-4 space-y-2 text-sm text-slate-700">
-            <li>Catalogo y stock por sede</li>
+            <li>Servicios por sucursal</li>
             <li>Profesionales y horarios por sede</li>
             <li>Permisos y canales por sede</li>
           </ul>
@@ -364,8 +364,8 @@ function WhatsAppAdminPanel({ status }: { status: string }) {
           </div>
           <h2 className="mt-3 text-xl font-semibold text-slate-950">Canal de WhatsApp</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-            Controla el estado del canal, reconexion y pruebas de envio. Opera con proveedor
-            simulado para desarrollo o con Cloud API de Meta para produccion.
+            Controla el estado del canal, reconexion y pruebas de envio segun la configuracion
+            vigente del negocio.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link to="/admin/whatsapp-channel">
@@ -379,8 +379,7 @@ function WhatsAppAdminPanel({ status }: { status: string }) {
           </p>
           <p className="mt-4 text-2xl font-semibold text-slate-950">{toWhatsAppChannelLabel(status)}</p>
           <p className="mt-2 text-sm leading-6 text-slate-700">
-            Para produccion, prioriza Cloud API o modo de simulacion controlado segun configuracion
-            del ambiente.
+            Prioriza una configuracion trazable, con controles de envio y detencion inmediata.
           </p>
         </div>
       </div>

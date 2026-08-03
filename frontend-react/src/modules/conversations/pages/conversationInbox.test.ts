@@ -43,8 +43,10 @@ describe('conversation inbox helpers', () => {
   ]
 
   it('translates technical statuses to Spanish labels', () => {
-    expect(translateConversationStatus('UNREAD')).toBe('No leido')
-    expect(translateConversationStatus('IN_PROGRESS')).toBe('En progreso')
+    expect(translateConversationStatus('UNREAD')).toBe('Pendiente del negocio')
+    expect(translateConversationStatus('IN_PROGRESS')).toBe('Abierta')
+    expect(translateConversationStatus('PENDING_CUSTOMER')).toBe('Pendiente del cliente')
+    expect(translateConversationStatus('RESOLVED')).toBe('Resuelta')
     expect(translateConversationStatus('UNKNOWN_STATUS')).toBe('Sin clasificar')
   })
 

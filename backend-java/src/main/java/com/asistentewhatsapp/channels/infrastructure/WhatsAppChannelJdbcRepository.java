@@ -220,6 +220,30 @@ public class WhatsAppChannelJdbcRepository {
 		return count == null ? 0 : count;
 	}
 
+	public Optional<OffsetDateTime> findLastMessageAt(UUID businessId, String direction) {
+		List<OffsetDateTime> items = jdbcTemplate.query("""
+				select coalesce(received_at, sent_at, created_at) as occurred_at
+				from message
+				where business_id = ?
+				  and direction = ?
+				order by coalesce(received_at, sent_at, created_at) desc
+				limit 1
+				""", (resultSet, rowNum) -> resultSet.getObject("occurred_at", OffsetDateTime.class), businessId,
+				direction);
+		return items.stream().findFirst();
+	}
+
+	public int countRecentDeliveryStatus(UUID businessId, String deliveryStatus, int lastMinutes) {
+		Integer count = jdbcTemplate.queryForObject("""
+				select count(*)
+				from message_delivery_log
+				where business_id = ?
+				  and delivery_status = ?
+				  and occurred_at > current_timestamp - (? || ' minutes')::interval
+				""", Integer.class, businessId, deliveryStatus, lastMinutes);
+		return count == null ? 0 : count;
+	}
+
 	public Optional<String> findPhoneNumberIdByBusinessId(UUID businessId) {
 		List<String> items = jdbcTemplate.query("""
 				select phone_number_id from channel_account

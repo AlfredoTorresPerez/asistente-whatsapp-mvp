@@ -19,6 +19,20 @@ import type { SecurityPolicyRequest, SecurityPolicyResponse } from '../../../ser
 
 type PolicyForm = SecurityPolicyRequest
 
+const permissionMatrix = [
+  { module: 'Panel principal', actions: 'Ver' },
+  { module: 'Conversaciones', actions: 'Ver, crear, editar, administrar, enviar' },
+  { module: 'Prospectos', actions: 'Ver, crear, editar, eliminar, exportar' },
+  { module: 'Agenda', actions: 'Ver, crear, editar, aprobar, administrar' },
+  { module: 'Citas', actions: 'Ver, crear, editar, cancelar, reprogramar, exportar' },
+  { module: 'Catalogo', actions: 'Ver, crear, editar, eliminar, administrar' },
+  { module: 'Reportes', actions: 'Ver, exportar' },
+  { module: 'Inteligencia artificial', actions: 'Ver, probar, revisar, enviar, administrar' },
+  { module: 'Administracion', actions: 'Ver, administrar' },
+  { module: 'Usuarios', actions: 'Ver, crear, editar, administrar' },
+  { module: 'Seguridad', actions: 'Ver, administrar' },
+]
+
 function toPolicyForm(policy: SecurityPolicyResponse): PolicyForm {
   return {
     maxFailedLoginAttempts: policy.maxFailedLoginAttempts,
@@ -177,6 +191,24 @@ function SecurityPolicyForm({ policy }: { policy: SecurityPolicyResponse }) {
             />
           </div>
 
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            <ControlCard
+              label="Contrasenas comunes"
+              value="Bloqueadas"
+              tone="success"
+            />
+            <ControlCard
+              label="MFA perfiles privilegiados"
+              value="Requerido"
+              tone="warning"
+            />
+            <ControlCard
+              label="Revocacion de sesiones"
+              value="Disponible"
+              tone="info"
+            />
+          </div>
+
           {formError ? (
             <div className="mt-5 rounded-[18px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {formError}
@@ -211,9 +243,58 @@ function SecurityPolicyForm({ policy }: { policy: SecurityPolicyResponse }) {
                   .join(', ') || 'basicas'
               }
             />
+            <SecurityLine label="Bloqueo temporal" value="Activo por politica de acceso" />
+            <SecurityLine label="Auditoria" value="Cambios administrativos registrados" />
           </div>
         </Card>
       </div>
+
+      <Card className="overflow-hidden p-0">
+        <div className="border-b border-[var(--color-border)] bg-slate-50 px-5 py-4">
+          <p className="text-lg font-semibold text-slate-950">Matriz de permisos por modulo</p>
+          <p className="mt-1 text-sm text-slate-600">
+            Referencia operativa para rol, excepciones por sucursal y permisos efectivos.
+          </p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full border-separate border-spacing-0">
+            <thead>
+              <tr className="bg-white">
+                {['Modulo', 'Permisos minimos', 'Origen', 'Excepciones', 'Efectivo'].map((column) => (
+                  <th
+                    key={column}
+                    className="border-b border-[var(--color-border)] px-5 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500"
+                    scope="col"
+                  >
+                    {column}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="bg-white">
+              {permissionMatrix.map((item) => (
+                <tr key={item.module}>
+                  <td className="border-b border-[var(--color-border)] px-5 py-4 text-sm font-semibold text-slate-950">
+                    {item.module}
+                  </td>
+                  <td className="border-b border-[var(--color-border)] px-5 py-4 text-sm text-slate-700">
+                    {item.actions}
+                  </td>
+                  <td className="border-b border-[var(--color-border)] px-5 py-4">
+                    <StatusBadge label="Rol" tone="info" />
+                  </td>
+                  <td className="border-b border-[var(--color-border)] px-5 py-4">
+                    <StatusBadge label="Sucursal" tone="neutral" />
+                  </td>
+                  <td className="border-b border-[var(--color-border)] px-5 py-4">
+                    <StatusBadge label="Calculado" tone="success" />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
     </section>
   )
 }
@@ -257,6 +338,25 @@ function CheckboxCard({
       />
       {label}
     </label>
+  )
+}
+
+function ControlCard({
+  label,
+  tone,
+  value,
+}: {
+  label: string
+  tone: 'success' | 'warning' | 'info'
+  value: string
+}) {
+  return (
+    <div className="rounded-[18px] border border-[var(--color-border)] bg-slate-50 px-4 py-4">
+      <p className="text-sm font-medium text-slate-500">{label}</p>
+      <div className="mt-3">
+        <StatusBadge label={value} tone={tone} />
+      </div>
+    </div>
   )
 }
 

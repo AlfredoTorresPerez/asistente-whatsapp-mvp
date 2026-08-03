@@ -4,7 +4,6 @@ type Props = {
   open: boolean
   onClose: () => void
   services: { name: string }[]
-  products: { name: string }[]
   rules: { name: string }[]
 }
 
@@ -30,19 +29,15 @@ function KnowledgeColumn({ title, items }: { title: string; items: string[] }) {
   )
 }
 
-export function KnowledgeBaseModal({ open, onClose, services, products, rules }: Props) {
+export function KnowledgeBaseModal({ open, onClose, services, rules }: Props) {
   return (
     <Modal maxWidthClassName="max-w-[980px]" onClose={onClose} open={open}>
       <div className="p-6">
         <h2 className="mb-4 text-lg font-semibold">Base de conocimiento completa</h2>
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid gap-6 md:grid-cols-2">
           <KnowledgeColumn
             title="Servicios"
             items={services.map((s) => s.name)}
-          />
-          <KnowledgeColumn
-            title="Productos"
-            items={products.map((p) => p.name)}
           />
           <KnowledgeColumn
             title="Reglas"

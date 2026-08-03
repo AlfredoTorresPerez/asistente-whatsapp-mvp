@@ -17,6 +17,10 @@ import {
 import { ApiClientError } from '../../../services/api/httpClient'
 import type { CustomerBookingItemResponse } from '../../../services/api/types'
 import type { UseMutationResult } from '@tanstack/react-query'
+import {
+  getBookingStatusLabel,
+  normalizeBookingStatus,
+} from '../bookingOptions'
 
 type RescheduleDraft = {
   serviceId: string
@@ -35,13 +39,14 @@ function getErrorMessage(error: unknown, fallback: string) {
 }
 
 function statusTone(status: string) {
-  const s = status.toUpperCase()
-  if (['CONFIRMED', 'CONFIRMADA'].includes(s)) return 'bg-emerald-100 text-emerald-800'
-  if (['PENDING', 'PENDIENTE', 'RESERVED', 'RESERVADA'].includes(s))
+  const s = normalizeBookingStatus(status)
+  if (['CONFIRMADA', 'COMPLETADA'].includes(s)) return 'bg-emerald-100 text-emerald-800'
+  if (['SOLICITADA', 'PENDIENTE_CONFIRMACION', 'PENDIENTE_PAGO'].includes(s))
     return 'bg-amber-100 text-amber-800'
-  if (['CANCELADA', 'CANCELLED', 'NO_SHOW', 'EXPIRADA'].includes(s))
+  if (['CANCELADA', 'CANCELADA_POR_CLIENTE', 'NO_ASISTE', 'EXPIRADA'].includes(s))
     return 'bg-red-100 text-red-800'
-  if (['RESCHEDULED', 'REPROGRAMADA'].includes(s)) return 'bg-blue-100 text-blue-800'
+  if (['EN_ATENCION', 'REPROGRAMADA', 'REPROGRAMACION_PENDIENTE'].includes(s))
+    return 'bg-blue-100 text-blue-800'
   return 'bg-slate-100 text-slate-800'
 }
 
@@ -565,7 +570,7 @@ function BookingCard({
                 statusTone(booking.status),
               ].join(' ')}
             >
-              {booking.status}
+              {getBookingStatusLabel(booking.status)}
             </span>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -588,7 +593,6 @@ function BookingCard({
           <Info label="Duracion" value={`${booking.durationMinutes} minutos`} />
           <Info label="Sucursal" value={booking.locationName ?? 'Por confirmar'} />
           <Info label="Profesional" value={booking.professionalName ?? 'Por asignar'} />
-          <Info label="Reserva" value={booking.bookingId} />
         </div>
 
         {isCancelling ? (

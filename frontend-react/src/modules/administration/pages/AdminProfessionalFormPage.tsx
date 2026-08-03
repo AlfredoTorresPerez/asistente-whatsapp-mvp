@@ -33,6 +33,8 @@ type FormState = {
   locationIds: string[]
 }
 
+const DEFAULT_COLOR = '#0EA5E9'
+
 function toInitialForm(p?: ProfessionalResponse): FormState {
   return {
     fullName: p?.fullName ?? '',
@@ -41,7 +43,7 @@ function toInitialForm(p?: ProfessionalResponse): FormState {
     email: p?.email ?? '',
     phone: p?.phone ?? '',
     description: p?.description ?? '',
-    color: p?.color ?? '',
+    color: p?.color ?? DEFAULT_COLOR,
     maxDailyBookings: p?.maxDailyBookings != null ? String(p.maxDailyBookings) : '',
     qualificationLevel: p?.qualificationLevel != null ? String(p.qualificationLevel) : '',
     certificationRef: p?.certificationRef ?? '',
@@ -217,13 +219,21 @@ function AdminProfessionalForm({
             onChange={(event) => setForm({ ...form, phone: event.target.value })}
             value={form.phone}
           />
-          <Input
-            label="Color"
-            hint="Hex: #E8F4FD"
-            onChange={(event) => setForm({ ...form, color: event.target.value })}
-            placeholder="#"
-            value={form.color}
-          />
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              Color en agenda
+            </label>
+            <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2.5">
+              <input
+                aria-label="Seleccionar color del profesional"
+                className="h-10 w-12 cursor-pointer rounded-lg border border-slate-200 bg-white p-1"
+                onChange={(event) => setForm({ ...form, color: event.target.value })}
+                type="color"
+                value={form.color || DEFAULT_COLOR}
+              />
+              <span className="text-sm text-slate-600">Selecciona el color visible en agenda</span>
+            </div>
+          </div>
           <Input
             label="Cupo diario maximo"
             hint="Reservas por dia (opcional)"

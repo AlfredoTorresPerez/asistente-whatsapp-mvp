@@ -11,15 +11,39 @@ public final class BookingStateMachine {
 	public static final String PENDING_CONFIRMATION = "PENDIENTE_CONFIRMACION";
 	public static final String PENDING_PAYMENT = "PENDIENTE_PAGO";
 	public static final String CONFIRMED = "CONFIRMADA";
+	public static final String IN_SERVICE = "EN_ATENCION";
 	public static final String RESCHEDULE_PENDING = "REPROGRAMACION_PENDIENTE";
 	public static final String RESCHEDULED = "REPROGRAMADA";
 	public static final String CANCELLED = "CANCELADA";
 	public static final String CANCELLED_BY_CUSTOMER = "CANCELADA_POR_CLIENTE";
 	public static final String EXPIRED = "EXPIRADA";
-	public static final String ATTENDED = "ATENDIDA";
+	public static final String COMPLETED = "COMPLETADA";
+	public static final String ATTENDED = COMPLETED;
 	public static final String NO_SHOW = "NO_ASISTE";
 
 	private BookingStateMachine() {
+	}
+
+	public static String label(String status) {
+		String canonical = canonical(status);
+		if (canonical == null) {
+			return "Sin estado";
+		}
+		return switch (canonical) {
+			case REQUESTED -> "Solicitada";
+			case PENDING_CONFIRMATION -> "Pendiente de confirmación";
+			case PENDING_PAYMENT -> "Pendiente de pago";
+			case CONFIRMED -> "Confirmada";
+			case IN_SERVICE -> "En atención";
+			case RESCHEDULE_PENDING -> "Reprogramación pendiente";
+			case RESCHEDULED -> "Reprogramada";
+			case CANCELLED -> "Cancelada";
+			case CANCELLED_BY_CUSTOMER -> "Cancelada por cliente";
+			case EXPIRED -> "Expirada";
+			case COMPLETED -> "Completada";
+			case NO_SHOW -> "No asistió";
+			default -> canonical != null ? canonical : "Sin estado";
+		};
 	}
 
 	public static String canonical(String status) {
@@ -31,12 +55,13 @@ public final class BookingStateMachine {
 			case "TEMPORARY", "TEMPORAL", "PENDIENTE_CONFIRMACION" -> PENDING_CONFIRMATION;
 			case "PENDING_PAYMENT", "PENDIENTE_PAGO" -> PENDING_PAYMENT;
 			case "CONFIRMED", "CONFIRMADA" -> CONFIRMED;
+			case "IN_PROGRESS", "EN_ATENCION", "EN_ATENCIÓN" -> IN_SERVICE;
 			case "RESCHEDULE_PENDING", "REPROGRAMACION_PENDIENTE" -> RESCHEDULE_PENDING;
 			case "RESCHEDULED", "REPROGRAMADA" -> RESCHEDULED;
 			case "CANCELLED", "CANCELED", "CANCELADA" -> CANCELLED;
 			case "CANCELLED_BY_CUSTOMER", "CANCELADA_POR_CLIENTE" -> CANCELLED_BY_CUSTOMER;
 			case "EXPIRED", "RELEASED", "LIBERADA", "EXPIRADA" -> EXPIRED;
-			case "COMPLETED", "ATTENDED", "ATENDIDA" -> ATTENDED;
+			case "COMPLETED", "COMPLETADA", "ATTENDED", "ATENDIDA" -> COMPLETED;
 			case "NO_SHOW", "NO_ASISTE" -> NO_SHOW;
 			default -> status.trim().toUpperCase(Locale.ROOT);
 		};
@@ -78,7 +103,7 @@ public final class BookingStateMachine {
 	public static boolean isClosed(String status) {
 		String current = canonical(status);
 		return CANCELLED.equals(current) || CANCELLED_BY_CUSTOMER.equals(current) || EXPIRED.equals(current)
-				|| ATTENDED.equals(current) || NO_SHOW.equals(current);
+				|| COMPLETED.equals(current) || NO_SHOW.equals(current);
 	}
 
 	private static boolean isOpen(String status) {
@@ -104,6 +129,7 @@ public final class BookingStateMachine {
 			case PENDING_PAYMENT -> REQUESTED.equals(current) || PENDING_CONFIRMATION.equals(current);
 			case CONFIRMED ->
 				REQUESTED.equals(current) || PENDING_CONFIRMATION.equals(current) || PENDING_PAYMENT.equals(current);
+			case IN_SERVICE -> CONFIRMED.equals(current) || RESCHEDULED.equals(current);
 			case RESCHEDULE_PENDING -> CONFIRMED.equals(current) || RESCHEDULED.equals(current);
 			case RESCHEDULED -> REQUESTED.equals(current) || PENDING_CONFIRMATION.equals(current)
 					|| PENDING_PAYMENT.equals(current) || CONFIRMED.equals(current)
@@ -116,7 +142,8 @@ public final class BookingStateMachine {
 					|| RESCHEDULE_PENDING.equals(current) || RESCHEDULED.equals(current);
 			case EXPIRED ->
 				REQUESTED.equals(current) || PENDING_CONFIRMATION.equals(current) || PENDING_PAYMENT.equals(current);
-			case ATTENDED, NO_SHOW -> CONFIRMED.equals(current) || RESCHEDULED.equals(current);
+			case COMPLETED -> CONFIRMED.equals(current) || RESCHEDULED.equals(current) || IN_SERVICE.equals(current);
+			case NO_SHOW -> CONFIRMED.equals(current) || RESCHEDULED.equals(current);
 			default -> false;
 		};
 	}

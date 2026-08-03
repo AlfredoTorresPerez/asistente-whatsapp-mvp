@@ -27,20 +27,20 @@ export const conversationInboxCategories: Array<{ key: ConversationInboxCategory
 export function translateConversationStatus(status: string | null | undefined) {
   const normalized = (status ?? '').toUpperCase()
   const labels: Record<string, string> = {
-    UNREAD: 'No leido',
-    IN_PROGRESS: 'En progreso',
-    PENDING: 'Pendiente',
-    RESOLVED: 'Resuelto',
-    ARCHIVED: 'Archivado',
-    OPEN: 'Abierto',
-    CLOSED: 'Cerrado',
-    ASSIGNED: 'Asignado',
+    UNREAD: 'Pendiente del negocio',
+    IN_PROGRESS: 'Abierta',
+    PENDING: 'Pendiente del negocio',
+    PENDING_CUSTOMER: 'Pendiente del cliente',
+    PENDING_BUSINESS: 'Pendiente del negocio',
+    RESOLVED: 'Resuelta',
+    ARCHIVED: 'Archivada',
+    OPEN: 'Abierta',
+    CLOSED: 'Resuelta',
+    ASSIGNED: 'Abierta',
     SENT: 'Enviado',
     FAILED: 'Fallido',
     DELIVERED: 'Entregado',
     READ: 'Leido',
-    SIMULATED: 'Simulado',
-    DRY_RUN: 'Simulacion',
   }
 
   return labels[normalized] ?? 'Sin clasificar'
@@ -108,7 +108,7 @@ export function translateCustomerTag(tag: ConversationCustomerTag) {
     NEW: 'Nuevo',
     CUSTOMER: 'Cliente',
     VIP: 'VIP',
-    LEAD: 'Lead',
+    LEAD: 'Prospecto',
     UNKNOWN: 'Sin clasificar',
   }
 

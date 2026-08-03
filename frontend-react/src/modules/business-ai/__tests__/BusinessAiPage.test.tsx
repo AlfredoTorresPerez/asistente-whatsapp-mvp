@@ -51,7 +51,7 @@ const defaultSettings = {
   allowBooking: true,
   allowPromotions: false,
   requireAvailabilityCheck: true,
-  allowedTopics: ['Servicios', 'Productos', 'Citas'],
+  allowedTopics: ['Servicios', 'Citas'],
   blockedTopics: ['Diagnosticos medicos', 'Temas legales'],
   updatedAt: '2026-07-30T15:00:00Z',
   activePromptVersion: 1,
@@ -393,8 +393,8 @@ describe('BusinessAiPage', () => {
       expect(screen.getByText('Preparación del asistente')).toBeTruthy()
     })
     expect(screen.getByText(/de 10 verificaciones correctas/)).toBeTruthy()
-    expect(screen.getByText('Servicios sin precio')).toBeTruthy()
-    expect(screen.getByText('Sucursales sin horario')).toBeTruthy()
+    expect(screen.getByText('Todos los servicios tienen precio')).toBeTruthy()
+    expect(screen.getByText('Todas las sucursales tienen horario')).toBeTruthy()
   })
 
   it('shows warnings for services without price', async () => {
@@ -411,7 +411,7 @@ describe('BusinessAiPage', () => {
     renderPage()
     await userEvent.click(await screen.findByRole('button', { name: 'Información del negocio' }))
     await waitFor(() => {
-      expect(screen.getAllByText(/sin precio/).length).toBeGreaterThanOrEqual(1)
+      expect(screen.getAllByText(/requiere precio/).length).toBeGreaterThanOrEqual(1)
     })
   })
 
@@ -449,7 +449,7 @@ describe('BusinessAiPage', () => {
     renderPage()
     await userEvent.click(await screen.findByRole('button', { name: 'Información del negocio' }))
     await waitFor(() => {
-      expect(screen.getAllByText(/sin dirección/).length).toBeGreaterThanOrEqual(1)
+      expect(screen.getAllByText(/requiere dirección/).length).toBeGreaterThanOrEqual(1)
     })
   })
 

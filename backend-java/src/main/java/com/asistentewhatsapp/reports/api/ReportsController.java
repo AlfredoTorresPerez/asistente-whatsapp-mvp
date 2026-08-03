@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +34,19 @@ public class ReportsController {
 			@RequestParam(required = false) UUID ownerUserId, @RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "20") int size) {
 		return reportsService.getSummary(authenticatedUser, from, to, locationId, professionalId, serviceId,
+				bookingStatus, ownerUserId, page, size);
+	}
+
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'REPORTS_VIEW')")
+	@GetMapping(value = "/api/v1/reports/summary.csv", produces = "text/csv;charset=UTF-8")
+	public ResponseEntity<byte[]> exportCsv(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+			@RequestParam(required = false) UUID locationId, @RequestParam(required = false) UUID professionalId,
+			@RequestParam(required = false) UUID serviceId, @RequestParam(required = false) String bookingStatus,
+			@RequestParam(required = false) UUID ownerUserId, @RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "500") int size) {
+		return reportsService.exportCsv(authenticatedUser, from, to, locationId, professionalId, serviceId,
 				bookingStatus, ownerUserId, page, size);
 	}
 }

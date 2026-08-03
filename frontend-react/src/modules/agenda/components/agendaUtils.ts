@@ -297,6 +297,20 @@ const statusColorMap: Record<
     hex: '#10b981',
     label: 'Confirmada',
   },
+  EN_ATENCION: {
+    bar: 'bg-cyan-500',
+    bg: 'bg-cyan-50',
+    text: 'text-cyan-900',
+    hex: '#06b6d4',
+    label: 'En atencion',
+  },
+  IN_PROGRESS: {
+    bar: 'bg-cyan-500',
+    bg: 'bg-cyan-50',
+    text: 'text-cyan-900',
+    hex: '#06b6d4',
+    label: 'En atencion',
+  },
   PENDIENTE_CONFIRMACION: {
     bar: 'bg-amber-400',
     bg: 'bg-amber-50',
@@ -353,12 +367,19 @@ const statusColorMap: Record<
     hex: '#94a3b8',
     label: 'Completada',
   },
+  COMPLETADA: {
+    bar: 'bg-slate-400',
+    bg: 'bg-slate-50',
+    text: 'text-slate-800',
+    hex: '#94a3b8',
+    label: 'Completada',
+  },
   ATENDIDA: {
     bar: 'bg-slate-400',
     bg: 'bg-slate-50',
     text: 'text-slate-800',
     hex: '#94a3b8',
-    label: 'Atendida',
+    label: 'Completada',
   },
   NO_SHOW: {
     bar: 'bg-orange-400',

@@ -15,6 +15,7 @@ import { Textarea } from '../../../components/ui/Textarea'
 import { useShellSession } from '../../../lib/shellSession'
 import { useToast } from '../../../lib/toast'
 import { useOnlineStatus } from '../../../lib/useOnlineStatus'
+import { getBusinessLocationsRequest } from '../../../services/api/businessLocationsApi'
 import { getLeadDetailRequest, updateLeadRequest } from '../../../services/api/leadsApi'
 import { leadStageOptions } from '../leadOptions'
 
@@ -24,6 +25,7 @@ const schema = z.object({
   phone: z.string().trim().min(8, 'Ingresa un telefono valido.').max(30),
   email: z.string().trim().max(255).email('Ingresa un correo valido.').or(z.literal('')),
   stage: z.string().trim().min(1, 'Selecciona una etapa.'),
+  locationId: z.string(),
   notes: z.string().trim().max(2000, 'La nota no puede superar los 2000 caracteres.'),
 })
 
@@ -48,8 +50,14 @@ export function EditLeadPage() {
       phone: '',
       email: '',
       stage: 'NEW',
+      locationId: '',
       notes: '',
     },
+  })
+
+  const locationsQuery = useQuery({
+    queryKey: ['business-locations', 'active'],
+    queryFn: () => getBusinessLocationsRequest({ activeOnly: true }),
   })
 
   const leadQuery = useQuery({
@@ -69,6 +77,7 @@ export function EditLeadPage() {
       phone: leadQuery.data.phone,
       email: leadQuery.data.email ?? '',
       stage: leadQuery.data.stage,
+      locationId: leadQuery.data.locationId ?? '',
       notes: leadQuery.data.notes ?? '',
     })
   }, [leadQuery.data, reset])
@@ -87,6 +96,7 @@ export function EditLeadPage() {
         stage: values.stage,
         notes: values.notes || undefined,
         assignedUserId: user?.id,
+        locationId: values.locationId || undefined,
       })
     },
     onSuccess: (lead) => {
@@ -164,15 +174,28 @@ export function EditLeadPage() {
               />
             </div>
 
-            <Select
-              error={errors.stage?.message}
-              label="Etapa"
-              options={leadStageOptions.map((option) => ({
-                label: option.label,
-                value: option.value,
-              }))}
-              {...register('stage')}
-            />
+            <div className="grid gap-5 md:grid-cols-2">
+              <Select
+                error={errors.stage?.message}
+                label="Etapa"
+                options={leadStageOptions.map((option) => ({
+                  label: option.label,
+                  value: option.value,
+                }))}
+                {...register('stage')}
+              />
+              <Select
+                label="Sucursal"
+                options={[
+                  { label: 'Sin sucursal asignada', value: '' },
+                  ...(locationsQuery.data ?? []).map((location) => ({
+                    label: location.name,
+                    value: location.id,
+                  })),
+                ]}
+                {...register('locationId')}
+              />
+            </div>
 
             <Textarea
               error={errors.notes?.message}

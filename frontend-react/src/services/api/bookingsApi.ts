@@ -18,12 +18,13 @@ import type {
   CreateBookingFromLeadRequest,
   CreateBookingPaymentLinkRequest,
   CreateBookingRequest,
-  CreateBookingRescheduleLinkRequest,
+   CreateBookingRescheduleLinkRequest,
   CreatePublicBookingRequest,
   CreatePublicBookingResponse,
   CustomerBookingItemResponse,
   CustomerBookingRescheduleRequest,
   CustomerBookingReschedulePreviewResponse,
+  CustomerSearchResponse,
   PagedResponse,
   PublicBookingCancellationFromConfirmationRequest,
   PublicBookingCancellationResponse,
@@ -446,14 +447,23 @@ export function getCustomerBookingRescheduleAvailabilityRequest(
 export function rescheduleCustomerBookingRequest(
   token: string,
   bookingId: string,
-  payload: CustomerBookingRescheduleRequest,
-) {
-  return apiFetch<CustomerBookingItemResponse>(
-    `/public/customer-bookings/${enc(token)}/${bookingId}/reschedule`,
-    {
-      method: 'POST',
-      auth: false,
-      body: JSON.stringify(payload),
-    },
-  )
-}
+   payload: CustomerBookingRescheduleRequest,
+  ) {
+    return apiFetch<CustomerBookingItemResponse>(
+      `/public/customer-bookings/${enc(token)}/${bookingId}/reschedule`,
+      {
+        method: 'POST',
+        auth: false,
+        body: JSON.stringify(payload),
+      },
+    )
+  }
+
+  export function searchCustomersRequest(params: { phone?: string; name?: string; email?: string } = {}) {
+    const searchParams = new URLSearchParams()
+    if (params.phone) searchParams.set('phone', params.phone)
+    if (params.name) searchParams.set('name', params.name)
+    if (params.email) searchParams.set('email', params.email)
+    const qs = searchParams.toString()
+    return apiFetch<CustomerSearchResponse[]>(`/customers/search${qs ? `?${qs}` : ''}`)
+  }

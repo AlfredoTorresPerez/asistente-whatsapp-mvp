@@ -129,19 +129,12 @@ export function CompanySettingsPage() {
       <PageHeader
         actions={
           <>
-            <Button
-              disabled={!isOnline || updateCompanyMutation.isPending || !isDirty}
-              loading={updateCompanyMutation.isPending || isSubmitting}
-              onClick={() => void onSubmit()}
-            >
-              Guardar cambios
-            </Button>
             <Button onClick={() => navigate('/admin')} variant="secondary">
               Cancelar
             </Button>
           </>
         }
-        description="Actualiza la razon social, el nombre comercial y los datos operativos base que usa el shell privado."
+        description="Actualiza la razon social, el nombre comercial y los datos operativos base del negocio."
         eyebrow="Administración"
         title="Configuracion de empresa"
       />
@@ -178,13 +171,13 @@ export function CompanySettingsPage() {
                 <Input
                   error={errors.companyName?.message}
                   label="Razon social"
-                  placeholder="Centro Estetico Bella SpA"
+                  placeholder="Razón social registrada"
                   {...register('companyName')}
                 />
                 <Input
                   error={errors.businessName?.message}
                   label="Nombre comercial"
-                  placeholder="Centro Estetico Bella"
+                  placeholder="Nombre comercial"
                   {...register('businessName')}
                 />
                 <Select
@@ -208,7 +201,7 @@ export function CompanySettingsPage() {
                   Vista operativa
                 </p>
                 <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-                  Snapshot visible en el shell
+                  Vista operativa
                 </h2>
               </div>
               <div className="rounded-[24px] border border-blue-100 bg-blue-50 px-5 py-5">
@@ -217,15 +210,14 @@ export function CompanySettingsPage() {
                   {companyQuery.data.businessName}
                 </p>
                 <p className="mt-2 text-sm leading-6 text-slate-700">
-                  El topbar y la sesion del usuario se sincronizan con este nombre comercial despues
-                  del guardado.
+                  El nombre comercial se actualiza en la navegación privada despues del guardado.
                 </p>
               </div>
               <div className="rounded-[24px] border border-[var(--color-border)] bg-slate-50 px-5 py-5">
                 <p className="text-sm font-semibold text-slate-900">Contexto operativo</p>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
-                  Esta configuracion es la fuente visible para administracion, topbar y partes del
-                  flujo comercial de Fase 1.
+                  Esta configuracion es la fuente visible para administracion, agenda y flujo
+                  comercial del negocio.
                 </p>
               </div>
             </Card>
@@ -243,14 +235,14 @@ export function CompanySettingsPage() {
               <Input
                 error={errors.contactEmail?.message}
                 label="Correo de contacto"
-                placeholder="admin@demo.cl"
+                placeholder="contacto@empresa.cl"
                 type="email"
                 {...register('contactEmail')}
               />
               <Input
                 error={errors.supportPhone?.message}
                 label="Telefono de soporte"
-                placeholder="+56955550100"
+                placeholder="+569XXXXXXXX"
                 {...register('supportPhone')}
               />
             </div>
@@ -258,7 +250,7 @@ export function CompanySettingsPage() {
             <Input
               error={errors.address?.message}
               label="Direccion"
-              placeholder="Av. Providencia 2450, Santiago"
+              placeholder="Dirección legal o principal"
               {...register('address')}
             />
 

@@ -30,7 +30,7 @@ const PUBLIC_LAYOUT_VARIANTS: Record<string, PublicLayoutVariant> = {
     heading: 'Gestiona tu negocio desde conversaciones',
     accent: 'que generan resultados',
     description:
-      'Automatiza conversaciones, prospectos, reservas y pedidos desde una sola plataforma.',
+      'Automatiza conversaciones, prospectos y reservas desde una sola plataforma.',
     trustTitle: 'Acceso seguro',
     trustText: 'Tus datos estan protegidos con cifrado de nivel empresarial.',
     features: [

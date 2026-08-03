@@ -11,6 +11,7 @@ export const leadOriginOptions = [
   { label: 'Todos', value: '' },
   { label: 'Manual', value: 'MANUAL' },
   { label: 'Conversacion', value: 'CONVERSATION' },
+  { label: 'Pagina publica', value: 'LANDING_PAGE' },
 ] as const
 
 export function getLeadStageLabel(stage: string) {
@@ -40,6 +41,8 @@ export function getLeadOriginLabel(sourceType: string) {
       return 'Manual'
     case 'CONVERSATION':
       return 'Conversacion'
+    case 'LANDING_PAGE':
+      return 'Pagina publica'
     default:
       return sourceType
   }

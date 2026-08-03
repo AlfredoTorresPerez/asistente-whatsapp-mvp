@@ -3,6 +3,7 @@ package com.asistentewhatsapp.administration.api;
 import com.asistentewhatsapp.administration.application.AdminUserService;
 import com.asistentewhatsapp.security.domain.AuthenticatedUser;
 import com.asistentewhatsapp.shared.api.PagedResponse;
+import com.asistentewhatsapp.shared.api.StatusResponse;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -56,6 +57,27 @@ public class AdminUserController {
 	public AdminUserResponse updateUser(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
 			@PathVariable UUID userId, @Valid @RequestBody AdminUserRequest request) {
 		return adminUserService.updateUser(authenticatedUser, userId, request);
+	}
+
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'USERS_MANAGE')")
+	@PostMapping("/api/v1/admin/users/{userId}/deactivate")
+	public StatusResponse deactivateUser(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@PathVariable UUID userId) {
+		return adminUserService.deactivateUser(authenticatedUser, userId);
+	}
+
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'USERS_MANAGE')")
+	@PostMapping("/api/v1/admin/users/{userId}/revoke-sessions")
+	public StatusResponse revokeSessions(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@PathVariable UUID userId) {
+		return adminUserService.revokeSessions(authenticatedUser, userId);
+	}
+
+	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'USERS_MANAGE')")
+	@PostMapping("/api/v1/admin/users/{userId}/reset-access")
+	public StatusResponse resetAccess(@AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+			@PathVariable UUID userId) {
+		return adminUserService.resetAccess(authenticatedUser, userId);
 	}
 
 	@PreAuthorize("hasPermission(#authenticatedUser.businessId(), 'USERS_VIEW')")

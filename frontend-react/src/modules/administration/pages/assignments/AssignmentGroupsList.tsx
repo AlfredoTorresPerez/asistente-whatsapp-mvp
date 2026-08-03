@@ -125,8 +125,14 @@ export function AssignmentGroupsList({
                       {group.serviceName}
                     </p>
                     <p className="mt-0.5 text-xs text-[var(--color-text-secondary)]">
-                      {group.professionalsCount} profesional(es) · {group.roomsCount} cabina(s)
+                      {group.categoryName} · {group.professionalsCount} profesional(es) · {group.roomsCount}{' '}
+                      cabina(s)
                     </p>
+                    {group.locationNames.length > 0 ? (
+                      <p className="mt-0.5 truncate text-xs text-[var(--color-text-secondary)]">
+                        {group.locationNames.join(', ')}
+                      </p>
+                    ) : null}
                   </div>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
@@ -134,9 +140,6 @@ export function AssignmentGroupsList({
                     label={group.covered ? 'Cubierto' : group.professionalsCount + group.roomsCount > 0 ? 'Parcial' : 'Sin asignar'}
                     tone={group.covered ? 'success' : group.professionalsCount + group.roomsCount > 0 ? 'warning' : 'neutral'}
                   />
-                  <span className="hidden text-xs text-[var(--color-text-secondary)] sm:block">
-                    {group.serviceCode}
-                  </span>
                 </div>
               </button>
 

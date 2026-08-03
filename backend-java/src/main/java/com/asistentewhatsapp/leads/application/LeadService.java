@@ -29,13 +29,14 @@ public class LeadService {
 
 	@Transactional(readOnly = true)
 	public PagedResponse<LeadSummaryResponse> list(AuthenticatedUser authenticatedUser, int page, int size,
-			String search, String stage, String origin, UUID responsibleUserId) {
+			String search, String stage, String origin, UUID responsibleUserId, UUID locationId) {
 		int resolvedPage = Math.max(page, 0);
 		int resolvedSize = Math.min(Math.max(size, 1), 100);
 
 		return leadJdbcRepository.findLeads(authenticatedUser.businessId(), resolvedPage, resolvedSize,
 				normalizeSearch(search), normalizeOptionalStage(stage), normalizeOptionalOrigin(origin),
-				resolveResponsibleUserId(authenticatedUser, responsibleUserId));
+				resolveResponsibleUserId(authenticatedUser, responsibleUserId),
+				resolveOptionalLocationId(authenticatedUser.businessId(), locationId));
 	}
 
 	@Transactional(readOnly = true)
@@ -52,12 +53,13 @@ public class LeadService {
 		String notes = normalizeOptionalText(request.notes(), 2000);
 		String stage = normalizeStage(request.stage());
 		UUID assignedUserId = resolveResponsibleUserId(authenticatedUser, request.assignedUserId());
+		UUID locationId = resolveOptionalLocationId(authenticatedUser.businessId(), request.locationId());
 
 		LeadJdbcRepository.CustomerRecord customer = resolveOrCreateCustomer(authenticatedUser.businessId(), null,
 				firstName, lastName, phone, email);
 
-		UUID leadId = leadJdbcRepository.insertLead(authenticatedUser.businessId(), customer.id(), null, "MANUAL",
-				firstName, lastName, phone, email, stage, notes, assignedUserId);
+		UUID leadId = leadJdbcRepository.insertLead(authenticatedUser.businessId(), customer.id(), null, locationId,
+				"MANUAL", firstName, lastName, phone, email, stage, notes, assignedUserId);
 		return leadJdbcRepository.findLeadDetail(authenticatedUser.businessId(), leadId);
 	}
 
@@ -108,12 +110,14 @@ public class LeadService {
 		String stage = normalizeStage(request.stage());
 		UUID assignedUserId = resolveResponsibleUserId(authenticatedUser,
 				request.assignedUserId() != null ? request.assignedUserId() : conversation.assignedUserId());
+		UUID locationId = resolveOptionalLocationId(authenticatedUser.businessId(),
+				request.locationId() != null ? request.locationId() : conversation.locationId());
 
 		LeadJdbcRepository.CustomerRecord customer = resolveOrCreateCustomer(authenticatedUser.businessId(),
 				conversation.customerId(), firstName, lastName, phone, email);
 
 		UUID leadId = leadJdbcRepository.insertLead(authenticatedUser.businessId(), customer.id(), conversationId,
-				"CONVERSATION", firstName, lastName, phone, email, stage, notes, assignedUserId);
+				locationId, "CONVERSATION", firstName, lastName, phone, email, stage, notes, assignedUserId);
 		return leadJdbcRepository.findLeadDetail(authenticatedUser.businessId(), leadId);
 	}
 
@@ -129,12 +133,13 @@ public class LeadService {
 		String notes = normalizeOptionalText(request.notes(), 2000);
 		String stage = normalizeStage(request.stage());
 		UUID assignedUserId = resolveResponsibleUserId(authenticatedUser, request.assignedUserId());
+		UUID locationId = resolveOptionalLocationId(authenticatedUser.businessId(), request.locationId());
 
 		LeadJdbcRepository.CustomerRecord customer = resolveOrCreateCustomer(authenticatedUser.businessId(),
 				currentLead.customerId(), firstName, lastName, phone, email);
 
-		leadJdbcRepository.updateLead(authenticatedUser.businessId(), leadId, customer.id(), firstName, lastName, phone,
-				email, stage, notes, assignedUserId);
+		leadJdbcRepository.updateLead(authenticatedUser.businessId(), leadId, customer.id(), locationId, firstName,
+				lastName, phone, email, stage, notes, assignedUserId);
 		return leadJdbcRepository.findLeadDetail(authenticatedUser.businessId(), leadId);
 	}
 
@@ -185,6 +190,15 @@ public class LeadService {
 				.orElseThrow(() -> validationError("assignedUserId", "El responsable indicado no existe."));
 	}
 
+	private UUID resolveOptionalLocationId(UUID businessId, UUID locationId) {
+		if (locationId == null) {
+			return null;
+		}
+
+		return leadJdbcRepository.findActiveLocationId(businessId, locationId)
+				.orElseThrow(() -> validationError("locationId", "La sucursal indicada no esta disponible."));
+	}
+
 	private String normalizeSearch(String search) {
 		if (search == null || search.isBlank()) {
 			return null;
@@ -227,7 +241,7 @@ public class LeadService {
 		}
 
 		return switch (origin.trim().toUpperCase()) {
-			case "MANUAL", "CONVERSATION" -> origin.trim().toUpperCase();
+			case "MANUAL", "CONVERSATION", "LANDING_PAGE" -> origin.trim().toUpperCase();
 			default -> throw validationError("origin", "El origen indicado no es valido.");
 		};
 	}

@@ -10,12 +10,15 @@ import { Input } from '../../../components/ui/Input'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { Select } from '../../../components/ui/Select'
 import { usePermissions } from '../../../hooks/usePermissions'
-import { listAestheticServices } from '../../../services/api/aestheticApi'
+import { listAestheticServiceCategories, listAestheticServices } from '../../../services/api/aestheticApi'
 import {
   getAssignmentsSummaryRequest,
   listAssignmentGroupsRequest,
   type AssignmentGroupsParams,
 } from '../../../services/api/assignmentsApi'
+import { getBusinessLocationsRequest } from '../../../services/api/businessLocationsApi'
+import { listProfessionalsRequest } from '../../../services/api/professionalsApi'
+import { listRoomsRequest } from '../../../services/api/roomsApi'
 import { AssignmentsCoveragePanel } from './assignments/AssignmentsCoveragePanel'
 import { AssignmentGroupsList } from './assignments/AssignmentGroupsList'
 import { AssignmentsSummaryCards } from './assignments/AssignmentsSummaryCards'
@@ -37,7 +40,11 @@ export function AdminAssignmentsPage() {
   const [page, setPage] = useState(0)
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
+  const [locationId, setLocationId] = useState('')
+  const [categoryCode, setCategoryCode] = useState('')
   const [serviceId, setServiceId] = useState('')
+  const [professionalId, setProfessionalId] = useState('')
+  const [roomId, setRoomId] = useState('')
   const [coverage, setCoverage] = useState('')
   const [createOpen, setCreateOpen] = useState(false)
   const [createServiceId, setCreateServiceId] = useState<string | undefined>()
@@ -52,12 +59,28 @@ export function AdminAssignmentsPage() {
   }, [searchInput])
 
   const groupsQuery = useQuery({
-    queryKey: ['administration', 'assignments', 'groups', page, search, serviceId, coverage],
+    queryKey: [
+      'administration',
+      'assignments',
+      'groups',
+      page,
+      search,
+      locationId,
+      categoryCode,
+      serviceId,
+      professionalId,
+      roomId,
+      coverage,
+    ],
     queryFn: () =>
       listAssignmentGroupsRequest({
         page,
         search: search || undefined,
+        locationId: locationId || undefined,
+        categoryCode: categoryCode || undefined,
         serviceId: serviceId || undefined,
+        professionalId: professionalId || undefined,
+        roomId: roomId || undefined,
         size: PAGE_SIZE,
         coverage: coverage as AssignmentGroupsParams['coverage'],
       }),
@@ -74,9 +97,48 @@ export function AdminAssignmentsPage() {
     queryFn: () => listAestheticServices({ size: 200 }),
   })
 
+  const categoriesQuery = useQuery({
+    queryKey: ['administration', 'service-categories', 'active'],
+    queryFn: () => listAestheticServiceCategories({ size: 200, active: true }),
+  })
+
+  const locationsQuery = useQuery({
+    queryKey: ['administration', 'locations', 'active'],
+    queryFn: () => getBusinessLocationsRequest({ activeOnly: true }),
+  })
+
+  const professionalsQuery = useQuery({
+    queryKey: ['administration', 'professionals', 'active'],
+    queryFn: () => listProfessionalsRequest({ size: 200, active: true }),
+  })
+
+  const roomsQuery = useQuery({
+    queryKey: ['administration', 'rooms', 'active'],
+    queryFn: () => listRoomsRequest({ size: 200, active: true }),
+  })
+
   const serviceOptions = [
     { label: 'Todos los servicios', value: '' },
     ...(servicesQuery.data?.items ?? []).map((s) => ({ label: s.name, value: s.id })),
+  ]
+  const locationOptions = [
+    { label: 'Todas las sedes', value: '' },
+    ...(locationsQuery.data ?? []).map((l) => ({ label: l.name, value: l.id })),
+  ]
+  const categoryOptions = [
+    { label: 'Todas las categorias', value: '' },
+    ...(categoriesQuery.data?.items ?? []).map((c) => ({ label: c.name, value: c.code })),
+  ]
+  const professionalOptions = [
+    { label: 'Todos los profesionales', value: '' },
+    ...(professionalsQuery.data?.items ?? []).map((p) => ({
+      label: p.displayName ?? p.fullName,
+      value: p.id,
+    })),
+  ]
+  const roomOptions = [
+    { label: 'Todas las cabinas', value: '' },
+    ...(roomsQuery.data?.items ?? []).map((r) => ({ label: r.name, value: r.id })),
   ]
 
   const groups = groupsQuery.data?.items ?? []
@@ -116,6 +178,24 @@ export function AdminAssignmentsPage() {
           value={searchInput}
         />
         <Select
+          label="Sede"
+          onChange={(event) => {
+            setLocationId(event.target.value)
+            setPage(0)
+          }}
+          options={locationOptions}
+          value={locationId}
+        />
+        <Select
+          label="Categoria"
+          onChange={(event) => {
+            setCategoryCode(event.target.value)
+            setPage(0)
+          }}
+          options={categoryOptions}
+          value={categoryCode}
+        />
+        <Select
           label="Servicio"
           onChange={(event) => {
             setServiceId(event.target.value)
@@ -123,6 +203,24 @@ export function AdminAssignmentsPage() {
           }}
           options={serviceOptions}
           value={serviceId}
+        />
+        <Select
+          label="Profesional"
+          onChange={(event) => {
+            setProfessionalId(event.target.value)
+            setPage(0)
+          }}
+          options={professionalOptions}
+          value={professionalId}
+        />
+        <Select
+          label="Cabina"
+          onChange={(event) => {
+            setRoomId(event.target.value)
+            setPage(0)
+          }}
+          options={roomOptions}
+          value={roomId}
         />
         <Select
           label="Cobertura"

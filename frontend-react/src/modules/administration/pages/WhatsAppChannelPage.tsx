@@ -104,10 +104,34 @@ function toProviderLabel(provider: string | null | undefined) {
     case 'META_CLOUD_API':
       return 'WhatsApp Cloud API (Meta)'
     case 'SIMULATED':
-      return 'Modo simulado'
+      return 'Modo de prueba local'
     default:
       return provider ?? 'No configurado'
   }
+}
+
+function toAdapterModeLabel(adapterMode: string | null | undefined) {
+  switch (adapterMode) {
+    case 'META_CLOUD_API':
+      return 'Recepcion automatica activa'
+    case 'SIMULATED':
+    case 'WHATSAPP_WEB_LOCAL':
+      return 'Recepcion local controlada'
+    default:
+      return adapterMode ? 'Recepcion configurada' : 'Sin recepcion configurada'
+  }
+}
+
+function maskPhoneNumber(phone: string | null | undefined) {
+  const digits = phone?.replace(/\D/g, '') ?? ''
+  if (digits.length < 4) {
+    return 'Sin numero configurado'
+  }
+  return `***${digits.slice(-4)}`
+}
+
+function formatDateTime(value: string | null | undefined) {
+  return value ? dayjs(value).format('DD/MM/YYYY HH:mm') : 'Sin registro reciente'
 }
 
 type AiDecisionSource = {
@@ -214,7 +238,7 @@ function getAppliedRules(decision: AiDecisionSource): string[] {
   const rules = new Set<string>()
 
   if (decision.requiresDatabaseLookup) {
-    rules.add('Consultar base de datos antes de responder datos operativos')
+    rules.add('Consultar informacion operativa vigente antes de responder')
   }
   if (decision.requiresHumanHandoff) {
     rules.add('Derivar a atencion humana antes de confirmar o recomendar')
@@ -234,11 +258,10 @@ function getAppliedRules(decision: AiDecisionSource): string[] {
   }
   if (
     decision.intent.includes('precio') ||
-    decision.intent.includes('producto') ||
     decision.intent.includes('duracion') ||
     decision.intent.includes('promocion')
   ) {
-    rules.add('Usar catalogo vigente; no inventar precio, stock, duracion ni promociones')
+    rules.add('Usar servicios vigentes; no inventar precio, duracion ni promociones')
   }
   if (
     decision.intent.includes('contraindicacion') ||
@@ -276,8 +299,8 @@ export function WhatsAppChannelPage() {
   } = useForm<TestMessageValues>({
     resolver: zodResolver(testMessageSchema),
     defaultValues: {
-      recipientPhone: '56950954580',
-      body: 'Hola, este es un mensaje de prueba enviado desde el canal de WhatsApp.',
+      recipientPhone: '',
+      body: 'Hola, confirmamos que el canal de WhatsApp esta disponible para atender tu solicitud.',
     },
   })
 
@@ -348,7 +371,7 @@ export function WhatsAppChannelPage() {
       reset(undefined, { keepValues: true })
       showToast({
         title: 'Mensaje enviado',
-        description: `Identificador externo: ${response.externalMessageId}.`,
+        description: `Estado del envio: ${toProcessingLabel(response.deliveryStatus)}.`,
         tone: 'success',
       })
     },
@@ -375,7 +398,7 @@ export function WhatsAppChannelPage() {
     onError: () => {
       showToast({
         title: 'No pudimos analizar el mensaje',
-        description: 'Revisa que el backend este disponible y que el modulo estetico este migrado.',
+        description: 'Revisa que el servicio este disponible y vuelve a intentarlo.',
         tone: 'error',
       })
     },
@@ -427,7 +450,7 @@ export function WhatsAppChannelPage() {
             </Button>
           </>
         }
-        description="Estado del canal de WhatsApp, proveedor activo, eventos recientes y envío de prueba."
+        description="Estado operativo, configuracion, diagnostico e historial del canal de WhatsApp."
         eyebrow="Administración"
         title="Canal de WhatsApp"
       />
@@ -476,10 +499,10 @@ export function WhatsAppChannelPage() {
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
-                    Estado del canal
+                    Estado operativo
                   </p>
                   <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-                    {toProviderLabel(status.provider)}
+                    Canal {toStatusLabel(isSyncing ? 'SYNCING' : status.connectionStatus).toLowerCase()}
                   </h2>
                 </div>
                 <StatusBadge
@@ -489,51 +512,58 @@ export function WhatsAppChannelPage() {
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <SnapshotItem label="Proveedor activo" value={toProviderLabel(status.provider)} />
+                <SnapshotItem label="Estado" value={toStatusLabel(status.connectionStatus)} />
                 <SnapshotItem
-                  label="Numero"
-                  value={status.phoneNumber ?? 'Sin numero configurado'}
+                  label="Numero asociado"
+                  value={maskPhoneNumber(status.phoneNumber)}
                 />
                 <SnapshotItem
-                  label="Phone Number ID"
-                  value={status.phoneNumberId ?? 'Sin phone_number_id'}
+                  label="Ultimo mensaje recibido"
+                  value={formatDateTime(status.lastInboundMessageAt)}
                 />
                 <SnapshotItem
-                  label="Modo del adaptador"
-                  value={status.adapterMode ?? 'No disponible'}
+                  label="Ultimo mensaje enviado"
+                  value={formatDateTime(status.lastOutboundMessageAt)}
                 />
-                <SnapshotItem
-                  label="Ultimo evento"
-                  value={
-                    status.lastEventAt
-                      ? dayjs(status.lastEventAt).format('DD/MM/YYYY HH:mm')
-                      : 'Sin eventos recientes'
-                  }
-                />
-                <SnapshotItem
-                  label="Errores recientes (24h)"
-                  value={String(status.recentErrorCount)}
-                />
-              </div>
-
-              <div className="flex flex-wrap gap-3 border-t border-[var(--color-border)] pt-5">
-                <Button
-                  disabled={!isOnline || isSyncing}
-                  loading={connectMutation.isPending}
-                  onClick={handleConnect}
-                >
-                  Conectar canal
-                </Button>
-                <Button
-                  disabled={!isOnline || isSyncing}
-                  onClick={() => setIsDisconnectDialogOpen(true)}
-                  variant="danger"
-                >
-                  Desconectar
-                </Button>
               </div>
             </Card>
 
+            <Card className="space-y-5">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
+                  Configuracion
+                </p>
+                <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+                  Proveedor y recepcion automatica
+                </h2>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <SnapshotItem label="Proveedor activo" value={toProviderLabel(status.provider)} />
+                <SnapshotItem
+                  label="Punto de recepcion"
+                  value={toAdapterModeLabel(status.adapterMode)}
+                />
+                <SnapshotItem
+                  label="Credenciales"
+                  value={status.connectionStatus === 'CONNECTED' ? 'Vigentes' : 'Requieren revision'}
+                />
+                <SnapshotItem
+                  label="Ultima actividad"
+                  value={formatDateTime(status.lastEventAt)}
+                />
+              </div>
+            </Card>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-4">
+            <SnapshotItem label="Mensajes entregados" value={String(status.deliveredMessages)} />
+            <SnapshotItem label="Mensajes leidos" value={String(status.readMessages)} />
+            <SnapshotItem label="Mensajes fallidos" value={String(status.failedMessages)} />
+            <SnapshotItem label="Errores recientes" value={String(status.recentErrorCount)} />
+          </div>
+
+          <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
             <Card className="space-y-5">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
@@ -546,7 +576,7 @@ export function WhatsAppChannelPage() {
 
               {status.recentEvents.length === 0 ? (
                 <EmptyState
-                  description="Todavia no hay webhooks ni cambios de sesion registrados para este negocio."
+                  description="Todavia no hay eventos registrados para este negocio."
                   title="Sin eventos recientes"
                   variant="card"
                 />
@@ -572,10 +602,6 @@ export function WhatsAppChannelPage() {
                           }
                         />
                       </div>
-                      <p className="mt-2 text-sm text-slate-600">
-                        ID de entrega:{' '}
-                        <span className="font-mono text-slate-700">{event.deliveryId}</span>
-                      </p>
                       <p className="mt-1 text-sm text-slate-600">
                         Recibido {dayjs(event.receivedAt).format('DD/MM/YYYY HH:mm:ss')}
                       </p>
@@ -605,7 +631,7 @@ export function WhatsAppChannelPage() {
                   Probar envio
                 </p>
                 <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-                  Mensaje de prueba real
+                  Mensaje de prueba controlado
                 </h2>
               </div>
               <StatusBadge label={toProviderLabel(status.provider)} tone={isSimulated ? 'warning' : 'info'} />
@@ -614,9 +640,9 @@ export function WhatsAppChannelPage() {
             <form className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]" onSubmit={onSubmit}>
               <Input
                 error={errors.recipientPhone?.message}
-                hint="Formato esperado: 56950954580"
+                hint="Usa un numero autorizado en formato internacional."
                 label="Telefono destino"
-                placeholder="56950954580"
+                placeholder="+56 9 XXXX XXXX"
                 {...register('recipientPhone')}
               />
               <Textarea
@@ -718,12 +744,12 @@ function AiRuleResponseCard({
             <DecisionMetric label="Intencion" value={toIntentLabel(decision.intent)} />
             <DecisionMetric label="Confianza" value={`${Math.round(decision.confidence * 100)}%`} />
             <DecisionMetric
-              label="Consulta BD"
-              value={decision.requiresDatabaseLookup ? 'Si' : 'No'}
+              label="Consulta operativa"
+              value={decision.requiresDatabaseLookup ? 'Sí' : 'No'}
             />
             <DecisionMetric
               label="Derivacion"
-              value={decision.requiresHumanHandoff ? 'Si' : 'No'}
+              value={decision.requiresHumanHandoff ? 'Sí' : 'No'}
             />
           </div>
 
@@ -732,7 +758,6 @@ function AiRuleResponseCard({
               <p className="text-sm font-semibold text-slate-950">Entidades detectadas</p>
               <dl className="mt-4 grid gap-3 sm:grid-cols-2">
                 <EntityItem label="Servicio" value={decision.entities.servicio} />
-                <EntityItem label="Producto" value={decision.entities.producto} />
                 <EntityItem label="Fecha" value={decision.entities.fecha} />
                 <EntityItem label="Hora" value={decision.entities.hora} />
                 <EntityItem label="Profesional" value={decision.entities.profesional} />
@@ -810,7 +835,7 @@ function AiRuleResponseCard({
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-blue-100 pt-5">
         <p className="max-w-2xl text-sm leading-6 text-slate-600">
           Este recuadro es de auditoria operativa: permite validar que la IA interpreta la intencion
-          y que las reglas impiden inventar precios, horarios, stock o indicaciones sensibles.
+          y que las reglas impiden inventar precios, horarios o indicaciones sensibles.
         </p>
         <Button
           disabled={analyzeDisabled}

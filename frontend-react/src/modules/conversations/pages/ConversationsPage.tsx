@@ -41,7 +41,7 @@ import {
 import type { ConversationCustomerTag, ConversationInboxCategory } from './conversationInbox'
 
 type ConversationTab = ConversationInboxCategory
-type SemanticTag = 'NEW_LEAD' | 'FOLLOW_UP' | 'BOOKING' | 'NO_REPLY' | 'ORDER'
+type SemanticTag = 'NEW_LEAD' | 'FOLLOW_UP' | 'BOOKING' | 'NO_REPLY'
 type IconName =
   | 'chat'
   | 'clock'
@@ -118,18 +118,10 @@ const tagConfig: Record<SemanticTag, { label: string; className: string }> = {
     label: 'Sin responder',
     className: 'border-amber-100 bg-amber-50 text-amber-700',
   },
-  ORDER: {
-    label: 'Pedido',
-    className: 'border-emerald-100 bg-emerald-50 text-emerald-700',
-  },
 }
 
 function getSemanticTag(conversation: ConversationSummaryResponse): SemanticTag {
   const text = `${conversation.customerName} ${conversation.lastMessagePreview ?? ''}`.toLowerCase()
-
-  if (text.includes('pedido') || text.includes('comprar') || text.includes('masaje')) {
-    return 'ORDER'
-  }
 
   if (
     text.includes('reserva') ||
@@ -538,6 +530,9 @@ type InboxViewProps = {
   isFetching: boolean
   onRetry: () => void
   onOpenConversation: (conversationId: string) => void
+  onBulkMarkRead: (conversationIds: string[]) => void
+  onBulkResolve: (conversationIds: string[]) => void
+  bulkActionPending: boolean
 }
 
 function InboxView({
@@ -573,10 +568,14 @@ function InboxView({
   isFetching,
   onRetry,
   onOpenConversation,
+  onBulkMarkRead,
+  onBulkResolve,
+  bulkActionPending,
 }: InboxViewProps) {
   const allVisibleSelected =
     paginatedConversations.length > 0 &&
     paginatedConversations.every((conversation) => selectedIds.includes(conversation.id))
+  const selectedCount = selectedIds.length
   const statusOptions = [
     'UNREAD',
     'IN_PROGRESS',
@@ -769,6 +768,42 @@ function InboxView({
 
         {visibleConversations.length > 0 ? (
           <>
+            {selectedCount > 0 ? (
+              <div className="flex flex-col gap-3 border-b border-[var(--color-border)] bg-emerald-50/60 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm font-semibold text-emerald-900">
+                  {selectedCount} conversacion(es) seleccionada(s)
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    disabled={bulkActionPending}
+                    loading={bulkActionPending}
+                    onClick={() => onBulkMarkRead(selectedIds)}
+                    size="sm"
+                    variant="secondary"
+                  >
+                    Marcar como leidas
+                  </Button>
+                  <Button
+                    disabled={bulkActionPending}
+                    loading={bulkActionPending}
+                    onClick={() => onBulkResolve(selectedIds)}
+                    size="sm"
+                    variant="secondary"
+                  >
+                    Resolver
+                  </Button>
+                  <Button
+                    disabled={bulkActionPending}
+                    onClick={() => setSelectedIds([])}
+                    size="sm"
+                    variant="secondary"
+                  >
+                    Limpiar seleccion
+                  </Button>
+                </div>
+              </div>
+            ) : null}
+
             <div className="hidden min-h-0 flex-1 overflow-y-auto lg:block">
               <div className="grid grid-cols-[44px_minmax(220px,1.25fr)_minmax(260px,1.45fr)_minmax(150px,0.85fr)_minmax(120px,0.7fr)_90px] items-center border-b border-[var(--color-border)] bg-white px-4 py-3 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
                 <label className="flex items-center justify-center">
@@ -1199,8 +1234,8 @@ export function ConversationsPage() {
       setCloseDialogOpen(false)
       await queryClient.invalidateQueries({ queryKey: ['conversations'] })
       showToast({
-        title: 'Conversacion cerrada',
-        description: 'El hilo quedo marcado como cerrado.',
+        title: 'Conversacion resuelta',
+        description: 'El hilo quedo marcado como resuelto.',
         tone: 'success',
       })
     },
@@ -1232,6 +1267,53 @@ export function ConversationsPage() {
       showToast({
         title: 'No se pudo reabrir la conversacion',
         description: 'La accion no pudo completarse. Reintenta nuevamente.',
+        tone: 'error',
+      })
+    },
+  })
+
+  const bulkMarkReadMutation = useMutation({
+    mutationFn: async (conversationIds: string[]) => {
+      await Promise.all(conversationIds.map((id) => markConversationReadRequest(id)))
+    },
+    onSuccess: async (_, conversationIds) => {
+      setSelectedConversationIds([])
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['conversations'] }),
+        queryClient.invalidateQueries({ queryKey: ['conversations', 'metrics'] }),
+      ])
+      showToast({
+        title: 'Conversaciones actualizadas',
+        description: `${conversationIds.length} conversacion(es) quedaron marcadas como leidas.`,
+        tone: 'success',
+      })
+    },
+    onError: () => {
+      showToast({
+        title: 'No se pudo completar la accion',
+        description: 'Reintenta la accion masiva en unos segundos.',
+        tone: 'error',
+      })
+    },
+  })
+
+  const bulkResolveMutation = useMutation({
+    mutationFn: async (conversationIds: string[]) => {
+      await Promise.all(conversationIds.map((id) => closeConversationRequest(id)))
+    },
+    onSuccess: async (_, conversationIds) => {
+      setSelectedConversationIds([])
+      await queryClient.invalidateQueries({ queryKey: ['conversations'] })
+      showToast({
+        title: 'Conversaciones resueltas',
+        description: `${conversationIds.length} conversacion(es) salieron de la bandeja activa.`,
+        tone: 'success',
+      })
+    },
+    onError: () => {
+      showToast({
+        title: 'No se pudo completar la accion',
+        description: 'Revisa el estado de las conversaciones y vuelve a intentar.',
         tone: 'error',
       })
     },
@@ -1318,6 +1400,7 @@ export function ConversationsPage() {
   }, [])
 
   const inboxPage = paginateConversations(visibleConversations, page, rowsPerPage)
+  const bulkActionPending = bulkMarkReadMutation.isPending || bulkResolveMutation.isPending
   const selectedConversation = detailQuery.data
   const selectedAssignedToCurrentUser = Boolean(
     user && selectedConversation?.assignedUserId === user.id,
@@ -1380,6 +1463,9 @@ export function ConversationsPage() {
         isLoading={conversationsQuery.isPending && !conversationsQuery.data}
         locationFilter={locationFilter}
         locationOptions={locationOptions}
+        bulkActionPending={bulkActionPending}
+        onBulkMarkRead={(ids) => bulkMarkReadMutation.mutate(ids)}
+        onBulkResolve={(ids) => bulkResolveMutation.mutate(ids)}
         onOpenConversation={(id) => navigate(`/conversations/${id}`)}
         onRetry={() => void conversationsQuery.refetch()}
         page={inboxPage.currentPage}
@@ -1524,14 +1610,6 @@ export function ConversationsPage() {
                     Agendar cita
                   </Button>
                   <Button
-                    leadingIcon={<Icon name="cart" />}
-                    onClick={() => navigate(`/conversations/${selectedConversation.id}/orders/new`)}
-                    size="sm"
-                    variant="secondary"
-                  >
-                    Crear pedido
-                  </Button>
-                  <Button
                     leadingIcon={<Icon name="sparkles" />}
                     loading={aiReplyMutation.isPending}
                     onClick={() => void aiReplyMutation.mutateAsync()}
@@ -1552,7 +1630,7 @@ export function ConversationsPage() {
                     </Button>
                   ) : (
                     <button
-                      aria-label="Cerrar conversacion"
+                      aria-label="Resolver conversacion"
                       className="inline-flex h-10 w-10 items-center justify-center rounded-[14px] text-slate-500 transition hover:bg-slate-100"
                       onClick={() => setCloseDialogOpen(true)}
                       type="button"
@@ -1587,7 +1665,7 @@ export function ConversationsPage() {
                       })
                     ].label
                   }{' '}
-                  - Primera interaccion
+                  - Actividad registrada
                 </span>
                 <span>
                   {selectedConversation.lastMessageAt
@@ -1689,13 +1767,13 @@ export function ConversationsPage() {
       </div>
 
       <ConfirmDialog
-        confirmLabel="Cerrar conversacion"
+        confirmLabel="Resolver conversacion"
         confirmLoading={closeMutation.isPending}
         description="La conversacion quedara fuera de la bandeja activa hasta que decidas reabrirla."
         onCancel={() => setCloseDialogOpen(false)}
         onConfirm={() => void closeMutation.mutateAsync()}
         open={closeDialogOpen}
-        title="Cerrar conversacion"
+        title="Resolver conversacion"
         tone="danger"
       />
     </section>
