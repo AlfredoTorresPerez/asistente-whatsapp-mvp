@@ -1,0 +1,3408 @@
+{
+  "schemaVersion": "1.0",
+  "metadata": {
+    "title": "Catálogo Maestro de Conversación",
+    "description": "Fuente única de verdad del motor de intenciones: intenciones, entidades, estados, transiciones, reglas, respuestas, sinónimos y mapeo de agentes.",
+    "sourceArtifacts": [
+      "IntentDetectorService.java (listas de sinónimos)",
+      "conversation/intents.json (taxonomía)",
+      "ai_intent_expression (códigos de catálogo BD)",
+      "ConversationSpecCatalog.java (reglas de conversación)",
+      "AgentRegistry.java + BookingAgent (mapeo de agentes y respuestas)",
+      "Estados persistidos de ai_conversation_context (deriveConversationState)"
+    ],
+    "generatedBy": "Manual/MEMANTO; regenerable con tools/catalog-generator.mjs",
+    "generationScript": "catálogo generado; el runtime solo lee este JSON."
+  },
+  "agents": [
+    {
+      "type": "RECEPTION",
+      "name": "Recepción",
+      "execution": "Solo ejecuta acciones: saludo, despedida, bienvenida con capacidades.",
+      "intents": [
+        "GREETING",
+        "THANKS_OR_FAREWELL",
+        "AMBIGUOUS"
+      ]
+    },
+    {
+      "type": "SALES",
+      "name": "Ventas",
+      "execution": "Consulta de catálogo y precios; NO agenda. Puede recomendar desde catálogo.",
+      "intents": [
+        "COMMERCIAL_INQUIRY",
+        "SERVICE_INFORMATION",
+        "SERVICE_RECOMMENDATION",
+        "PRICE_REQUEST",
+        "QUOTE_REQUEST"
+      ]
+    },
+    {
+      "type": "BOOKING",
+      "name": "Agenda",
+      "execution": "Crea/cambia/cancela/consulta reservas, disponibilidad y lista de espera.",
+      "intents": [
+        "COMMERCIAL_AND_BOOKING",
+        "AVAILABILITY_QUERY",
+        "PROFESSIONAL_QUERY",
+        "BOOKING_REQUEST",
+        "BOOKING_CHANGE",
+        "BOOKING_CANCEL",
+        "BOOKING_STATUS",
+        "WAITLIST_QUERY"
+      ]
+    },
+    {
+      "type": "PAYMENTS",
+      "name": "Pagos",
+      "execution": "Informa métodos de pago, abonos y comprobantes; deriva incidencias.",
+      "intents": [
+        "PAYMENT_INQUIRY",
+        "PAYMENT_PROBLEM"
+      ]
+    },
+    {
+      "type": "SUPPORT",
+      "name": "Soporte",
+      "execution": "Ubicación, horarios de atención y soporte general.",
+      "intents": [
+        "LOCATION_QUERY",
+        "BUSINESS_HOURS_QUERY",
+        "SUPPORT_GENERAL",
+        "TECHNICAL_MESSAGE"
+      ]
+    },
+    {
+      "type": "KNOWLEDGE",
+      "name": "Conocimiento",
+      "execution": "Responde políticas y conocimiento interno desde la base de conocimiento.",
+      "intents": [
+        "KNOWLEDGE_QUERY"
+      ]
+    },
+    {
+      "type": "FOLLOW_UP",
+      "name": "Seguimiento",
+      "execution": "Retoma cotizaciones o consultas pendientes.",
+      "intents": [
+        "FOLLOW_UP"
+      ]
+    },
+    {
+      "type": "HUMAN_HANDOFF",
+      "name": "Derivación Humana",
+      "execution": "Deriva a humano; jamás resuelve reclamos por sí solo.",
+      "intents": [
+        "COMPLAINT",
+        "HUMAN_REQUEST"
+      ]
+    }
+  ],
+  "aiIntegration": {
+    "role": "support_only",
+    "responsibilities": [
+      "clasificar_texto_libre_sin_confianza_determinista",
+      "extraer_entidades_de_texto_libre",
+      "resolver_ambiguedad_con_contexto"
+    ],
+    "prohibitions": [
+      "crear_reglas",
+      "definir_prioridades",
+      "inventar_precios",
+      "decidir_politicas_de_cancelacion",
+      "derivar_sin_regla"
+    ]
+  },
+  "intents": [
+    {
+      "code": "GREETING",
+      "name": "Saludar / Presentarse",
+      "description": "Inicio o reanudación cordial de la conversación.",
+      "priority": "media",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "bajo",
+      "agent": "RECEPTION",
+      "requiresHuman": false,
+      "requiresAi": false,
+      "requiredEntities": [],
+      "allowedStates": [
+        "INICIO",
+        "IDENTIFICAR_INTENCION"
+      ],
+      "synonymGroups": [
+        "SOCIAL_GREETING_WORDS",
+        "GREETING_WORDS"
+      ],
+      "catalogCodes": [
+        "GREETING"
+      ],
+      "notes": ""
+    },
+    {
+      "code": "THANKS_OR_FAREWELL",
+      "name": "Agradecer / Despedirse",
+      "description": "Cierre cortés de la conversación.",
+      "priority": "media",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "bajo",
+      "agent": "RECEPTION",
+      "requiresHuman": false,
+      "requiresAi": false,
+      "requiredEntities": [],
+      "allowedStates": [
+        "INICIO",
+        "IDENTIFICAR_INTENCION"
+      ],
+      "synonymGroups": [
+        "THANKS_WORDS"
+      ],
+      "catalogCodes": [
+        "THANKS",
+        "GOODBYE"
+      ],
+      "notes": ""
+    },
+    {
+      "code": "AMBIGUOUS",
+      "name": "Mensaje ambiguo o fuera de contexto",
+      "description": "No se puede determinar una intención con confianza mínima.",
+      "priority": "media",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "bajo",
+      "agent": "RECEPTION",
+      "requiresHuman": false,
+      "requiresAi": false,
+      "requiredEntities": [],
+      "allowedStates": [
+        "INICIO",
+        "IDENTIFICAR_INTENCION"
+      ],
+      "synonymGroups": [],
+      "catalogCodes": [],
+      "notes": ""
+    },
+    {
+      "code": "COMMERCIAL_INQUIRY",
+      "name": "Consulta comercial",
+      "description": "Pregunta abierta sobre productos, servicios o promociones.",
+      "priority": "media",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "bajo",
+      "agent": "SALES",
+      "requiresHuman": false,
+      "requiresAi": true,
+      "requiredEntities": [],
+      "allowedStates": [
+        "CONSULTAR_SERVICIOS",
+        "CAPTURAR_DATOS"
+      ],
+      "synonymGroups": [
+        "HELP_WORDS",
+        "SALES_WORDS"
+      ],
+      "catalogCodes": [
+        "COMMERCIAL_INQUIRY"
+      ],
+      "notes": ""
+    },
+    {
+      "code": "SERVICE_INFORMATION",
+      "name": "Información sobre un servicio",
+      "description": "Detalles, duración, preparación o contraindicaciones de un tratamiento.",
+      "priority": "media",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "bajo",
+      "agent": "SALES",
+      "requiresHuman": false,
+      "requiresAi": false,
+      "requiredEntities": [],
+      "allowedStates": [
+        "CONSULTAR_SERVICIOS"
+      ],
+      "synonymGroups": [
+        "SERVICE_INFORMATION_WORDS"
+      ],
+      "catalogCodes": [
+        "SERVICE_INFORMATION"
+      ],
+      "notes": ""
+    },
+    {
+      "code": "SERVICE_RECOMMENDATION",
+      "name": "Recomendación de servicio",
+      "description": "El cliente pide sugerencia según su necesidad o tipo de piel.",
+      "priority": "media",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "bajo",
+      "agent": "SALES",
+      "requiresHuman": false,
+      "requiresAi": true,
+      "requiredEntities": [],
+      "allowedStates": [
+        "CONSULTAR_SERVICIOS"
+      ],
+      "synonymGroups": [
+        "RECOMMENDATION_WORDS"
+      ],
+      "catalogCodes": [
+        "SERVICE_RECOMMENDATION"
+      ],
+      "notes": ""
+    },
+    {
+      "code": "PRICE_REQUEST",
+      "name": "Consultar precio",
+      "description": "Pregunta por el precio o valor de un servicio o producto.",
+      "priority": "alta",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "medio",
+      "agent": "SALES",
+      "requiresHuman": false,
+      "requiresAi": false,
+      "requiredEntities": [],
+      "allowedStates": [
+        "CONSULTAR_PRECIO",
+        "CONSULTAR_SERVICIOS"
+      ],
+      "synonymGroups": [
+        "PRICE_WORDS"
+      ],
+      "catalogCodes": [
+        "SERVICE_PRICE"
+      ],
+      "notes": "En combinaciones con agenda, precio tiene prioridad para inhibir acción (ver reglas)."
+    },
+    {
+      "code": "QUOTE_REQUEST",
+      "name": "Solicitar cotización",
+      "description": "El cliente solicita una cotización o presupuesto a medida.",
+      "priority": "media",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "bajo",
+      "agent": "SALES",
+      "requiresHuman": false,
+      "requiresAi": false,
+      "requiredEntities": [],
+      "allowedStates": [
+        "CONSULTAR_PRECIO"
+      ],
+      "synonymGroups": [
+        "QUOTE_WORDS"
+      ],
+      "catalogCodes": [
+        "QUOTE_REQUEST"
+      ],
+      "notes": ""
+    },
+    {
+      "code": "BOOKING_REQUEST",
+      "name": "Reservar hora",
+      "description": "El cliente desea agendar, reservar, apartar o separar una hora.",
+      "priority": "critica",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "alto",
+      "agent": "BOOKING",
+      "requiresHuman": false,
+      "requiresAi": false,
+      "requiredEntities": [
+        "servicio_o_producto",
+        "sede",
+        "fecha",
+        "hora",
+        "cliente"
+      ],
+      "allowedStates": [
+        "INICIO",
+        "VERIFICAR_DISPONIBILIDAD",
+        "CAPTURAR_DATOS",
+        "CONFIRMAR_CITA"
+      ],
+      "synonymGroups": [
+        "BOOKING_WORDS"
+      ],
+      "catalogCodes": [
+        "BOOKING_CREATE"
+      ],
+      "notes": ""
+    },
+    {
+      "code": "BOOKING_CHANGE",
+      "name": "Reprogramar / Cambiar reserva",
+      "description": "El cliente desea cambiar fecha u hora de una reserva existente.",
+      "priority": "alta",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "medio",
+      "agent": "BOOKING",
+      "requiresHuman": false,
+      "requiresAi": false,
+      "requiredEntities": [
+        "servicio_o_producto",
+        "sede",
+        "fecha",
+        "hora"
+      ],
+      "allowedStates": [
+        "REPROGRAMAR_CITA",
+        "CAPTURAR_DATOS"
+      ],
+      "synonymGroups": [
+        "CHANGE_BOOKING_WORDS"
+      ],
+      "catalogCodes": [
+        "BOOKING_RESCHEDULE"
+      ],
+      "notes": ""
+    },
+    {
+      "code": "BOOKING_CANCEL",
+      "name": "Cancelar reserva",
+      "description": "El cliente desea cancelar una reserva existente.",
+      "priority": "alta",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "medio",
+      "agent": "BOOKING",
+      "requiresHuman": false,
+      "requiresAi": false,
+      "requiredEntities": [],
+      "allowedStates": [
+        "CANCELAR_CITA"
+      ],
+      "synonymGroups": [
+        "CANCEL_BOOKING_WORDS",
+        "CANCEL_FOLLOW_UP_WORDS"
+      ],
+      "catalogCodes": [
+        "BOOKING_CANCEL"
+      ],
+      "notes": ""
+    },
+    {
+      "code": "BOOKING_STATUS",
+      "name": "Consultar estado de reserva",
+      "description": "El cliente consulta su agenda, confirmación o código de reserva.",
+      "priority": "media",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "bajo",
+      "agent": "BOOKING",
+      "requiresHuman": false,
+      "requiresAi": false,
+      "requiredEntities": [],
+      "allowedStates": [
+        "CONSULTAR_RESERVA"
+      ],
+      "synonymGroups": [
+        "BOOKING_STATUS_WORDS",
+        "LINK_RESEND_WORDS",
+        "LINK_EXPIRED_WORDS",
+        "STATUS_FOLLOW_UP_WORDS"
+      ],
+      "catalogCodes": [
+        "BOOKING_STATUS"
+      ],
+      "notes": ""
+    },
+    {
+      "code": "AVAILABILITY_QUERY",
+      "name": "Consultar disponibilidad",
+      "description": "El cliente pregunta por horarios, cupos o disponibilidad.",
+      "priority": "alta",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "medio",
+      "agent": "BOOKING",
+      "requiresHuman": false,
+      "requiresAi": false,
+      "requiredEntities": [],
+      "allowedStates": [
+        "VERIFICAR_DISPONIBILIDAD"
+      ],
+      "synonymGroups": [
+        "AVAILABILITY_WORDS"
+      ],
+      "catalogCodes": [
+        "BOOKING_AVAILABILITY"
+      ],
+      "notes": ""
+    },
+    {
+      "code": "PROFESSIONAL_QUERY",
+      "name": "Consultar por profesional",
+      "description": "El cliente pregunta por profesionales o quienes realizan un tratamiento.",
+      "priority": "media",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "bajo",
+      "agent": "BOOKING",
+      "requiresHuman": false,
+      "requiresAi": false,
+      "requiredEntities": [],
+      "allowedStates": [
+        "CONSULTAR_SERVICIOS",
+        "IDENTIFICAR_INTENCION"
+      ],
+      "synonymGroups": [
+        "PROFESSIONAL_WORDS"
+      ],
+      "catalogCodes": [
+        "PROFESSIONAL_QUERY"
+      ],
+      "notes": ""
+    },
+    {
+      "code": "LOCATION_QUERY",
+      "name": "Consultar ubicación",
+      "description": "El cliente pregunta por dirección, ubicación o cómo llegar.",
+      "priority": "media",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "bajo",
+      "agent": "SUPPORT",
+      "requiresHuman": false,
+      "requiresAi": false,
+      "requiredEntities": [],
+      "allowedStates": [
+        "IDENTIFICAR_INTENCION"
+      ],
+      "synonymGroups": [
+        "LOCATION_WORDS"
+      ],
+      "catalogCodes": [
+        "BUSINESS_LOCATION"
+      ],
+      "notes": ""
+    },
+    {
+      "code": "BUSINESS_HOURS_QUERY",
+      "name": "Consultar horario de atención",
+      "description": "El cliente pregunta por horarios de apertura, cierre o atención.",
+      "priority": "media",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "bajo",
+      "agent": "SUPPORT",
+      "requiresHuman": false,
+      "requiresAi": false,
+      "requiredEntities": [],
+      "allowedStates": [
+        "CONSULTAR_HORARIOS"
+      ],
+      "synonymGroups": [
+        "BUSINESS_HOURS_WORDS"
+      ],
+      "catalogCodes": [
+        "BUSINESS_HOURS"
+      ],
+      "notes": ""
+    },
+    {
+      "code": "PAYMENT_INQUIRY",
+      "name": "Consultar pago",
+      "description": "El cliente consulta métodos de pago, abono o comprobantes.",
+      "priority": "media",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "bajo",
+      "agent": "PAYMENTS",
+      "requiresHuman": false,
+      "requiresAi": false,
+      "requiredEntities": [],
+      "allowedStates": [
+        "REGISTRAR_PAGO"
+      ],
+      "synonymGroups": [
+        "PAYMENT_WORDS"
+      ],
+      "catalogCodes": [
+        "PAYMENT_INFORMATION",
+        "PAYMENT_STATUS"
+      ],
+      "notes": ""
+    },
+    {
+      "code": "PAYMENT_PROBLEM",
+      "name": "Problema de pago",
+      "description": "El cliente reporta un problema de pago (duplicado, monto incorrecto, devolución).",
+      "priority": "critica",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "alto",
+      "agent": "PAYMENTS",
+      "requiresHuman": true,
+      "requiresAi": false,
+      "requiredEntities": [],
+      "allowedStates": [
+        "REGISTRAR_PAGO",
+        "DERIVAR_HUMANO"
+      ],
+      "synonymGroups": [
+        "PAYMENT_PROBLEM_WORDS"
+      ],
+      "catalogCodes": [
+        "PAYMENT_PROBLEM"
+      ],
+      "notes": "Requiere revisión humana por defecto."
+    },
+    {
+      "code": "SUPPORT_GENERAL",
+      "name": "Soporte general",
+      "description": "El cliente solicita ayuda, soporte o información genérica.",
+      "priority": "media",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "bajo",
+      "agent": "SUPPORT",
+      "requiresHuman": false,
+      "requiresAi": false,
+      "requiredEntities": [],
+      "allowedStates": [
+        "IDENTIFICAR_INTENCION"
+      ],
+      "synonymGroups": [
+        "SUPPORT_WORDS"
+      ],
+      "catalogCodes": [
+        "SUPPORT_GENERAL"
+      ],
+      "notes": ""
+    },
+    {
+      "code": "TECHNICAL_MESSAGE",
+      "name": "Mensaje técnico",
+      "description": "Mensaje irrelevante con contenido de comandos o stack traces.",
+      "priority": "baja",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "bajo",
+      "agent": "SUPPORT",
+      "requiresHuman": false,
+      "requiresAi": false,
+      "requiredEntities": [],
+      "allowedStates": [
+        "INICIO"
+      ],
+      "synonymGroups": [
+        "TECHNICAL_COMMAND_WORDS"
+      ],
+      "catalogCodes": [
+        "TECHNICAL_MESSAGE"
+      ],
+      "notes": ""
+    },
+    {
+      "code": "KNOWLEDGE_QUERY",
+      "name": "Consulta de conocimiento interno",
+      "description": "Políticas, términos, penalizaciones, datos del negocio.",
+      "priority": "media",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "bajo",
+      "agent": "KNOWLEDGE",
+      "requiresHuman": false,
+      "requiresAi": false,
+      "requiredEntities": [],
+      "allowedStates": [
+        "IDENTIFICAR_INTENCION",
+        "CONSULTAR_HORARIOS"
+      ],
+      "synonymGroups": [
+        "KNOWLEDGE_WORDS"
+      ],
+      "catalogCodes": [
+        "KNOWLEDGE_QUERY"
+      ],
+      "notes": ""
+    },
+    {
+      "code": "FOLLOW_UP",
+      "name": "Seguimiento comercial",
+      "description": "El cliente retoma una consulta o cotización previa.",
+      "priority": "media",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "bajo",
+      "agent": "FOLLOW_UP",
+      "requiresHuman": false,
+      "requiresAi": false,
+      "requiredEntities": [],
+      "allowedStates": [
+        "IDENTIFICAR_INTENCION"
+      ],
+      "synonymGroups": [
+        "FOLLOW_UP_WORDS",
+        "CONTINUE_BOOKING_WORDS"
+      ],
+      "catalogCodes": [
+        "FOLLOW_UP"
+      ],
+      "notes": ""
+    },
+    {
+      "code": "COMPLAINT",
+      "name": "Reclamo",
+      "description": "El cliente expresa molestia, reclamo o urgencia que requiere persona.",
+      "priority": "critica",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "alto",
+      "agent": "HUMAN_HANDOFF",
+      "requiresHuman": true,
+      "requiresAi": false,
+      "requiredEntities": [],
+      "allowedStates": [
+        "GESTIONAR_RECLAMO",
+        "DERIVAR_HUMANO"
+      ],
+      "synonymGroups": [
+        "COMPLAINT_WORDS",
+        "SENSITIVE_WORDS"
+      ],
+      "catalogCodes": [
+        "COMPLAINT"
+      ],
+      "notes": "Siempre deriva a humano."
+    },
+    {
+      "code": "HUMAN_REQUEST",
+      "name": "Solicitud de atención humana",
+      "description": "El cliente pide explícitamente hablar con una persona.",
+      "priority": "critica",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "alto",
+      "agent": "HUMAN_HANDOFF",
+      "requiresHuman": true,
+      "requiresAi": false,
+      "requiredEntities": [],
+      "allowedStates": [
+        "GESTIONAR_RECLAMO",
+        "DERIVAR_HUMANO"
+      ],
+      "synonymGroups": [
+        "HUMAN_WORDS"
+      ],
+      "catalogCodes": [
+        "HUMAN_REQUEST"
+      ],
+      "notes": "Siempre deriva a humano."
+    },
+    {
+      "code": "COMMERCIAL_AND_BOOKING",
+      "name": "Consulta comercial con agenda",
+      "description": "Combinación de consulta de precio o información con intención de reservar.",
+      "priority": "alta",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "medio",
+      "agent": "BOOKING",
+      "requiresHuman": false,
+      "requiresAi": false,
+      "requiredEntities": [
+        "servicio_o_producto",
+        "sede",
+        "fecha",
+        "hora"
+      ],
+      "allowedStates": [
+        "CONSULTAR_SERVICIOS",
+        "CONFIRMAR_CITA"
+      ],
+      "synonymGroups": [
+        "BOOKING_WORDS",
+        "PRICE_WORDS"
+      ],
+      "catalogCodes": [],
+      "notes": ""
+    },
+    {
+      "code": "WAITLIST_QUERY",
+      "name": "Lista de espera",
+      "description": "El cliente desea entrar, salir o conocer su posición en la lista de espera.",
+      "priority": "media",
+      "confidence": 0.8,
+      "minimumConfidence": 0.5,
+      "urgency": "bajo",
+      "agent": "BOOKING",
+      "requiresHuman": false,
+      "requiresAi": false,
+      "requiredEntities": [],
+      "allowedStates": [
+        "VERIFICAR_DISPONIBILIDAD"
+      ],
+      "synonymGroups": [
+        "WAITLIST_WORDS"
+      ],
+      "catalogCodes": [
+        "WAITLIST_QUERY"
+      ],
+      "notes": ""
+    }
+  ],
+  "entities": [
+    {
+      "key": "servicio_o_producto",
+      "entityType": "SERVICE",
+      "name": "Servicio o producto",
+      "required": true,
+      "deterministic": true,
+      "source": "catálogo de servicios + inferencia + alias",
+      "synonyms": [
+        "servicio",
+        "producto",
+        "tratamiento",
+        "plan"
+      ]
+    },
+    {
+      "key": "sede",
+      "entityType": "LOCATION",
+      "name": "Sucursal",
+      "required": true,
+      "deterministic": true,
+      "source": "ubicaciones de negocio + comuna/ciudad",
+      "synonyms": [
+        "sucursal",
+        "sede",
+        "ubicación",
+        "dirección"
+      ]
+    },
+    {
+      "key": "profesional",
+      "entityType": "PROFESSIONAL",
+      "name": "Profesional",
+      "required": false,
+      "deterministic": true,
+      "source": "catálogo de profesionales + prefijo 'con'",
+      "synonyms": [
+        "profesional",
+        "especialista"
+      ]
+    },
+    {
+      "key": "cabina",
+      "entityType": "CABIN",
+      "name": "Cabina",
+      "required": false,
+      "deterministic": true,
+      "source": "capacidad / planificación",
+      "synonyms": [
+        "cabina",
+        "box"
+      ]
+    },
+    {
+      "key": "fecha",
+      "entityType": "DATE",
+      "name": "Fecha explícita",
+      "required": false,
+      "deterministic": true,
+      "source": "regex fecha dd/mm o mes",
+      "synonyms": []
+    },
+    {
+      "key": "fecha_relativa",
+      "entityType": "RELATIVE_DATE",
+      "name": "Fecha relativa",
+      "required": false,
+      "deterministic": true,
+      "source": "días de semana, hoy, mañana, esta/próxima semana",
+      "synonyms": [
+        "hoy",
+        "mañana",
+        "lunes",
+        "martes",
+        "sábado"
+      ]
+    },
+    {
+      "key": "hora",
+      "entityType": "TIME",
+      "name": "Hora",
+      "required": true,
+      "deterministic": true,
+      "source": "regex hora (HH:mm, HH hrs, a las HH)",
+      "synonyms": [
+        "hrs",
+        "horas"
+      ]
+    },
+    {
+      "key": "tramo_horario",
+      "entityType": "TIME_RANGE",
+      "name": "Tramo horario",
+      "required": false,
+      "deterministic": true,
+      "source": "mañana/tarde/noche/primera hora/mediodía",
+      "synonyms": [
+        "en la mañana",
+        "en la tarde",
+        "en la noche"
+      ]
+    },
+    {
+      "key": "cliente",
+      "entityType": "CUSTOMER",
+      "name": "Cliente",
+      "required": true,
+      "deterministic": false,
+      "source": "displayName de la sesión WhatsApp",
+      "synonyms": [
+        "cliente"
+      ]
+    },
+    {
+      "key": "nombre",
+      "entityType": "CUSTOMER_NAME",
+      "name": "Nombre del cliente",
+      "required": false,
+      "deterministic": true,
+      "source": "soy / me llamo / mi nombre es + nombre suelto",
+      "synonyms": []
+    },
+    {
+      "key": "correo",
+      "entityType": "EMAIL",
+      "name": "Correo electrónico",
+      "required": false,
+      "deterministic": true,
+      "source": "regex email",
+      "synonyms": [
+        "correo",
+        "email"
+      ]
+    },
+    {
+      "key": "telefono",
+      "entityType": "PHONE",
+      "name": "Teléfono",
+      "required": false,
+      "deterministic": true,
+      "source": "número de la sesión WhatsApp",
+      "synonyms": [
+        "teléfono"
+      ]
+    },
+    {
+      "key": "observaciones",
+      "entityType": "NOTES",
+      "name": "Observaciones",
+      "required": false,
+      "deterministic": false,
+      "source": "notas libres del cliente",
+      "synonyms": [
+        "observaciones",
+        "notas",
+        "comentario"
+      ]
+    },
+    {
+      "key": "preferencia_horaria",
+      "entityType": "PREFERENCE",
+      "name": "Preferencia horaria",
+      "required": false,
+      "deterministic": true,
+      "source": "aliases canónicos PREFERENCE",
+      "synonyms": []
+    },
+    {
+      "key": "monto",
+      "entityType": "AMOUNT",
+      "name": "Monto",
+      "required": false,
+      "deterministic": true,
+      "source": "regex monto $",
+      "synonyms": [
+        "$"
+      ]
+    },
+    {
+      "key": "numero_solicitud",
+      "entityType": "ORDER_NUMBER",
+      "name": "Número de pedido/solicitud",
+      "required": false,
+      "deterministic": true,
+      "source": "regex pedido #",
+      "synonyms": [
+        "pedido",
+        "orden",
+        "folio"
+      ]
+    },
+    {
+      "key": "accion_pendiente",
+      "entityType": "PENDING_ACTION",
+      "name": "Acción pendiente",
+      "required": false,
+      "deterministic": false,
+      "source": "máquina de estados (cancelación/reprogramación en curso)",
+      "synonyms": []
+    },
+    {
+      "key": "fecha_limite",
+      "entityType": "DEADLINE",
+      "name": "Fecha límite",
+      "required": false,
+      "deterministic": false,
+      "source": "resultado de cambio/cancelación",
+      "synonyms": []
+    }
+  ],
+  "synonymGroups": {
+    "HUMAN_WORDS": [
+      "ejecutivo",
+      "humano",
+      "asesor",
+      "supervisor",
+      "llamenme",
+      "llamarme",
+      "contactarme",
+      "contactenme",
+      "contactenos",
+      "quiero hablar",
+      "hablar con recepcion",
+      "hablar con recepción",
+      "hablar con un",
+      "hablar con una",
+      "alguien del centro",
+      "alguien de recepcion",
+      "alguien de recepción",
+      "me llame",
+      "me llamen",
+      "me contacten",
+      "me contacte",
+      "que una persona",
+      "una persona revise",
+      "una persona atienda",
+      "una persona me ayude",
+      "una persona real",
+      "de una persona que"
+    ],
+    "COMPLAINT_WORDS": [
+      "reclamo",
+      "molesto",
+      "molesta",
+      "pesimo",
+      "horrible",
+      "denuncia",
+      "fraude",
+      "estafa",
+      "nadie responde",
+      "problema grave",
+      "amenaza",
+      "problema con mi atencion",
+      "problema con mi atención",
+      "no quede conforme",
+      "no quedé conforme",
+      "error en mi reserva",
+      "desaparecio de la agenda",
+      "desapareció de la agenda",
+      "no tenian registrada",
+      "no tenían registrada",
+      "cobraron de mas",
+      "cobraron de más",
+      "devolucion",
+      "devolución",
+      "reembolso",
+      "ofrecer a otra",
+      "ofrecerlo a otra",
+      "ofrecerselo a",
+      "ofrecerselo"
+    ],
+    "PAYMENT_WORDS": [
+      "pagar",
+      "pago",
+      "transferencia",
+      "comprobante",
+      "factura",
+      "boleta",
+      "deuda",
+      "cobro",
+      "link de pago"
+    ],
+    "PAYMENT_PROBLEM_WORDS": [
+      "pago duplicado",
+      "cobro duplicado",
+      "cobraron dos veces",
+      "no aparece",
+      "no se reflejo",
+      "no se reflejó",
+      "monto incorrecto",
+      "me cobraron",
+      "reembolso",
+      "devolucion",
+      "devolución"
+    ],
+    "BOOKING_WORDS": [
+      "agendar",
+      "agenda una",
+      "agenda la",
+      "reservar",
+      "reserva una",
+      "reserva la",
+      "tomar hora",
+      "pedir hora",
+      "sacar hora",
+      "necesito una cita",
+      "quiero una cita",
+      "cita para",
+      "un turno",
+      "turno para",
+      "sacar turno",
+      "pedir turno",
+      "apartar",
+      "separar",
+      "programar",
+      "anotar",
+      "inscribir",
+      "matricular",
+      "hacer una reserva",
+      "hacer una cita",
+      "hacer una hora",
+      "una horita",
+      "un cupo",
+      "un cupito",
+      "un turnito",
+      "entrar a la agenda"
+    ],
+    "AVAILABILITY_WORDS": [
+      "tienen hora",
+      "tiene hora",
+      "hay hora",
+      "hay disponibilidad",
+      "disponibilidad",
+      "horarios hay",
+      "que horarios",
+      "qué horarios",
+      "que horas",
+      "qué horas",
+      "hora libre",
+      "horas libres",
+      "tiene horas",
+      "tienen horas",
+      "primera hora",
+      "ultima hora",
+      "última hora",
+      "cuantas personas",
+      "cuántas personas",
+      "cuanta gente",
+      "cuánta gente",
+      "al mismo tiempo",
+      "atender al mismo tiempo",
+      "horarios disponibles",
+      "dame horarios",
+      "disponible para"
+    ],
+    "RECOMMENDATION_WORDS": [
+      "recomiendas",
+      "recomienden",
+      "recomendar",
+      "que me recomiendan",
+      "qué me recomiendan",
+      "sirve para",
+      "busco un",
+      "busco una",
+      "quiero algo para",
+      "piel sensible",
+      "hidratar",
+      "hidratacion",
+      "hidratación",
+      "relajarme",
+      "relajacion",
+      "relajación",
+      "no invasivo",
+      "no invasiva"
+    ],
+    "SERVICE_INFORMATION_WORDS": [
+      "que incluye",
+      "qué incluye",
+      "cuanto dura",
+      "cuánto dura",
+      "es invasivo",
+      "es invasiva",
+      "tratamientos tienen",
+      "servicios tienen",
+      "que tratamientos",
+      "qué tratamientos",
+      "que servicios",
+      "qué servicios",
+      "necesita evaluacion",
+      "necesita evaluación",
+      "informacion",
+      "información",
+      "mas informacion",
+      "más información",
+      "quiero informacion",
+      "quiero información",
+      "preparacion",
+      "preparación",
+      "prepararme",
+      "como debo prepararme",
+      "cómo debo prepararme",
+      "hacer algo antes del tratamiento",
+      "hacer algo antes de la sesion",
+      "hacer algo antes de la sesión",
+      "suspender algun producto",
+      "suspender algún producto",
+      "suspender algun",
+      "cuanto antes debo llegar",
+      "cuánto antes debo llegar",
+      "cuanto tiempo antes",
+      "puedo ir acompañada",
+      "puedo ir acompañado",
+      "puedo comer antes",
+      "que ropa",
+      "qué ropa",
+      "contraindicacion",
+      "contraindicación",
+      "como debo",
+      "cómo debo"
+    ],
+    "PROFESSIONAL_WORDS": [
+      "carla",
+      "profesional",
+      "doctor",
+      "doctora",
+      "terapeuta",
+      "especialista",
+      "quien realiza",
+      "quién realiza",
+      "atiende",
+      "atienden",
+      "atiende con",
+      "atienden con",
+      "recibe",
+      "trabaja la",
+      "trabaja",
+      "trabaja los",
+      "trabaja el",
+      "la misma",
+      "misma persona",
+      "misma profesional",
+      "la misma persona",
+      "la misma profesional",
+      "hace hidratacion",
+      "hace hidratación",
+      "horas tiene el doctor",
+      "horas tiene la profesional"
+    ],
+    "BUSINESS_HOURS_WORDS": [
+      "a que hora abren",
+      "a qué hora abren",
+      "hasta que hora",
+      "hasta qué hora",
+      "atienden los sabados",
+      "atienden los sábados",
+      "trabajan domingos",
+      "trabajan los domingos",
+      "horario de atencion",
+      "horario de atención",
+      "esta abierto",
+      "está abierto",
+      "atienden en la manana",
+      "atienden en la mañana",
+      "atienden en la tarde",
+      "horario de apertura",
+      "abren los",
+      "abren el",
+      "abren en",
+      "feriado",
+      "a la hora de almuerzo",
+      "hora de almuerzo",
+      "despues de las",
+      "después de las",
+      "apertura extraordinaria",
+      "atienden en dias",
+      "atienden en días",
+      "abren los sabados",
+      "abren los sábados",
+      "abren los domingos",
+      "abren feriados",
+      "que horarios tienen",
+      "qué horarios tienen",
+      "horarios tienen",
+      "horarios atienden",
+      "cual es el horario",
+      "cuál es el horario",
+      "cuales son los horarios",
+      "cuáles son los horarios"
+    ],
+    "THANKS_WORDS": [
+      "gracias",
+      "muchas gracias",
+      "hasta luego",
+      "chao",
+      "eso era todo"
+    ],
+    "BOOKING_STATUS_WORDS": [
+      "tengo agendado",
+      "tengo agendada",
+      "tengo reserva",
+      "tengo una reserva",
+      "mi reserva",
+      "mis reservas",
+      "revisar agenda",
+      "revisa la agenda",
+      "revisala la agenda",
+      "agenda de junio",
+      "agenda de este mes",
+      "estado reserva",
+      "confirmar mi hora",
+      "ver mi cita",
+      "tengo cita",
+      "tengo una cita",
+      "confirmar mi cita",
+      "confirmar mi reserva",
+      "confirmacion de cita",
+      "confirmación de cita",
+      "confirmacion de reserva",
+      "confirmación de reserva",
+      "codigo de reserva",
+      "código de reserva",
+      "codigo de cita",
+      "código de cita",
+      "codigo de la reserva",
+      "código de la reserva",
+      "codigo de la cita",
+      "código de la cita",
+      "buscar mi cita",
+      "buscar mi reserva",
+      "buscar por telefono",
+      "buscar por teléfono",
+      "ver lo de manana",
+      "ver lo de mañana",
+      "quiero confirmar",
+      "esta listo",
+      "está listo",
+      "ya pague",
+      "ya pagué",
+      "todavia sirve",
+      "todavía sirve",
+      "me enviaran una nueva confirmacion",
+      "me enviarán una nueva confirmación",
+      "me enviaran una confirmacion",
+      "me enviarán una confirmación",
+      "enviaran confirmacion",
+      "enviarán confirmación",
+      "confirmacion por whatsapp",
+      "confirmación por whatsapp",
+      "confirmacion por correo",
+      "confirmación por correo",
+      "no me llego confirmacion",
+      "no me llegó confirmación",
+      "me pueden recordar la cita",
+      "me pueden recordar la hora",
+      "me avisaran si",
+      "me avisarán si",
+      "me avisan por",
+      "aviso de recordatorio"
+    ],
+    "CHANGE_BOOKING_WORDS": [
+      "reagendar",
+      "reprogramar",
+      "reprogramacion",
+      "reprogramación",
+      "cambiar hora",
+      "cambiar mi hora",
+      "cambiar reserva",
+      "cambiar mi reserva",
+      "cambiar cita",
+      "cambiar mi cita",
+      "cambio de hora",
+      "cambio la hora",
+      "cambiarme",
+      "cámbiame",
+      "cambieme",
+      "cambiar la hora",
+      "cambiar de hora",
+      "modificar cita",
+      "modificar mi cita",
+      "mover",
+      "mover mi hora",
+      "mover mi reserva",
+      "cambio de fecha",
+      "cambiar de fecha",
+      "cambiar fecha",
+      "elegir otro dia",
+      "elegir otro día",
+      "elegir otra hora",
+      "cambie la cita",
+      "cambie la reserva",
+      "necesito cambiar",
+      "mantener mi hora actual",
+      "mantener la hora"
+    ],
+    "CANCEL_BOOKING_WORDS": [
+      "cancelar",
+      "cancela",
+      "cancele",
+      "cancelo",
+      "canceló",
+      "cancelada",
+      "cancelado",
+      "anular",
+      "anule",
+      "anula",
+      "cancelacion",
+      "cancelación",
+      "no voy a poder ir",
+      "no voy a poder asistir",
+      "no puedo ir",
+      "no voy a ir",
+      "no poder asistir",
+      "no pude asistir"
+    ],
+    "PRICE_WORDS": [
+      "precio",
+      "valor",
+      "cuanto cuesta",
+      "cuánto cuesta",
+      "cuanto vale",
+      "cuánto vale",
+      "tarifa",
+      "sale",
+      "cuesta"
+    ],
+    "QUOTE_WORDS": [
+      "cotizar",
+      "cotizacion",
+      "cotización",
+      "presupuesto"
+    ],
+    "SALES_WORDS": [
+      "producto",
+      "servicio",
+      "plan",
+      "promocion",
+      "promoción",
+      "comprar",
+      "contratar",
+      "disponible",
+      "stock",
+      "depilacion",
+      "depilación",
+      "axilas",
+      "piernas",
+      "bikini",
+      "bozo",
+      "rostro",
+      "facial",
+      "limpieza facial",
+      "laser",
+      "láser",
+      "manicure",
+      "pedicure",
+      "masaje"
+    ],
+    "SUPPORT_WORDS": [
+      "ayuda",
+      "soporte",
+      "problema",
+      "error",
+      "falla",
+      "no funciona",
+      "horario",
+      "ubicacion",
+      "ubicación",
+      "direccion",
+      "dirección",
+      "estacionamiento",
+      "estacionar",
+      "donde estacionar",
+      "dónde estacionar",
+      "llegar en auto",
+      "llegar en micro",
+      "llegar en bus",
+      "llegar en metro",
+      "acceso",
+      "estacionarse"
+    ],
+    "KNOWLEDGE_WORDS": [
+      "politica",
+      "política",
+      "manual",
+      "documento",
+      "faq",
+      "preguntas frecuentes",
+      "catalogo",
+      "catálogo",
+      "terminos",
+      "términos",
+      "penalizacion",
+      "penalización",
+      "no show",
+      "inasistencia",
+      "reembolso",
+      "devolucion",
+      "devolución",
+      "bloqueada",
+      "bloqueado",
+      "registradas",
+      "edad minima",
+      "edad mínima",
+      "menor de edad",
+      "edad",
+      "tutor",
+      "tutora",
+      "autorizacion del tutor",
+      "autorización del tutor",
+      "adulto responsable",
+      "datos del tutor",
+      "consentimiento",
+      "firmar un consentimiento",
+      "aceptar el consentimiento",
+      "como cancelo mi cita",
+      "como cancelar",
+      "cómo cancelo mi cita",
+      "cómo cancelar",
+      "como anular",
+      "cómo anular",
+      "proceso de cancelacion",
+      "proceso de cancelación",
+      "paso para cancelar",
+      "penalizacion por cancelar",
+      "penalización por cancelar",
+      "tratamientos que no se realizan a menores",
+      "tratamiento a menor",
+      "servicio requiere abono",
+      "abono es reembolsable",
+      "abono si reprogramo",
+      "abono para otra cita",
+      "usar el abono",
+      "abono confirma",
+      "abono",
+      "cuanto tengo que abonar",
+      "cuánto tengo que abonar",
+      "cuanto abonar",
+      "cuánto abonar",
+      "me devolveran el dinero",
+      "me devolverán el dinero",
+      "me devolveran",
+      "me devolverán",
+      "perdi el abono",
+      "perdí el abono",
+      "no aparezco en la agenda",
+      "no tenian registrada",
+      "no tenían registrada",
+      "cuantas veces puedo cambiar",
+      "cuántas veces puedo cambiar"
+    ],
+    "FOLLOW_UP_WORDS": [
+      "seguimiento",
+      "retomar",
+      "cotizacion pendiente",
+      "cotización pendiente",
+      "recordatorio",
+      "me contactaron"
+    ],
+    "SOCIAL_GREETING_WORDS": [
+      "como estas",
+      "como esta",
+      "que tal",
+      "hola como estas",
+      "hola que tal",
+      "buen dia",
+      "buen día"
+    ],
+    "TECHNICAL_COMMAND_WORDS": [
+      "docker compose",
+      "docker",
+      "kubectl",
+      "mvn",
+      "maven",
+      "gradle",
+      "npm",
+      "pnpm",
+      "yarn",
+      "git ",
+      "curl",
+      "http://",
+      "https://",
+      "localhost",
+      "stacktrace",
+      "exception",
+      "sql ",
+      "select ",
+      "insert ",
+      "update ",
+      "delete ",
+      "dockerfile",
+      "compose up",
+      "--build"
+    ],
+    "SENSITIVE_WORDS": [
+      "reaccion",
+      "reacción",
+      "ardor",
+      "me ardio",
+      "me ardió",
+      "inflamacion",
+      "inflamación",
+      "alergia",
+      "irritacion",
+      "irritación",
+      "quemadura",
+      "dolor fuerte",
+      "infeccion",
+      "infección",
+      "embarazada",
+      "condicion medica",
+      "condición médica"
+    ],
+    "LINK_RESEND_WORDS": [
+      "no me llego el link",
+      "no me llegó el link",
+      "no me llego el enlace",
+      "no me llegó el enlace",
+      "reenviar",
+      "reenvia",
+      "reenvía",
+      "mandame el link",
+      "mándame el link",
+      "mandame el enlace",
+      "mándame el enlace"
+    ],
+    "LINK_EXPIRED_WORDS": [
+      "enlace expiro",
+      "enlace expiró",
+      "link expiro",
+      "link expiró",
+      "link vencio",
+      "link venció",
+      "no funciona el enlace",
+      "no funciona el link",
+      "me dice expirado"
+    ],
+    "LOCATION_WORDS": [
+      "donde queda",
+      "dónde queda",
+      "direccion",
+      "dirección",
+      "ubicacion",
+      "ubicación",
+      "ubicados",
+      "como llego",
+      "cómo llego",
+      "sucursal",
+      "sede"
+    ],
+    "WAITLIST_WORDS": [
+      "lista de espera",
+      "listo de espera",
+      "cupo que se libero",
+      "cupo que se liberó",
+      "salir de la lista",
+      "posicion en la lista",
+      "posición en la lista",
+      "aceptar el cupo"
+    ],
+    "HELP_WORDS": [
+      "no se por donde empezar",
+      "no sé por dónde empezar",
+      "por donde empezar",
+      "por dónde empezar",
+      "que cosas puedo hacer",
+      "qué cosas puedo hacer",
+      "que puedo hacer",
+      "qué puedo hacer",
+      "como funciona",
+      "cómo funciona",
+      "que haces",
+      "qué haces",
+      "que puedes hacer",
+      "qué puedes hacer",
+      "ayudame a empezar",
+      "ayúdame a empezar",
+      "quiero hacer una consulta",
+      "quisiera hacer una consulta",
+      "necesito orientacion",
+      "necesito orientación",
+      "pueden orientarme",
+      "pueden orientarme",
+      "me puedes orientar",
+      "me pueden orientar",
+      "puedes orientarme",
+      "puede orientarme"
+    ],
+    "NEGATED_AGENDA_ACTION_WORDS": [
+      "no quiero cancelar",
+      "no deseo cancelar",
+      "no necesito cancelar",
+      "no voy a cancelar",
+      "no es para cancelar",
+      "no quiero anular",
+      "no quiero agendar",
+      "no deseo agendar",
+      "no necesito agendar",
+      "no voy a agendar",
+      "no es para agendar",
+      "no quiero reservar",
+      "no deseo reservar",
+      "no quiero tomar hora",
+      "no quiero pedir hora",
+      "no quiero sacar hora"
+    ],
+    "INFO_ONLY_MARKERS_WORDS": [
+      "solo consultar",
+      "solo preguntar",
+      "solo saber",
+      "solo quiero saber",
+      "era una pregunta",
+      "es una pregunta",
+      "consulta",
+      "consultar",
+      "pregunta",
+      "informacion",
+      "información"
+    ],
+    "GREETING_WORDS": [
+      "hola",
+      "buenas",
+      "buenos dias",
+      "buenos días",
+      "buenas tardes",
+      "buenas noches"
+    ],
+    "CANCEL_FOLLOW_UP_WORDS": [
+      "no voy a poder ir",
+      "no puedo ir",
+      "no voy a ir",
+      "no pude asistir",
+      "no poder asistir"
+    ],
+    "STATUS_FOLLOW_UP_WORDS": [
+      "ya pague",
+      "ya pagué",
+      "esta listo",
+      "está listo",
+      "todavia sirve",
+      "todavía sirve",
+      "quiero confirmar",
+      "listo",
+      "confirmar mi cita",
+      "confirmar mi reserva",
+      "confirmar mi hora"
+    ],
+    "AFFIRMATIVE_WORDS": [
+      "si",
+      "sí",
+      "ok",
+      "okay",
+      "dale",
+      "claro",
+      "simon",
+      "sep",
+      "yes",
+      "por supuesto",
+      "obvio",
+      "correcto",
+      "confirmo"
+    ],
+    "CONTINUE_BOOKING_WORDS": [
+      "la misma de la otra vez",
+      "el tratamiento anterior",
+      "a la misma hora",
+      "con ella",
+      "con el",
+      "no quiero ese",
+      "no quiero esa",
+      "quiero otra opcion",
+      "quiero otra opción",
+      "la de la otra vez",
+      "el anterior",
+      "lo mismo de antes",
+      "la misma hora",
+      "quiero lo mismo"
+    ]
+  },
+  "taxonomy": [
+    {
+      "normalizedPhrase": "hola",
+      "intent": "GREETING",
+      "confidence": 0.78,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:saludar"
+    },
+    {
+      "normalizedPhrase": "buenas",
+      "intent": "GREETING",
+      "confidence": 0.78,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:saludar"
+    },
+    {
+      "normalizedPhrase": "hola como estan",
+      "intent": "GREETING",
+      "confidence": 0.78,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:saludar"
+    },
+    {
+      "normalizedPhrase": "gracias chao",
+      "intent": "THANKS_OR_FAREWELL",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:despedirse"
+    },
+    {
+      "normalizedPhrase": "nos vemos",
+      "intent": "THANKS_OR_FAREWELL",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:despedirse"
+    },
+    {
+      "normalizedPhrase": "hasta luego",
+      "intent": "THANKS_OR_FAREWELL",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:despedirse"
+    },
+    {
+      "normalizedPhrase": "gracias",
+      "intent": "THANKS_OR_FAREWELL",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:agradecer"
+    },
+    {
+      "normalizedPhrase": "muchas gracias",
+      "intent": "THANKS_OR_FAREWELL",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:agradecer"
+    },
+    {
+      "normalizedPhrase": "se pasaron",
+      "intent": "THANKS_OR_FAREWELL",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:agradecer"
+    },
+    {
+      "normalizedPhrase": "que puedes hacer",
+      "intent": "SUPPORT_GENERAL",
+      "confidence": 0.78,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:solicitar_ayuda"
+    },
+    {
+      "normalizedPhrase": "ayudame",
+      "intent": "SUPPORT_GENERAL",
+      "confidence": 0.78,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:solicitar_ayuda"
+    },
+    {
+      "normalizedPhrase": "no se como reservar",
+      "intent": "SUPPORT_GENERAL",
+      "confidence": 0.78,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:solicitar_ayuda"
+    },
+    {
+      "normalizedPhrase": "que servicios tienen",
+      "intent": "COMMERCIAL_INQUIRY",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_servicios"
+    },
+    {
+      "normalizedPhrase": "hacen limpieza facial",
+      "intent": "COMMERCIAL_INQUIRY",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_servicios"
+    },
+    {
+      "normalizedPhrase": "cuanto sale",
+      "intent": "PRICE_REQUEST",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_precio"
+    },
+    {
+      "normalizedPhrase": "precio de depilacion",
+      "intent": "PRICE_REQUEST",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_precio"
+    },
+    {
+      "normalizedPhrase": "cuanto demora",
+      "intent": "SERVICE_INFORMATION",
+      "confidence": 0.78,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_duracion"
+    },
+    {
+      "normalizedPhrase": "cuanto dura el masaje",
+      "intent": "SERVICE_INFORMATION",
+      "confidence": 0.78,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_duracion"
+    },
+    {
+      "normalizedPhrase": "tienen promociones",
+      "intent": "COMMERCIAL_INQUIRY",
+      "confidence": 0.78,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_promocion"
+    },
+    {
+      "normalizedPhrase": "sigue el descuento",
+      "intent": "COMMERCIAL_INQUIRY",
+      "confidence": 0.78,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_promocion"
+    },
+    {
+      "normalizedPhrase": "donde tienen sucursales",
+      "intent": "LOCATION_QUERY",
+      "confidence": 0.78,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_sucursales"
+    },
+    {
+      "normalizedPhrase": "atienden en providencia",
+      "intent": "LOCATION_QUERY",
+      "confidence": 0.78,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_sucursales"
+    },
+    {
+      "normalizedPhrase": "mandame la direccion",
+      "intent": "LOCATION_QUERY",
+      "confidence": 0.78,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_direccion"
+    },
+    {
+      "normalizedPhrase": "como llego",
+      "intent": "LOCATION_QUERY",
+      "confidence": 0.78,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_direccion"
+    },
+    {
+      "normalizedPhrase": "abren el sabado",
+      "intent": "BUSINESS_HOURS_QUERY",
+      "confidence": 0.78,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_horario_empresa"
+    },
+    {
+      "normalizedPhrase": "hasta que hora atienden",
+      "intent": "BUSINESS_HOURS_QUERY",
+      "confidence": 0.78,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_horario_empresa"
+    },
+    {
+      "normalizedPhrase": "quien hace botox",
+      "intent": "PROFESSIONAL_QUERY",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_profesionales"
+    },
+    {
+      "normalizedPhrase": "trabaja carla hoy",
+      "intent": "PROFESSIONAL_QUERY",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_profesionales"
+    },
+    {
+      "normalizedPhrase": "que horas hay manana",
+      "intent": "AVAILABILITY_QUERY",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_disponibilidad"
+    },
+    {
+      "normalizedPhrase": "tienen cupo hoy",
+      "intent": "AVAILABILITY_QUERY",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_disponibilidad"
+    },
+    {
+      "normalizedPhrase": "quiero reservar",
+      "intent": "BOOKING_REQUEST",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:reservar"
+    },
+    {
+      "normalizedPhrase": "necesito pedir una hora",
+      "intent": "BOOKING_REQUEST",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:reservar"
+    },
+    {
+      "normalizedPhrase": "la limpieza facial",
+      "intent": "BOOKING_REQUEST",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:seleccionar_servicio"
+    },
+    {
+      "normalizedPhrase": "el segundo servicio",
+      "intent": "BOOKING_REQUEST",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:seleccionar_servicio"
+    },
+    {
+      "normalizedPhrase": "la de providencia",
+      "intent": "BOOKING_REQUEST",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:seleccionar_sucursal"
+    },
+    {
+      "normalizedPhrase": "en las condes",
+      "intent": "BOOKING_REQUEST",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:seleccionar_sucursal"
+    },
+    {
+      "normalizedPhrase": "con carla",
+      "intent": "PROFESSIONAL_QUERY",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:seleccionar_profesional"
+    },
+    {
+      "normalizedPhrase": "cualquiera disponible",
+      "intent": "PROFESSIONAL_QUERY",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:seleccionar_profesional"
+    },
+    {
+      "normalizedPhrase": "la segunda",
+      "intent": "BOOKING_REQUEST",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:seleccionar_horario"
+    },
+    {
+      "normalizedPhrase": "a las 16 30",
+      "intent": "BOOKING_REQUEST",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:seleccionar_horario"
+    },
+    {
+      "normalizedPhrase": "esa me sirve",
+      "intent": "BOOKING_REQUEST",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:seleccionar_horario"
+    },
+    {
+      "normalizedPhrase": "si confirmo",
+      "intent": "BOOKING_REQUEST",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:confirmar_reserva"
+    },
+    {
+      "normalizedPhrase": "reserva esa hora",
+      "intent": "BOOKING_REQUEST",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:confirmar_reserva"
+    },
+    {
+      "normalizedPhrase": "ninguna me sirve",
+      "intent": "AVAILABILITY_QUERY",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:rechazar_horario"
+    },
+    {
+      "normalizedPhrase": "mas tarde",
+      "intent": "AVAILABILITY_QUERY",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:rechazar_horario"
+    },
+    {
+      "normalizedPhrase": "a que hora era mi cita",
+      "intent": "BOOKING_STATUS",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_reserva"
+    },
+    {
+      "normalizedPhrase": "esta confirmada",
+      "intent": "BOOKING_STATUS",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_reserva"
+    },
+    {
+      "normalizedPhrase": "muestrame mis horas",
+      "intent": "BOOKING_STATUS",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:listar_reservas"
+    },
+    {
+      "normalizedPhrase": "que reservas tengo",
+      "intent": "BOOKING_STATUS",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:listar_reservas"
+    },
+    {
+      "normalizedPhrase": "la del viernes",
+      "intent": "BOOKING_STATUS",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:seleccionar_reserva"
+    },
+    {
+      "normalizedPhrase": "la segunda cita",
+      "intent": "BOOKING_STATUS",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:seleccionar_reserva"
+    },
+    {
+      "normalizedPhrase": "quiero cambiar mi hora",
+      "intent": "BOOKING_CHANGE",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:reprogramar"
+    },
+    {
+      "normalizedPhrase": "puede ser manana",
+      "intent": "BOOKING_CHANGE",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:reprogramar"
+    },
+    {
+      "normalizedPhrase": "quiero cancelar",
+      "intent": "BOOKING_CANCEL",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:cancelar"
+    },
+    {
+      "normalizedPhrase": "no podre asistir",
+      "intent": "BOOKING_CANCEL",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:cancelar"
+    },
+    {
+      "normalizedPhrase": "si cancelala",
+      "intent": "BOOKING_CANCEL",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:confirmar_cancelacion"
+    },
+    {
+      "normalizedPhrase": "confirmo la anulacion",
+      "intent": "BOOKING_CANCEL",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:confirmar_cancelacion"
+    },
+    {
+      "normalizedPhrase": "no dejala como esta",
+      "intent": "BOOKING_CANCEL",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:rechazar_cancelacion"
+    },
+    {
+      "normalizedPhrase": "mejor no",
+      "intent": "BOOKING_CANCEL",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:rechazar_cancelacion"
+    },
+    {
+      "normalizedPhrase": "confirmo mi hora",
+      "intent": "BOOKING_STATUS",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:confirmar_asistencia"
+    },
+    {
+      "normalizedPhrase": "si asistire",
+      "intent": "BOOKING_STATUS",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:confirmar_asistencia"
+    },
+    {
+      "normalizedPhrase": "soy ana perez",
+      "intent": "BOOKING_REQUEST",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:enviar_datos_cliente"
+    },
+    {
+      "normalizedPhrase": "mi correo es",
+      "intent": "BOOKING_REQUEST",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:enviar_datos_cliente"
+    },
+    {
+      "normalizedPhrase": "mi apellido es perez no peres",
+      "intent": "BOOKING_REQUEST",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:corregir_dato"
+    },
+    {
+      "normalizedPhrase": "era 18 30",
+      "intent": "BOOKING_REQUEST",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:corregir_dato"
+    },
+    {
+      "normalizedPhrase": "puedo pagar con tarjeta",
+      "intent": "PAYMENT_INQUIRY",
+      "confidence": 0.78,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_medio_pago"
+    },
+    {
+      "normalizedPhrase": "aceptan transferencia",
+      "intent": "PAYMENT_INQUIRY",
+      "confidence": 0.78,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_medio_pago"
+    },
+    {
+      "normalizedPhrase": "hay que abonar",
+      "intent": "PAYMENT_INQUIRY",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_abono"
+    },
+    {
+      "normalizedPhrase": "cuanto debo pagar para reservar",
+      "intent": "PAYMENT_INQUIRY",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_abono"
+    },
+    {
+      "normalizedPhrase": "quiero que me devuelvan el abono",
+      "intent": "PAYMENT_PROBLEM",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": true,
+      "reason": "taxonomia_conversacion:solicitar_devolucion"
+    },
+    {
+      "normalizedPhrase": "enviame el comprobante",
+      "intent": "PAYMENT_INQUIRY",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:solicitar_comprobante"
+    },
+    {
+      "normalizedPhrase": "necesito boleta",
+      "intent": "PAYMENT_INQUIRY",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:solicitar_comprobante"
+    },
+    {
+      "normalizedPhrase": "quiero hablar con alguien",
+      "intent": "HUMAN_REQUEST",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": true,
+      "reason": "taxonomia_conversacion:hablar_con_persona"
+    },
+    {
+      "normalizedPhrase": "pasame con una persona",
+      "intent": "HUMAN_REQUEST",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": true,
+      "reason": "taxonomia_conversacion:hablar_con_persona"
+    },
+    {
+      "normalizedPhrase": "me atendieron mal",
+      "intent": "COMPLAINT",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": true,
+      "reason": "taxonomia_conversacion:presentar_reclamo"
+    },
+    {
+      "normalizedPhrase": "me cobraron dos veces",
+      "intent": "COMPLAINT",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": true,
+      "reason": "taxonomia_conversacion:presentar_reclamo"
+    },
+    {
+      "normalizedPhrase": "no la canceles mejor cambiala",
+      "intent": "AMBIGUOUS",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:cambiar_intencion"
+    },
+    {
+      "normalizedPhrase": "antes dime el precio",
+      "intent": "AMBIGUOUS",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:cambiar_intencion"
+    },
+    {
+      "normalizedPhrase": "quien gano el partido",
+      "intent": "AMBIGUOUS",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:mensaje_fuera_de_contexto"
+    },
+    {
+      "normalizedPhrase": "cuentame un chiste",
+      "intent": "AMBIGUOUS",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:mensaje_fuera_de_contexto"
+    },
+    {
+      "normalizedPhrase": "asdf",
+      "intent": "AMBIGUOUS",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:mensaje_incomprensible"
+    },
+    {
+      "normalizedPhrase": "hraa mnn",
+      "intent": "AMBIGUOUS",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:mensaje_incomprensible"
+    },
+    {
+      "normalizedPhrase": "si cambia la cita",
+      "intent": "BOOKING_CHANGE",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:confirmar_reprogramacion"
+    },
+    {
+      "normalizedPhrase": "confirmo el nuevo horario",
+      "intent": "BOOKING_CHANGE",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:confirmar_reprogramacion"
+    },
+    {
+      "normalizedPhrase": "no dejala como estaba",
+      "intent": "BOOKING_CHANGE",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:rechazar_reprogramacion"
+    },
+    {
+      "normalizedPhrase": "mejor mantengo mi hora",
+      "intent": "BOOKING_CHANGE",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:rechazar_reprogramacion"
+    },
+    {
+      "normalizedPhrase": "hasta cuando puedo cancelar",
+      "intent": "BOOKING_STATUS",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_politica_cancelacion"
+    },
+    {
+      "normalizedPhrase": "pierdo el abono",
+      "intent": "BOOKING_STATUS",
+      "confidence": 0.84,
+      "urgency": "medio",
+      "requiresHuman": false,
+      "reason": "taxonomia_conversacion:consultar_politica_cancelacion"
+    }
+  ],
+  "catalogCodes": {
+    "BOOKING_CREATE": "BOOKING_REQUEST",
+    "BOOKING_RESCHEDULE": "BOOKING_CHANGE",
+    "BOOKING_CANCEL": "BOOKING_CANCEL",
+    "BOOKING_AVAILABILITY": "AVAILABILITY_QUERY",
+    "BOOKING_STATUS": "BOOKING_STATUS",
+    "SERVICE_INFORMATION": "SERVICE_INFORMATION",
+    "SERVICE_PRICE": "PRICE_REQUEST",
+    "BUSINESS_HOURS": "BUSINESS_HOURS_QUERY",
+    "BUSINESS_LOCATION": "LOCATION_QUERY",
+    "PAYMENT_INFORMATION": "PAYMENT_INQUIRY",
+    "PAYMENT_STATUS": "PAYMENT_INQUIRY",
+    "GREETING": "GREETING",
+    "THANKS": "THANKS_OR_FAREWELL",
+    "GOODBYE": "THANKS_OR_FAREWELL",
+    "HUMAN_REQUEST": "HUMAN_REQUEST",
+    "COMMERCIAL_INQUIRY": "COMMERCIAL_INQUIRY",
+    "SERVICE_RECOMMENDATION": "SERVICE_RECOMMENDATION",
+    "PROFESSIONAL_QUERY": "PROFESSIONAL_QUERY",
+    "QUOTE_REQUEST": "QUOTE_REQUEST",
+    "PAYMENT_PROBLEM": "PAYMENT_PROBLEM",
+    "SUPPORT_GENERAL": "SUPPORT_GENERAL",
+    "TECHNICAL_MESSAGE": "TECHNICAL_MESSAGE",
+    "KNOWLEDGE_QUERY": "KNOWLEDGE_QUERY",
+    "FOLLOW_UP": "FOLLOW_UP",
+    "COMPLAINT": "COMPLAINT",
+    "WAITLIST_QUERY": "WAITLIST_QUERY"
+  },
+  "states": [
+    {
+      "code": "INICIO",
+      "name": "Inicio",
+      "description": "Sin conversación activa o intención no determinada todavía.",
+      "entryData": [],
+      "allowedIntents": [
+        "GREETING",
+        "THANKS_OR_FAREWELL",
+        "AMBIGUOUS",
+        "TECHNICAL_MESSAGE"
+      ]
+    },
+    {
+      "code": "IDENTIFICAR_INTENCION",
+      "name": "Identificando intención",
+      "description": "El turno actual clasifica el mensaje del cliente.",
+      "entryData": [],
+      "allowedIntents": [
+        "GREETING",
+        "THANKS_OR_FAREWELL",
+        "COMMERCIAL_INQUIRY",
+        "SERVICE_INFORMATION",
+        "SERVICE_RECOMMENDATION",
+        "PROFESSIONAL_QUERY",
+        "LOCATION_QUERY",
+        "BUSINESS_HOURS_QUERY",
+        "SUPPORT_GENERAL",
+        "KNOWLEDGE_QUERY",
+        "FOLLOW_UP",
+        "PAYMENT_INQUIRY",
+        "PAYMENT_PROBLEM",
+        "AMBIGUOUS"
+      ]
+    },
+    {
+      "code": "VERIFICAR_DISPONIBILIDAD",
+      "name": "Verificando disponibilidad",
+      "description": "Se consultan cupos y horarios del servicio/sucursal.",
+      "entryData": [
+        "servicio_o_producto",
+        "sede"
+      ],
+      "allowedIntents": [
+        "AVAILABILITY_QUERY",
+        "BOOKING_REQUEST",
+        "WAITLIST_QUERY",
+        "COMMERCIAL_AND_BOOKING"
+      ]
+    },
+    {
+      "code": "CAPTURAR_DATOS",
+      "name": "Capturando datos de reserva",
+      "description": "Se recopilan servicio, sucursal, fecha, hora y datos del cliente.",
+      "entryData": [
+        "servicio_o_producto",
+        "sede",
+        "fecha",
+        "hora",
+        "cliente"
+      ],
+      "allowedIntents": [
+        "BOOKING_REQUEST",
+        "BOOKING_CHANGE",
+        "COMMERCIAL_AND_BOOKING",
+        "AMBIGUOUS"
+      ]
+    },
+    {
+      "code": "CONSULTAR_PRECIO",
+      "name": "Consultando precio",
+      "description": "Se informa precio con fuente del catálogo.",
+      "entryData": [
+        "servicio_o_producto"
+      ],
+      "allowedIntents": [
+        "PRICE_REQUEST",
+        "QUOTE_REQUEST",
+        "COMMERCIAL_INQUIRY"
+      ]
+    },
+    {
+      "code": "CONFIRMAR_CITA",
+      "name": "Confirmando cita",
+      "description": "Se envía enlace de confirmación y se espera aceptación.",
+      "entryData": [
+        "servicio_o_producto",
+        "sede",
+        "fecha",
+        "hora",
+        "cliente"
+      ],
+      "allowedIntents": [
+        "BOOKING_REQUEST",
+        "BOOKING_STATUS",
+        "AMBIGUOUS"
+      ]
+    },
+    {
+      "code": "REPROGRAMAR_CITA",
+      "name": "Reprogramando cita",
+      "description": "Cambio de fecha/hora de una reserva existente.",
+      "entryData": [
+        "servicio_o_producto",
+        "sede",
+        "fecha",
+        "hora"
+      ],
+      "allowedIntents": [
+        "BOOKING_CHANGE",
+        "BOOKING_STATUS",
+        "AMBIGUOUS"
+      ]
+    },
+    {
+      "code": "CANCELAR_CITA",
+      "name": "Cancelando cita",
+      "description": "Anulación de una reserva con confirmación.",
+      "entryData": [
+        "fecha",
+        "hora"
+      ],
+      "allowedIntents": [
+        "BOOKING_CANCEL",
+        "BOOKING_STATUS",
+        "AMBIGUOUS"
+      ]
+    },
+    {
+      "code": "CONSULTAR_RESERVA",
+      "name": "Consultando reserva",
+      "description": "Estado, código o confirmación de una reserva.",
+      "entryData": [],
+      "allowedIntents": [
+        "BOOKING_STATUS",
+        "BOOKING_CHANGE",
+        "BOOKING_CANCEL",
+        "AMBIGUOUS"
+      ]
+    },
+    {
+      "code": "CONSULTAR_SERVICIOS",
+      "name": "Consultando servicios",
+      "description": "Información, precios o recomendaciones de la oferta.",
+      "entryData": [],
+      "allowedIntents": [
+        "COMMERCIAL_INQUIRY",
+        "SERVICE_INFORMATION",
+        "SERVICE_RECOMMENDATION",
+        "PRICE_REQUEST",
+        "QUOTE_REQUEST",
+        "PROFESSIONAL_QUERY",
+        "COMMERCIAL_AND_BOOKING"
+      ]
+    },
+    {
+      "code": "CONSULTAR_HORARIOS",
+      "name": "Consultando horarios / ubicación",
+      "description": "Horarios de atención, horarios de apertura o ubicación.",
+      "entryData": [],
+      "allowedIntents": [
+        "BUSINESS_HOURS_QUERY",
+        "LOCATION_QUERY",
+        "KNOWLEDGE_QUERY"
+      ]
+    },
+    {
+      "code": "REGISTRAR_PAGO",
+      "name": "Gestionando pago",
+      "description": "Métodos de pago, abono, comprobantes o incidencias.",
+      "entryData": [],
+      "allowedIntents": [
+        "PAYMENT_INQUIRY",
+        "PAYMENT_PROBLEM"
+      ]
+    },
+    {
+      "code": "GESTIONAR_RECLAMO",
+      "name": "Gestionando reclamo",
+      "description": "Reclamos o solicitudes de atención humana.",
+      "entryData": [],
+      "allowedIntents": [
+        "COMPLAINT",
+        "HUMAN_REQUEST"
+      ]
+    },
+    {
+      "code": "DERIVAR_HUMANO",
+      "name": "Derivando a humano",
+      "description": "Conversación asignada a un agente humano.",
+      "entryData": [],
+      "allowedIntents": [
+        "COMPLAINT",
+        "HUMAN_REQUEST",
+        "PAYMENT_PROBLEM"
+      ]
+    }
+  ],
+  "legacyStateMap": {
+    "ESPERANDO_SERVICIO": "CAPTURAR_DATOS",
+    "ESPERANDO_SUCURSAL": "CAPTURAR_DATOS",
+    "ESPERANDO_FECHA": "CAPTURAR_DATOS",
+    "ESPERANDO_HORARIO": "VERIFICAR_DISPONIBILIDAD",
+    "ESPERANDO_SELECCION_RESERVA": "CONSULTAR_RESERVA",
+    "ESPERANDO_CONFIRMACION_RESERVA": "CONFIRMAR_CITA",
+    "ESPERANDO_CONFIRMACION_REPROGRAMACION": "REPROGRAMAR_CITA",
+    "ESPERANDO_FECHA_REPROGRAMACION": "REPROGRAMAR_CITA",
+    "ESPERANDO_CONFIRMACION_CANCELACION": "CANCELAR_CITA",
+    "DERIVADO_HUMANO": "DERIVAR_HUMANO"
+  },
+  "stateTransitions": [
+    {
+      "from": "INICIO",
+      "to": "IDENTIFICAR_INTENCION",
+      "onIntent": "AMBIGUOUS",
+      "condition": null,
+      "priority": "alta"
+    },
+    {
+      "from": "INICIO",
+      "to": "CAPTURAR_DATOS",
+      "onIntent": "BOOKING_REQUEST",
+      "condition": "datos de reserva incompletos",
+      "priority": "critica"
+    },
+    {
+      "from": "INICIO",
+      "to": "REPROGRAMAR_CITA",
+      "onIntent": "BOOKING_CHANGE",
+      "condition": "reserva existente localizada",
+      "priority": "alta"
+    },
+    {
+      "from": "INICIO",
+      "to": "CANCELAR_CITA",
+      "onIntent": "BOOKING_CANCEL",
+      "condition": "reserva existente localizada",
+      "priority": "alta"
+    },
+    {
+      "from": "INICIO",
+      "to": "CONSULTAR_RESERVA",
+      "onIntent": "BOOKING_STATUS",
+      "condition": null,
+      "priority": "media"
+    },
+    {
+      "from": "INICIO",
+      "to": "VERIFICAR_DISPONIBILIDAD",
+      "onIntent": "AVAILABILITY_QUERY",
+      "condition": null,
+      "priority": "alta"
+    },
+    {
+      "from": "INICIO",
+      "to": "CONSULTAR_PRECIO",
+      "onIntent": "PRICE_REQUEST",
+      "condition": null,
+      "priority": "alta"
+    },
+    {
+      "from": "INICIO",
+      "to": "CONSULTAR_PRECIO",
+      "onIntent": "QUOTE_REQUEST",
+      "condition": null,
+      "priority": "alta"
+    },
+    {
+      "from": "INICIO",
+      "to": "CONSULTAR_SERVICIOS",
+      "onIntent": "COMMERCIAL_INQUIRY",
+      "condition": null,
+      "priority": "media"
+    },
+    {
+      "from": "INICIO",
+      "to": "CONSULTAR_SERVICIOS",
+      "onIntent": "SERVICE_INFORMATION",
+      "condition": null,
+      "priority": "media"
+    },
+    {
+      "from": "INICIO",
+      "to": "CONSULTAR_SERVICIOS",
+      "onIntent": "SERVICE_RECOMMENDATION",
+      "condition": null,
+      "priority": "media"
+    },
+    {
+      "from": "INICIO",
+      "to": "CONSULTAR_SERVICIOS",
+      "onIntent": "PROFESSIONAL_QUERY",
+      "condition": null,
+      "priority": "media"
+    },
+    {
+      "from": "INICIO",
+      "to": "CONSULTAR_HORARIOS",
+      "onIntent": "BUSINESS_HOURS_QUERY",
+      "condition": null,
+      "priority": "media"
+    },
+    {
+      "from": "INICIO",
+      "to": "CONSULTAR_HORARIOS",
+      "onIntent": "LOCATION_QUERY",
+      "condition": null,
+      "priority": "media"
+    },
+    {
+      "from": "INICIO",
+      "to": "REGISTRAR_PAGO",
+      "onIntent": "PAYMENT_INQUIRY",
+      "condition": null,
+      "priority": "media"
+    },
+    {
+      "from": "INICIO",
+      "to": "REGISTRAR_PAGO",
+      "onIntent": "PAYMENT_PROBLEM",
+      "condition": null,
+      "priority": "critica"
+    },
+    {
+      "from": "INICIO",
+      "to": "GESTIONAR_RECLAMO",
+      "onIntent": "COMPLAINT",
+      "condition": null,
+      "priority": "critica"
+    },
+    {
+      "from": "INICIO",
+      "to": "DERIVAR_HUMANO",
+      "onIntent": "HUMAN_REQUEST",
+      "condition": null,
+      "priority": "critica"
+    },
+    {
+      "from": "IDENTIFICAR_INTENCION",
+      "to": "VERIFICAR_DISPONIBILIDAD",
+      "onIntent": "AVAILABILITY_QUERY",
+      "condition": "disponibilidad preguntada",
+      "priority": "alta"
+    },
+    {
+      "from": "IDENTIFICAR_INTENCION",
+      "to": "CAPTURAR_DATOS",
+      "onIntent": "BOOKING_REQUEST",
+      "condition": "datos de reserva incompletos",
+      "priority": "critica"
+    },
+    {
+      "from": "IDENTIFICAR_INTENCION",
+      "to": "CONSULTAR_PRECIO",
+      "onIntent": "PRICE_REQUEST",
+      "condition": null,
+      "priority": "alta"
+    },
+    {
+      "from": "IDENTIFICAR_INTENCION",
+      "to": "CONSULTAR_PRECIO",
+      "onIntent": "QUOTE_REQUEST",
+      "condition": null,
+      "priority": "alta"
+    },
+    {
+      "from": "IDENTIFICAR_INTENCION",
+      "to": "CONSULTAR_SERVICIOS",
+      "onIntent": "COMMERCIAL_INQUIRY",
+      "condition": null,
+      "priority": "media"
+    },
+    {
+      "from": "IDENTIFICAR_INTENCION",
+      "to": "CONSULTAR_SERVICIOS",
+      "onIntent": "SERVICE_INFORMATION",
+      "condition": null,
+      "priority": "media"
+    },
+    {
+      "from": "IDENTIFICAR_INTENCION",
+      "to": "CONSULTAR_SERVICIOS",
+      "onIntent": "SERVICE_RECOMMENDATION",
+      "condition": null,
+      "priority": "media"
+    },
+    {
+      "from": "IDENTIFICAR_INTENCION",
+      "to": "CONSULTAR_SERVICIOS",
+      "onIntent": "PROFESSIONAL_QUERY",
+      "condition": null,
+      "priority": "media"
+    },
+    {
+      "from": "IDENTIFICAR_INTENCION",
+      "to": "CONSULTAR_HORARIOS",
+      "onIntent": "BUSINESS_HOURS_QUERY",
+      "condition": null,
+      "priority": "media"
+    },
+    {
+      "from": "IDENTIFICAR_INTENCION",
+      "to": "CONSULTAR_HORARIOS",
+      "onIntent": "LOCATION_QUERY",
+      "condition": null,
+      "priority": "media"
+    },
+    {
+      "from": "IDENTIFICAR_INTENCION",
+      "to": "CONSULTAR_RESERVA",
+      "onIntent": "BOOKING_STATUS",
+      "condition": null,
+      "priority": "alta"
+    },
+    {
+      "from": "IDENTIFICAR_INTENCION",
+      "to": "REPROGRAMAR_CITA",
+      "onIntent": "BOOKING_CHANGE",
+      "condition": "reserva existente localizada",
+      "priority": "alta"
+    },
+    {
+      "from": "IDENTIFICAR_INTENCION",
+      "to": "CANCELAR_CITA",
+      "onIntent": "BOOKING_CANCEL",
+      "condition": "reserva existente localizada",
+      "priority": "alta"
+    },
+    {
+      "from": "IDENTIFICAR_INTENCION",
+      "to": "REGISTRAR_PAGO",
+      "onIntent": "PAYMENT_INQUIRY",
+      "condition": null,
+      "priority": "media"
+    },
+    {
+      "from": "IDENTIFICAR_INTENCION",
+      "to": "REGISTRAR_PAGO",
+      "onIntent": "PAYMENT_PROBLEM",
+      "condition": null,
+      "priority": "critica"
+    },
+    {
+      "from": "IDENTIFICAR_INTENCION",
+      "to": "GESTIONAR_RECLAMO",
+      "onIntent": "COMPLAINT",
+      "condition": null,
+      "priority": "critica"
+    },
+    {
+      "from": "IDENTIFICAR_INTENCION",
+      "to": "DERIVAR_HUMANO",
+      "onIntent": "HUMAN_REQUEST",
+      "condition": null,
+      "priority": "critica"
+    },
+    {
+      "from": "VERIFICAR_DISPONIBILIDAD",
+      "to": "CAPTURAR_DATOS",
+      "onIntent": "BOOKING_REQUEST",
+      "condition": "cliente elige horario",
+      "priority": "critica"
+    },
+    {
+      "from": "VERIFICAR_DISPONIBILIDAD",
+      "to": "CONFIRMAR_CITA",
+      "onIntent": "COMMERCIAL_AND_BOOKING",
+      "condition": "datos completos",
+      "priority": "alta"
+    },
+    {
+      "from": "CAPTURAR_DATOS",
+      "to": "CONFIRMAR_CITA",
+      "onIntent": "BOOKING_REQUEST",
+      "condition": "datos completos y validados",
+      "priority": "critica"
+    },
+    {
+      "from": "REPROGRAMAR_CITA",
+      "to": "CONFIRMAR_CITA",
+      "onIntent": "BOOKING_CHANGE",
+      "condition": "nueva fecha/hora confirmadas",
+      "priority": "critica"
+    },
+    {
+      "from": "CANCELAR_CITA",
+      "to": "INICIO",
+      "onIntent": "BOOKING_CANCEL",
+      "condition": "cancelación confirmada",
+      "priority": "critica"
+    },
+    {
+      "from": "CONSULTAR_RESERVA",
+      "to": "REPROGRAMAR_CITA",
+      "onIntent": "BOOKING_CHANGE",
+      "condition": "cliente pide cambio",
+      "priority": "alta"
+    },
+    {
+      "from": "CONSULTAR_RESERVA",
+      "to": "CANCELAR_CITA",
+      "onIntent": "BOOKING_CANCEL",
+      "condition": "cliente pide cancelación",
+      "priority": "alta"
+    },
+    {
+      "from": "CONSULTAR_SERVICIOS",
+      "to": "CONSULTAR_PRECIO",
+      "onIntent": "PRICE_REQUEST",
+      "condition": "pregunta de precio",
+      "priority": "alta"
+    },
+    {
+      "from": "CONSULTAR_SERVICIOS",
+      "to": "CAPTURAR_DATOS",
+      "onIntent": "COMMERCIAL_AND_BOOKING",
+      "condition": "cliente decide reservar",
+      "priority": "alta"
+    },
+    {
+      "from": "GESTIONAR_RECLAMO",
+      "to": "DERIVAR_HUMANO",
+      "onIntent": "HUMAN_REQUEST",
+      "condition": "requiere persona",
+      "priority": "critica"
+    },
+    {
+      "from": "REGISTRAR_PAGO",
+      "to": "DERIVAR_HUMANO",
+      "onIntent": "PAYMENT_PROBLEM",
+      "condition": "incidencia de pago",
+      "priority": "critica"
+    },
+    {
+      "from": "CONFIRMAR_CITA",
+      "to": "INICIO",
+      "onIntent": "THANKS_OR_FAREWELL",
+      "condition": "cita confirmada y conversación terminada",
+      "priority": "media"
+    }
+  ],
+  "rules": [
+    {
+      "id": "R1",
+      "name": "Todo mensaje atendido",
+      "type": "MODEL",
+      "description": "Todo mensaje de un cliente autorizado recibe una respuesta o una derivación; nunca queda sin procesar.",
+      "appliesTo": "PROCESAMIENTO"
+    },
+    {
+      "id": "R2",
+      "name": "No inventar información",
+      "type": "MODEL",
+      "description": "Precios, horarios, duraciones y políticas se responden SOLO desde catálogo/BD. La IA nunca fabrica valores.",
+      "appliesTo": "RESPUESTA"
+    },
+    {
+      "id": "R3",
+      "name": "Confirmación antes de agendar",
+      "type": "MODEL",
+      "description": "No se confirma una reserva sin validar servicio, sede, fecha, hora y datos del cliente.",
+      "appliesTo": "AGENDA"
+    },
+    {
+      "id": "R4",
+      "name": "Derivación humana en casos sensibles",
+      "type": "MODEL",
+      "description": "Reclamos, problemas de pago, reacciones post tratamiento y solicitudes de humano derivan siempre.",
+      "appliesTo": "DERIVACION"
+    },
+    {
+      "id": "R5",
+      "name": "Detección determinista primero",
+      "type": "MODEL",
+      "description": "La clasificación de intención se resuelve por catálogo determinista; la IA solo asiste en ambigüedad y texto libre.",
+      "appliesTo": "DETECCION"
+    },
+    {
+      "id": "R6",
+      "name": "Solo datos válidos del catálogo",
+      "type": "MODEL",
+      "description": "Las entidades se resuelven contra servicios, ubicaciones y profesionales activos; nunca se inventan valores.",
+      "appliesTo": "ENTIDADES"
+    },
+    {
+      "id": "R7",
+      "name": "Respuestas en español neutral",
+      "type": "MODEL",
+      "description": "Tono cordial, claro y en español neutral es-419.",
+      "appliesTo": "RESPUESTA"
+    },
+    {
+      "id": "R8",
+      "name": "Errores ortográficos normalizados",
+      "type": "MODEL",
+      "description": "Antes de comparar sinónimos se normalizan tildes, mayúsculas y errores ortográficos conocidos.",
+      "appliesTo": "NORMALIZACION"
+    },
+    {
+      "id": "R9",
+      "name": "No exponer datos sensibles",
+      "type": "MODEL",
+      "description": "Logs, métricas y registros sanitizan números, nombres y datos personales.",
+      "appliesTo": "SEGURIDAD"
+    },
+    {
+      "id": "R10",
+      "name": "Prioridad de consulta sobre acción combinada",
+      "type": "MODEL",
+      "description": "Negación explícita de agenda con pregunta de precio o información resuelve a consulta, NO a reserva/cancelación.",
+      "appliesTo": "DETECCION"
+    },
+    {
+      "id": "SAFETY-1",
+      "name": "Acknowledgment aislado",
+      "type": "CONVERSATION",
+      "appliesTo": "DETECCION",
+      "intent": "AMBIGUOUS",
+      "confidence": 0.72,
+      "urgency": "bajo",
+      "reason": "mensaje ambiguo segun reglas de conversacion",
+      "description": "ok/oki/símbolos aislados no ejecutan acciones."
+    },
+    {
+      "id": "SAFETY-2",
+      "name": "Rechazo breve sin objeto",
+      "type": "CONVERSATION",
+      "appliesTo": "DETECCION",
+      "intent": "AMBIGUOUS",
+      "confidence": 0.74,
+      "urgency": "bajo",
+      "reason": "rechazo breve sin objeto de agenda",
+      "description": "mejor no / sabes que mejor no / no mejor no."
+    },
+    {
+      "id": "SAFETY-3",
+      "name": "Cancelación negada con cambio",
+      "type": "CONVERSATION",
+      "appliesTo": "DETECCION",
+      "intent": "BOOKING_CHANGE",
+      "confidence": 0.93,
+      "urgency": "medio",
+      "reason": "negacion explicita inhibe cancelar",
+      "description": "no quiero cancelar + cambiar/reprogramar/reagendar/mover."
+    },
+    {
+      "id": "SAFETY-4",
+      "name": "Imposibilidad de asistir + fecha nueva",
+      "type": "CONVERSATION",
+      "appliesTo": "DETECCION",
+      "intent": "BOOKING_CHANGE",
+      "confidence": 0.88,
+      "urgency": "medio",
+      "reason": "fecha u horario nuevo junto a imposibilidad de asistir",
+      "description": "no puedo/no podré/no alcanzo + día/hora nuevo."
+    }
+  ],
+  "responses": [
+    {
+      "intentCode": "GREETING",
+      "templates": {
+        "initial": "GREETING_INTRO",
+        "missingData": "GREETING_MISSING_DATA",
+        "success": "GREETING_SUCCESS",
+        "error": "GREETING_ERROR",
+        "handoff": "GREETING_HANDOFF",
+        "farewell": "GREETING_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "THANKS_OR_FAREWELL",
+      "templates": {
+        "initial": "THANKS_OR_FAREWELL_INTRO",
+        "missingData": "THANKS_OR_FAREWELL_MISSING_DATA",
+        "success": "THANKS_OR_FAREWELL_SUCCESS",
+        "error": "THANKS_OR_FAREWELL_ERROR",
+        "handoff": "THANKS_OR_FAREWELL_HANDOFF",
+        "farewell": "THANKS_OR_FAREWELL_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "AMBIGUOUS",
+      "templates": {
+        "initial": "AMBIGUOUS_INTRO",
+        "missingData": "AMBIGUOUS_MISSING_DATA",
+        "success": "AMBIGUOUS_SUCCESS",
+        "error": "AMBIGUOUS_ERROR",
+        "handoff": "AMBIGUOUS_HANDOFF",
+        "farewell": "AMBIGUOUS_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "COMMERCIAL_INQUIRY",
+      "templates": {
+        "initial": "COMMERCIAL_INQUIRY_INTRO",
+        "missingData": "COMMERCIAL_INQUIRY_MISSING_DATA",
+        "success": "COMMERCIAL_INQUIRY_SUCCESS",
+        "error": "COMMERCIAL_INQUIRY_ERROR",
+        "handoff": "COMMERCIAL_INQUIRY_HANDOFF",
+        "farewell": "COMMERCIAL_INQUIRY_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "SERVICE_INFORMATION",
+      "templates": {
+        "initial": "SERVICE_INFORMATION_INTRO",
+        "missingData": "SERVICE_INFORMATION_MISSING_DATA",
+        "success": "SERVICE_INFORMATION_SUCCESS",
+        "error": "SERVICE_INFORMATION_ERROR",
+        "handoff": "SERVICE_INFORMATION_HANDOFF",
+        "farewell": "SERVICE_INFORMATION_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "SERVICE_RECOMMENDATION",
+      "templates": {
+        "initial": "SERVICE_RECOMMENDATION_INTRO",
+        "missingData": "SERVICE_RECOMMENDATION_MISSING_DATA",
+        "success": "SERVICE_RECOMMENDATION_SUCCESS",
+        "error": "SERVICE_RECOMMENDATION_ERROR",
+        "handoff": "SERVICE_RECOMMENDATION_HANDOFF",
+        "farewell": "SERVICE_RECOMMENDATION_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "PRICE_REQUEST",
+      "templates": {
+        "initial": "PRICE_REQUEST_INTRO",
+        "missingData": "PRICE_REQUEST_MISSING_DATA",
+        "success": "PRICE_REQUEST_SUCCESS",
+        "error": "PRICE_REQUEST_ERROR",
+        "handoff": "PRICE_REQUEST_HANDOFF",
+        "farewell": "PRICE_REQUEST_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "QUOTE_REQUEST",
+      "templates": {
+        "initial": "QUOTE_REQUEST_INTRO",
+        "missingData": "QUOTE_REQUEST_MISSING_DATA",
+        "success": "QUOTE_REQUEST_SUCCESS",
+        "error": "QUOTE_REQUEST_ERROR",
+        "handoff": "QUOTE_REQUEST_HANDOFF",
+        "farewell": "QUOTE_REQUEST_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "BOOKING_REQUEST",
+      "templates": {
+        "initial": "BOOKING_REQUEST_INTRO",
+        "missingData": "BOOKING_REQUEST_MISSING_DATA",
+        "success": "BOOKING_REQUEST_SUCCESS",
+        "error": "BOOKING_REQUEST_ERROR",
+        "handoff": "BOOKING_REQUEST_HANDOFF",
+        "farewell": "BOOKING_REQUEST_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "BOOKING_CHANGE",
+      "templates": {
+        "initial": "BOOKING_CHANGE_INTRO",
+        "missingData": "BOOKING_CHANGE_MISSING_DATA",
+        "success": "BOOKING_CHANGE_SUCCESS",
+        "error": "BOOKING_CHANGE_ERROR",
+        "handoff": "BOOKING_CHANGE_HANDOFF",
+        "farewell": "BOOKING_CHANGE_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "BOOKING_CANCEL",
+      "templates": {
+        "initial": "BOOKING_CANCEL_INTRO",
+        "missingData": "BOOKING_CANCEL_MISSING_DATA",
+        "success": "BOOKING_CANCEL_SUCCESS",
+        "error": "BOOKING_CANCEL_ERROR",
+        "handoff": "BOOKING_CANCEL_HANDOFF",
+        "farewell": "BOOKING_CANCEL_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "BOOKING_STATUS",
+      "templates": {
+        "initial": "BOOKING_STATUS_INTRO",
+        "missingData": "BOOKING_STATUS_MISSING_DATA",
+        "success": "BOOKING_STATUS_SUCCESS",
+        "error": "BOOKING_STATUS_ERROR",
+        "handoff": "BOOKING_STATUS_HANDOFF",
+        "farewell": "BOOKING_STATUS_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "AVAILABILITY_QUERY",
+      "templates": {
+        "initial": "AVAILABILITY_QUERY_INTRO",
+        "missingData": "AVAILABILITY_QUERY_MISSING_DATA",
+        "success": "AVAILABILITY_QUERY_SUCCESS",
+        "error": "AVAILABILITY_QUERY_ERROR",
+        "handoff": "AVAILABILITY_QUERY_HANDOFF",
+        "farewell": "AVAILABILITY_QUERY_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "PROFESSIONAL_QUERY",
+      "templates": {
+        "initial": "PROFESSIONAL_QUERY_INTRO",
+        "missingData": "PROFESSIONAL_QUERY_MISSING_DATA",
+        "success": "PROFESSIONAL_QUERY_SUCCESS",
+        "error": "PROFESSIONAL_QUERY_ERROR",
+        "handoff": "PROFESSIONAL_QUERY_HANDOFF",
+        "farewell": "PROFESSIONAL_QUERY_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "LOCATION_QUERY",
+      "templates": {
+        "initial": "LOCATION_QUERY_INTRO",
+        "missingData": "LOCATION_QUERY_MISSING_DATA",
+        "success": "LOCATION_QUERY_SUCCESS",
+        "error": "LOCATION_QUERY_ERROR",
+        "handoff": "LOCATION_QUERY_HANDOFF",
+        "farewell": "LOCATION_QUERY_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "BUSINESS_HOURS_QUERY",
+      "templates": {
+        "initial": "BUSINESS_HOURS_QUERY_INTRO",
+        "missingData": "BUSINESS_HOURS_QUERY_MISSING_DATA",
+        "success": "BUSINESS_HOURS_QUERY_SUCCESS",
+        "error": "BUSINESS_HOURS_QUERY_ERROR",
+        "handoff": "BUSINESS_HOURS_QUERY_HANDOFF",
+        "farewell": "BUSINESS_HOURS_QUERY_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "PAYMENT_INQUIRY",
+      "templates": {
+        "initial": "PAYMENT_INQUIRY_INTRO",
+        "missingData": "PAYMENT_INQUIRY_MISSING_DATA",
+        "success": "PAYMENT_INQUIRY_SUCCESS",
+        "error": "PAYMENT_INQUIRY_ERROR",
+        "handoff": "PAYMENT_INQUIRY_HANDOFF",
+        "farewell": "PAYMENT_INQUIRY_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "PAYMENT_PROBLEM",
+      "templates": {
+        "initial": "PAYMENT_PROBLEM_INTRO",
+        "missingData": "PAYMENT_PROBLEM_MISSING_DATA",
+        "success": "PAYMENT_PROBLEM_SUCCESS",
+        "error": "PAYMENT_PROBLEM_ERROR",
+        "handoff": "PAYMENT_PROBLEM_HANDOFF",
+        "farewell": "PAYMENT_PROBLEM_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "SUPPORT_GENERAL",
+      "templates": {
+        "initial": "SUPPORT_GENERAL_INTRO",
+        "missingData": "SUPPORT_GENERAL_MISSING_DATA",
+        "success": "SUPPORT_GENERAL_SUCCESS",
+        "error": "SUPPORT_GENERAL_ERROR",
+        "handoff": "SUPPORT_GENERAL_HANDOFF",
+        "farewell": "SUPPORT_GENERAL_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "TECHNICAL_MESSAGE",
+      "templates": {
+        "initial": "TECHNICAL_MESSAGE_INTRO",
+        "missingData": "TECHNICAL_MESSAGE_MISSING_DATA",
+        "success": "TECHNICAL_MESSAGE_SUCCESS",
+        "error": "TECHNICAL_MESSAGE_ERROR",
+        "handoff": "TECHNICAL_MESSAGE_HANDOFF",
+        "farewell": "TECHNICAL_MESSAGE_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "KNOWLEDGE_QUERY",
+      "templates": {
+        "initial": "KNOWLEDGE_QUERY_INTRO",
+        "missingData": "KNOWLEDGE_QUERY_MISSING_DATA",
+        "success": "KNOWLEDGE_QUERY_SUCCESS",
+        "error": "KNOWLEDGE_QUERY_ERROR",
+        "handoff": "KNOWLEDGE_QUERY_HANDOFF",
+        "farewell": "KNOWLEDGE_QUERY_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "FOLLOW_UP",
+      "templates": {
+        "initial": "FOLLOW_UP_INTRO",
+        "missingData": "FOLLOW_UP_MISSING_DATA",
+        "success": "FOLLOW_UP_SUCCESS",
+        "error": "FOLLOW_UP_ERROR",
+        "handoff": "FOLLOW_UP_HANDOFF",
+        "farewell": "FOLLOW_UP_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "COMPLAINT",
+      "templates": {
+        "initial": "COMPLAINT_INTRO",
+        "missingData": "COMPLAINT_MISSING_DATA",
+        "success": "COMPLAINT_SUCCESS",
+        "error": "COMPLAINT_ERROR",
+        "handoff": "COMPLAINT_HANDOFF",
+        "farewell": "COMPLAINT_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "HUMAN_REQUEST",
+      "templates": {
+        "initial": "HUMAN_REQUEST_INTRO",
+        "missingData": "HUMAN_REQUEST_MISSING_DATA",
+        "success": "HUMAN_REQUEST_SUCCESS",
+        "error": "HUMAN_REQUEST_ERROR",
+        "handoff": "HUMAN_REQUEST_HANDOFF",
+        "farewell": "HUMAN_REQUEST_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "COMMERCIAL_AND_BOOKING",
+      "templates": {
+        "initial": "COMMERCIAL_AND_BOOKING_INTRO",
+        "missingData": "COMMERCIAL_AND_BOOKING_MISSING_DATA",
+        "success": "COMMERCIAL_AND_BOOKING_SUCCESS",
+        "error": "COMMERCIAL_AND_BOOKING_ERROR",
+        "handoff": "COMMERCIAL_AND_BOOKING_HANDOFF",
+        "farewell": "COMMERCIAL_AND_BOOKING_FAREWELL"
+      }
+    },
+    {
+      "intentCode": "WAITLIST_QUERY",
+      "templates": {
+        "initial": "WAITLIST_QUERY_INTRO",
+        "missingData": "WAITLIST_QUERY_MISSING_DATA",
+        "success": "WAITLIST_QUERY_SUCCESS",
+        "error": "WAITLIST_QUERY_ERROR",
+        "handoff": "WAITLIST_QUERY_HANDOFF",
+        "farewell": "WAITLIST_QUERY_FAREWELL"
+      }
+    }
+  ]
+}

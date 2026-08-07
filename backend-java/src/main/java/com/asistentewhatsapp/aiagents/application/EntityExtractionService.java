@@ -1,6 +1,7 @@
 package com.asistentewhatsapp.aiagents.application;
 
 import com.asistentewhatsapp.aiagents.infrastructure.CanonicalEntityJdbcRepository.CanonicalEntityRecord;
+import com.asistentewhatsapp.aiagents.catalog.RelativeDateService;
 import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository;
 import com.asistentewhatsapp.locations.infrastructure.BusinessLocationJdbcRepository.BusinessLocationRecord;
 import com.asistentewhatsapp.shared.observability.LogSanitizer;
@@ -41,6 +42,12 @@ public class EntityExtractionService {
 	private static final Pattern PROFESSIONAL_WITH_PREFIX_PATTERN = Pattern.compile(
 			"\\b(?:con|atiende\\s+con|atienden\\s+con)\\s+([A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?:\\s+[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+){0,2})",
 			Pattern.CASE_INSENSITIVE);
+	private static final Pattern PROFESSIONAL_ATTENDS_BEFORE_PATTERN = Pattern.compile(
+			"(^|[¿\\s])([A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?:\\s+[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+){0,1})(?:\\s+)(?:atiende|atender|recibe|trabaja)",
+			Pattern.CASE_INSENSITIVE);
+	private static final Pattern PROFESSIONAL_ATTENDS_AFTER_PATTERN = Pattern.compile(
+			"(?:cuando\\s+atiende|atiende|atienden)\\s+([A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?:\\s+[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+){0,1})",
+			Pattern.CASE_INSENSITIVE);
 	private static final Pattern RELATIVE_DATE_TIME_LOCATION_PATTERN = Pattern.compile(
 			"\\b(?:hoy|ma(?:n|ñ)ana|pasado\\s+ma(?:n|ñ)ana|lunes|martes|mi(?:e|é)rcoles|jueves|viernes|s(?:a|á)bado|domingo)\\b.*?"
 					+ "\\b(?:a\\s+las|desde\\s+las|para\\s+las)?\\s*([01]?\\d|2[0-3])\\s*(?:h|hrs?|horas?)\\b",
@@ -48,25 +55,33 @@ public class EntityExtractionService {
 	private static final Pattern RELATIVE_DATE_BARE_HOUR_PATTERN = Pattern.compile(
 			"\\b(?:hoy|ma(?:n|ñ)ana|pasado\\s+ma(?:n|ñ)ana)\\s+([01]?\\d|2[0-3])\\b(?!\\s*(?:de|/|-|:|\\.))",
 			Pattern.CASE_INSENSITIVE);
-	private static final Map<String, String> WEEKDAYS = Map.of("lunes", "lunes", "martes", "martes", "miercoles",
-			"miércoles", "jueves", "jueves", "viernes", "viernes", "sabado", "sábado", "domingo", "domingo");
 
 	private final AiBusinessKnowledgeService knowledgeService;
 	private final BusinessLocationJdbcRepository businessLocationJdbcRepository;
 	private final CanonicalEntityService canonicalEntityService;
+	private final RelativeDateService relativeDateService;
+	private final ProfessionalCatalogService professionalCatalogService;
 
 	public EntityExtractionService(AiBusinessKnowledgeService knowledgeService,
 			BusinessLocationJdbcRepository businessLocationJdbcRepository) {
-		this(knowledgeService, businessLocationJdbcRepository, null);
+		this(knowledgeService, businessLocationJdbcRepository, null, null);
+	}
+
+	public EntityExtractionService(AiBusinessKnowledgeService knowledgeService,
+			BusinessLocationJdbcRepository businessLocationJdbcRepository,
+			CanonicalEntityService canonicalEntityService) {
+		this(knowledgeService, businessLocationJdbcRepository, canonicalEntityService, null);
 	}
 
 	@Autowired
 	public EntityExtractionService(AiBusinessKnowledgeService knowledgeService,
 			BusinessLocationJdbcRepository businessLocationJdbcRepository,
-			CanonicalEntityService canonicalEntityService) {
+			CanonicalEntityService canonicalEntityService, ProfessionalCatalogService professionalCatalogService) {
 		this.knowledgeService = knowledgeService;
 		this.businessLocationJdbcRepository = businessLocationJdbcRepository;
 		this.canonicalEntityService = canonicalEntityService;
+		this.professionalCatalogService = professionalCatalogService;
+		this.relativeDateService = RelativeDateService.shared();
 	}
 
 	public Map<String, String> extract(AgentConversationRequest request) {
@@ -92,7 +107,7 @@ public class EntityExtractionService {
 		applyServiceCatalogInference(entities, request, message);
 		applyWeekdayRelativeDates(entities, normalized);
 		applyTimeRange(entities, normalized);
-		applyProfessionalMention(entities, message, normalized);
+		applyProfessionalMention(entities, request, message, normalized);
 		applyBusinessLocationAliases(entities, request, normalized);
 
 		String standaloneName = inferStandaloneName(message, normalized);
@@ -257,11 +272,24 @@ public class EntityExtractionService {
 		if (entities.containsKey("fecha") || entities.containsKey("fecha_relativa")) {
 			return;
 		}
-		for (Map.Entry<String, String> weekday : WEEKDAYS.entrySet()) {
+		for (Map.Entry<String, String> weekday : relativeDateService.weekdayMap().entrySet()) {
 			if (containsWholeToken(normalizedMessage, weekday.getKey())) {
-				entities.put("fecha_relativa", weekday.getValue());
+				String qualifier = "";
+				if (containsWholeToken(normalizedMessage, "proximo") || containsWholeToken(normalizedMessage, "proxima")
+						|| containsWholeToken(normalizedMessage, "siguiente")) {
+					qualifier = "proximo";
+				} else if (containsWholeToken(normalizedMessage, "este")
+						|| containsWholeToken(normalizedMessage, "esta")) {
+					qualifier = "este";
+				}
+				entities.put("fecha_relativa",
+						qualifier.isBlank() ? weekday.getValue() : qualifier + " " + weekday.getValue());
 				return;
 			}
+		}
+		if (normalizedMessage.contains("fin de semana")) {
+			entities.put("fecha_relativa", "fin de semana");
+			return;
 		}
 		if (normalizedMessage.contains("pasado manana")) {
 			entities.put("fecha_relativa", "pasado mañana");
@@ -319,20 +347,72 @@ public class EntityExtractionService {
 		}
 	}
 
-	private void applyProfessionalMention(Map<String, String> entities, String message, String normalizedMessage) {
+	private void applyProfessionalMention(Map<String, String> entities, AgentConversationRequest request,
+			String message, String normalizedMessage) {
 		if (entities.containsKey("profesional")) {
 			return;
 		}
-		Matcher matcher = PROFESSIONAL_WITH_PREFIX_PATTERN.matcher(message == null ? "" : message);
-		if (matcher.find()) {
-			String name = matcher.group(1).trim();
+		UUID businessId = request == null ? null : request.businessId();
+		Matcher withPrefix = PROFESSIONAL_WITH_PREFIX_PATTERN.matcher(message == null ? "" : message);
+		if (withPrefix.find()) {
+			String name = withPrefix.group(1).trim();
 			if (!name.isBlank()) {
-				entities.put("profesional", name);
+				putProfessionalIfCatalogOrMarkNotFound(entities, businessId, name);
 				return;
 			}
 		}
-		if (containsWholeToken(normalizedMessage, "carla")) {
-			entities.put("profesional", "Carla Mendez");
+		Matcher before = PROFESSIONAL_ATTENDS_BEFORE_PATTERN.matcher(message == null ? "" : message);
+		if (before.find()) {
+			String name = before.group(2).trim();
+			if (!name.isBlank() && !entities.containsKey("servicio_o_producto") && !isLocationName(request, name)) {
+				putProfessionalIfCatalogOrMarkNotFound(entities, businessId, name);
+				return;
+			}
+		}
+		Matcher after = PROFESSIONAL_ATTENDS_AFTER_PATTERN.matcher(message == null ? "" : message);
+		if (after.find()) {
+			String name = after.group(1).trim();
+			if (!name.isBlank() && !isLocationName(request, name)) {
+				putProfessionalIfCatalogOrMarkNotFound(entities, businessId, name);
+				return;
+			}
+		}
+		if (containsAny(normalizedMessage, "misma persona", "misma profesional", "la misma", "el mismo",
+				"misma de la vez")) {
+			entities.putIfAbsent("profesional_mencion_generica", "misma_persona");
+		}
+	}
+
+	private boolean isLocationName(AgentConversationRequest request, String candidate) {
+		if (request == null || candidate == null || candidate.isBlank() || request.businessId() == null) {
+			return false;
+		}
+		String normalizedCandidate = normalize(candidate);
+		for (String token : normalizedCandidate.split(" ")) {
+			if (token.length() < 3) {
+				continue;
+			}
+			for (BusinessLocationRecord location : businessLocationJdbcRepository.findActive(request.businessId())) {
+				if (token.equals(normalize(location.name())) || token.equals(normalize(location.commune()))
+						|| token.equals(normalize(location.city())) || token.equals(normalize(location.code()))) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private void putProfessionalIfCatalogOrMarkNotFound(Map<String, String> entities, UUID businessId, String mention) {
+		if (professionalCatalogService == null || businessId == null) {
+			entities.put("profesional", mention);
+			return;
+		}
+		Optional<ProfessionalCatalogService.ProfessionalInfo> match = professionalCatalogService.findByName(businessId,
+				mention);
+		if (match.isPresent()) {
+			entities.put("profesional", match.get().name());
+		} else {
+			entities.put("profesional_no_encontrado", mention);
 		}
 	}
 

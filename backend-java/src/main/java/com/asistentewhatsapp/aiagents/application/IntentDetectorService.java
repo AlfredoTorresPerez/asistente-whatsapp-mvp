@@ -1,12 +1,14 @@
 package com.asistentewhatsapp.aiagents.application;
 
 import com.asistentewhatsapp.aiagents.application.AiKnowledgeRepository.IntentExpression;
+import com.asistentewhatsapp.aiagents.catalog.LanguageNormalizer;
+import com.asistentewhatsapp.aiagents.catalog.MasterConversationCatalog;
 import com.asistentewhatsapp.aiagents.domain.AgentIntent;
 import com.asistentewhatsapp.shared.observability.LogSanitizer;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,8 @@ public class IntentDetectorService {
 
 	private final ConversationSpecCatalog conversationSpecCatalog;
 	private final IntentExpressionService intentExpressionService;
+	private final MasterConversationCatalog masterCatalog;
+	private final LanguageNormalizer languageNormalizer;
 
 	private static final Pattern EXPLICIT_TIME_PATTERN = Pattern
 			.compile("\\b(?:a\\s+las\\s+)?(?:[01]?\\d|2[0-3])(?::[0-5]\\d)?\\s*(?:hrs?|horas?)?\\b");
@@ -30,140 +34,39 @@ public class IntentDetectorService {
 					+ "me avisar|me avisarán|qué pasa si|qué pasa sí|hasta cuándo|hasta cuando|"
 					+ "cuántas veces|cuantas veces|cuál es|cual es|es posible|se puede|"
 					+ "tienen|tiene|existe|existiría|sería posible)", Pattern.CASE_INSENSITIVE);
+	private static final Pattern STANDALONE_ORA = Pattern.compile("(?<![a-z])ora(?![a-z])");
 
-	private static final List<String> HUMAN_WORDS = List.of("ejecutivo", "humano", "asesor", "supervisor", "llamenme",
-			"llamarme", "contactarme", "contactenme", "contactenos", "quiero hablar", "hablar con recepcion",
-			"hablar con recepción", "hablar con un", "hablar con una", "alguien del centro", "alguien de recepcion",
-			"alguien de recepción", "me llame", "me llamen", "me contacten", "me contacte", "que una persona",
-			"una persona revise", "una persona atienda", "una persona me ayude", "una persona real",
-			"de una persona que");
-	private static final List<String> COMPLAINT_WORDS = List.of("reclamo", "molesto", "molesta", "pesimo", "horrible",
-			"denuncia", "fraude", "estafa", "nadie responde", "problema grave", "amenaza", "problema con mi atencion",
-			"problema con mi atención", "no quede conforme", "no quedé conforme", "error en mi reserva",
-			"desaparecio de la agenda", "desapareció de la agenda", "no tenian registrada", "no tenían registrada",
-			"cobraron de mas", "cobraron de más", "devolucion", "devolución", "reembolso", "ofrecer a otra",
-			"ofrecerlo a otra", "ofrecerselo a", "ofrecerselo");
-	private static final List<String> PAYMENT_WORDS = List.of("pagar", "pago", "transferencia", "comprobante",
-			"factura", "boleta", "deuda", "cobro", "link de pago");
-	private static final List<String> PAYMENT_PROBLEM_WORDS = List.of("pago duplicado", "cobro duplicado",
-			"cobraron dos veces", "no aparece", "no se reflejo", "no se reflejó", "monto incorrecto", "me cobraron",
-			"reembolso", "devolucion", "devolución");
-	private static final List<String> BOOKING_WORDS = List.of("agendar", "agenda una", "agenda la", "reservar",
-			"reserva una", "reserva la", "tomar hora", "pedir hora", "sacar hora", "necesito una cita",
-			"quiero una cita", "cita para", "un turno", "turno para", "sacar turno", "pedir turno", "apartar",
-			"separar", "programar", "anotar", "inscribir", "matricular", "hacer una reserva", "hacer una cita",
-			"hacer una hora", "una horita", "un cupo", "un cupito", "un turnito", "entrar a la agenda");
-	private static final List<String> AVAILABILITY_WORDS = List.of("tienen hora", "tiene hora", "hay hora",
-			"hay disponibilidad", "disponibilidad", "horarios hay", "que horarios", "qué horarios", "que horas",
-			"qué horas", "hora libre", "horas libres", "tiene horas", "tienen horas", "primera hora", "ultima hora",
-			"última hora", "cuantas personas", "cuántas personas", "cuanta gente", "cuánta gente", "al mismo tiempo",
-			"atender al mismo tiempo", "horarios disponibles", "dame horarios", "disponible para");
-	private static final List<String> RECOMMENDATION_WORDS = List.of("recomiendas", "recomienden", "recomendar",
-			"que me recomiendan", "qué me recomiendan", "sirve para", "busco un", "busco una", "quiero algo para",
-			"piel sensible", "hidratar", "hidratacion", "hidratación", "relajarme", "relajacion", "relajación",
-			"no invasivo", "no invasiva");
-	private static final List<String> SERVICE_INFORMATION_WORDS = List.of("que incluye", "qué incluye", "cuanto dura",
-			"cuánto dura", "es invasivo", "es invasiva", "tratamientos tienen", "servicios tienen", "que tratamientos",
-			"qué tratamientos", "que servicios", "qué servicios", "necesita evaluacion", "necesita evaluación",
-			"informacion", "información", "mas informacion", "más información", "quiero informacion",
-			"quiero información", "preparacion", "preparación", "prepararme", "como debo prepararme",
-			"cómo debo prepararme", "hacer algo antes del tratamiento", "hacer algo antes de la sesion",
-			"hacer algo antes de la sesión", "suspender algun producto", "suspender algún producto", "suspender algun",
-			"cuanto antes debo llegar", "cuánto antes debo llegar", "cuanto tiempo antes", "puedo ir acompañada",
-			"puedo ir acompañado", "puedo comer antes", "que ropa", "qué ropa", "contraindicacion", "contraindicación",
-			"como debo", "cómo debo");
-	private static final List<String> PROFESSIONAL_WORDS = List.of("carla", "profesional", "quien realiza",
-			"quién realiza", "atienden con", "trabaja los", "trabaja el", "hace hidratacion", "hace hidratación");
-	private static final List<String> BUSINESS_HOURS_WORDS = List.of("a que hora abren", "a qué hora abren",
-			"hasta que hora", "hasta qué hora", "atienden los sabados", "atienden los sábados", "trabajan domingos",
-			"trabajan los domingos", "horario de atencion", "horario de atención", "esta abierto", "está abierto",
-			"atienden en la manana", "atienden en la mañana", "atienden en la tarde", "horario de apertura",
-			"abren los", "abren el", "abren en", "feriado", "a la hora de almuerzo", "hora de almuerzo",
-			"despues de las", "después de las", "apertura extraordinaria", "atienden en dias", "atienden en días",
-			"abren los sabados", "abren los sábados", "abren los domingos", "abren feriados", "que horarios tienen",
-			"qué horarios tienen", "horarios tienen", "horarios atienden", "cual es el horario", "cuál es el horario",
-			"cuales son los horarios", "cuáles son los horarios");
-	private static final List<String> THANKS_WORDS = List.of("gracias", "muchas gracias", "hasta luego", "chao",
-			"eso era todo");
-	private static final List<String> BOOKING_STATUS_WORDS = List.of("tengo agendado", "tengo agendada",
-			"tengo reserva", "tengo una reserva", "mi reserva", "mis reservas", "revisar agenda", "revisa la agenda",
-			"revisala la agenda", "agenda de junio", "agenda de este mes", "estado reserva", "confirmar mi hora",
-			"ver mi cita", "tengo cita", "tengo una cita", "confirmar mi cita", "confirmar mi reserva",
-			"confirmacion de cita", "confirmación de cita", "confirmacion de reserva", "confirmación de reserva",
-			"codigo de reserva", "código de reserva", "codigo de cita", "código de cita", "codigo de la reserva",
-			"código de la reserva", "codigo de la cita", "código de la cita", "buscar mi cita", "buscar mi reserva",
-			"buscar por telefono", "buscar por teléfono", "ver lo de manana", "ver lo de mañana", "quiero confirmar",
-			"esta listo", "está listo", "ya pague", "ya pagué", "todavia sirve", "todavía sirve",
-			"me enviaran una nueva confirmacion", "me enviarán una nueva confirmación", "me enviaran una confirmacion",
-			"me enviarán una confirmación", "enviaran confirmacion", "enviarán confirmación",
-			"confirmacion por whatsapp", "confirmación por whatsapp", "confirmacion por correo",
-			"confirmación por correo", "no me llego confirmacion", "no me llegó confirmación",
-			"me pueden recordar la cita", "me pueden recordar la hora", "me avisaran si", "me avisarán si",
-			"me avisan por", "aviso de recordatorio");
-	private static final List<String> CHANGE_BOOKING_WORDS = List.of("reagendar", "reprogramar", "reprogramacion",
-			"reprogramación", "cambiar hora", "cambiar mi hora", "cambiar reserva", "cambiar mi reserva",
-			"cambiar cita", "cambiar mi cita", "cambio de hora", "cambio la hora", "cambiarme", "cámbiame", "cambieme",
-			"cambiar la hora", "cambiar de hora", "modificar cita", "modificar mi cita", "mover", "mover mi hora",
-			"mover mi reserva", "cambio de fecha", "cambiar de fecha", "cambiar fecha", "elegir otro dia",
-			"elegir otro día", "elegir otra hora", "cambie la cita", "cambie la reserva", "necesito cambiar",
-			"mantener mi hora actual", "mantener la hora");
-	private static final List<String> CANCEL_BOOKING_WORDS = List.of("cancelar", "cancela", "cancele", "cancelo",
-			"canceló", "cancelada", "cancelado", "anular", "anule", "anula", "cancelacion", "cancelación",
-			"no voy a poder ir", "no voy a poder asistir", "no puedo ir", "no voy a ir", "no poder asistir",
-			"no pude asistir");
-	private static final List<String> PRICE_WORDS = List.of("precio", "valor", "cuanto cuesta", "cuánto cuesta",
-			"cuanto vale", "cuánto vale", "tarifa", "sale", "cuesta");
-	private static final List<String> QUOTE_WORDS = List.of("cotizar", "cotizacion", "cotización", "presupuesto");
-	private static final List<String> SALES_WORDS = List.of("producto", "servicio", "plan", "promocion", "promoción",
-			"comprar", "contratar", "disponible", "stock", "depilacion", "depilación", "axilas", "piernas", "bikini",
-			"bozo", "rostro", "facial", "limpieza facial", "laser", "láser", "manicure", "pedicure", "masaje");
-	private static final List<String> SUPPORT_WORDS = List.of("ayuda", "soporte", "problema", "error", "falla",
-			"no funciona", "horario", "ubicacion", "ubicación", "direccion", "dirección", "estacionamiento",
-			"estacionar", "donde estacionar", "dónde estacionar", "llegar en auto", "llegar en micro", "llegar en bus",
-			"llegar en metro", "acceso", "estacionarse");
-	private static final List<String> KNOWLEDGE_WORDS = List.of("politica", "política", "manual", "documento", "faq",
-			"preguntas frecuentes", "catalogo", "catálogo", "terminos", "términos", "penalizacion", "penalización",
-			"no show", "inasistencia", "reembolso", "devolucion", "devolución", "bloqueada", "bloqueado", "registradas",
-			"edad minima", "edad mínima", "menor de edad", "edad", "tutor", "tutora", "autorizacion del tutor",
-			"autorización del tutor", "adulto responsable", "datos del tutor", "consentimiento",
-			"firmar un consentimiento", "aceptar el consentimiento", "como cancelo mi cita", "como cancelar",
-			"cómo cancelo mi cita", "cómo cancelar", "como anular", "cómo anular", "proceso de cancelacion",
-			"proceso de cancelación", "paso para cancelar", "penalizacion por cancelar", "penalización por cancelar",
-			"tratamientos que no se realizan a menores", "tratamiento a menor", "servicio requiere abono",
-			"abono es reembolsable", "abono si reprogramo", "abono para otra cita", "usar el abono", "abono confirma",
-			"abono", "cuanto tengo que abonar", "cuánto tengo que abonar", "cuanto abonar", "cuánto abonar",
-			"me devolveran el dinero", "me devolverán el dinero", "me devolveran", "me devolverán", "perdi el abono",
-			"perdí el abono", "no aparezco en la agenda", "no tenian registrada", "no tenían registrada",
-			"cuantas veces puedo cambiar", "cuántas veces puedo cambiar");
-	private static final List<String> FOLLOW_UP_WORDS = List.of("seguimiento", "retomar", "cotizacion pendiente",
-			"cotización pendiente", "recordatorio", "me contactaron");
-	private static final List<String> SOCIAL_GREETING_WORDS = List.of("como estas", "como esta", "que tal",
-			"hola como estas", "hola que tal", "buen dia", "buen día");
-	private static final List<String> TECHNICAL_COMMAND_WORDS = List.of("docker compose", "docker", "kubectl", "mvn",
-			"maven", "gradle", "npm", "pnpm", "yarn", "git ", "curl", "http://", "https://", "localhost", "stacktrace",
-			"exception", "sql ", "select ", "insert ", "update ", "delete ", "dockerfile", "compose up", "--build");
-
-	private static final List<String> SENSITIVE_WORDS = List.of("reaccion", "reacción", "ardor", "me ardio", "me ardió",
-			"inflamacion", "inflamación", "alergia", "irritacion", "irritación", "quemadura", "dolor fuerte",
-			"infeccion", "infección", "embarazada", "condicion medica", "condición médica");
-	private static final List<String> LINK_RESEND_WORDS = List.of("no me llego el link", "no me llegó el link",
-			"no me llego el enlace", "no me llegó el enlace", "reenviar", "reenvia", "reenvía", "mandame el link",
-			"mándame el link", "mandame el enlace", "mándame el enlace");
-	private static final List<String> LINK_EXPIRED_WORDS = List.of("enlace expiro", "enlace expiró", "link expiro",
-			"link expiró", "link vencio", "link venció", "no funciona el enlace", "no funciona el link",
-			"me dice expirado");
-	private static final List<String> LOCATION_WORDS = List.of("donde queda", "dónde queda", "direccion", "dirección",
-			"ubicacion", "ubicación", "ubicados", "como llego", "cómo llego", "sucursal", "sede");
-	private static final List<String> WAITLIST_WORDS = List.of("lista de espera", "listo de espera",
-			"cupo que se libero", "cupo que se liberó", "salir de la lista", "posicion en la lista",
-			"posición en la lista", "aceptar el cupo");
-	private static final List<String> HELP_WORDS = List.of("no se por donde empezar", "no sé por dónde empezar",
-			"por donde empezar", "por dónde empezar", "que cosas puedo hacer", "qué cosas puedo hacer",
-			"que puedo hacer", "qué puedo hacer", "como funciona", "cómo funciona", "que haces", "qué haces",
-			"que puedes hacer", "qué puedes hacer", "ayudame a empezar", "ayúdame a empezar",
-			"quiero hacer una consulta", "quisiera hacer una consulta", "necesito orientacion", "necesito orientación",
-			"pueden orientarme", "pueden orientarme", "me puedes orientar", "me pueden orientar", "puedes orientarme",
-			"puede orientarme");
+	private final List<String> humanWords;
+	private final List<String> complaintWords;
+	private final List<String> paymentWords;
+	private final List<String> paymentProblemWords;
+	private final List<String> bookingWords;
+	private final List<String> availabilityWords;
+	private final List<String> recommendationWords;
+	private final List<String> serviceInformationWords;
+	private final List<String> professionalWords;
+	private final List<String> businessHoursWords;
+	private final List<String> thanksWords;
+	private final List<String> bookingStatusWords;
+	private final List<String> changeBookingWords;
+	private final List<String> cancelBookingWords;
+	private final List<String> priceWords;
+	private final List<String> quoteWords;
+	private final List<String> salesWords;
+	private final List<String> supportWords;
+	private final List<String> knowledgeWords;
+	private final List<String> followUpWords;
+	private final List<String> socialGreetingWords;
+	private final List<String> technicalCommandWords;
+	private final List<String> sensitiveWords;
+	private final List<String> linkResendWords;
+	private final List<String> linkExpiredWords;
+	private final List<String> locationWords;
+	private final List<String> waitlistWords;
+	private final List<String> helpWords;
+	private final List<String> negatedAgendaActionWords;
+	private final List<String> infoOnlyMarkersWords;
+	private final Set<String> greetingWords;
 
 	public IntentDetectorService() {
 		this(new ConversationSpecCatalog(), null);
@@ -176,10 +79,53 @@ public class IntentDetectorService {
 	@Autowired
 	public IntentDetectorService(ConversationSpecCatalog conversationSpecCatalog,
 			IntentExpressionService intentExpressionService) {
+		this(conversationSpecCatalog, intentExpressionService, MasterConversationCatalog.shared());
+	}
+
+	public IntentDetectorService(ConversationSpecCatalog conversationSpecCatalog,
+			IntentExpressionService intentExpressionService, MasterConversationCatalog masterCatalog) {
 		this.conversationSpecCatalog = conversationSpecCatalog == null
 				? new ConversationSpecCatalog()
 				: conversationSpecCatalog;
 		this.intentExpressionService = intentExpressionService;
+		this.masterCatalog = masterCatalog == null ? MasterConversationCatalog.shared() : masterCatalog;
+		this.languageNormalizer = LanguageNormalizer.shared();
+
+		this.humanWords = group("HUMAN_WORDS");
+		this.complaintWords = group("COMPLAINT_WORDS");
+		this.paymentWords = group("PAYMENT_WORDS");
+		this.paymentProblemWords = group("PAYMENT_PROBLEM_WORDS");
+		this.bookingWords = group("BOOKING_WORDS");
+		this.availabilityWords = group("AVAILABILITY_WORDS");
+		this.recommendationWords = group("RECOMMENDATION_WORDS");
+		this.serviceInformationWords = group("SERVICE_INFORMATION_WORDS");
+		this.professionalWords = group("PROFESSIONAL_WORDS");
+		this.businessHoursWords = group("BUSINESS_HOURS_WORDS");
+		this.thanksWords = group("THANKS_WORDS");
+		this.bookingStatusWords = group("BOOKING_STATUS_WORDS");
+		this.changeBookingWords = group("CHANGE_BOOKING_WORDS");
+		this.cancelBookingWords = group("CANCEL_BOOKING_WORDS");
+		this.priceWords = group("PRICE_WORDS");
+		this.quoteWords = group("QUOTE_WORDS");
+		this.salesWords = group("SALES_WORDS");
+		this.supportWords = group("SUPPORT_WORDS");
+		this.knowledgeWords = group("KNOWLEDGE_WORDS");
+		this.followUpWords = group("FOLLOW_UP_WORDS");
+		this.socialGreetingWords = group("SOCIAL_GREETING_WORDS");
+		this.technicalCommandWords = group("TECHNICAL_COMMAND_WORDS");
+		this.sensitiveWords = group("SENSITIVE_WORDS");
+		this.linkResendWords = group("LINK_RESEND_WORDS");
+		this.linkExpiredWords = group("LINK_EXPIRED_WORDS");
+		this.locationWords = group("LOCATION_WORDS");
+		this.waitlistWords = group("WAITLIST_WORDS");
+		this.helpWords = group("HELP_WORDS");
+		this.negatedAgendaActionWords = group("NEGATED_AGENDA_ACTION_WORDS");
+		this.infoOnlyMarkersWords = group("INFO_ONLY_MARKERS_WORDS");
+		this.greetingWords = Set.copyOf(group("GREETING_WORDS"));
+	}
+
+	private List<String> group(String name) {
+		return List.copyOf(masterCatalog.synonymGroup(name));
 	}
 
 	public IntentDetectionResult detect(AgentConversationRequest request) {
@@ -190,17 +136,17 @@ public class IntentDetectorService {
 				LogSanitizer.messageSummary("message", request.messageBody()) + " normalizedLength=" + text.length());
 		boolean isQuestionText = isQuestion(text);
 		AiTraceLogger.info("INTENT_CANDIDATES", traceId, request.conversationId(), null, "IntentDetectorService",
-				"human=" + containsAny(text, HUMAN_WORDS) + " sensitive=" + containsAny(text, SENSITIVE_WORDS)
-						+ " cancel=" + containsAny(text, CANCEL_BOOKING_WORDS) + " change="
-						+ containsAny(text, CHANGE_BOOKING_WORDS) + " booking=" + containsAny(text, BOOKING_WORDS)
-						+ " sales=" + containsAny(text, SALES_WORDS) + " payment=" + containsAny(text, PAYMENT_WORDS)
-						+ " location=" + containsAny(text, LOCATION_WORDS) + " question=" + isQuestionText);
+				"human=" + containsAny(text, humanWords) + " sensitive=" + containsAny(text, sensitiveWords)
+						+ " cancel=" + containsAny(text, cancelBookingWords) + " change="
+						+ containsAny(text, changeBookingWords) + " booking=" + containsAny(text, bookingWords)
+						+ " sales=" + containsAny(text, salesWords) + " payment=" + containsAny(text, paymentWords)
+						+ " location=" + containsAny(text, locationWords) + " question=" + isQuestionText);
 
 		if (text.isBlank() || text.equals("mensaje recibido sin texto")) {
 			return new IntentDetectionResult(AgentIntent.AMBIGUOUS, null, 0.1, "bajo", false, null);
 		}
 
-		if (containsAny(text, TECHNICAL_COMMAND_WORDS)) {
+		if (containsAny(text, technicalCommandWords)) {
 			return new IntentDetectionResult(AgentIntent.TECHNICAL_MESSAGE, null, 0.91, "bajo", false, null);
 		}
 
@@ -208,7 +154,7 @@ public class IntentDetectorService {
 			return new IntentDetectionResult(AgentIntent.GREETING, null, 0.76, "bajo", false, "cliente entrega nombre");
 		}
 
-		if (containsAny(text, SENSITIVE_WORDS)) {
+		if (containsAny(text, sensitiveWords)) {
 			return new IntentDetectionResult(AgentIntent.COMPLAINT, null, 0.96, "alto", true,
 					"caso sensible o reacción post tratamiento");
 		}
@@ -218,11 +164,11 @@ public class IntentDetectorService {
 					"cliente solicita atencion humana");
 		}
 
-		if (containsAny(text, KNOWLEDGE_WORDS)) {
+		if (containsAny(text, knowledgeWords)) {
 			return new IntentDetectionResult(AgentIntent.KNOWLEDGE_QUERY, null, 0.82, "bajo", false, null);
 		}
 
-		if (containsAny(text, FOLLOW_UP_WORDS)) {
+		if (containsAny(text, followUpWords)) {
 			return new IntentDetectionResult(AgentIntent.FOLLOW_UP, null, 0.8, "bajo", false, null);
 		}
 
@@ -242,26 +188,26 @@ public class IntentDetectorService {
 			return databaseCatalogIntent.get();
 		}
 
-		if (!isInfoQueryNotAction(text) && containsAny(text, CANCEL_BOOKING_WORDS)) {
+		if (!isInfoQueryNotAction(text) && containsAny(text, cancelBookingWords)) {
 			return new IntentDetectionResult(AgentIntent.BOOKING_CANCEL, null, 0.9, "medio", false, null);
 		}
 
-		if (!isInfoQueryNotAction(text) && containsAny(text, CHANGE_BOOKING_WORDS)) {
+		if (!isInfoQueryNotAction(text) && containsAny(text, changeBookingWords)) {
 			return new IntentDetectionResult(AgentIntent.BOOKING_CHANGE, null, 0.9, "medio", false, null);
 		}
 
-		if (containsAny(text, LINK_RESEND_WORDS) || containsAny(text, LINK_EXPIRED_WORDS)) {
+		if (containsAny(text, linkResendWords) || containsAny(text, linkExpiredWords)) {
 			return new IntentDetectionResult(AgentIntent.BOOKING_STATUS, null, 0.9, "medio", false, null);
 		}
 
-		if (containsAny(text, SOCIAL_GREETING_WORDS)) {
+		if (containsAny(text, socialGreetingWords)) {
 			return new IntentDetectionResult(AgentIntent.GREETING, null, 0.78, "bajo", false, null);
 		}
 
 		boolean hasBooking = containsExplicitBookingRequest(text);
 
-		boolean hasPayment = containsAny(text, PAYMENT_WORDS);
-		boolean hasPaymentProblem = containsAny(text, PAYMENT_PROBLEM_WORDS);
+		boolean hasPayment = containsAny(text, paymentWords);
+		boolean hasPaymentProblem = containsAny(text, paymentProblemWords);
 		if (hasPayment && hasBooking) {
 			return new IntentDetectionResult(AgentIntent.BOOKING_REQUEST, null, 0.86, "bajo", false, null);
 		}
@@ -273,32 +219,32 @@ public class IntentDetectorService {
 			return new IntentDetectionResult(AgentIntent.PAYMENT_INQUIRY, null, 0.88, "medio", false, null);
 		}
 
-		if (containsAny(text, COMPLAINT_WORDS)) {
+		if (containsAny(text, complaintWords)) {
 			return new IntentDetectionResult(AgentIntent.COMPLAINT, null, 0.94, "alto", true,
 					"reclamo, molestia o urgencia");
 		}
-		boolean hasBookingStatus = containsAny(text, BOOKING_STATUS_WORDS);
-		boolean hasPrice = containsAny(text, PRICE_WORDS);
-		boolean hasQuote = containsAny(text, QUOTE_WORDS);
-		boolean hasSales = containsAny(text, SALES_WORDS) || hasPrice || hasQuote;
+		boolean hasBookingStatus = containsAny(text, bookingStatusWords);
+		boolean hasPrice = containsAny(text, priceWords);
+		boolean hasQuote = containsAny(text, quoteWords);
+		boolean hasSales = containsAny(text, salesWords) || hasPrice || hasQuote;
 		boolean hasExplicitCommercialQuestion = hasPrice || hasQuote;
 		boolean hasSchedulingDate = EXPLICIT_DATE_PATTERN.matcher(text).find();
 		boolean hasSchedulingTime = hasExplicitTime(text);
-		boolean hasSchedulingLocation = containsAny(text, LOCATION_WORDS) || text.contains(" providencia")
+		boolean hasSchedulingLocation = containsAny(text, locationWords) || text.contains(" providencia")
 				|| text.contains(" las condes") || text.contains(" en providencia") || text.contains(" en las condes");
 		boolean hasSchedulingData = hasSchedulingTime || (hasSchedulingDate && hasSchedulingLocation);
-		boolean hasAvailabilityQuestion = containsAny(text, AVAILABILITY_WORDS);
-		boolean hasRecommendation = containsAny(text, RECOMMENDATION_WORDS);
-		boolean hasServiceInformation = containsAny(text, SERVICE_INFORMATION_WORDS);
-		boolean hasProfessional = containsAny(text, PROFESSIONAL_WORDS);
-		boolean hasLocationQuery = containsAny(text, LOCATION_WORDS);
-		boolean hasBusinessHoursQuery = containsAny(text, BUSINESS_HOURS_WORDS);
+		boolean hasAvailabilityQuestion = containsAny(text, availabilityWords);
+		boolean hasRecommendation = containsAny(text, recommendationWords);
+		boolean hasServiceInformation = containsAny(text, serviceInformationWords);
+		boolean hasProfessional = containsAny(text, professionalWords);
+		boolean hasLocationQuery = containsAny(text, locationWords);
+		boolean hasBusinessHoursQuery = containsAny(text, businessHoursWords);
 
 		if (hasHelpQuery(text)) {
 			return new IntentDetectionResult(AgentIntent.COMMERCIAL_INQUIRY, null, 0.86, "bajo", false, null);
 		}
 
-		if (containsAny(text, WAITLIST_WORDS)) {
+		if (containsAny(text, waitlistWords)) {
 			return new IntentDetectionResult(AgentIntent.WAITLIST_QUERY, null, 0.86, "bajo", false, null);
 		}
 
@@ -340,11 +286,11 @@ public class IntentDetectorService {
 					"bajo", false, null);
 		}
 
-		if (containsAny(text, QUOTE_WORDS)) {
+		if (containsAny(text, quoteWords)) {
 			return new IntentDetectionResult(AgentIntent.QUOTE_REQUEST, null, 0.88, "bajo", false, null);
 		}
 
-		if (containsAny(text, PRICE_WORDS)) {
+		if (containsAny(text, priceWords)) {
 			return new IntentDetectionResult(AgentIntent.PRICE_REQUEST, null, 0.88, "bajo", false, null);
 		}
 
@@ -365,11 +311,11 @@ public class IntentDetectorService {
 					false, null);
 		}
 
-		if (!isInfoQueryNotAction(text) && hasBooking && containsAny(text, CANCEL_BOOKING_WORDS)) {
+		if (!isInfoQueryNotAction(text) && hasBooking && containsAny(text, cancelBookingWords)) {
 			return new IntentDetectionResult(AgentIntent.BOOKING_CANCEL, null, 0.9, "medio", false, null);
 		}
 
-		if (!isInfoQueryNotAction(text) && hasBooking && containsAny(text, CHANGE_BOOKING_WORDS)) {
+		if (!isInfoQueryNotAction(text) && hasBooking && containsAny(text, changeBookingWords)) {
 			return new IntentDetectionResult(AgentIntent.BOOKING_CHANGE, null, 0.9, "medio", false, null);
 		}
 
@@ -385,19 +331,19 @@ public class IntentDetectorService {
 			return new IntentDetectionResult(AgentIntent.COMMERCIAL_INQUIRY, null, 0.82, "bajo", false, null);
 		}
 
-		if (containsAny(text, KNOWLEDGE_WORDS)) {
+		if (containsAny(text, knowledgeWords)) {
 			return new IntentDetectionResult(AgentIntent.KNOWLEDGE_QUERY, null, 0.82, "bajo", false, null);
 		}
 
-		if (containsAny(text, FOLLOW_UP_WORDS)) {
+		if (containsAny(text, followUpWords)) {
 			return new IntentDetectionResult(AgentIntent.FOLLOW_UP, null, 0.8, "bajo", false, null);
 		}
 
-		if (containsAny(text, LOCATION_WORDS)) {
+		if (containsAny(text, locationWords)) {
 			return new IntentDetectionResult(AgentIntent.LOCATION_QUERY, null, 0.82, "medio", false, null);
 		}
 
-		if (containsAny(text, SUPPORT_WORDS)) {
+		if (containsAny(text, supportWords)) {
 			return new IntentDetectionResult(AgentIntent.SUPPORT_GENERAL, null, 0.78, "medio", false, null);
 		}
 
@@ -413,7 +359,7 @@ public class IntentDetectorService {
 	}
 
 	private boolean containsExplicitBookingRequest(String text) {
-		if (containsAny(text, BOOKING_WORDS)) {
+		if (containsAny(text, bookingWords)) {
 			return true;
 		}
 		return Pattern
@@ -436,8 +382,8 @@ public class IntentDetectorService {
 		}
 		List<IntentExpression> expressions = intentExpressionService.findActive(request.businessId());
 		for (IntentExpression expression : expressions) {
-			AgentIntent mapped = mapCatalogCodeToAgentIntent(expression.code());
-			if (mapped == null) {
+			Optional<AgentIntent> mapped = masterCatalog.mapCatalogCodeToAgentIntent(expression.code());
+			if (mapped.isEmpty()) {
 				continue;
 			}
 			boolean matches = isOrthographicError(expression)
@@ -450,10 +396,11 @@ public class IntentDetectorService {
 			if (confidence < toDouble(expression.minimumConfidence(), 0.0)) {
 				continue;
 			}
+			AgentIntent intent = mapped.get();
 			AiTraceLogger.info("INTENT_DB_CATALOG", traceId, request.conversationId(), null, "IntentDetectorService",
-					"intent=" + mapped + " expressionType=" + expression.expressionType() + " confidence=" + confidence
+					"intent=" + intent + " expressionType=" + expression.expressionType() + " confidence=" + confidence
 							+ " source=DATABASE");
-			return Optional.of(new IntentDetectionResult(mapped, null, confidence, "bajo", expression.requiresHuman(),
+			return Optional.of(new IntentDetectionResult(intent, null, confidence, "bajo", expression.requiresHuman(),
 					"intencion desde catalogo BD (ai_intent_expression)", "DATABASE"));
 		}
 		return Optional.empty();
@@ -467,61 +414,24 @@ public class IntentDetectorService {
 		return value == null ? fallback : value.doubleValue();
 	}
 
-	private static AgentIntent mapCatalogCodeToAgentIntent(String code) {
-		if (code == null) {
-			return null;
-		}
-		return CATALOG_CODE_TO_INTENT.get(code);
-	}
-
-	private static final Map<String, AgentIntent> CATALOG_CODE_TO_INTENT = Map.ofEntries(
-			Map.entry("BOOKING_CREATE", AgentIntent.BOOKING_REQUEST),
-			Map.entry("BOOKING_RESCHEDULE", AgentIntent.BOOKING_CHANGE),
-			Map.entry("BOOKING_CANCEL", AgentIntent.BOOKING_CANCEL),
-			Map.entry("BOOKING_AVAILABILITY", AgentIntent.AVAILABILITY_QUERY),
-			Map.entry("BOOKING_STATUS", AgentIntent.BOOKING_STATUS),
-			Map.entry("SERVICE_INFORMATION", AgentIntent.SERVICE_INFORMATION),
-			Map.entry("SERVICE_PRICE", AgentIntent.PRICE_REQUEST),
-			Map.entry("BUSINESS_HOURS", AgentIntent.BUSINESS_HOURS_QUERY),
-			Map.entry("BUSINESS_LOCATION", AgentIntent.LOCATION_QUERY),
-			Map.entry("PAYMENT_INFORMATION", AgentIntent.PAYMENT_INQUIRY),
-			Map.entry("PAYMENT_STATUS", AgentIntent.PAYMENT_INQUIRY), Map.entry("GREETING", AgentIntent.GREETING),
-			Map.entry("THANKS", AgentIntent.THANKS_OR_FAREWELL), Map.entry("GOODBYE", AgentIntent.THANKS_OR_FAREWELL),
-			Map.entry("HUMAN_REQUEST", AgentIntent.HUMAN_REQUEST),
-			Map.entry("COMMERCIAL_INQUIRY", AgentIntent.COMMERCIAL_INQUIRY),
-			Map.entry("SERVICE_RECOMMENDATION", AgentIntent.SERVICE_RECOMMENDATION),
-			Map.entry("PROFESSIONAL_QUERY", AgentIntent.PROFESSIONAL_QUERY),
-			Map.entry("QUOTE_REQUEST", AgentIntent.QUOTE_REQUEST),
-			Map.entry("PAYMENT_PROBLEM", AgentIntent.PAYMENT_PROBLEM),
-			Map.entry("SUPPORT_GENERAL", AgentIntent.SUPPORT_GENERAL),
-			Map.entry("TECHNICAL_MESSAGE", AgentIntent.TECHNICAL_MESSAGE),
-			Map.entry("KNOWLEDGE_QUERY", AgentIntent.KNOWLEDGE_QUERY), Map.entry("FOLLOW_UP", AgentIntent.FOLLOW_UP),
-			Map.entry("COMPLAINT", AgentIntent.COMPLAINT), Map.entry("WAITLIST_QUERY", AgentIntent.WAITLIST_QUERY));
-
 	private String normalizeRaw(String value) {
 		return TextNormalizer.normalize(value);
 	}
 
 	private Optional<IntentDetectionResult> detectNegatedAgendaActionInformation(String text) {
-		boolean negatedAgendaAction = containsAny(text,
-				List.of("no quiero cancelar", "no deseo cancelar", "no necesito cancelar", "no voy a cancelar",
-						"no es para cancelar", "no quiero anular", "no quiero agendar", "no deseo agendar",
-						"no necesito agendar", "no voy a agendar", "no es para agendar", "no quiero reservar",
-						"no deseo reservar", "no quiero tomar hora", "no quiero pedir hora", "no quiero sacar hora"));
+		boolean negatedAgendaAction = containsAny(text, negatedAgendaActionWords);
 		if (!negatedAgendaAction) {
 			return Optional.empty();
 		}
-		if (containsAny(text, PRICE_WORDS)) {
+		if (containsAny(text, priceWords)) {
 			return Optional.of(new IntentDetectionResult(AgentIntent.PRICE_REQUEST, null, 0.9, "bajo", false,
 					"negacion explicita inhibe accion de agenda"));
 		}
-		if (containsAny(text, SERVICE_INFORMATION_WORDS)) {
+		if (containsAny(text, serviceInformationWords)) {
 			return Optional.of(new IntentDetectionResult(AgentIntent.SERVICE_INFORMATION, null, 0.86, "bajo", false,
 					"negacion explicita inhibe accion de agenda"));
 		}
-		boolean asksInformation = containsAny(text,
-				List.of("solo consultar", "solo preguntar", "solo saber", "solo quiero saber", "era una pregunta",
-						"es una pregunta", "consulta", "consultar", "pregunta", "informacion", "información"));
+		boolean asksInformation = containsAny(text, infoOnlyMarkersWords);
 		if (asksInformation) {
 			return Optional.of(new IntentDetectionResult(AgentIntent.COMMERCIAL_INQUIRY, null, 0.84, "bajo", false,
 					"negacion explicita inhibe accion de agenda"));
@@ -559,7 +469,7 @@ public class IntentDetectorService {
 		if (trimmed.length() > 40 || trimmed.contains("?")) {
 			return false;
 		}
-		return containsAny(trimmed, THANKS_WORDS);
+		return containsAny(trimmed, thanksWords);
 	}
 
 	private boolean isNameIntroduction(String text) {
@@ -568,9 +478,10 @@ public class IntentDetectorService {
 
 	private boolean isGreeting(String text) {
 		String trimmed = text.trim();
-		return trimmed.equals("hola") || trimmed.equals("buenas") || trimmed.equals("buenos dias")
-				|| trimmed.equals("buenos días") || trimmed.equals("buenas tardes") || trimmed.equals("buenas noches")
-				|| trimmed.startsWith("hola ");
+		if (greetingWords.contains(trimmed)) {
+			return true;
+		}
+		return trimmed.startsWith("hola ");
 	}
 
 	private boolean hasExplicitTime(String text) {
@@ -587,7 +498,7 @@ public class IntentDetectorService {
 	}
 
 	private boolean hasHelpQuery(String text) {
-		return containsAny(text, HELP_WORDS);
+		return containsAny(text, helpWords);
 	}
 
 	private boolean shouldUseCatalogIntent(IntentDetectionResult result) {
@@ -606,7 +517,7 @@ public class IntentDetectorService {
 	}
 
 	private boolean containsHumanRequest(String text) {
-		for (String candidate : HUMAN_WORDS) {
+		for (String candidate : humanWords) {
 			String normalized = normalize(candidate);
 			if (normalized.contains(" ")) {
 				if (text.contains(normalized)) {
@@ -622,11 +533,7 @@ public class IntentDetectorService {
 	}
 
 	private String normalize(String value) {
-		String t = TextNormalizer.normalize(value);
-		t = t.replace("reserbar", "reservar").replace("recervar", "reservar").replace("resarvar", "reservar")
-				.replace("ajendar", "agendar").replace("agndar", "agendar").replace("hroa", "hora");
-		Pattern standaloneOra = Pattern.compile("(?<![a-z])ora(?![a-z])");
-		t = standaloneOra.matcher(t).replaceAll("hora");
-		return t;
+		String t = languageNormalizer.normalizeWithTypoFix(value);
+		return STANDALONE_ORA.matcher(t).replaceAll("hora");
 	}
 }

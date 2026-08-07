@@ -26,16 +26,28 @@ public class BookingAgent extends AbstractAgentHandler {
 	private final BookingConfirmationJdbcRepository confirmationRepository;
 	private final BookingConfirmationService bookingConfirmationService;
 	private final CompleteAgendaJdbcRepository agendaRepository;
+	private final ProfessionalCatalogService professionalCatalogService;
 
 	public BookingAgent(AiBusinessKnowledgeService knowledgeService,
 			TransactionalAgendaBookingService transactionalAgendaBookingService,
 			BookingConfirmationJdbcRepository confirmationRepository,
 			BookingConfirmationService bookingConfirmationService, CompleteAgendaJdbcRepository agendaRepository) {
+		this(knowledgeService, transactionalAgendaBookingService, confirmationRepository, bookingConfirmationService,
+				agendaRepository, null);
+	}
+
+	@org.springframework.beans.factory.annotation.Autowired
+	public BookingAgent(AiBusinessKnowledgeService knowledgeService,
+			TransactionalAgendaBookingService transactionalAgendaBookingService,
+			BookingConfirmationJdbcRepository confirmationRepository,
+			BookingConfirmationService bookingConfirmationService, CompleteAgendaJdbcRepository agendaRepository,
+			ProfessionalCatalogService professionalCatalogService) {
 		this.knowledgeService = knowledgeService;
 		this.transactionalAgendaBookingService = transactionalAgendaBookingService;
 		this.confirmationRepository = confirmationRepository;
 		this.bookingConfirmationService = bookingConfirmationService;
 		this.agendaRepository = agendaRepository;
+		this.professionalCatalogService = professionalCatalogService;
 	}
 
 	@Override
@@ -147,10 +159,18 @@ public class BookingAgent extends AbstractAgentHandler {
 		TransactionalAgendaBookingService.BookingLinkResult linkResult = transactionalAgendaBookingService
 				.generateBookingLink(request.businessId(), request.customerPhone(), request.conversationId(),
 						request.customerId());
-		Optional<String> response = transactionalAgendaBookingService.checkAvailability(request.businessId(),
-				request.messageBody(), value(entities, "servicio_o_producto"), value(entities, "sede"),
-				firstNonBlank(value(entities, "fecha"), value(entities, "fecha_relativa")), value(entities, "hora"),
-				value(entities, "tramo_horario"), linkResult.url(), traceId, request.conversationId());
+		UUID professionalId = resolveProfessionalId(request, entities);
+		Optional<String> response = professionalId == null
+				? transactionalAgendaBookingService.checkAvailability(request.businessId(), request.messageBody(),
+						value(entities, "servicio_o_producto"), value(entities, "sede"),
+						firstNonBlank(value(entities, "fecha"), value(entities, "fecha_relativa")),
+						value(entities, "hora"), value(entities, "tramo_horario"), linkResult.url(), traceId,
+						request.conversationId())
+				: transactionalAgendaBookingService.checkAvailability(request.businessId(), request.messageBody(),
+						value(entities, "servicio_o_producto"), value(entities, "sede"),
+						firstNonBlank(value(entities, "fecha"), value(entities, "fecha_relativa")),
+						value(entities, "hora"), value(entities, "tramo_horario"), professionalId, linkResult.url(),
+						traceId, request.conversationId());
 		String body = response
 				.orElseGet(() -> availabilityMissingDataResponse(entities, availabilityMissingData(entities)));
 		List<String> nextMissingData = containsNumberedOptions(body) ? missing("horario_preferido") : List.of();
@@ -159,14 +179,62 @@ public class BookingAgent extends AbstractAgentHandler {
 		return result(request, intent, type(), entities, nextMissingData, body, false, null);
 	}
 
+	private UUID resolveProfessionalId(AgentConversationRequest request, Map<String, String> entities) {
+		String professional = value(entities, "profesional");
+		if (professional.isBlank() || professionalCatalogService == null || request.businessId() == null) {
+			return null;
+		}
+		return professionalCatalogService.findByName(request.businessId(), professional).map(info -> info.id())
+				.orElse(null);
+	}
+
 	private AgentRoutingResult handleProfessionalQuery(AgentConversationRequest request, IntentDetectionResult intent,
 			Map<String, String> entities) {
 		String professional = value(entities, "profesional");
-		String response = professional.isBlank()
-				? "Puedo revisar profesionales disponibles. ¿Con qué profesional o para qué servicio necesitas atención?"
-				: "Puedo revisar disponibilidad con " + professional + ". ¿Qué servicio y qué día necesitas consultar?";
+		String notFoundMention = value(entities, "profesional_no_encontrado");
+		String response;
+		if (!professional.isBlank()) {
+			response = "Puedo revisar disponibilidad con " + professional + catalogSpecialty(request, professional)
+					+ ". ¿Qué servicio y qué día necesitas consultar?";
+		} else if (!notFoundMention.isBlank()) {
+			response = "No tengo a \"" + notFoundMention
+					+ "\" registrada como profesional activa en este momento. Dime el servicio y el día que deseas y reviso disponibilidad con quien atiende ese servicio.";
+		} else {
+			response = renderProfessionalList(request);
+		}
 		return result(request, intent, type(), entities, missing("servicio_o_producto", "fecha_deseada"), response,
 				false, null);
+	}
+
+	private String catalogSpecialty(AgentConversationRequest request, String professional) {
+		if (professionalCatalogService == null || professional.isBlank()) {
+			return "";
+		}
+		return professionalCatalogService.findByName(request.businessId(), professional)
+				.filter(info -> info.specialty() != null && !info.specialty().isBlank())
+				.map(info -> " (" + info.specialty() + ")").orElse("");
+	}
+
+	private String renderProfessionalList(AgentConversationRequest request) {
+		if (professionalCatalogService == null) {
+			return "Puedo revisar profesionales disponibles. ¿Con qué profesional o para qué servicio necesitas atención?";
+		}
+		List<ProfessionalCatalogService.ProfessionalInfo> professionals = professionalCatalogService
+				.findActive(request.businessId());
+		if (professionals.isEmpty()) {
+			return "Hoy no tengo profesionales con agenda disponible. ¿Quieres que derive tu consulta con una persona del equipo?";
+		}
+		StringBuilder body = new StringBuilder("*Profesionales disponibles hoy:*").append("\n");
+		for (ProfessionalCatalogService.ProfessionalInfo professional : professionals) {
+			body.append("\u2022 ").append(professional.name());
+			if (professional.specialty() != null && !professional.specialty().isBlank()) {
+				body.append(" \u2014 ").append(professional.specialty());
+			}
+			body.append("\n");
+		}
+		body.append(
+				"\u2705 Dime con cu\u00e9l quieres atenderte, qu\u00e9 servicio y para qu\u00e9 d\u00eda, y reviso disponibilidad.");
+		return body.toString();
 	}
 
 	private AgentRoutingResult handleBookingRequest(AgentConversationRequest request, IntentDetectionResult intent,
@@ -178,12 +246,18 @@ public class BookingAgent extends AbstractAgentHandler {
 				TransactionalAgendaBookingService.BookingLinkResult linkResult = transactionalAgendaBookingService
 						.generateBookingLink(request.businessId(), request.customerPhone(), request.conversationId(),
 								request.customerId());
-				Optional<String> availability = transactionalAgendaBookingService.checkAvailability(
-						request.businessId(), request.messageBody(), value(entities, "servicio_o_producto"),
-						value(entities, "sede"),
-						firstNonBlank(value(entities, "fecha"), value(entities, "fecha_relativa")),
-						value(entities, "hora"), value(entities, "tramo_horario"), linkResult.url(), traceId,
-						request.conversationId());
+				UUID professionalId = resolveProfessionalId(request, entities);
+				Optional<String> availability = professionalId == null
+						? transactionalAgendaBookingService.checkAvailability(request.businessId(),
+								request.messageBody(), value(entities, "servicio_o_producto"), value(entities, "sede"),
+								firstNonBlank(value(entities, "fecha"), value(entities, "fecha_relativa")),
+								value(entities, "hora"), value(entities, "tramo_horario"), linkResult.url(), traceId,
+								request.conversationId())
+						: transactionalAgendaBookingService.checkAvailability(request.businessId(),
+								request.messageBody(), value(entities, "servicio_o_producto"), value(entities, "sede"),
+								firstNonBlank(value(entities, "fecha"), value(entities, "fecha_relativa")),
+								value(entities, "hora"), value(entities, "tramo_horario"), professionalId,
+								linkResult.url(), traceId, request.conversationId());
 				if (availability.isPresent()) {
 					traceLinkDecision(request, traceId, intent, entities, "LOOKUP_AVAILABILITY_BEFORE_BOOKING",
 							"containsLink=" + containsLink(availability.get()));

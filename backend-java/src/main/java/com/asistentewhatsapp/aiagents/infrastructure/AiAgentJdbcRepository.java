@@ -1,6 +1,7 @@
 package com.asistentewhatsapp.aiagents.infrastructure;
 
 import com.asistentewhatsapp.aiagents.application.AgentRoutingResult;
+import com.asistentewhatsapp.aiagents.catalog.ConversationStateMachine;
 import com.asistentewhatsapp.aiagents.domain.AgentIntent;
 import com.asistentewhatsapp.aiagents.domain.AgentType;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,10 +21,18 @@ public class AiAgentJdbcRepository {
 
 	private final JdbcTemplate jdbcTemplate;
 	private final ObjectMapper objectMapper;
+	private final ConversationStateMachine stateMachine;
 
 	public AiAgentJdbcRepository(JdbcTemplate jdbcTemplate, ObjectMapper objectMapper) {
+		this(jdbcTemplate, objectMapper, ConversationStateMachine.defaults());
+	}
+
+	@org.springframework.beans.factory.annotation.Autowired
+	public AiAgentJdbcRepository(JdbcTemplate jdbcTemplate, ObjectMapper objectMapper,
+			ConversationStateMachine stateMachine) {
 		this.jdbcTemplate = jdbcTemplate;
 		this.objectMapper = objectMapper;
+		this.stateMachine = stateMachine;
 	}
 
 	public void upsertConversationContext(AgentRoutingResult result) {
@@ -271,43 +280,8 @@ public class AiAgentJdbcRepository {
 		if (result == null) {
 			return "INICIO";
 		}
-		if (result.requiresHuman() || result.agentType() == AgentType.HUMAN_HANDOFF) {
-			return "DERIVADO_HUMANO";
-		}
-		List<String> missing = result.missingData() == null ? List.of() : result.missingData();
-		if (missing.contains("motivo_o_servicio") || missing.contains("servicio_o_producto")) {
-			return "ESPERANDO_SERVICIO";
-		}
-		if (missing.contains("sucursal")) {
-			return "ESPERANDO_SUCURSAL";
-		}
-		if (missing.contains("fecha_deseada")) {
-			return "ESPERANDO_FECHA";
-		}
-		if (missing.contains("horario_preferido")) {
-			return "ESPERANDO_HORARIO";
-		}
-		if (missing.contains("seleccion_reserva")) {
-			return "ESPERANDO_SELECCION_RESERVA";
-		}
-		if (missing.contains("confirmacion_cancelacion")) {
-			return "ESPERANDO_CONFIRMACION_CANCELACION";
-		}
-		if (missing.contains("nueva_fecha_u_horario")) {
-			return "ESPERANDO_FECHA_REPROGRAMACION";
-		}
-		if (result.primaryIntent() == AgentIntent.BOOKING_REQUEST
-				&& contains(result.responseToCustomer(), "/reservas/confirmar/")) {
-			return "ESPERANDO_CONFIRMACION_RESERVA";
-		}
-		if (result.primaryIntent() == AgentIntent.BOOKING_CHANGE
-				&& contains(result.responseToCustomer(), "reprogram")) {
-			return "ESPERANDO_CONFIRMACION_REPROGRAMACION";
-		}
-		if (result.primaryIntent() == AgentIntent.BOOKING_CANCEL && contains(result.responseToCustomer(), "cancel")) {
-			return "ESPERANDO_CONFIRMACION_CANCELACION";
-		}
-		return "INICIO";
+		return stateMachine.deriveLegacyColumn(result.agentType(), result.primaryIntent(), result.requiresHuman(),
+				result.missingData(), result.responseToCustomer());
 	}
 
 	private List<String> activeOptions(AgentRoutingResult result) {

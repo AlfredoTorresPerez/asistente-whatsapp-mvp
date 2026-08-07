@@ -1,24 +1,24 @@
 package com.asistentewhatsapp.aiagents.application;
 
-import java.text.Normalizer;
-import java.util.Locale;
+import com.asistentewhatsapp.aiagents.catalog.LanguageNormalizer;
 
+/**
+ * Facade de compatibilidad hacia {@link LanguageNormalizer} (Fase 7). La lógica
+ * de normalización está centralizada en el catálogo; esta clase se mantiene
+ * para no tocar a los ~20 consumidores históricos del paquete application.
+ */
 final class TextNormalizer {
+
+	private static final LanguageNormalizer NORMALIZER = LanguageNormalizer.shared();
 
 	private TextNormalizer() {
 	}
 
 	static String normalize(String value) {
-		if (value == null) {
-			return "";
-		}
-		return Normalizer.normalize(value.toLowerCase(Locale.ROOT), Normalizer.Form.NFD).replaceAll("\\p{M}", "")
-				.replaceAll("[^a-z0-9 ]", " ").replaceAll("\\s+", " ").trim();
+		return NORMALIZER.normalize(value);
 	}
 
 	static boolean contains(String text, String expected) {
-		String normalizedText = normalize(text);
-		String normalizedExpected = normalize(expected);
-		return !normalizedExpected.isBlank() && normalizedText.contains(normalizedExpected);
+		return NORMALIZER.contains(text, expected);
 	}
 }

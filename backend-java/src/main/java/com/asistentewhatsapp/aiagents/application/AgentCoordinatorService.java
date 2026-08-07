@@ -2,6 +2,7 @@ package com.asistentewhatsapp.aiagents.application;
 
 import com.asistentewhatsapp.aiagents.domain.AgentIntent;
 import com.asistentewhatsapp.aiagents.domain.AgentType;
+import com.asistentewhatsapp.aiagents.catalog.MasterConversationCatalog;
 import com.asistentewhatsapp.aiagents.infrastructure.AiAgentJdbcRepository;
 import com.asistentewhatsapp.businessai.api.BusinessAiSettingsResponse;
 import com.asistentewhatsapp.businessai.application.BusinessAiSettingsService;
@@ -28,8 +29,6 @@ public class AgentCoordinatorService {
 			Pattern.CASE_INSENSITIVE);
 	private static final Pattern SERVICE_OPTION_LINE_PATTERN = Pattern.compile("^\\s*([1-3])\\.\\s+(.+)$",
 			Pattern.MULTILINE);
-	private static final Set<String> AFFIRMATIVE_WORDS = Set.of("si", "sí", "ok", "okay", "dale", "claro", "simon",
-			"sep", "yes", "por supuesto", "obvio");
 	private static final Set<String> TRANSIENT_CONTEXT_KEYS = Set.of("trace_id", "intencion", "nombre",
 			"ultimo_mensaje_cliente", "ultima_respuesta_ia", "timestamp_ultimo_turno", "ultimo_dato_solicitado");
 	private static final Set<String> BOOKING_CONTEXT_KEYS = Set.of("servicio_o_producto", "servicio_codigo", "sede",
@@ -507,41 +506,44 @@ public class AgentCoordinatorService {
 		if (message == null || message.isBlank())
 			return false;
 		String n = TextNormalizer.normalize(message);
-		return n.contains("no voy a poder ir") || n.contains("no puedo ir") || n.contains("no voy a ir")
-				|| n.contains("no pude asistir") || n.contains("no poder asistir");
+		return matchesFollowUpGroup(n, "CANCEL_FOLLOW_UP_WORDS");
 	}
 
 	private boolean matchesStatusFollowUp(String message) {
 		if (message == null || message.isBlank())
 			return false;
 		String n = TextNormalizer.normalize(message);
-		return n.contains("ya pague") || n.contains("ya pagué") || n.contains("esta listo") || n.contains("está listo")
-				|| n.contains("todavia sirve") || n.contains("todavía sirve") || n.contains("quiero confirmar")
-				|| n.equals("listo") || n.contains("confirmar mi cita") || n.contains("confirmar mi reserva")
-				|| n.contains("confirmar mi hora");
+		return matchesFollowUpGroup(n, "STATUS_FOLLOW_UP_WORDS");
 	}
 
 	private boolean matchesContinueBooking(String message) {
 		if (message == null || message.isBlank())
 			return false;
 		String n = TextNormalizer.normalize(message);
-		return n.contains("la misma de la otra vez") || n.contains("el tratamiento anterior")
-				|| n.contains("a la misma hora") || n.contains("con ella") || n.contains("con el")
-				|| n.contains("no quiero ese") || n.contains("no quiero esa") || n.contains("quiero otra opcion")
-				|| n.contains("quiero otra opción") || n.contains("la de la otra vez") || n.contains("el anterior")
-				|| n.contains("lo mismo de antes") || n.contains("la misma hora") || n.contains("quiero lo mismo");
+		return matchesFollowUpGroup(n, "CONTINUE_BOOKING_WORDS");
+	}
+
+	private boolean matchesFollowUpGroup(String normalized, String group) {
+		for (String candidate : MasterConversationCatalog.shared().synonymGroup(group)) {
+			boolean exactMatch = !candidate.contains(" ");
+			if (exactMatch ? normalized.equals(candidate) : normalized.contains(candidate)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private boolean isAffirmative(String message) {
 		if (message == null || message.isBlank()) {
 			return false;
 		}
+		Set<String> affirmative = Set.copyOf(MasterConversationCatalog.shared().synonymGroup("AFFIRMATIVE_WORDS"));
 		String normalized = TextNormalizer.normalize(message).trim().toLowerCase(java.util.Locale.ROOT);
-		if (AFFIRMATIVE_WORDS.contains(normalized)) {
+		if (affirmative.contains(normalized)) {
 			return true;
 		}
 		String firstWord = normalized.split("\\s+")[0];
-		return AFFIRMATIVE_WORDS.contains(firstWord);
+		return affirmative.contains(firstWord);
 	}
 
 	private boolean continuesPreviousAvailabilityQuery(IntentDetectionResult current,

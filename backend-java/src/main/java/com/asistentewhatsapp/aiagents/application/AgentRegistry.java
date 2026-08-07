@@ -1,21 +1,54 @@
 package com.asistentewhatsapp.aiagents.application;
 
+import com.asistentewhatsapp.aiagents.catalog.MasterConversationCatalog;
+import com.asistentewhatsapp.aiagents.catalog.MasterConversationCatalog.IntentDefinition;
 import com.asistentewhatsapp.aiagents.domain.AgentIntent;
 import com.asistentewhatsapp.aiagents.domain.AgentType;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AgentRegistry {
 
 	private final Map<AgentType, AgentHandler> handlers = new EnumMap<>(AgentType.class);
+	private final Map<AgentIntent, AgentType> intentToAgent;
 
 	public AgentRegistry(List<AgentHandler> agentHandlers) {
+		this(agentHandlers, MasterConversationCatalog.shared());
+	}
+
+	@Autowired
+	public AgentRegistry(List<AgentHandler> agentHandlers, MasterConversationCatalog masterCatalog) {
 		for (AgentHandler handler : agentHandlers) {
 			handlers.put(handler.type(), handler);
 		}
+		this.intentToAgent = buildIntentToAgent(masterCatalog);
+	}
+
+	private Map<AgentIntent, AgentType> buildIntentToAgent(MasterConversationCatalog masterCatalog) {
+		Map<AgentIntent, AgentType> mapping = new EnumMap<>(AgentIntent.class);
+		for (IntentDefinition definition : masterCatalog.intents()) {
+			if (definition.agent() == null) {
+				continue;
+			}
+			AgentType type;
+			try {
+				type = AgentType.valueOf(definition.agent());
+			} catch (IllegalArgumentException exception) {
+				continue;
+			}
+			AgentIntent intent;
+			try {
+				intent = AgentIntent.valueOf(definition.code());
+			} catch (IllegalArgumentException exception) {
+				continue;
+			}
+			mapping.put(intent, type);
+		}
+		return mapping;
 	}
 
 	public AgentHandler resolve(IntentDetectionResult intent) {
@@ -31,21 +64,8 @@ public class AgentRegistry {
 		if (intent.requiresHuman()) {
 			return AgentType.HUMAN_HANDOFF;
 		}
-
 		AgentIntent primaryIntent = intent.primaryIntent();
-		return switch (primaryIntent) {
-			case GREETING, THANKS_OR_FAREWELL, AMBIGUOUS -> AgentType.RECEPTION;
-			case COMMERCIAL_INQUIRY, SERVICE_INFORMATION, SERVICE_RECOMMENDATION, PRICE_REQUEST, QUOTE_REQUEST ->
-				AgentType.SALES;
-			case COMMERCIAL_AND_BOOKING -> AgentType.BOOKING;
-			case AVAILABILITY_QUERY, PROFESSIONAL_QUERY, BOOKING_REQUEST, BOOKING_CHANGE, BOOKING_CANCEL,
-					BOOKING_STATUS, WAITLIST_QUERY ->
-				AgentType.BOOKING;
-			case PAYMENT_INQUIRY, PAYMENT_PROBLEM -> AgentType.PAYMENTS;
-			case LOCATION_QUERY, BUSINESS_HOURS_QUERY, SUPPORT_GENERAL, TECHNICAL_MESSAGE -> AgentType.SUPPORT;
-			case KNOWLEDGE_QUERY -> AgentType.KNOWLEDGE;
-			case FOLLOW_UP -> AgentType.FOLLOW_UP;
-			case COMPLAINT, HUMAN_REQUEST -> AgentType.HUMAN_HANDOFF;
-		};
+		AgentType mapped = intentToAgent.get(primaryIntent);
+		return mapped == null ? AgentType.RECEPTION : mapped;
 	}
 }

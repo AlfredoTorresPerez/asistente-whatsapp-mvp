@@ -10,6 +10,7 @@ import com.asistentewhatsapp.agenda.api.AgendaSlotResponse;
 import com.asistentewhatsapp.agenda.api.CreateTemporaryAgendaBookingRequest;
 import com.asistentewhatsapp.agenda.application.CompleteDigitalAgendaService;
 import com.asistentewhatsapp.agenda.infrastructure.CompleteAgendaJdbcRepository;
+import com.asistentewhatsapp.aiagents.catalog.MasterConversationCatalog;
 import com.asistentewhatsapp.bookings.api.BookingConfirmationLinkResponse;
 import com.asistentewhatsapp.bookings.api.BookingDetailResponse;
 import com.asistentewhatsapp.bookings.api.CreateBookingConfirmationLinkRequest;
@@ -25,6 +26,7 @@ import com.asistentewhatsapp.security.domain.AuthenticatedUser;
 import com.asistentewhatsapp.shared.api.PagedResponse;
 import com.asistentewhatsapp.shared.exception.ApiException;
 import java.text.Normalizer;
+import java.time.DateTimeException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -39,6 +41,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -64,6 +67,12 @@ public class TransactionalAgendaBookingService {
 			.compile("\\b(\\d{1,2})[/-](\\d{1,2})(?:[/-](\\d{2,4}))?\\b");
 	private static final Pattern MONTH_NAME_DATE_PATTERN = Pattern.compile(
 			"\\b(\\d{1,2})(?:\\s+de)?\\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)(?:\\s+de\\s+(\\d{2,4}))?\\b",
+			Pattern.CASE_INSENSITIVE);
+	private static final Pattern RELATIVE_DAY_COUNT_PATTERN = Pattern.compile(
+			"\\b(?:en|dentro de)\\s+(?:solo\\s+)?(un|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|\\d{1,2})\\s+d[ií]as?\\b",
+			Pattern.CASE_INSENSITIVE);
+	private static final Pattern RELATIVE_WEEK_COUNT_PATTERN = Pattern.compile(
+			"\\b(?:en|dentro de)\\s+(?:solo\\s+)?(una|un|dos|tres|cuatro|[1-4])\\s+semanas?\\b",
 			Pattern.CASE_INSENSITIVE);
 	private static final Pattern TIME_PATTERN = Pattern.compile(
 			"\\b(?:a\\s+las\\s+)?([01]?\\d|2[0-3])(?:(?::|\\.)([0-5]\\d)|\\s*(?:h|hrs?|horas?))?\\b",
@@ -148,6 +157,14 @@ public class TransactionalAgendaBookingService {
 	public Optional<String> checkAvailability(UUID businessId, String message, String serviceText, String locationText,
 			String dateText, String timeText, String timeRange, String bookingUrl, String traceId,
 			UUID traceConversationId) {
+		return checkAvailability(businessId, message, serviceText, locationText, dateText, timeText, timeRange, null,
+				bookingUrl, traceId, traceConversationId);
+	}
+
+	@Transactional(propagation = Propagation.NOT_SUPPORTED)
+	public Optional<String> checkAvailability(UUID businessId, String message, String serviceText, String locationText,
+			String dateText, String timeText, String timeRange, UUID professionalId, String bookingUrl, String traceId,
+			UUID traceConversationId) {
 		Optional<AestheticServiceResponse> service = resolveService(businessId, firstNonBlank(serviceText, message));
 		Optional<BusinessLocationRecord> location = resolveLocation(businessId, firstNonBlank(locationText, message));
 		Optional<LocalDate> date = resolveDate(dateText);
@@ -155,7 +172,8 @@ public class TransactionalAgendaBookingService {
 		AiTraceLogger.info("CONVERSATIONAL_AVAILABILITY_INPUT", traceId, traceConversationId, null,
 				"TransactionalAgendaBookingService",
 				"hasService=" + service.isPresent() + " hasLocation=" + location.isPresent() + " hasDate="
-						+ date.isPresent() + " hasExactTime=" + time.isPresent() + " timeRange=" + safe(timeRange));
+						+ date.isPresent() + " hasExactTime=" + time.isPresent() + " timeRange=" + safe(timeRange)
+						+ " professionalId=" + (professionalId == null ? "null" : professionalId));
 		if (service.isEmpty() || location.isEmpty() || date.isEmpty()) {
 			return Optional.empty();
 		}
@@ -163,8 +181,8 @@ public class TransactionalAgendaBookingService {
 		try {
 			AuthenticatedUser systemUser = systemUser(businessId, location.get());
 			AgendaAvailabilityResponse availability = completeDigitalAgendaService.availability(systemUser,
-					new AgendaAvailabilityRequest(location.get().id(), service.get().id(), null, null, date.get(), null,
-							40));
+					new AgendaAvailabilityRequest(location.get().id(), service.get().id(), professionalId, null,
+							date.get(), null, 40));
 			List<AgendaSlotResponse> available = availability.slots().stream().filter(AgendaSlotResponse::available)
 					.filter(slot -> matchesTimeRange(slot.startsAt().toLocalTime(), timeRange)).toList();
 			AiTraceLogger.info("CONVERSATIONAL_AVAILABILITY_RESULT", traceId, traceConversationId, null,
@@ -1095,9 +1113,11 @@ public class TransactionalAgendaBookingService {
 
 	private boolean isAffirmative(String normalizedMessage) {
 		String value = normalizedMessage == null ? "" : normalizedMessage.trim();
-		return value.equals("si") || value.equals("sí") || value.equals("ok") || value.equals("dale")
-				|| value.equals("correcto") || value.equals("confirmo") || value.contains("confirmo")
-				|| value.contains("si confirmo") || value.contains("si por favor");
+		Set<String> affirmative = Set.copyOf(MasterConversationCatalog.shared().synonymGroup("AFFIRMATIVE_WORDS"));
+		if (affirmative.contains(value)) {
+			return true;
+		}
+		return value.contains("confirmo") || value.contains("si por favor");
 	}
 
 	private boolean isNegative(String normalizedMessage) {
@@ -1413,52 +1433,51 @@ public class TransactionalAgendaBookingService {
 	}
 
 	private Optional<LocalDate> resolveDate(String rawDate, ZoneId zone) {
+		return resolveDateAt(rawDate, zone, null);
+	}
+
+	static Optional<LocalDate> resolveDateAt(String rawDate, ZoneId zone, LocalDate baseDate) {
+		ZoneId effectiveZone = zone == null ? DEFAULT_BUSINESS_ZONE : zone;
 		String normalized = normalize(rawDate);
-		LocalDate today = LocalDate.now(zone == null ? DEFAULT_BUSINESS_ZONE : zone);
 		if (normalized.isBlank()) {
 			return Optional.empty();
 		}
+		LocalDate today = baseDate == null ? LocalDate.now(effectiveZone) : baseDate;
 		if (containsWholeToken(normalized, "antes") && containsWholeToken(normalized, "posible")
 				|| containsWholeToken(normalized, "cuanto") && containsWholeToken(normalized, "antes")
 				|| normalized.contains("lo antes posible") || normalized.contains("cuanto antes")
 				|| normalized.contains("apenas puedas") || normalized.contains("ni bien puedas")) {
 			return Optional.of(today);
 		}
-		Matcher iso = ISO_DATE_PATTERN.matcher(normalized);
-		if (iso.find()) {
-			int year = Integer.parseInt(iso.group(1));
-			int month = Integer.parseInt(iso.group(2));
-			int day = Integer.parseInt(iso.group(3));
-			return Optional.of(LocalDate.of(year, month, day));
+		Optional<LocalDate> absolute = resolveAbsoluteDate(normalized, effectiveZone, today);
+		if (absolute.isPresent()) {
+			return absolute;
 		}
-		Matcher explicit = EXPLICIT_DATE_PATTERN.matcher(normalized);
-		if (explicit.find()) {
-			int day = Integer.parseInt(explicit.group(1));
-			int month = Integer.parseInt(explicit.group(2));
-			int year = explicit.group(3) == null ? today.getYear() : Integer.parseInt(explicit.group(3));
-			if (year < 100) {
-				year += 2000;
-			}
-			return Optional.of(LocalDate.of(year, month, day));
+		if (normalized.contains("fin de semana")) {
+			return Optional.empty();
 		}
-		Matcher monthName = MONTH_NAME_DATE_PATTERN.matcher(normalized);
-		if (monthName.find()) {
-			int day = Integer.parseInt(monthName.group(1));
-			int month = monthNumber(monthName.group(2));
-			int year = monthName.group(3) == null ? today.getYear() : Integer.parseInt(monthName.group(3));
-			if (year < 100) {
-				year += 2000;
-			}
-			return Optional.of(LocalDate.of(year, month, day));
+		if (containsWholeToken(normalized, "esta") && containsWholeToken(normalized, "semana")) {
+			return Optional.empty();
 		}
-		if (containsWholeToken(normalized, "hoy")) {
-			return Optional.of(today);
+		if (containsWholeToken(normalized, "proxima") && containsWholeToken(normalized, "semana")) {
+			return Optional.empty();
+		}
+		Optional<LocalDate> offset = resolveRelativeOffset(normalized, today);
+		if (offset.isPresent()) {
+			return offset;
 		}
 		if (normalized.contains("pasado manana")) {
 			return Optional.of(today.plusDays(2));
 		}
+		if (containsWholeToken(normalized, "hoy")) {
+			return Optional.of(today);
+		}
 		if (containsWholeToken(normalized, "manana")) {
 			return Optional.of(today.plusDays(1));
+		}
+		Optional<LocalDate> weekendWeekday = resolveEsteProximoWeekday(normalized, today);
+		if (weekendWeekday.isPresent()) {
+			return weekendWeekday;
 		}
 		Optional<DayOfWeek> dayOfWeek = resolveDayOfWeek(normalized);
 		if (dayOfWeek.isPresent()) {
@@ -1468,7 +1487,99 @@ public class TransactionalAgendaBookingService {
 		return Optional.empty();
 	}
 
-	private int monthNumber(String value) {
+	private static Optional<LocalDate> resolveAbsoluteDate(String normalized, ZoneId zone, LocalDate today) {
+		try {
+			Matcher iso = ISO_DATE_PATTERN.matcher(normalized);
+			if (iso.find()) {
+				int year = Integer.parseInt(iso.group(1));
+				int month = Integer.parseInt(iso.group(2));
+				int day = Integer.parseInt(iso.group(3));
+				return Optional.of(LocalDate.of(year, month, day));
+			}
+			Matcher explicit = EXPLICIT_DATE_PATTERN.matcher(normalized);
+			if (explicit.find()) {
+				int day = Integer.parseInt(explicit.group(1));
+				int month = Integer.parseInt(explicit.group(2));
+				int year = explicit.group(3) == null ? today.getYear() : Integer.parseInt(explicit.group(3));
+				if (year < 100) {
+					year += 2000;
+				}
+				return Optional.of(LocalDate.of(year, month, day));
+			}
+			Matcher monthName = MONTH_NAME_DATE_PATTERN.matcher(normalized);
+			if (monthName.find()) {
+				int day = Integer.parseInt(monthName.group(1));
+				int month = monthNumber(monthName.group(2));
+				int year = monthName.group(3) == null ? today.getYear() : Integer.parseInt(monthName.group(3));
+				if (year < 100) {
+					year += 2000;
+				}
+				return Optional.of(LocalDate.of(year, month, day));
+			}
+			return Optional.empty();
+		} catch (DateTimeException e) {
+			return Optional.empty();
+		}
+	}
+
+	private static Optional<LocalDate> resolveRelativeOffset(String normalized, LocalDate today) {
+		Matcher dayCount = RELATIVE_DAY_COUNT_PATTERN.matcher(normalized);
+		if (dayCount.find()) {
+			return Optional.of(today.plusDays(relativeCount(dayCount.group(1))));
+		}
+		Matcher weekCount = RELATIVE_WEEK_COUNT_PATTERN.matcher(normalized);
+		if (weekCount.find()) {
+			return Optional.of(today.plusWeeks(relativeCount(weekCount.group(1))));
+		}
+		return Optional.empty();
+	}
+
+	private static long relativeCount(String value) {
+		return switch (normalize(value)) {
+			case "un", "una", "uno" -> 1;
+			case "dos" -> 2;
+			case "tres", "3" -> 3;
+			case "cuatro", "4" -> 4;
+			case "cinco" -> 5;
+			case "seis" -> 6;
+			case "siete" -> 7;
+			case "ocho" -> 8;
+			case "nueve" -> 9;
+			case "diez", "10" -> 10;
+			default -> {
+				try {
+					yield Long.parseLong(value.trim());
+				} catch (NumberFormatException e) {
+					yield 1;
+				}
+			}
+		};
+	}
+
+	private static Optional<LocalDate> resolveEsteProximoWeekday(String normalized, LocalDate today) {
+		Optional<DayOfWeek> dayOfWeek = resolveDayOfWeek(normalized);
+		if (dayOfWeek.isEmpty()) {
+			return Optional.empty();
+		}
+		boolean proximo = containsWholeToken(normalized, "proximo") || containsWholeToken(normalized, "proxima")
+				|| containsWholeToken(normalized, "siguiente");
+		boolean este = containsWholeToken(normalized, "este") || containsWholeToken(normalized, "esta");
+		if (!proximo && !este) {
+			return Optional.empty();
+		}
+		DayOfWeek day = dayOfWeek.get();
+		LocalDate mondayThisWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+		LocalDate thisWeekDay = mondayThisWeek.plusDays((day.getValue() - DayOfWeek.MONDAY.getValue() + 7) % 7);
+		if (proximo) {
+			return Optional.of(thisWeekDay.plusWeeks(1));
+		}
+		if (thisWeekDay.isBefore(today)) {
+			return Optional.of(thisWeekDay.plusWeeks(1));
+		}
+		return Optional.of(thisWeekDay);
+	}
+
+	private static int monthNumber(String value) {
 		return switch (normalize(value)) {
 			case "enero" -> 1;
 			case "febrero" -> 2;
@@ -1486,7 +1597,7 @@ public class TransactionalAgendaBookingService {
 		};
 	}
 
-	private Optional<DayOfWeek> resolveDayOfWeek(String normalized) {
+	private static Optional<DayOfWeek> resolveDayOfWeek(String normalized) {
 		if (containsWholeToken(normalized, "lunes"))
 			return Optional.of(DayOfWeek.MONDAY);
 		if (containsWholeToken(normalized, "martes"))
@@ -1663,7 +1774,7 @@ public class TransactionalAgendaBookingService {
 		return value == null ? "" : value.replaceAll("\\D", "").trim();
 	}
 
-	private boolean containsWholeToken(String normalizedText, String token) {
+	private static boolean containsWholeToken(String normalizedText, String token) {
 		if (normalizedText == null || normalizedText.isBlank() || token == null || token.isBlank()) {
 			return false;
 		}
@@ -1675,7 +1786,7 @@ public class TransactionalAgendaBookingService {
 		return false;
 	}
 
-	private String normalize(String value) {
+	private static String normalize(String value) {
 		if (value == null) {
 			return "";
 		}
